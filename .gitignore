@@ -1,3 +1,9 @@
 .launches/
 .settings/
 Debug/
+settings/
+am335x/
+*.ewt
+*.dep
+*.html
+.metadata/
