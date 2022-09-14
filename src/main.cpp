@@ -55,7 +55,7 @@ int main()
     xBinarySemaphore = xSemaphoreCreateBinary();
     xSemaphoreGive(xBinarySemaphore);
 
-    int ret = xTaskCreate(vTask1, "Task 1", 1000, NULL, 1, NULL);
+    int ret = xTaskCreate(vTask1, "Task 1", 1000, NULL, 1, (TaskHandle_t *)NULL);
     if (ret == pdPASS) 
     {
         ConsoleUtilsPrintf("Task %x succesfully created.\r\n", vTask1);
@@ -65,7 +65,7 @@ int main()
         ConsoleUtilsPrintf("Task not created: %d", ret);
     }
     
-    ret =  xTaskCreate(vTask2, "Task 2", 1000, NULL, 2, NULL);
+    ret =  xTaskCreate(vTask2, "Task 2", 1000, NULL, 2, (TaskHandle_t *)NULL);
     if (ret == pdPASS) 
     {
         ConsoleUtilsPrintf("Task %x succesfully created.\r\n", vTask2);

@@ -357,6 +357,7 @@
                     <state>$PROJ_DIR$\lib\include\armv7a\am335x</state>
                     <state>$PROJ_DIR$\vendor\freertos\include</state>
                     <state>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8</state>
+                    <state>$PROJ_DIR$\lib\include\usblib</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -782,7 +783,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>E:\5.Git\proj\repliclay_sw.icf</state>
+                    <state>$PROJ_DIR$\repliclay_sw.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -830,10 +831,10 @@
                 </option>
                 <option>
                     <name>IlinkAdditionalLibs</name>
-                    <state>$PROJ_DIR$\lib\drivers.lib</state>
-                    <state>$PROJ_DIR$\lib\platform.lib</state>
-                    <state>$PROJ_DIR$\lib\system.lib</state>
-                    <state>$PROJ_DIR$\lib\utils.lib</state>
+                    <state>$PROJ_DIR$\lib\libdrivers.a</state>
+                    <state>$PROJ_DIR$\lib\libplatform.a</state>
+                    <state>$PROJ_DIR$\lib\libsystem_config.a</state>
+                    <state>$PROJ_DIR$\lib\libutils.a</state>
                 </option>
                 <option>
                     <name>IlinkOverrideProgramEntryLabel</name>

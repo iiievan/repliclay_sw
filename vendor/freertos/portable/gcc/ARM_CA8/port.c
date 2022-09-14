@@ -79,6 +79,8 @@
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
+#include "am335.h"
+#include "hw_intc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,6 +88,27 @@ extern "C" {
   
 extern volatile int **pxCurrentTCB;
 extern void vSetupTickInterrupt();
+void vTickISR ( void ) __attribute__((naked));
+void vIRQHandler ( void ) __attribute__((naked));
+
+/* Setup the timer to generate the tick interrupts. */
+static void prvSetupTimerInterrupt( void );
+
+/*--------------------------------------------------*/
+/* 
+ * The scheduler can only be started from ARM mode, so 
+ * vPortISRStartFirstSTask() is defined in portISR.c. 
+ */
+extern void vPortISRStartFirstTask( void );
+
+/* ISR to handle manual context switches (from a call to taskYIELD()). */
+void vPortYieldProcessor( void ) __attribute__((interrupt("SWI"), naked));
+
+/* 
+ * The scheduler can only be started from ARM mode, hence the inclusion of this
+ * function here.
+ */
+void vPortISRStartFirstTask( void );
 
 /* Some vendor specific files default configCLEAR_TICK_INTERRUPT() in
 portmacro.h. */
@@ -320,40 +343,14 @@ static void prvTaskExitError( void )
 
 BaseType_t xPortStartScheduler( void )
 {
-uint32_t ulAPSR;
-	/* Only continue if the CPU is not in User mode.  The CPU must be in a
-	Privileged mode for the scheduler to start. */
-	__asm volatile ( "MRS %0, APSR" : "=r" ( ulAPSR ) );
-	ulAPSR &= portAPSR_MODE_BITS_MASK;
-	configASSERT( ulAPSR != portAPSR_USER_MODE );
+	/* Start the timer that generates the tick ISR.  Interrupts are disabled
+	here already. */
+	prvSetupTimerInterrupt();
 
-	if( ulAPSR != portAPSR_USER_MODE )
-	{
-		/* Interrupts are turned off in the CPU itself to ensure tick does
-			not execute	while the scheduler is being started.  Interrupts are
-			automatically turned back on in the CPU when the first task starts
-			executing. */
-		portCPU_IRQ_DISABLE();
+	/* Start the first task. */
+	vPortISRStartFirstTask();	
 
-		/* Start the timer that generates the tick ISR. */
-		configSETUP_TICK_INTERRUPT(); // should start TI DMTIMER
-
-		/* Start the first task executing. */
-        ConsoleUtilsPrintf("Dumping context before restoring context\r\n");
-        unsigned int i;
-        for (i = 0; i < 33; i++) {
-            ConsoleUtilsPrintf("%x : %x\r\n", (*pxCurrentTCB + i),
-                *(*pxCurrentTCB + i));
-        }
-
-		vPortRestoreTaskContext();
-	}
-	/* Will only get here if vTaskStartScheduler() was called with the CPU in
-	a non-privileged mode or the binary point register was not set to its lowest
-	possible value.  prvTaskExitError() is referenced to prevent a compiler
-	warning about it being defined but not referenced in the case that the user
-	defines their own exit address. */
-	( void ) prvTaskExitError;
+	/* Should not get here! */
 	return 0;
 }
 /*-----------------------------------------------------------*/
@@ -363,6 +360,146 @@ void vPortEndScheduler( void )
 	/* Not implemented in ports where there is nothing to return to.
 	Artificially force an assert. */
 	configASSERT( ulCriticalNesting == 1000UL );
+}
+/*-----------------------------------------------------------*/
+
+static void prvSetupTimerInterrupt( void )
+{
+	unsigned long ulCompareMatch;
+	extern void ( vIRQHandler )( void );
+	extern void ( vPortYieldProcessor ) ( void );
+
+	/* Reset Interrupt Controller */
+    /* Performing a software reset to trigger a Memory Protection Unit 
+     * Interrupt Controller module reset */
+	(*(REG32(MPU_INTC + INTC_SYSCONFIG))) = 0x00000002;
+    /* Functional clock auto-idle mode : FuncFree */
+	(*(REG32(MPU_INTC + INTC_IDLE))) = 0x00000001;
+
+	/* Enable Interrupt 37 which is used for GPTIMER 1 and interrupt 74 for UART3*/
+//	(*(REG32(MPU_INTC + INTC_MIR_CLEAR1))) = ~(*(REG32(MPU_INTC + INTC_MIR1)))|0x20;
+//	(*(REG32(MPU_INTC + INTC_MIR_CLEAR2))) = ~(*(REG32(MPU_INTC + INTC_MIR2)))|0x400;
+	
+
+	/* Enable Interrupt 37 which is used for DMTIMER 0 */
+    (*(REG32(MPU_INTC + INTCPS_MIR_CLEAR1))) = ~(*(REG32(MPU_INTC + INTCPS_MIR1)))|0x20;
+	(*(REG32(MPU_INTC + INTCPS_MIR_CLEAR2))) = ~(*(REG32(MPU_INTC + INTCPS_MIR2)))|0x400;
+
+	/* Calculate the match value required for our wanted tick rate */
+	ulCompareMatch = configCPU_CLOCK_HZ / configTICK_RATE_HZ;
+	
+	/* Protect against divide by zero */
+	#if portPRESCALE_VALUE != 0
+		ulCompareMatch /= ( portPRESCALE_VALUE +1 );
+	#endif
+	
+	/* Setup Interrupts */
+	E_SWI = ( long ) vPortYieldProcessor;
+	/* Setup interrupt handler */
+	E_IRQ = ( long ) vIRQHandler;
+
+	
+	/* The timer must be in compare mode, and should be the value
+	 * holded in ulCompareMatch
+	 * bit 0=1 -> enable timer
+	 * bit 1=1 -> autoreload
+	 * bit 6=1 -> compare mode
+	 * The source is 32Khz
+	 * */
+	
+    //(*(REG32(GPTI1 + GPTI_TIOCP_CFG))) = 0x2; // reset interface
+    (*(REG32(DMTIMER0 + DMTIMER_TIOCP_CFG))) = 0x2; // reset interface
+
+	//(*(REG32(GPTI1 + GPTI_TCRR))) = 0; // initialize counter
+    (*(REG32(DMTIMER0 + DMTIMER_TCRR))) = 0; // initialize counter
+
+	//(*(REG32(GPTI1 + GPTI_TMAR))) = ulCompareMatch; // load match value
+	(*(REG32(DMTIMER0 + DMTIMER_TMAR))) = ulCompareMatch; // load match value
+
+	/* Clear pending matching interrupt (if any) */
+	//(*(REG32(GPTI1 + GPTI_TISR))) = 0x1;
+	(*(REG32(DMTIMER0 + GPTI_TISR))) = 0x1;
+
+	/* Enable matching interrupts */
+	(*(REG32(GPTI1 + GPTI_TIER))) = 0x1;
+
+	/* Timer Control Register
+	 * bit 0 -> start
+	 * bit 1 -> autoreload
+	 * bit 6 -> compare enabled
+	 */
+
+	(*(REG32(GPTI1 + GPTI_TCLR))) = 0x43;
+	
+	/* Reset the timer */
+	(*(REG32(GPTI1 + GPTI_TTGR))) = 0xFF;
+
+}
+
+/*-----------------------------------------------------------*/
+
+void vPortISRStartFirstTask( void )
+{
+	/* Simply start the scheduler.  This is included here as it can only be
+	called from ARM mode. */
+	__asm volatile ( "portRESTORE_CONTEXT");
+}
+/*-----------------------------------------------------------*/
+/* Read the incoming interrupt and then jump to the appropriate ISR */
+void vIRQHandler ( void )
+{
+  	__asm volatile ( "portSAVE_CONTEXT");
+
+	/* If this is IRQ_38 then jump to vTickISR */
+	if((*(REG32(MPU_INTC + INTCPS_SIR_IRQ))) == 68)
+	{
+		(*(REG32(DMTIMER2 + 0x28))) = 0x01; //Clear pending 
+		(*(REG32(DMTIMER2 + 0x44))) = 0xFF;	
+		(*(REG32(MPU_INTC + 0x48))) = 0x01; //NEWIRQ
+		__asm volatile ("bl vTickISR");
+	}
+	/* If this is IRQ_38 then jump to vTickISR */
+	else //if((*(REG32(MPU_INTC + INTCPS_SIR_IRQ))) == 45)
+	{
+		if ((*(REG32(GPIO0_BASE + 0x2C)))&PIN2)	{
+			channel1_flag = TRUE;
+		}	
+		if ((*(REG32(GPIO0_BASE + 0x2C)))&PIN14)	{
+			channel2_flag = TRUE;
+		}	
+		if ((*(REG32(GPIO0_BASE + 0x2C)))&PIN15)	{
+			channel3_flag = TRUE;
+		}	
+		
+		(*(REG32(GPIO0_BASE+0x2C))) |= (PIN2 | PIN14 | PIN15);  //IRQ Status  Clear interrupts
+		(*(REG32(MPU_INTC + 0x48))) = 0x01; //NEWIRQ
+	}
+
+	__asm volatile ( "portRESTORE_CONTEXT");
+
+}
+
+/*-----------------------------------------------------------*/
+/* 
+ * The ISR used for the scheduler tick.
+ */
+void vTickISR( void )
+{
+
+	/* Save LR. Make sure we will be able to go back to the IRQ handler */
+	__asm volatile("push {lr}	\n\t");
+	
+    /* Increment the RTOS tick count, then look for the highest priority 
+	task that is ready to run. */
+	__asm volatile("bl vTaskIncrementTick");
+
+	#if configUSE_PREEMPTION == 1
+		__asm volatile("bl vTaskSwitchContext");
+	#endif
+
+
+ 	__asm volatile("pop {lr}	\n\t");
+
 }
 /*-----------------------------------------------------------*/
 
