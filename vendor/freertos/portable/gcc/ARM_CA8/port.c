@@ -69,8 +69,6 @@
 
 /* Standard includes. */
 #include <stdlib.h>
-/* IAR includes. */
-#include <intrinsics.h>
 #include <string.h>
 
 #include "interrupt.h"
@@ -79,36 +77,12 @@
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
-#include "am335.h"
-#include "hw_intc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
   
 extern volatile int **pxCurrentTCB;
-extern void vSetupTickInterrupt();
-void vTickISR ( void ) __attribute__((naked));
-void vIRQHandler ( void ) __attribute__((naked));
-
-/* Setup the timer to generate the tick interrupts. */
-static void prvSetupTimerInterrupt( void );
-
-/*--------------------------------------------------*/
-/* 
- * The scheduler can only be started from ARM mode, so 
- * vPortISRStartFirstSTask() is defined in portISR.c. 
- */
-extern void vPortISRStartFirstTask( void );
-
-/* ISR to handle manual context switches (from a call to taskYIELD()). */
-void vPortYieldProcessor( void ) __attribute__((interrupt("SWI"), naked));
-
-/* 
- * The scheduler can only be started from ARM mode, hence the inclusion of this
- * function here.
- */
-void vPortISRStartFirstTask( void );
 
 /* Some vendor specific files default configCLEAR_TICK_INTERRUPT() in
 portmacro.h. */
@@ -121,9 +95,6 @@ portmacro.h. */
 this value. */
 #define portNO_CRITICAL_NESTING			( ( uint32_t ) 0 )
 
-/* In INTC can be written to the priority mask register to unmask all
-   priorities */
-#define portUNMASK_VALUE				( 0xFFUL )
 
 /* Tasks are not created with a floating point context, but can be given a
 floating point context after they have been created.  A variable is stored as
@@ -162,16 +133,25 @@ the CPU itself before modifying certain hardware registers. */
 	__asm volatile ( "DSB" );										\
 	__asm volatile ( "ISB" );
 
+#if 1
 /* Macro to unmask all interrupt priorities. */
 #define portCLEAR_INTERRUPT_MASK()									\
 {																	\
 	portCPU_IRQ_DISABLE();											\
-	IntPriorityThresholdSet(portUNMASK_VALUE);		\
+	IntPriorityThresholdSet(portUNMASK_VALUE);		                \
 	__asm volatile (	"DSB		\n"								\
 						"ISB		\n" );							\
 	portCPU_IRQ_ENABLE();											\
 }
-
+#else
+/* Macro to unmask all interrupt priorities. */
+#define portCLEAR_INTERRUPT_MASK()									\
+{																	\
+	IntPriorityThresholdSet(portUNMASK_VALUE);		                \
+	__asm volatile (	"DSB		\n"								\
+						"ISB		\n" );							\
+}
+#endif
 #define portINTERRUPT_PRIORITY_REGISTER_OFFSET		0x400UL
 #define portMAX_8_BIT_VALUE							( ( uint8_t ) 0xff )
 #define portBIT_0_SET								( ( uint8_t ) 0x01 )
@@ -189,6 +169,12 @@ debugger. */
 registers, plus a 32-bit status register. */
 #define portFPU_REGISTER_WORDS	( ( 8 * 2 ) + 1 ) // D0-D7 + FPSCR
 
+/*-----------------------------------------------------------*/
+
+/* Used in the asm file. */
+volatile uint32_t ulMaxAPIPriorityMask = ( configMAX_API_CALL_INTERRUPT_PRIORITY );
+
+/*-----------------------------------------------------------*/
 /*-----------------------------------------------------------*/
 
 /*
@@ -209,7 +195,7 @@ variable has to be stored as part of the task context and must be initialised to
 a non zero value to ensure interrupts don't inadvertently become unmasked before
 the scheduler starts.  As it is stored as part of the task context it will
 automatically be set to 0 when the first task is started. */
-volatile uint32_t ulCriticalNesting = 9999UL;
+volatile uint32_t ulCriticalNesting = 0UL;
 
 /* Saved as part of the task context.  If ulPortTaskHasFPUContext is non-zero then
 a floating point context must be saved and restored for the task. */
@@ -283,14 +269,11 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 	*pxTopOfStack = ( StackType_t ) 0x01010101;	/* R1 */
 	pxTopOfStack--;
 	*pxTopOfStack = ( StackType_t ) pvParameters; /* R0 */
-
-    ConsoleUtilsPrintf("Initialising stack of task!\r\n");
-
-
+	pxTopOfStack--;
 
 	/* The task will start with a critical nesting count of 0 as interrupts are
 	enabled. */
-	// *pxTopOfStack = portNO_CRITICAL_NESTING; // removed for now
+	*pxTopOfStack = portNO_CRITICAL_NESTING;
 
 	#if( configUSE_TASK_FPU_SUPPORT == 1 )
 	{
@@ -307,9 +290,9 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 		pxTopOfStack -= portFPU_REGISTER_WORDS;
 		memset( pxTopOfStack, 0x00, portFPU_REGISTER_WORDS * sizeof( StackType_t ) );
 
-		//pxTopOfStack--;
-		//*pxTopOfStack = pdTRUE; removde for now
-		//ulPortTaskHasFPUContext = pdTRUE; remo
+		pxTopOfStack--;
+		*pxTopOfStack = pdTRUE;
+		ulPortTaskHasFPUContext = pdTRUE;
 	}
 	#else
 	{
@@ -317,12 +300,7 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
         configUSE_TASK_FPU_SUPPORT must be set to 1, 2, or left undefined.
 	}
 	#endif
-
-    unsigned int i;
-    for (i = 0; i < 33; i++) {
-        ConsoleUtilsPrintf("%x : %x\r\n", pxTopOfStack + i, *(pxTopOfStack + i));
-    }
-
+	
 	return pxTopOfStack;
 }
 /*-----------------------------------------------------------*/
@@ -343,14 +321,33 @@ static void prvTaskExitError( void )
 
 BaseType_t xPortStartScheduler( void )
 {
-	/* Start the timer that generates the tick ISR.  Interrupts are disabled
-	here already. */
-	prvSetupTimerInterrupt();
+uint32_t ulAPSR;
+	/* Only continue if the CPU is not in User mode.  The CPU must be in a
+	Privileged mode for the scheduler to start. */
+	__asm volatile ( "MRS %0, APSR" : "=r" ( ulAPSR ) );
+	ulAPSR &= portAPSR_MODE_BITS_MASK;
+	configASSERT( ulAPSR != portAPSR_USER_MODE );
 
-	/* Start the first task. */
-	vPortISRStartFirstTask();	
+	if( ulAPSR != portAPSR_USER_MODE )
+	{
+		/* Interrupts are turned off in the CPU itself to ensure tick does
+			not execute	while the scheduler is being started.  Interrupts are
+			automatically turned back on in the CPU when the first task starts
+			executing. */
+		portCPU_IRQ_DISABLE();
 
-	/* Should not get here! */
+		/* Start the timer that generates the tick ISR. */
+		configSETUP_TICK_INTERRUPT(); // should start TI DMTIMER
+
+		/* Start the first task executing. */
+		vPortRestoreTaskContext();
+	}
+	/* Will only get here if vTaskStartScheduler() was called with the CPU in
+	a non-privileged mode or the binary point register was not set to its lowest
+	possible value.  prvTaskExitError() is referenced to prevent a compiler
+	warning about it being defined but not referenced in the case that the user
+	defines their own exit address. */
+	( void ) prvTaskExitError;
 	return 0;
 }
 /*-----------------------------------------------------------*/
@@ -363,170 +360,36 @@ void vPortEndScheduler( void )
 }
 /*-----------------------------------------------------------*/
 
-static void prvSetupTimerInterrupt( void )
-{
-	unsigned long ulCompareMatch;
-	extern void ( vIRQHandler )( void );
-	extern void ( vPortYieldProcessor ) ( void );
-
-	/* Reset Interrupt Controller */
-    /* Performing a software reset to trigger a Memory Protection Unit 
-     * Interrupt Controller module reset */
-	(*(REG32(MPU_INTC + INTC_SYSCONFIG))) = 0x00000002;
-    /* Functional clock auto-idle mode : FuncFree */
-	(*(REG32(MPU_INTC + INTC_IDLE))) = 0x00000001;
-
-	/* Enable Interrupt 37 which is used for GPTIMER 1 and interrupt 74 for UART3*/
-//	(*(REG32(MPU_INTC + INTC_MIR_CLEAR1))) = ~(*(REG32(MPU_INTC + INTC_MIR1)))|0x20;
-//	(*(REG32(MPU_INTC + INTC_MIR_CLEAR2))) = ~(*(REG32(MPU_INTC + INTC_MIR2)))|0x400;
-	
-
-	/* Enable Interrupt 37 which is used for DMTIMER 0 */
-    (*(REG32(MPU_INTC + INTCPS_MIR_CLEAR1))) = ~(*(REG32(MPU_INTC + INTCPS_MIR1)))|0x20;
-	(*(REG32(MPU_INTC + INTCPS_MIR_CLEAR2))) = ~(*(REG32(MPU_INTC + INTCPS_MIR2)))|0x400;
-
-	/* Calculate the match value required for our wanted tick rate */
-	ulCompareMatch = configCPU_CLOCK_HZ / configTICK_RATE_HZ;
-	
-	/* Protect against divide by zero */
-	#if portPRESCALE_VALUE != 0
-		ulCompareMatch /= ( portPRESCALE_VALUE +1 );
-	#endif
-	
-	/* Setup Interrupts */
-	E_SWI = ( long ) vPortYieldProcessor;
-	/* Setup interrupt handler */
-	E_IRQ = ( long ) vIRQHandler;
-
-	
-	/* The timer must be in compare mode, and should be the value
-	 * holded in ulCompareMatch
-	 * bit 0=1 -> enable timer
-	 * bit 1=1 -> autoreload
-	 * bit 6=1 -> compare mode
-	 * The source is 32Khz
-	 * */
-	
-    //(*(REG32(GPTI1 + GPTI_TIOCP_CFG))) = 0x2; // reset interface
-    (*(REG32(DMTIMER0 + DMTIMER_TIOCP_CFG))) = 0x2; // reset interface
-
-	//(*(REG32(GPTI1 + GPTI_TCRR))) = 0; // initialize counter
-    (*(REG32(DMTIMER0 + DMTIMER_TCRR))) = 0; // initialize counter
-
-	//(*(REG32(GPTI1 + GPTI_TMAR))) = ulCompareMatch; // load match value
-	(*(REG32(DMTIMER0 + DMTIMER_TMAR))) = ulCompareMatch; // load match value
-
-	/* Clear pending matching interrupt (if any) */
-	//(*(REG32(GPTI1 + GPTI_TISR))) = 0x1;
-	(*(REG32(DMTIMER0 + GPTI_TISR))) = 0x1;
-
-	/* Enable matching interrupts */
-	(*(REG32(GPTI1 + GPTI_TIER))) = 0x1;
-
-	/* Timer Control Register
-	 * bit 0 -> start
-	 * bit 1 -> autoreload
-	 * bit 6 -> compare enabled
-	 */
-
-	(*(REG32(GPTI1 + GPTI_TCLR))) = 0x43;
-	
-	/* Reset the timer */
-	(*(REG32(GPTI1 + GPTI_TTGR))) = 0xFF;
-
-}
-
-/*-----------------------------------------------------------*/
-
-void vPortISRStartFirstTask( void )
-{
-	/* Simply start the scheduler.  This is included here as it can only be
-	called from ARM mode. */
-	__asm volatile ( "portRESTORE_CONTEXT");
-}
-/*-----------------------------------------------------------*/
-/* Read the incoming interrupt and then jump to the appropriate ISR */
-void vIRQHandler ( void )
-{
-  	__asm volatile ( "portSAVE_CONTEXT");
-
-	/* If this is IRQ_38 then jump to vTickISR */
-	if((*(REG32(MPU_INTC + INTCPS_SIR_IRQ))) == 68)
-	{
-		(*(REG32(DMTIMER2 + 0x28))) = 0x01; //Clear pending 
-		(*(REG32(DMTIMER2 + 0x44))) = 0xFF;	
-		(*(REG32(MPU_INTC + 0x48))) = 0x01; //NEWIRQ
-		__asm volatile ("bl vTickISR");
-	}
-	/* If this is IRQ_38 then jump to vTickISR */
-	else //if((*(REG32(MPU_INTC + INTCPS_SIR_IRQ))) == 45)
-	{
-		if ((*(REG32(GPIO0_BASE + 0x2C)))&PIN2)	{
-			channel1_flag = TRUE;
-		}	
-		if ((*(REG32(GPIO0_BASE + 0x2C)))&PIN14)	{
-			channel2_flag = TRUE;
-		}	
-		if ((*(REG32(GPIO0_BASE + 0x2C)))&PIN15)	{
-			channel3_flag = TRUE;
-		}	
-		
-		(*(REG32(GPIO0_BASE+0x2C))) |= (PIN2 | PIN14 | PIN15);  //IRQ Status  Clear interrupts
-		(*(REG32(MPU_INTC + 0x48))) = 0x01; //NEWIRQ
-	}
-
-	__asm volatile ( "portRESTORE_CONTEXT");
-
-}
-
-/*-----------------------------------------------------------*/
-/* 
- * The ISR used for the scheduler tick.
- */
-void vTickISR( void )
-{
-
-	/* Save LR. Make sure we will be able to go back to the IRQ handler */
-	__asm volatile("push {lr}	\n\t");
-	
-    /* Increment the RTOS tick count, then look for the highest priority 
-	task that is ready to run. */
-	__asm volatile("bl vTaskIncrementTick");
-
-	#if configUSE_PREEMPTION == 1
-		__asm volatile("bl vTaskSwitchContext");
-	#endif
-
-
- 	__asm volatile("pop {lr}	\n\t");
-
-}
-/*-----------------------------------------------------------*/
-
 void vPortEnterCritical( void )
 {
-	/* Mask interrupts up to the max syscall interrupt priority. */
-	ulPortSetInterruptMask();
-
-	/* Now interrupts are disabled ulCriticalNesting can be accessed
-	directly.  Increment ulCriticalNesting to keep a count of how many times
-	portENTER_CRITICAL() has been called. */
-	ulCriticalNesting++;
-
-	/* This is not the interrupt safe version of the enter critical function so
-	assert() if it is being called from an interrupt context.  Only API
-	functions that end in "FromISR" can be used in an interrupt.  Only assert if
-	the critical nesting count is 1 to protect against recursive calls if the
-	assert function also uses a critical section. */
-	if( ulCriticalNesting == 1 )
+	//extern portBASE_TYPE xInsideISR;
+	
 	{
-		configASSERT( ulPortInterruptNesting == 0 );
+		/* Mask interrupts up to the max syscall interrupt priority. */
+		ulPortSetInterruptMask();
+		/* 	Now interrupts are disabled ulCriticalNesting can be accessed
+				directly.  Increment ulCriticalNesting to keep a count of how many times
+				portENTER_CRITICAL() has been called. */
+		
+		ulCriticalNesting++;
+		/* This is not the interrupt safe version of the enter critical function so
+		assert() if it is being called from an interrupt context.  Only API
+		functions that end in "FromISR" can be used in an interrupt.  Only assert if
+		the critical nesting count is 1 to protect against recursive calls if the
+		assert function also uses a critical section. */
+		if( ulCriticalNesting >= 1 )
+		{
+			while(ulPortInterruptNesting);
+			configASSERT( ulPortInterruptNesting == 0 );
+		}
 	}
 }
 /*-----------------------------------------------------------*/
 
 void vPortExitCritical( void )
 {
+	//extern portBASE_TYPE xInsideISR;
+	
 	if( ulCriticalNesting > portNO_CRITICAL_NESTING )
 	{
 		/* Decrement the nesting count as the critical section is being
@@ -541,6 +404,16 @@ void vPortExitCritical( void )
 			should be unmasked. */
 			portCLEAR_INTERRUPT_MASK();
 		}
+	}
+}
+/*-----------------------------------------------------------*/
+
+void FreeRTOS_Tick_Handler( void )
+{
+	/* Increment the RTOS tick. */
+	if( xTaskIncrementTick() != pdFALSE )
+	{
+		ulPortYieldRequired = pdTRUE;
 	}
 }
 
@@ -565,7 +438,7 @@ void vPortExitCritical( void )
 
 void vPortClearInterruptMask( uint32_t ulNewMaskValue )
 {
-	if( ulNewMaskValue == pdFALSE )
+	if((ulNewMaskValue == pdFALSE) && (ulPortInterruptNesting == 0))
 	{
 		portCLEAR_INTERRUPT_MASK();
 	}
@@ -574,11 +447,11 @@ void vPortClearInterruptMask( uint32_t ulNewMaskValue )
 
 uint32_t ulPortSetInterruptMask( void )
 {
-uint32_t ulReturn;
-
-	portCPU_IRQ_DISABLE();
-	if(IntPriorityThresholdGet()
-        == (uint32_t) (configMAX_API_CALL_INTERRUPT_PRIORITY))
+	uint32_t ulReturn;
+	if(ulPortInterruptNesting == 0)
+		portCPU_IRQ_DISABLE();
+	uint32_t current_threshold = IntPriorityThresholdGet();
+	if((uint32_t) (configMAX_API_CALL_INTERRUPT_PRIORITY) == current_threshold)
 	{
 		/* Interrupts were already masked. */
 		ulReturn = pdTRUE;
@@ -591,10 +464,8 @@ uint32_t ulReturn;
 		__asm volatile (	"dsb		\n"
 							"isb		\n" );
 	}
-	portCPU_IRQ_ENABLE();
-
-
-
+	if(ulPortInterruptNesting == 0)
+		portCPU_IRQ_ENABLE();
 	return ulReturn;
 }
 /*-----------------------------------------------------------*/

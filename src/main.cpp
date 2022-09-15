@@ -5,6 +5,7 @@
 #include "interrupt.h"
 #include "dmtimer.h"
 #include "error.h"
+#include "hal_bspInit.h"
 
 
 #include "FreeRTOS.h"
@@ -19,10 +20,16 @@ using namespace std;
 extern "C" {
 #endif
   
-void configure_platform(void);
-extern volatile unsigned int cntValue;
+extern void Entry(void);
+
+#define NUM_INTERRUPTS                 (128u)
+void (*fnRAMVectors[NUM_INTERRUPTS])(void);
 
 xSemaphoreHandle xBinarySemaphore;
+void init(void)
+{
+	halBspInit();
+}
 
 void vTask1(void *pvParameters) {
     int i = 0;
@@ -35,7 +42,7 @@ void vTask1(void *pvParameters) {
 }
 
 void vTask2(void *pvParameters) {
-    int i = 0, j;
+    int i = 0;
     while (1) {
         xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
         ConsoleUtilsPrintf("Task 2 message %d!\r\n", i++);
@@ -44,12 +51,43 @@ void vTask2(void *pvParameters) {
     }
 }
 
+void Delay_HMSM(uint32_t Hours, uint32_t Minutes, uint32_t Seconds, uint32_t Millis)
+{
+    /* Block for 500ms. */
+    TickType_t  xTicksToDelay  = 1; /* Lets do a minimum of 1 Tick Period */
+    if(Hours)   xTicksToDelay += Hours   * 3600 * 1000 / portTICK_PERIOD_MS;
+    if(Minutes) xTicksToDelay += Minutes *   60 * 1000 / portTICK_PERIOD_MS;
+    if(Seconds) xTicksToDelay += Seconds * 1000        / portTICK_PERIOD_MS;
+    if(Millis)  xTicksToDelay += Millis                / portTICK_PERIOD_MS;
+    
+    vTaskDelay( xTicksToDelay );
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t pxTask, signed char *pcTaskName)
+{
+	(void) pcTaskName;
+	(void) pxTask;
+
+	/**
+	 * Run time stack overflow checking is performed if
+	 * configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.
+	 * This hook function is called if a stack overflow is
+	 * detected.
+	 */
+	for (;;) 
+    {
+        Delay_HMSM(0,0,1,0);
+        ConsoleUtilsPrintf("\n\r\n\rIn Function:%s.\n\r",__FUNCTION__);
+	}
+	taskDISABLE_INTERRUPTS();
+}
+
 #ifdef __cplusplus
 }
 #endif
 int main() 
 {
-    configure_platform();
+    init();
     ConsoleUtilsPrintf("Platform initialized.\r\n");
 
     xBinarySemaphore = xSemaphoreCreateBinary();

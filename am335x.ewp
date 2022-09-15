@@ -631,6 +631,11 @@
                     <state>$PROJ_DIR$\lib\include</state>
                     <state>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8</state>
                     <state>$PROJ_DIR$\src</state>
+                    <state>$PROJ_DIR$\lib\include</state>
+                    <state>$PROJ_DIR$\lib\include\armv7a</state>
+                    <state>$PROJ_DIR$\lib\include\armv7a\am335x</state>
+                    <state>$PROJ_DIR$\lib\include\hw</state>
+                    <state>$PROJ_DIR$\lib\include\usblib</state>
                 </option>
                 <option>
                     <name>AExtraOptionsCheckV2</name>
@@ -2139,10 +2144,7 @@
                 <name>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8\port.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8\portASM.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8\portASM.S</name>
+                <name>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8\portASM_CA8_am335x.S</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8\portmacro.h</name>
@@ -2167,16 +2169,28 @@
     <group>
         <name>src</name>
         <file>
-            <name>$PROJ_DIR$\src\dmtimerCounter.c</name>
+            <name>$PROJ_DIR$\src\bsp_platform.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\src\FreeRTOSConfig.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\src\main.cpp</name>
+            <name>$PROJ_DIR$\src\hal_bspInit.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\src\platform.c</name>
+            <name>$PROJ_DIR$\src\hal_mmu.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\main.cpp</name>
+        </file>
+    </group>
+    <group>
+        <name>startup</name>
+        <file>
+            <name>$PROJ_DIR$\startup\am335x_startup.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\startup\amm335x_init.S</name>
         </file>
     </group>
     <file>

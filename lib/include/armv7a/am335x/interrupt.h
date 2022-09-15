@@ -215,8 +215,6 @@ extern unsigned int IntRawStatusGet(unsigned int intrNum);
 extern unsigned int IntPendingIrqMaskedStatusGet(unsigned int intrNum);
 extern unsigned int IntPendingFiqMaskedStatusGet(unsigned int intrNum);
 
-#define NUM_INTERRUPTS                 (128u)
-void (*fnRAMVectors[NUM_INTERRUPTS])(void);
 
 #ifdef __cplusplus
 }
