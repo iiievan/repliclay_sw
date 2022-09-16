@@ -37,12 +37,21 @@
 ;
 ;******************************************************************************
 
+        MODULE  startcode
+
+;****************************** Forfard Declaration*********************************
+        SECTION .bss:DATA:NOROOT(8)
+        SECTION CSTACK:DATA:NOROOT(8)
+        
+        SECTION .startcode:CODE:NOROOT(8)
+        ARM
+        
 ;****************************** Global Symbols*********************************
         PUBLIC Entry
         EXTERN  __iar_program_start
-        EXTERN _stack                  
-        EXTERN _bss_start
-        EXTERN _bss_end
+        PUBLIC _stack                  
+        PUBLIC _bss_start
+        PUBLIC _bss_end
         PUBLIC start_boot
         EXTERN CopyVectorTable
 
@@ -71,8 +80,8 @@ MODE_SYS        EQU      0x1F
 I_F_BIT         EQU      0xC0               
 
 ;**************************** Code Seection ***********************************
-        SECTION .text:CODE:ROOT(2)
-        ARM
+        
+
 
 ;******************************************************************************
 ;
@@ -83,6 +92,11 @@ I_F_BIT         EQU      0xC0
 ; IRQ shall be disabled during this. Then clear the BSS sections and finally
 ; switch to the function calling the main() function.
 ;
+
+_bss_start: DC32 SFB(.bss)        
+_bss_end:   DC32 SFE(.bss)        
+_stack:     DC32 SFB(CSTACK)
+        
 Entry
 ;
 ; Set up the Stack for Undefined mode
@@ -177,19 +191,19 @@ Loop
  *          file if the ELF executable is to loaded via a debugger on the
  *          target. This function never returns, but gives control to the
  *          application entry point.
- **/
-start_boot
-        LDR     R0, =CopyVectorTable
-        BLX     R0
-        LDR     R0, =__iar_program_start
-        BX      R0
-        
+ **/        
 Enter_main
          
          LDR   r10,=start_boot
          MOV   lr,pc                           ; Dummy return from start_boot
          BX    r10                             ; Branch to start_boot
          SUB   pc, pc, #0x08                   ; looping
+
+start_boot
+        LDR     R0, =CopyVectorTable
+        BLX     R0
+        LDR     R0, =__iar_program_start
+        BX      R0
 
 ;
 ; End of the file

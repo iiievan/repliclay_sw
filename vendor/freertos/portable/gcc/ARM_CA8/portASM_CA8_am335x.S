@@ -28,6 +28,9 @@
     INCLUDE hw_intc.h
     INCLUDE soc_AM335x.h
 
+	SECTION .text:CODE:NOROOT(8)
+	ARM
+    
 SYS_MODE    EQU		0x1f
 SVC_MODE    EQU		0x13
 IRQ_MODE    EQU		0x12
@@ -63,8 +66,7 @@ IRQ_MODE    EQU		0x12
 	;PUBLIC CPUAbortHandler
 	;PUBLIC fnRAMVectors       
 
-	SECTION .text:CODE:ROOT(2)
-	ARM
+
     
 ADDR_SIR_IRQ	    EQU     SOC_AINTC_REGS + INTC_SIR_IRQ
 ADDR_SIR_FIQ	    EQU     SOC_AINTC_REGS + INTC_SIR_FIQ
