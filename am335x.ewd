@@ -36,7 +36,7 @@
                 </option>
                 <option>
                     <name>MacFile</name>
-                    <state>E:\5.Git\proj\AM335x_evm_DDR3.mac</state>
+                    <state>$PROJ_DIR$\AM335x_evm_DDR3.mac</state>
                 </option>
                 <option>
                     <name>MemOverride</name>
@@ -48,7 +48,7 @@
                 </option>
                 <option>
                     <name>RunToEnable</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>RunToName</name>
@@ -56,11 +56,11 @@
                 </option>
                 <option>
                     <name>CExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CExtraOptions</name>
-                    <state></state>
+                    <state>--drv_vector_table_base=0x80000000</state>
                 </option>
                 <option>
                     <name>CFpuProcessor</name>

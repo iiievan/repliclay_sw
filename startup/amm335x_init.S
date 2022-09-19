@@ -42,6 +42,11 @@
 ;****************************** Forfard Declaration*********************************
         SECTION .bss:DATA:NOROOT(8)
         SECTION CSTACK:DATA:NOROOT(8)
+		SECTION .svcstack:DATA:NOROOT(8)
+		SECTION .irqstack:DATA:NOROOT(8)
+		SECTION .fiqstack:DATA:NOROOT(8)
+		SECTION .undstack:DATA:NOROOT(8)
+		SECTION .abtstack:DATA:NOROOT(8)
         
         SECTION .startcode:CODE:NOROOT(8)
         ARM
@@ -49,7 +54,12 @@
 ;****************************** Global Symbols*********************************
         PUBLIC Entry
         EXTERN  __iar_program_start
-        PUBLIC _stack                  
+        PUBLIC _stack
+		PUBLIC _und_stack
+		PUBLIC _abt_stack
+		PUBLIC _fiq_stack
+		PUBLIC _irq_stack
+		PUBLIC _svc_stack
         PUBLIC _bss_start
         PUBLIC _bss_end
         PUBLIC start_boot
@@ -92,41 +102,51 @@ I_F_BIT         EQU      0xC0
 ; IRQ shall be disabled during this. Then clear the BSS sections and finally
 ; switch to the function calling the main() function.
 ;
-
-_bss_start: DC32 SFB(.bss)        
-_bss_end:   DC32 SFE(.bss)        
-_stack:     DC32 SFB(CSTACK)
-        
+       
 Entry
 ;
 ; Set up the Stack for Undefined mode
 ;
-         LDR   r0, =_stack                     ; Read the stack address
+		 _bss_start: DC32 SFB(.bss)        
+		 _bss_end:   DC32 SFE(.bss)        
+		 _stack:     DC32 SFB(CSTACK)
+		 _und_stack: DC32 SFB(.undstack)
+		 _abt_stack: DC32 SFB(.abtstack)
+		 _fiq_stack: DC32 SFB(.fiqstack)
+		 _irq_stack: DC32 SFB(.irqstack)
+		 _svc_stack: DC32 SFB(.svcstack)
+
+         LDR   r0, _stack                      ; Read the stack address
          MSR   cpsr_c, #MODE_UND|I_F_BIT       ; switch to undef  mode
+		 LDR   r0, _und_stack                  ; Read the undefined stack address
          MOV   sp,r0                           ; write the stack pointer
          SUB   r0, r0, #UND_STACK_SIZE         ; give stack space
 ;
 ; Set up the Stack for abort mode
 ;        
          MSR   cpsr_c, #MODE_ABT|I_F_BIT       ; Change to abort mode
+	     LDR   r0, _abt_stack                  ; Read the abort stack address
          MOV   sp, r0                          ; write the stack pointer
          SUB   r0,r0, #ABT_STACK_SIZE          ; give stack space
 ;
 ; Set up the Stack for FIQ mode
 ;       
          MSR   cpsr_c, #MODE_FIQ|I_F_BIT       ; change to FIQ mode
+		 LDR   r0, _fiq_stack                  ; Read the FIQ stack address
          MOV   sp,r0                           ; write the stack pointer
          SUB   r0,r0, #FIQ_STACK_SIZE          ; give stack space
 ;
 ; Set up the Stack for IRQ mode
 ;       
          MSR   cpsr_c, #MODE_IRQ|I_F_BIT       ; change to IRQ mode
+		 LDR   r0, _irq_stack                  ; Read the IRQ stack address
          MOV   sp,r0                           ; write the stack pointer
          SUB   r0,r0, #IRQ_STACK_SIZE          ; give stack space
 ;
 ; Set up the Stack for SVC mode
 ;        
          MSR   cpsr_c, #MODE_SVC|I_F_BIT       ; change to SVC mode
+		 LDR   r0, _svc_stack                  ; Read the SVC stack address
          MOV   sp,r0                           ; write the stack pointer
          SUB   r0,r0, #SVC_STACK_SIZE          ; give stack space
 
@@ -165,8 +185,8 @@ Entry
 ;
 Clear_Bss_Section
 
-         LDR   r0, =_bss_start                 ; Start address of BSS
-         LDR   r1, =(_bss_end - 0x04)          ; End address of BSS
+         LDR   r0, _bss_start                 ; Start address of BSS
+         LDR   r1, _bss_end           		  ; End address of BSS
          MOV   r2, #0  
 Loop 
          STR   r2, [r0], #4                    ; Clear one word in BSS
