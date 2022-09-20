@@ -218,4 +218,7 @@ extern void EcapContextSave(unsigned int ecapBase, unsigned int pwmssBase,
 extern void EcapContextRestore(unsigned int ecapBase, unsigned int pwmssBase,
                                ECAPCONTEXT *contextPtr);
 
+#ifdef __cplusplus
+}
+#endif
 #endif  

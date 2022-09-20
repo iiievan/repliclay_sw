@@ -215,7 +215,6 @@ extern unsigned int IntRawStatusGet(unsigned int intrNum);
 extern unsigned int IntPendingIrqMaskedStatusGet(unsigned int intrNum);
 extern unsigned int IntPendingFiqMaskedStatusGet(unsigned int intrNum);
 
-
 #ifdef __cplusplus
 }
 #endif

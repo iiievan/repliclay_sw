@@ -103,7 +103,6 @@
 #define DCDC_VOLT_SEL_0950MV           (0x02)
 
 #define LDO_MASK                        0x1F
-#define LDO_VOLTAGE_OUT_1_8             0x06 /*This gives a value of 1.8V, which is required in BBB */
 #define LDO_VOLTAGE_OUT_3_3             0x1F
 
 #define PWR_SRC_USB_BITMASK             0x4

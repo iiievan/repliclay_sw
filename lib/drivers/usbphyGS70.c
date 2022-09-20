@@ -1,8 +1,9 @@
 /**
- * \file  hw_types.h
+ * \file    UsbphyGS70.c
  *
- * \brief Common type definitions and macros
- */
+ * \brief   This file contains AM335x USB Phy  related functions.
+ *
+*/
 
 /*
 * Copyright (C) 2010 Texas Instruments Incorporated - http://www.ti.com/
@@ -38,50 +39,71 @@
 *
 */
 
-
-#ifndef _HW_TYPES_H_
-#define _HW_TYPES_H_
+#include "hw_types.h"
+#include "soc_AM335x.h"    
+#include "hw_usbphyGS70.h"
+#include "usblib.h"
+#include "hw_usb.h"
+#include "debug.h"
 
 //*****************************************************************************
 //
-// Define a boolean type, and values for true and false.
+// USB instance Object
 //
 //*****************************************************************************
-typedef unsigned char tBoolean;
+extern tUSBInstanceObject g_USBInstance[];
 
-#ifndef true
-#define true 1
-#endif
 
-#ifndef false
-#define false 0
-#endif
+/**
+ * \brief This function will switch on the USB Phy  
+ *          
+ *
+ * \param    None
+ *
+ * \return   None
+ *
+  **/
+void UsbPhyOn(unsigned int ulIndex)
+{
+    unsigned int usbphycfg = 0;
+#if defined (am335x_15x15) || defined(am335x) || defined(c6a811x)
+	ASSERT((0==ulIndex)||(1==ulIndex));
+#else
+	ASSERT(0==ulIndex);
+#endif /* defined (am335x_15x15) || ... */
 
-#ifndef NULL
-#define NULL ((void*) 0)
-#endif
-//*****************************************************************************
-//
-// Macros for hardware access, both direct and via the bit-band region.
-//
-//*****************************************************************************
-#define HWREG(x)                                                              \
-        (*((volatile unsigned int *)(x)))
-#define HWREGH(x)                                                             \
-        (*((volatile unsigned short *)(x)))
-#define HWREGB(x)                                                             \
-        (*((volatile unsigned char *)(x)))
-#define HWREGBITW(x, b)                                                       \
-        HWREG(((unsigned int)(x) & 0xF0000000) | 0x02000000 |                \
-              (((unsigned int)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-#define HWREGBITH(x, b)                                                       \
-        HWREGH(((unsigned int)(x) & 0xF0000000) | 0x02000000 |               \
-               (((unsigned int)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-#define HWREGBITB(x, b)                                                       \
-        HWREGB(((unsigned int)(x) & 0xF0000000) | 0x02000000 |               \
-               (((unsigned int)(x) & 0x000FFFFF) << 5) | ((b) << 2))
+#ifdef USB_MODE_FULLSPEED
+	if (0==ulIndex)
+    	HWREGB(USB0_BASE + USB_O_POWER) &= 0xdf;
+#if defined (am335x_15x15) || defined(am335x) || defined(c6a811x)
+	else
+		HWREGB(USB1_BASE + USB_O_POWER) &= 0xdf;
+#endif /* defined (am335x_15x15) || ... */
+#endif /* USB_MODE_HS_DISABLE  */
 
-#define TRUE    1
-#define FALSE   0
+    usbphycfg = HWREG(g_USBInstance[ulIndex].uiPHYConfigRegAddr); 
+    usbphycfg &= ~(USBPHY_CM_PWRDN | USBPHY_OTG_PWRDN);
+    usbphycfg |= (USBPHY_OTGVDET_EN | USBPHY_OTGSESSEND_EN);
 
-#endif // __HW_TYPES_H__
+    HWREG(g_USBInstance[ulIndex].uiPHYConfigRegAddr) = usbphycfg;
+}
+
+
+/**
+ * \brief This function will switch off  the USB Phy  
+ *          
+ *
+ * \param    None
+ *
+ * \return   None
+ *
+  **/
+void UsbPhyOff(unsigned int ulIndex)
+{
+    unsigned int  usbphycfg = 0;
+    
+    usbphycfg = HWREG(g_USBInstance[ulIndex].uiPHYConfigRegAddr); 
+    usbphycfg |= (USBPHY_CM_PWRDN | USBPHY_OTG_PWRDN);
+    HWREG(g_USBInstance[ulIndex].uiPHYConfigRegAddr) = usbphycfg;
+}
+

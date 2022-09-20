@@ -224,7 +224,7 @@
                 </option>
                 <option>
                     <name>CCDefines</name>
-                    <state></state>
+                    <state>am335x</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -358,6 +358,11 @@
                     <state>$PROJ_DIR$\vendor\freertos\include</state>
                     <state>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8</state>
                     <state>$PROJ_DIR$\lib\include\usblib</state>
+                    <state>$PROJ_DIR$\lib\drivers</state>
+                    <state>$PROJ_DIR$\lib\platform</state>
+                    <state>$PROJ_DIR$\lib\system_config</state>
+                    <state>$PROJ_DIR$\lib\system_config\am335x</state>
+                    <state>$PROJ_DIR$\lib\utils</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -836,10 +841,9 @@
                 </option>
                 <option>
                     <name>IlinkAdditionalLibs</name>
-                    <state>$PROJ_DIR$\lib\libdrivers.a</state>
-                    <state>$PROJ_DIR$\lib\libplatform.a</state>
-                    <state>$PROJ_DIR$\lib\libsystem_config.a</state>
-                    <state>$PROJ_DIR$\lib\libutils.a</state>
+                    <state>
+
+</state>
                 </option>
                 <option>
                     <name>IlinkOverrideProgramEntryLabel</name>
@@ -2165,6 +2169,165 @@
         <file>
             <name>$PROJ_DIR$\vendor\freertos\timers.c</name>
         </file>
+    </group>
+    <group>
+        <name>lib</name>
+        <group>
+            <name>drivers</name>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\cppi41dma.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\cpsw.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\dcan.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\dmtimer.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\ecap.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\edma.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\ehrpwm.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\elm.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\gpio_v2.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\gpmc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\hs_mmcsd.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\hsi2c.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\mailbox.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\mcasp.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\mcspi.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\mdio.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\phy.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\raster.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\rtc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\tsc_adc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\uart_irda_cir.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\usb.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\usbphyGS70.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\drivers\watchdog.c</name>
+            </file>
+        </group>
+        <group>
+            <name>platform</name>
+            <file>
+                <name>$PROJ_DIR$\lib\beaglebone.c</name>
+            </file>
+        </group>
+        <group>
+            <name>system_config</name>
+            <group>
+                <name>am335x</name>
+                <file>
+                    <name>$PROJ_DIR$\lib\system_config\am335x\clock.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\lib\system_config\am335x\device.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\lib\system_config\am335x\exceptionhandler.S</name>
+                    <excluded>
+                        <configuration>Debug</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\lib\system_config\am335x\interrupt.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\lib\system_config\am335x\startup.c</name>
+                    <excluded>
+                        <configuration>Debug</configuration>
+                    </excluded>
+                </file>
+            </group>
+            <file>
+                <name>$PROJ_DIR$\lib\system_config\cache.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\system_config\cp15.S</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\system_config\cpu.S</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\system_config\init.S</name>
+                <excluded>
+                    <configuration>Debug</configuration>
+                </excluded>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\system_config\mmu.c</name>
+            </file>
+        </group>
+        <group>
+            <name>utils</name>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\ascii.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\board.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\cmdline.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\consoleUtils.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\delay.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\misc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\perf.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\systick.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\utils\uartStdio.c</name>
+            </file>
+        </group>
     </group>
     <group>
         <name>src</name>

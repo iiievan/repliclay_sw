@@ -7,7 +7,6 @@
 #include "error.h"
 #include "hal_bspInit.h"
 
-
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
@@ -21,9 +20,6 @@ extern "C" {
 #endif
   
 extern void Entry(void);
-
-#define NUM_INTERRUPTS                 (128u)
-void (*fnRAMVectors[NUM_INTERRUPTS])(void);
 
 xSemaphoreHandle xBinarySemaphore;
 void init(void)
