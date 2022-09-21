@@ -58,14 +58,13 @@ IRQ_MODE    EQU		0x12
 
 	;************************** Global symbols for TI ISR ************************************
 	
-	;PUBLIC IRQHandler
+	EXTERN IRQHandler
 	PUBLIC FIQHandler
 	PUBLIC AbortHandler
-	;PUBLIC SVC_Handler
+	EXTERN SVC_Handler
 	PUBLIC UndefInstHandler
-	;PUBLIC CPUAbortHandler
-	;PUBLIC fnRAMVectors       
-
+	EXTERN CPUAbortHandler
+	EXTERN fnRAMVectors 
 
     
 ADDR_SIR_IRQ	    EQU     SOC_AINTC_REGS + INTC_SIR_IRQ
@@ -83,6 +82,15 @@ MASK_SVC_NUM	    EQU     0xFF000000
 MODE_SYS	        EQU     0x1F
 MODE_IRQ	        EQU     0x12 
 I_BIT	            EQU     0x80
+
+pxCurrentTCBConst                   DC32    pxCurrentTCB
+ulCriticalNestingConst              DC32    ulCriticalNesting
+ulPortTaskHasFPUContextConst        DC32    ulPortTaskHasFPUContext
+ulMaxAPIPriorityMaskConst           DC32    ulMaxAPIPriorityMask
+vTaskSwitchContextConst             DC32    vTaskSwitchContext
+vApplicationIRQHandlerConst         DC32    vApplicationIRQHandler
+ulPortInterruptNestingConst         DC32    ulPortInterruptNesting
+vApplicationFPUSafeIRQHandlerConst  DC32    vApplicationFPUSafeIRQHandler
 
 portSAVE_CONTEXT macro 
 
@@ -150,9 +158,9 @@ portRESTORE_CONTEXT macro
 	LDR		R0, =ADDR_THRESHOLD
 	LDR		R2, [R0]
 	CMP		R1, #0
-	MOVEQ	R4, #255
-	LDRNE	R4, =ulMaxAPIPriorityMaskConst
-	LDRNE	R4, [R4]
+	MOV  	R4, #255
+	LDR	    R4, =ulMaxAPIPriorityMaskConst
+	LDR	    R4, [R4]
 	STR		R4, [R0]
 
 	;/* Restore all system mode registers other than the SP (which is already
@@ -173,7 +181,7 @@ portRESTORE_CONTEXT macro
 FreeRTOS_SWI_Handler
 	/* Save the context of the current task and select a new task to run. */
 	portSAVE_CONTEXT
-	LDR R0, =vTaskSwitchContextConst
+	LDR R0, vTaskSwitchContextConst
 	BLX	R0
 	portRESTORE_CONTEXT
 
@@ -224,7 +232,7 @@ FreeRTOS_IRQ_Handler
 
 	;/* Call the interrupt handler.  r4 pushed to maintain alignment. */
 	PUSH	{r0-r8, lr}
-	LDR		r1, =vApplicationIRQHandlerConst
+	LDR		r1, vApplicationIRQHandlerConst
 	BLX		r1
 	POP		{r0-r8, lr}
 	ADD		sp, sp, r2
@@ -288,7 +296,7 @@ switch_before_exit
 	;vTaskSwitchContext() if vTaskSwitchContext() uses LDRD or STRD
 	;instructions, or 8 byte aligned stack allocated data.  LR does not need
 	;saving as a new LR will be loaded by portRESTORE_CONTEXT anyway. */
-	LDR		R0, =vTaskSwitchContextConst
+	LDR		R0, vTaskSwitchContextConst
 	BLX		R0
 
 	;/* Restore the context of, and branch to, the task selected to execute
@@ -321,7 +329,7 @@ vApplicationIRQHandler
 	VPUSH	{D0-D7}
 	PUSH	{R1}
 
-	LDR		r1, =vApplicationFPUSafeIRQHandlerConst
+	LDR		r1, vApplicationFPUSafeIRQHandlerConst
 	BLX		r1
 
 	POP		{R0}
@@ -369,23 +377,6 @@ loop0
 										  ; Abort / Undefined Instruction
 		B       loop0         
 
-; ulICCIARConst:	.word ulICCIAR      @ #IRQn
-; ulICCEOIRConst:	.word ulICCEOIR     @ End of Interrupt  
-; ulICCPMRConst: .word ulICCPMR       @ Priority Mask
-pxCurrentTCBConst DC32 pxCurrentTCB
-ulCriticalNestingConst DC32 ulCriticalNesting
-ulPortTaskHasFPUContextConst DC32 ulPortTaskHasFPUContext
-ulMaxAPIPriorityMaskConst DC32 ulMaxAPIPriorityMask
-vTaskSwitchContextConst DC32 vTaskSwitchContext
-vApplicationIRQHandlerConst DC32 vApplicationIRQHandler
-; vApplicationIRQHandlerConst: .word IRQHandler
-ulPortInterruptNestingConst DC32 ulPortInterruptNesting
-vApplicationFPUSafeIRQHandlerConst DC32 vApplicationFPUSafeIRQHandler
-
-;*****************************************************************************
-;
-; End of the file
-;
     END
 
 
