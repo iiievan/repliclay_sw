@@ -78,11 +78,11 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>AM3358	TexasInstruments AM3358</state>
+                    <state>AM3359	TexasInstruments AM3359</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
@@ -138,7 +138,7 @@
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>AM3358	TexasInstruments AM3358</state>
+                    <state>AM3359	TexasInstruments AM3359</state>
                 </option>
                 <option>
                     <name>FPU2</name>
@@ -313,7 +313,7 @@
                 </option>
                 <option>
                     <name>CCSignedPlainChar</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCRequirePrototypes</name>
@@ -349,20 +349,25 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
+                    <state>$PROJ_DIR$\src</state>
+                    <state>$PROJ_DIR$\src\app</state>
                     <state>$PROJ_DIR$\lib\include</state>
                     <state>$PROJ_DIR$\lib</state>
-                    <state>$PROJ_DIR$\src</state>
                     <state>$PROJ_DIR$\lib\include\hw</state>
                     <state>$PROJ_DIR$\lib\include\armv7a</state>
                     <state>$PROJ_DIR$\lib\include\armv7a\am335x</state>
-                    <state>$PROJ_DIR$\vendor\freertos\include</state>
-                    <state>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8</state>
                     <state>$PROJ_DIR$\lib\include\usblib</state>
                     <state>$PROJ_DIR$\lib\drivers</state>
                     <state>$PROJ_DIR$\lib\platform</state>
                     <state>$PROJ_DIR$\lib\system_config</state>
                     <state>$PROJ_DIR$\lib\system_config\am335x</state>
                     <state>$PROJ_DIR$\lib\utils</state>
+                    <state>$PROJ_DIR$\lib\uC-LIB</state>
+                    <state>$PROJ_DIR$\lib\uC-LIB\Ports\ARM</state>
+                    <state>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A</state>
+                    <state>$PROJ_DIR$\vendor\uCOS-II\Source</state>
+                    <state>$PROJ_DIR$\vendor\uC-CPU</state>
+                    <state>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -374,11 +379,11 @@
                 </option>
                 <option>
                     <name>IProcessorMode2</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -387,7 +392,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules98</name>
@@ -634,7 +639,6 @@
                     <name>AUserIncludes</name>
                     <state>$PROJ_DIR$\lib</state>
                     <state>$PROJ_DIR$\lib\include</state>
-                    <state>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8</state>
                     <state>$PROJ_DIR$\src</state>
                     <state>$PROJ_DIR$\lib\include</state>
                     <state>$PROJ_DIR$\lib\include\armv7a</state>
@@ -666,7 +670,7 @@
                 <option>
                     <name>OOCOutputFormat</name>
                     <version>3</version>
-                    <state>0</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>OCOutputOverride</name>
@@ -674,7 +678,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>am335x.srec</state>
+                    <state>repliclay_sw.bin</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -682,7 +686,7 @@
                 </option>
                 <option>
                     <name>OOCObjCopyEnable</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
             </data>
         </settings>
@@ -1026,7 +1030,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>am335x_import_lib.o</state>
+                    <state>repliclay_sw_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -2133,42 +2137,6 @@
         </settings>
     </configuration>
     <group>
-        <name>freertos</name>
-        <group>
-            <name>memmang</name>
-            <file>
-                <name>$PROJ_DIR$\vendor\freertos\portable\memmang\heap_3.c</name>
-            </file>
-        </group>
-        <group>
-            <name>portable</name>
-            <file>
-                <name>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8\port.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8\portASM_CA8_am335x.S</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\freertos\portable\gcc\ARM_CA8\portmacro.h</name>
-            </file>
-        </group>
-        <file>
-            <name>$PROJ_DIR$\vendor\freertos\event_groups.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\vendor\freertos\list.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\vendor\freertos\queue.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\vendor\freertos\tasks.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\vendor\freertos\timers.c</name>
-        </file>
-    </group>
-    <group>
         <name>lib</name>
         <group>
             <name>drivers</name>
@@ -2297,6 +2265,45 @@
             </file>
         </group>
         <group>
+            <name>uC-LIB</name>
+            <group>
+                <name>Ports</name>
+                <group>
+                    <name>ARM</name>
+                    <file>
+                        <name>$PROJ_DIR$\lib\uC-LIB\Ports\ARM\lib_mem_a.asm</name>
+                    </file>
+                </group>
+            </group>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_ascii.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_ascii.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_def.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_math.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_math.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_mem.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_mem.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_str.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\uC-LIB\lib_str.h</name>
+            </file>
+        </group>
+        <group>
             <name>utils</name>
             <file>
                 <name>$PROJ_DIR$\lib\utils\ascii.c</name>
@@ -2329,11 +2336,26 @@
     </group>
     <group>
         <name>src</name>
+        <group>
+            <name>app</name>
+            <file>
+                <name>$PROJ_DIR$\src\app\app_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\app_hooks.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\cpu_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\lib_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\os_cfg.h</name>
+            </file>
+        </group>
         <file>
             <name>$PROJ_DIR$\src\bsp_platform.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\src\FreeRTOSConfig.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\src\hal_bspInit.c</name>
@@ -2353,6 +2375,102 @@
         <file>
             <name>$PROJ_DIR$\startup\amm335x_init.S</name>
         </file>
+    </group>
+    <group>
+        <name>uC-CPU</name>
+        <group>
+            <name>ARM-Cortex-A</name>
+            <file>
+                <name>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A\cpu_a.asm</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A\uC_cpu.h</name>
+            </file>
+        </group>
+        <file>
+            <name>$PROJ_DIR$\vendor\uC-CPU\cpu_cache.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\vendor\uC-CPU\cpu_core.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\vendor\uC-CPU\cpu_core.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\vendor\uC-CPU\cpu_def.h</name>
+        </file>
+    </group>
+    <group>
+        <name>uCOS-II</name>
+        <group>
+            <name>Ports</name>
+            <group>
+                <name>ARM-Cortex-A</name>
+                <file>
+                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-d16.asm</name>
+                    <excluded>
+                        <configuration>Debug</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-d32.asm</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-none.asm</name>
+                    <excluded>
+                        <configuration>Debug</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_c.c</name>
+                </file>
+            </group>
+        </group>
+        <group>
+            <name>Source</name>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_core.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_dbg_r.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_flag.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_mbox.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_mem.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_mutex.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_q.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_sem.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_task.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_time.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_tmr.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\vendor\uCOS-II\Source\ucos_ii.h</name>
+            </file>
+        </group>
     </group>
     <file>
         <name>$PROJ_DIR$\repliclay_sw.icf</name>

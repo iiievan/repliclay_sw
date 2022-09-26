@@ -40,10 +40,8 @@
 #include "error.h"
 #include "cp15.h"
 #include "hal_mmu.h"
-
-
-#include "FreeRTOS.h"
-#include "task.h"
+#include <uC_cpu.h>
+#include  <os.h>
 
 /**************************************************************************************************************************/
 /*                                                     CONFIGURATIONS                                                     */
@@ -73,13 +71,13 @@
 static void DMTimerAintcConfigure(void);
 static void DMTimerSetUp(void);
 static void DMTimerIsr(void);
-static void GPIOModuleClkConfig(uint32_t x);
+static void GPIOModuleClkConfig(CPU_INT32U x);
 
 /**************************************************************************************************************************/
 /*                                                    GLOBAL VARIABLES                                                    */
 /**************************************************************************************************************************/
 
-extern volatile uint32_t ulPortYieldRequired;
+extern volatile CPU_INT32U ulPortYieldRequired;
 volatile unsigned int cntValue = 0;
 static volatile unsigned int flagIsr = 0;
 
@@ -94,7 +92,6 @@ static volatile unsigned int flagIsr = 0;
 
 void configure_platform(void)
 {
-
     /* Initiate MMU and ... Invoke Cache */
     //InitMem(); 
     
@@ -137,6 +134,7 @@ void halBspInit(void)
 /*
 ** Do the necessary DMTimer configurations on to AINTC.
 */
+#define configMAX_IRQ_PRIORITIES                ((CPU_INT32U)(0x3Ful))
 static void DMTimerAintcConfigure(void)
 {
     /* Registering DMTimerIsr */
@@ -170,8 +168,7 @@ static void DMTimerSetUp(void)
 /*
 ** DMTimer interrupt service routine.
 */
-extern void FreeRTOS_Tick_Handler( void );
-//extern void vLED_blink_evBits_ActivateHook(uint32_t SetReset);
+
 static void DMTimerIsr(void)
 {
     /* Disable the DMTimer interrupts */
@@ -180,16 +177,15 @@ static void DMTimerIsr(void)
     /* Clear the status of the interrupt flags */
     DMTimerIntStatusClear(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_IT_FLAG);
 
-    FreeRTOS_Tick_Handler();
-    /* Application Hook */
-    //vLED_blink_evBits_ActivateHook(pdTRUE);
+     OSTimeTick();
+
     /* Enable the DMTimer interrupts */
 
     DMTimerIntEnable(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_EN_FLAG);
     IntSystemEnable(SYS_INT_TINT2);
 }
 
-static void GPIOModuleClkConfig(uint32_t x)
+static void GPIOModuleClkConfig(CPU_INT32U x)
 {
     switch(x)
     {

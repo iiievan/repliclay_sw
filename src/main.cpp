@@ -5,11 +5,16 @@
 #include "interrupt.h"
 #include "dmtimer.h"
 #include "error.h"
-#include "hal_bspInit.h"
 
-#include "FreeRTOS.h"
-#include "semphr.h"
-#include "task.h"
+
+#include "hal_bspInit.h"
+#include  <uC_cpu.h>
+#include  <app_cfg.h>
+#include  <cpu_cfg.h>
+#include  <cpu_core.h>
+#include  <os.h>
+#include  <lib_mem.h>
+#include  <lib_math.h>
 
 #include <string>
 
@@ -21,97 +26,142 @@ extern "C" {
   
 extern void Entry(void);
 
-xSemaphoreHandle xBinarySemaphore;
+/*
+*********************************************************************************************************
+*                                             LOCAL DEFINES
+*********************************************************************************************************
+*/
+
+
+/*
+*********************************************************************************************************
+*                                            LOCAL VARIABLES
+*********************************************************************************************************
+*/
+
+static  OS_STK        AppTaskStartStk[APP_CFG_TASK_START_STK_SIZE];
+
+
+/*
+*********************************************************************************************************
+*                                         FUNCTION PROTOTYPES
+*********************************************************************************************************
+*/
+
+static  void  AppTaskStart              (void *p_arg);
+static  void  AppTaskCreate             (void);
+static  void  AppEventCreate            (void);
+extern void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id);
+
 void init(void)
 {
 	halBspInit();
 }
 
-void vTask1(void *pvParameters) {
-    int i = 0;
-    while (1) {
-       xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
-       ConsoleUtilsPrintf("Task 1 message %d!\r\n", i++);
-       xSemaphoreGive(xBinarySemaphore);
-       vTaskDelay(1000);
-    }
-}
-
-void vTask2(void *pvParameters) {
-    int i = 0;
-    while (1) {
-        xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
-        ConsoleUtilsPrintf("Task 2 message %d!\r\n", i++);
-        xSemaphoreGive(xBinarySemaphore);
-        vTaskDelay(500);
-    }
-}
-
-void Delay_HMSM(uint32_t Hours, uint32_t Minutes, uint32_t Seconds, uint32_t Millis)
+static  void  OS_BSP_ExceptHandler (CPU_INT08U  except_type)
 {
-    /* Block for 500ms. */
-    TickType_t  xTicksToDelay  = 1; /* Lets do a minimum of 1 Tick Period */
-    if(Hours)   xTicksToDelay += Hours   * 3600 * 1000 / portTICK_PERIOD_MS;
-    if(Minutes) xTicksToDelay += Minutes *   60 * 1000 / portTICK_PERIOD_MS;
-    if(Seconds) xTicksToDelay += Seconds * 1000        / portTICK_PERIOD_MS;
-    if(Millis)  xTicksToDelay += Millis                / portTICK_PERIOD_MS;
+    switch (except_type) {
+        case OS_CPU_ARM_EXCEPT_RESET:
+        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
+        case OS_CPU_ARM_EXCEPT_SWI:
+        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
+        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
+             while (DEF_TRUE) {
+                 ;
+             }
+    }
+}
+
+void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
+{
+    switch (src_id) {
+        case OS_CPU_ARM_EXCEPT_IRQ:
+        case OS_CPU_ARM_EXCEPT_FIQ:
+             BSP_IntHandler((CPU_INT32U)src_id);
+             break;
+
+        case OS_CPU_ARM_EXCEPT_RESET:
+        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
+        case OS_CPU_ARM_EXCEPT_SWI:
+        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
+        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
+        case OS_CPU_ARM_EXCEPT_ADDR_ABORT:
+        default:
+             OS_BSP_ExceptHandler((CPU_INT08U)src_id);
+             break;
+    }
+}
+
+
+
+static  void  AppTaskStart (void *p_arg)
+{
+    (void)p_arg;
+    CPU_INT32U i;
     
-    vTaskDelay( xTicksToDelay );
+    Mem_Init();                                                 /* Initialize memory managment module                   */
+    Math_Init();
+    
+ #if (OS_TASK_STAT_EN > 0)
+    OSStatInit();                                               /* Determine CPU capacity                               */
+#endif
+  
+      while (DEF_TRUE) {
+        ConsoleUtilsPrintf("Task 1 message %d!\r\n", i++);
+        OSTimeDlyHMSM(0, 0, 0, 100);
+    }
 }
 
-void vApplicationStackOverflowHook(TaskHandle_t pxTask, signed char *pcTaskName)
-{
-	(void) pcTaskName;
-	(void) pxTask;
-
-	/**
-	 * Run time stack overflow checking is performed if
-	 * configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.
-	 * This hook function is called if a stack overflow is
-	 * detected.
-	 */
-	for (;;) 
-    {
-        Delay_HMSM(0,0,1,0);
-        ConsoleUtilsPrintf("\n\r\n\rIn Function:%s.\n\r",__FUNCTION__);
-	}
-	taskDISABLE_INTERRUPTS();
-}
 
 #ifdef __cplusplus
 }
 #endif
+
+/*
+*********************************************************************************************************
+*                                                main()
+*
+* Description : This is the standard entry point for C code.  It is assumed that your code will call
+*               main() once you have performed all necessary initialization.
+*
+* Arguments   : none
+*
+* Returns     : none
+*********************************************************************************************************
+*/
+
 int main() 
 {
+     CPU_INT08U	os_err;
+#if (CPU_CFG_NAME_EN == DEF_ENABLED)
+    CPU_ERR  cpu_err;
+#endif
     init();
+ 
+    //BSP_BranchPredictorEn();                                    /* Enable Branch Predictor and Cache.                   */
+    //BSP_CachesEn();
+    
     ConsoleUtilsPrintf("Platform initialized.\r\n");
 
-    xBinarySemaphore = xSemaphoreCreateBinary();
-    xSemaphoreGive(xBinarySemaphore);
+    OSInit();                                                   /* Init uC/OS-II                                        */
 
-    int ret = xTaskCreate(vTask1, "Task 1", 1000, NULL, 1, (TaskHandle_t *)NULL);
-    if (ret == pdPASS) 
-    {
-        ConsoleUtilsPrintf("Task %x succesfully created.\r\n", vTask1);
-    } 
-    else 
-    {
-        ConsoleUtilsPrintf("Task not created: %d", ret);
-    }
-    
-    ret =  xTaskCreate(vTask2, "Task 2", 1000, NULL, 2, (TaskHandle_t *)NULL);
-    if (ret == pdPASS) 
-    {
-        ConsoleUtilsPrintf("Task %x succesfully created.\r\n", vTask2);
-    } 
-    else 
-    {
-        ConsoleUtilsPrintf("Task not created: %d", ret);
-    }
-    
-    vTaskStartScheduler();
+    OSTaskCreateExt(AppTaskStart,                               /* Create the start task.                               */
+                    (void *)0,
+                    (OS_STK *)&AppTaskStartStk[APP_CFG_TASK_START_STK_SIZE - 1],
+                    APP_CFG_TASK_START_PRIO,
+                    APP_CFG_TASK_START_PRIO,
+                    (OS_STK *)&AppTaskStartStk[0],
+                    APP_CFG_TASK_START_STK_SIZE,
+                    (void *)0,
+                    OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR);
 
-    while(1);
+#if (OS_TASK_NAME_EN > 0)
+    OSTaskNameSet((INT8U  )APP_CFG_TASK_START_PRIO,
+                  (INT8U *)"Start Task",
+                  (INT8U *)&os_err);
+#endif
+
+    OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II.   */
 
 
 }

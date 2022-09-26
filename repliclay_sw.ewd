@@ -44,7 +44,7 @@
                 </option>
                 <option>
                     <name>MemFile</name>
-                    <state>$TOOLKIT_DIR$\CONFIG\debugger\TexasInstruments\AM3358.ddf</state>
+                    <state>$TOOLKIT_DIR$\CONFIG\debugger\TexasInstruments\AM3359.ddf</state>
                 </option>
                 <option>
                     <name>RunToEnable</name>
@@ -56,11 +56,11 @@
                 </option>
                 <option>
                     <name>CExtraOptionsCheck</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CExtraOptions</name>
-                    <state>--drv_vector_table_base=0x80000000</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CFpuProcessor</name>
@@ -429,7 +429,7 @@
                 </option>
                 <option>
                     <name>OCProbeConfig</name>
-                    <state>$TOOLKIT_DIR$\config\debugger\TexasInstruments\AM335x.ProbeConfig</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CMSISDAPProbeConfigRadio</name>

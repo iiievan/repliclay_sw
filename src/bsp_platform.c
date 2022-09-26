@@ -9,8 +9,6 @@
 #include "interrupt.h"
 #include "dmtimer.h"
 #include "error.h"
-#include "FreeRTOS.h"
-#include "task.h"
 
 #define portSEI()                                                          \
 {                                                                          \
@@ -32,7 +30,7 @@
 
 extern void IntIrqEnableNewIrqs(void);
 extern volatile uint32_t ulCriticalNesting, ulPortInterruptNesting;
-extern void (*fnRAMVectors[configMAX_IRQ_VECTORS])(void);
+
 
 void IntIrqEnableNewIrqs(void)
 {
@@ -94,15 +92,15 @@ void vApplicationFPUSafeIRQHandler(void)
     
     //xInsideISR ++;
     uint32_t IrqPrio     = IntCurrIrqPriorityGet();
-    IntPriorityThresholdSet(configMAX_API_CALL_INTERRUPT_PRIORITY);
+    //IntPriorityThresholdSet(configMAX_API_CALL_INTERRUPT_PRIORITY);
     uint32_t index = IntActiveIrqNumGet();
     IntSystemDisable(index);
     IntIrqEnableNewIrqs();
     portSEI();
-    fnRAMVectors[index]();
+    //fnRAMVectors[index]();
     portDI();
     //xInsideISR = Local_xInsideISR;
-    IntPriorityThresholdSet(portUNMASK_VALUE);
+    //IntPriorityThresholdSet(portUNMASK_VALUE);
 }
 
 
