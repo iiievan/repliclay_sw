@@ -1,6 +1,7 @@
 
 #include "consoleUtils.h"
 #include "soc_AM335x.h"
+#include "hw_intc.h"
 #include "beaglebone.h"
 #include "interrupt.h"
 #include "dmtimer.h"
@@ -52,6 +53,17 @@ static  void  AppTaskStart              (void *p_arg);
 static  void  AppTaskCreate             (void);
 static  void  AppEventCreate            (void);
 extern void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id);
+extern void  BSP_IntHandler       (CPU_INT32U     src_nbr);
+extern void  BSP_IntClr (CPU_INT08U  int_id);
+
+#define  REG_INTCPS_SIR_IRQ      (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_SIR_IRQ))
+#define  REG_INTCPS_SIR_FIQ      (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_SIR_FIQ))
+#define  REG_INTCPS_CONTROL      (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_CONTROL))
+#define  REG_INTCPS_ISR_CLEAR(x) (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_ISR_CLEAR(x)))
+#define  ACTIVE_IRQ_MASK                                (0x7F)
+#define  ACTIVE_FIQ_MASK                                (0x7F)
+
+static CPU_FNCT_PTR BSP_IntVectTbl[SYS_INT_ID_MAX];
 
 void init(void)
 {
@@ -88,6 +100,56 @@ void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
         case OS_CPU_ARM_EXCEPT_ADDR_ABORT:
         default:
              OS_BSP_ExceptHandler((CPU_INT08U)src_id);
+             break;
+    }
+}
+
+void  BSP_IntClr (CPU_INT08U  int_id)
+{
+    CPU_INT08U  reg_nbr;
+
+
+    if (int_id > SYS_INT_ID_MAX) {
+        return;
+    }
+
+    reg_nbr = int_id / 32;
+
+    REG_INTCPS_ISR_CLEAR(reg_nbr) = DEF_BIT(int_id % 32);
+}
+
+void  BSP_IntHandler (CPU_INT32U  src_nbr)
+{
+    CPU_INT32U    int_nbr;
+    CPU_FNCT_PTR  isr;
+
+
+    switch (src_nbr) {
+        case OS_CPU_ARM_EXCEPT_IRQ:
+             int_nbr = REG_INTCPS_SIR_IRQ;
+
+             isr = BSP_IntVectTbl[int_nbr & ACTIVE_IRQ_MASK];
+             if (isr != (CPU_FNCT_PTR)0) {
+                 isr((void *)int_nbr);
+             }
+			 BSP_IntClr(int_nbr);                               /* Clear interrupt									   	*/
+
+			 REG_INTCPS_CONTROL = INTC_CONTROL_NEWIRQAGR;
+             break;
+
+        case OS_CPU_ARM_EXCEPT_FIQ:
+             int_nbr = REG_INTCPS_SIR_FIQ;
+
+             isr = BSP_IntVectTbl[int_nbr & ACTIVE_FIQ_MASK];
+             if (isr != (CPU_FNCT_PTR)0) {
+                 isr((void *)int_nbr);
+             }
+			 BSP_IntClr(int_nbr);                       		/* Clear interrupt									   	*/
+
+			 REG_INTCPS_CONTROL = INTC_CONTROL_NEWFIQAGR;
+             break;
+
+        default:
              break;
     }
 }

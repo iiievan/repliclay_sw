@@ -37,22 +37,11 @@
 ;
 ;******************************************************************************
 
-        MODULE  startcode
+    MODULE  ?cstartup
 
-;****************************** Forfard Declaration*********************************
-        SECTION .bss:DATA:NOROOT(8)
-        SECTION CSTACK:DATA:NOROOT(8)
-		SECTION .svcstack:DATA:NOROOT(8)
-		SECTION .irqstack:DATA:NOROOT(8)
-		SECTION .fiqstack:DATA:NOROOT(8)
-		SECTION .undstack:DATA:NOROOT(8)
-		SECTION .abtstack:DATA:NOROOT(8)
-        
-        SECTION .startcode:CODE:NOROOT(8)
-        ARM
+
         
 ;****************************** Global Symbols*********************************
-        PUBLIC Entry
         EXTERN  __iar_program_start
         PUBLIC _stack
 		PUBLIC _und_stack
@@ -78,16 +67,114 @@ SVC_STACK_SIZE        EQU        0x1000
 
 ;
 ; to set the mode bits in CPSR for different modes
-;        
-MODE_USR        EQU      0x10            
-MODE_FIQ        EQU      0x11
-MODE_IRQ        EQU      0x12
-MODE_SVC        EQU      0x13
-MODE_ABT        EQU      0x17
-MODE_UND        EQU      0x1B
-MODE_SYS        EQU      0x1F            
+; 
+MODE_BITS	DEFINE	0x1F       
+MODE_USR    DEFINE  0x10            
+MODE_FIQ    DEFINE  0x11
+MODE_IRQ    DEFINE  0x12
+MODE_SVC    DEFINE  0x13
+MODE_ABT    DEFINE  0x17
+MODE_UND    DEFINE  0x1B
+MODE_SYS    DEFINE  0x1F            
 
-I_F_BIT         EQU      0xC0               
+                                                                ; Control register C1
+CTRL_C1_M   DEFINE  0x0001
+CTRL_C1_A   DEFINE  0x0002
+CTRL_C1_C   DEFINE  0x0004
+CTRL_C1_W   DEFINE  0x0008
+CTRL_C1_S   DEFINE  0x0100
+CTRL_C1_R   DEFINE  0x0200
+CTRL_C1_Z   DEFINE  0x0800
+CTRL_C1_I   DEFINE  0x1000
+CTRL_C1_V   DEFINE  0x2000
+CTRL_C1_RR  DEFINE  0x4000
+
+
+CP_DIS_MASK DEFINE  0xFFFFEFFA
+
+;********************************************************************************************************
+;                                            ARM EXCEPTION VECTORS
+;********************************************************************************************************
+
+    SECTION .intvec:CODE:NOROOT(2)
+    PUBLIC  __vector
+    PUBLIC  __iar_program_start
+
+    IMPORT  OS_CPU_ARM_ExceptUndefInstrHndlr
+    IMPORT  OS_CPU_ARM_ExceptSwiHndlr
+    IMPORT  OS_CPU_ARM_ExceptPrefetchAbortHndlr
+    IMPORT  OS_CPU_ARM_ExceptDataAbortHndlr
+    IMPORT  OS_CPU_ARM_ExceptIrqHndlr
+    IMPORT  OS_CPU_ARM_ExceptFiqHndlr
+    
+    
+                                   ; Level 1 page table descriptor templates
+TTB_ENTRY_SUPERSEC_FAULT  EQU  0x50006
+TTB_ENTRY_SUPERSEC_STRONG EQU  0x50C02
+TTB_ENTRY_SUPERSEC_DEV    EQU  0x50C06
+TTB_ENTRY_SUPERSEC_NORM   EQU  0x51C0E
+TTB_ENTRY_SEC_NORM        EQU  0x0C0E
+
+    ARM
+
+__vector:
+
+    LDR     PC,Reset_Addr           ; Reset
+    LDR     PC,Undefined_Addr       ; Undefined instructions
+    LDR     PC,SWI_Addr             ; Software interrupt (SWI/SVC)
+    LDR     PC,Prefetch_Addr        ; Prefetch abort
+    LDR     PC,Abort_Addr           ; Data abort
+    LDR     PC,Unused_Addr          ; RESERVED
+    LDR     PC,IRQ_Addr             ; IRQ
+    LDR     PC,FIQ_Addr             ; FIQ
+
+    DATA
+
+Reset_Addr:     DCD   __iar_program_start
+
+Undefined_Addr: DCD   OS_CPU_ARM_ExceptUndefInstrHndlr
+SWI_Addr:       DCD   OS_CPU_ARM_ExceptSwiHndlr
+Prefetch_Addr:  DCD   OS_CPU_ARM_ExceptPrefetchAbortHndlr
+Abort_Addr:     DCD   OS_CPU_ARM_ExceptDataAbortHndlr
+Unused_Addr:    DCD   .
+IRQ_Addr:       DCD   OS_CPU_ARM_ExceptIrqHndlr
+FIQ_Addr:       DCD   OS_CPU_ARM_ExceptFiqHndlr
+
+;****************************** Forfard Declaration*********************************
+        SECTION .bss:DATA:NOROOT(3)
+        SECTION CSTACK:DATA:NOROOT(3)
+		SECTION .svcstack:DATA:NOROOT(3)
+		SECTION .irqstack:DATA:NOROOT(3)
+		SECTION .fiqstack:DATA:NOROOT(3)
+		SECTION .undstack:DATA:NOROOT(3)
+		SECTION .abtstack:DATA:NOROOT(3)
+        
+
+        ARM
+;********************************************************************************************************
+;                                            ARM EXCEPTION VECTORS
+;********************************************************************************************************
+
+    SECTION .intvec:CODE:NOROOT(2)
+    PUBLIC  __vector
+    PUBLIC  __iar_program_start
+
+    IMPORT  OS_CPU_ARM_ExceptUndefInstrHndlr
+    IMPORT  OS_CPU_ARM_ExceptSwiHndlr
+    IMPORT  OS_CPU_ARM_ExceptPrefetchAbortHndlr
+    IMPORT  OS_CPU_ARM_ExceptDataAbortHndlr
+    IMPORT  OS_CPU_ARM_ExceptIrqHndlr
+    IMPORT  OS_CPU_ARM_ExceptFiqHndlr
+    
+    
+                                   ; Level 1 page table descriptor templates
+TTB_ENTRY_SUPERSEC_FAULT  EQU  0x50006
+TTB_ENTRY_SUPERSEC_STRONG EQU  0x50C02
+TTB_ENTRY_SUPERSEC_DEV    EQU  0x50C06
+TTB_ENTRY_SUPERSEC_NORM   EQU  0x51C0E
+TTB_ENTRY_SEC_NORM        EQU  0x0C0E
+
+    ARM             
 
 ;**************************** Code Seection ***********************************
         

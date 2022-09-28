@@ -98,6 +98,8 @@ void configure_platform(void)
      /* Initializing the ARM Interrupt Controller. */
     IntAINTCInit();
     
+    //BSP_IntInit();
+    
     /* Enable Branch Prediction Shit */
     CP15BranchPredictionEnable();
     

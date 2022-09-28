@@ -119,23 +119,6 @@ extern short channel3_flag;
 #define GPTI_TSICR				0x54
 #define GPTI_TCAR2				0x58
 
-#define DMTIMER_TIDR            0x00
-#define DMTIMER_TIOCP_CFG       0x10
-#define DMTIMER_IRQSTATUS_RAW   0x24
-#define DMTIMER_IRQSTATUS       0x28
-#define DMTIMER_IRQENABLE_SET   0x2C
-#define DMTIMER_IRQENABLE_CLR   0x30
-#define DMTIMER_IRQWAKEEN       0x34
-#define DMTIMER_TCLR            0x38
-#define DMTIMER_TCRR            0x3C
-#define DMTIMER_TLDR            0x40
-#define DMTIMER_TTGR            0x44
-#define DMTIMER_TWPS            0x48
-#define DMTIMER_TMAR            0x4C
-#define DMTIMER_TCAR1           0x50
-#define DMTIMER_TSICR           0x54
-#define DMTIMER_TCAR2           0x58
-
 /* modified */
 /* Define MPU_INTC */
 #define MPU_INTC				0x48200000
