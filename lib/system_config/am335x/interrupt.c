@@ -46,6 +46,7 @@
 #include "hw_types.h"
 #include "soc_AM335x.h"
 #include "cpu.h"
+#include "uC_cpu.h"
 
 /******************************************************************************
 **                INTERNAL MACRO DEFINITIONS
@@ -54,10 +55,19 @@
 #define REG_BIT_MASK                   (0x1F)
 #define NUM_INTERRUPTS                 (128u)
 
+#define  REG_INTCPS_SIR_IRQ            (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_SIR_IRQ))
+#define  REG_INTCPS_SIR_FIQ            (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_SIR_FIQ))
+#define  REG_INTCPS_CONTROL            (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_CONTROL))
+#define  REG_INTCPS_ISR_CLEAR(x)       (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_ISR_CLEAR(x)))
+#define  REG_INTCPS_ISR_CLEAR(x)       (*(CPU_REG32 *)(SOC_AINTC_REGS + INTC_ISR_CLEAR(x)))
+#define  ACTIVE_IRQ_MASK               (0x7F)
+#define  ACTIVE_FIQ_MASK               (0x7F)
+
 /**************** *************************************************************
 **                 STATIC VARIABLE DEFINITIONS
 ******************************************************************************/
-void (*fnRAMVectors[NUM_INTERRUPTS])(void);
+//void (*fnRAMVectors[NUM_INTERRUPTS])(void);
+CPU_FNCT_PTR BSP_IntVectTbl[SYS_INT_ID_MAX];
 
 /******************************************************************************
 **                STATIC FUNCTION DECLARATIONS
@@ -95,7 +105,25 @@ static void IntDefaultHandler(void)
 void IntRegister(unsigned int intrNum, void (*fnHandler)(void))
 {
     /* Assign ISR */
-    fnRAMVectors[intrNum] = fnHandler;
+    //fnRAMVectors[intrNum] = fnHandler;
+    BSP_IntVectTbl[intrNum] = (CPU_FNCT_PTR)fnHandler;
+}
+
+void  BSP_IntVectReg (CPU_INT08U     int_id,
+                      CPU_FNCT_PTR  isr)
+{
+    CPU_SR_ALLOC();
+
+
+    if (int_id > SYS_INT_ID_MAX) {
+        return;
+    }
+
+    if (int_id < SYS_INT_ID_MAX) {
+        CPU_CRITICAL_ENTER();
+        BSP_IntVectTbl[int_id] = isr;
+        CPU_CRITICAL_EXIT();
+    }
 }
 
 /**
@@ -111,7 +139,8 @@ void IntRegister(unsigned int intrNum, void (*fnHandler)(void))
 void IntUnRegister(unsigned int intrNum)
 {
     /* Assign default ISR */
-    fnRAMVectors[intrNum] = IntDefaultHandler;
+    //fnRAMVectors[intrNum] = IntDefaultHandler;
+    BSP_IntVectTbl[intrNum] = (CPU_FNCT_PTR)IntDefaultHandler;
 }
 
 /**
@@ -131,17 +160,106 @@ void IntAINTCInit(void)
     HWREG(SOC_AINTC_REGS + INTC_SYSCONFIG) = INTC_SYSCONFIG_SOFTRESET;
  
     /* Wait for the reset to complete */
-    while((HWREG(SOC_AINTC_REGS + INTC_SYSSTATUS) 
-          & INTC_SYSSTATUS_RESETDONE) != INTC_SYSSTATUS_RESETDONE);    
+    while((HWREG(SOC_AINTC_REGS + INTC_SYSSTATUS)& INTC_SYSSTATUS_RESETDONE) != INTC_SYSSTATUS_RESETDONE);    
   
     /* Enable any interrupt generation by setting priority threshold */ 
-    HWREG(SOC_AINTC_REGS + INTC_THRESHOLD) = 
-                                       INTC_THRESHOLD_PRIORITYTHRESHOLD;
+    HWREG(SOC_AINTC_REGS + INTC_THRESHOLD) = INTC_THRESHOLD_PRIORITYTHRESHOLD;
+    
+    /* Disable all pending interrupts                       */
+    REG_INTCPS_ISR_CLEAR(0) = DEF_BIT_FIELD(32u, 0u);
+    REG_INTCPS_ISR_CLEAR(1) = DEF_BIT_FIELD(32u, 0u);
+    REG_INTCPS_ISR_CLEAR(2) = DEF_BIT_FIELD(32u, 0u);
+    REG_INTCPS_ISR_CLEAR(3) = DEF_BIT_FIELD(32u, 0u);
 
-    /* Register the default handler for all interrupts */
-    for(intrNum = 0; intrNum < NUM_INTERRUPTS; intrNum++)
+    for (CPU_INT32U int_id = 0; int_id < SYS_INT_ID_MAX; int_id++) 
     {
-        fnRAMVectors[intrNum] = IntDefaultHandler;
+        BSP_IntVectReg((CPU_INT08U  )int_id,(CPU_FNCT_PTR)IntDefaultHandler);
+    }
+    
+    REG_INTCPS_CONTROL = (INTC_CONTROL_NEWFIQAGR | INTC_CONTROL_NEWIRQAGR);
+}
+
+static  void  OS_BSP_ExceptHandler (CPU_INT08U  except_type)
+{
+    switch (except_type) {
+        case OS_CPU_ARM_EXCEPT_RESET:
+        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
+        case OS_CPU_ARM_EXCEPT_SWI:
+        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
+        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
+             while (DEF_TRUE) {
+                 ;
+             }
+    }
+}
+
+void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
+{
+    switch (src_id) {
+        case OS_CPU_ARM_EXCEPT_IRQ:
+        case OS_CPU_ARM_EXCEPT_FIQ:
+             BSP_IntHandler((CPU_INT32U)src_id);
+             break;
+
+        case OS_CPU_ARM_EXCEPT_RESET:
+        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
+        case OS_CPU_ARM_EXCEPT_SWI:
+        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
+        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
+        case OS_CPU_ARM_EXCEPT_ADDR_ABORT:
+        default:
+             OS_BSP_ExceptHandler((CPU_INT08U)src_id);
+             break;
+    }
+}
+
+void  BSP_IntClr (CPU_INT08U  int_id)
+{
+    CPU_INT08U  reg_nbr;
+
+
+    if (int_id > SYS_INT_ID_MAX) {
+        return;
+    }
+
+    reg_nbr = int_id / 32;
+
+    REG_INTCPS_ISR_CLEAR(reg_nbr) = DEF_BIT(int_id % 32);
+}
+
+void  BSP_IntHandler (CPU_INT32U  src_nbr)
+{
+    CPU_INT32U    int_nbr;
+    CPU_FNCT_PTR  isr;
+
+
+    switch (src_nbr) {
+        case OS_CPU_ARM_EXCEPT_IRQ:
+             int_nbr = REG_INTCPS_SIR_IRQ;
+
+             isr = BSP_IntVectTbl[int_nbr & ACTIVE_IRQ_MASK];
+             if (isr != (CPU_FNCT_PTR)0) {
+                 isr((void *)int_nbr);
+             }
+			 BSP_IntClr(int_nbr);                               /* Clear interrupt									   	*/
+
+			 REG_INTCPS_CONTROL = INTC_CONTROL_NEWIRQAGR;
+             break;
+
+        case OS_CPU_ARM_EXCEPT_FIQ:
+             int_nbr = REG_INTCPS_SIR_FIQ;
+
+             isr = BSP_IntVectTbl[int_nbr & ACTIVE_FIQ_MASK];
+             if (isr != (CPU_FNCT_PTR)0) {
+                 isr((void *)int_nbr);
+             }
+			 BSP_IntClr(int_nbr);                       		/* Clear interrupt									   	*/
+
+			 REG_INTCPS_CONTROL = INTC_CONTROL_NEWFIQAGR;
+             break;
+
+        default:
+             break;
     }
 }
 

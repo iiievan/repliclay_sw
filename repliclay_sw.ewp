@@ -849,7 +849,7 @@
                 </option>
                 <option>
                     <name>IlinkOverrideProgramEntryLabel</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabelSelect</name>
@@ -857,7 +857,7 @@
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabel</name>
-                    <state>Entry</state>
+                    <state>__iar_program_start</state>
                 </option>
                 <option>
                     <name>DoFill</name>

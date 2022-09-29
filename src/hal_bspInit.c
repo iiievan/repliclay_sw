@@ -93,7 +93,7 @@ static volatile unsigned int flagIsr = 0;
 void configure_platform(void)
 {
     /* Initiate MMU and ... Invoke Cache */
-    //InitMem(); 
+    InitMem(); 
     
      /* Initializing the ARM Interrupt Controller. */
     IntAINTCInit();
@@ -140,8 +140,8 @@ void halBspInit(void)
 static void DMTimerAintcConfigure(void)
 {
     /* Registering DMTimerIsr */
-    IntRegister(SYS_INT_TINT2, DMTimerIsr);
-
+    //IntRegister(SYS_INT_TINT2, DMTimerIsr);
+    BSP_IntVectReg(SYS_INT_TINT2,(CPU_FNCT_PTR)DMTimerIsr);
     /* Set the priority */
     IntPrioritySet(SYS_INT_TINT2,(configMAX_IRQ_PRIORITIES -1), AINTC_HOSTINT_ROUTE_IRQ); /* Lowest Priority */
 

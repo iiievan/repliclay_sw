@@ -1,96 +1,35 @@
-;******************************************************************************
 ;
-; init.S - Init code routines
+;********************************************************************************************************
+;                                    EXCEPTION VECTORS & STARTUP CODE
 ;
-;******************************************************************************
+; File      : cstartup.s
+; For       : ARM7 or ARM9
+; Toolchain : IAR EWARM V5.10 and higher
+;********************************************************************************************************
 ;
-; Copyright (C) 2010 Texas Instruments Incorporated - http://www.ti.com/
-;
-;
-;  Redistribution and use in source and binary forms, with or without
-;  modification, are permitted provided that the following conditions
-;  are met:
-;
-;    Redistributions of source code must retain the above copyright
-;    notice, this list of conditions and the following disclaimer.
-;
-;    Redistributions in binary form must reproduce the above copyright
-;    notice, this list of conditions and the following disclaimer in the
-;    documentation and/or other materials provided with the
-;    distribution.
-;
-;    Neither the name of Texas Instruments Incorporated nor the names of
-;    its contributors may be used to endorse or promote products derived
-;    from this software without specific prior written permission.
-;
-;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-;  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-;  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-;  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-;  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-;  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-;  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-;  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-;  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-;  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-;  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-;
-;******************************************************************************
 
     MODULE  ?cstartup
 
+;********************************************************************************************************
+;                                           MACROS AND DEFINIITIONS
+;********************************************************************************************************
 
-        
-;****************************** Global Symbols*********************************
-        EXTERN  __iar_program_start
-        PUBLIC _stack
-		PUBLIC _und_stack
-		PUBLIC _abt_stack
-		PUBLIC _fiq_stack
-		PUBLIC _irq_stack
-		PUBLIC _svc_stack
-        PUBLIC _bss_start
-        PUBLIC _bss_end
-        PUBLIC start_boot
-        EXTERN CopyVectorTable
-
-;************************ Internal Definitions ********************************
-;
-; Define the stack sizes for different modes. The user/system mode will use
-; the rest of the total stack size
-;
-UND_STACK_SIZE        EQU        0x1000
-ABT_STACK_SIZE        EQU        0x1000
-FIQ_STACK_SIZE        EQU        0x1000
-IRQ_STACK_SIZE        EQU        0x1000
-SVC_STACK_SIZE        EQU        0x1000
-
-;
-; to set the mode bits in CPSR for different modes
-; 
-MODE_BITS	DEFINE	0x1F       
-MODE_USR    DEFINE  0x10            
-MODE_FIQ    DEFINE  0x11
-MODE_IRQ    DEFINE  0x12
-MODE_SVC    DEFINE  0x13
-MODE_ABT    DEFINE  0x17
-MODE_UND    DEFINE  0x1B
-MODE_SYS    DEFINE  0x1F            
+                                                                ; Mode, correspords to bits 0-5 in CPSR
+MODE_BITS	DEFINE	0x1F		                                ; Bit mask for mode bits in CPSR
+USR_MODE	DEFINE	0x10		                                ; User mode
+FIQ_MODE	DEFINE	0x11		                                ; Fast Interrupt Request mode
+IRQ_MODE	DEFINE	0x12		                                ; Interrupt Request mode
+SVC_MODE	DEFINE	0x13		                                ; Supervisor mode
+ABT_MODE	DEFINE	0x17		                                ; Abort mode
+UND_MODE	DEFINE	0x1B		                                ; Undefined Instruction mode
+SYS_MODE	DEFINE	0x1F		                                ; System mode
 
                                                                 ; Control register C1
-CTRL_C1_M   DEFINE  0x0001
-CTRL_C1_A   DEFINE  0x0002
-CTRL_C1_C   DEFINE  0x0004
-CTRL_C1_W   DEFINE  0x0008
-CTRL_C1_S   DEFINE  0x0100
-CTRL_C1_R   DEFINE  0x0200
-CTRL_C1_Z   DEFINE  0x0800
-CTRL_C1_I   DEFINE  0x1000
-CTRL_C1_V   DEFINE  0x2000
-CTRL_C1_RR  DEFINE  0x4000
+
 
 
 CP_DIS_MASK DEFINE  0xFFFFEFFA
+
 
 ;********************************************************************************************************
 ;                                            ARM EXCEPTION VECTORS
@@ -140,182 +79,127 @@ Unused_Addr:    DCD   .
 IRQ_Addr:       DCD   OS_CPU_ARM_ExceptIrqHndlr
 FIQ_Addr:       DCD   OS_CPU_ARM_ExceptFiqHndlr
 
-;****************************** Forfard Declaration*********************************
-        SECTION .bss:DATA:NOROOT(3)
-        SECTION CSTACK:DATA:NOROOT(3)
-		SECTION .svcstack:DATA:NOROOT(3)
-		SECTION .irqstack:DATA:NOROOT(3)
-		SECTION .fiqstack:DATA:NOROOT(3)
-		SECTION .undstack:DATA:NOROOT(3)
-		SECTION .abtstack:DATA:NOROOT(3)
-        
 
-        ARM
 ;********************************************************************************************************
-;                                            ARM EXCEPTION VECTORS
+;                                   LOW-LEVEL INITIALIZATION
 ;********************************************************************************************************
 
-    SECTION .intvec:CODE:NOROOT(2)
-    PUBLIC  __vector
+    SECTION FIQ_STACK:DATA:NOROOT(3)
+    SECTION IRQ_STACK:DATA:NOROOT(3)
+    SECTION SVC_STACK:DATA:NOROOT(3)
+    SECTION ABT_STACK:DATA:NOROOT(3)
+    SECTION UND_STACK:DATA:NOROOT(3)
+    SECTION CSTACK:DATA:NOROOT(3)
+    SECTION MMU_TT:DATA:NOROOT(3)
+    SECTION .bss:DATA:NOROOT(3)
+    SECTION text:CODE:NOROOT(2)
+    REQUIRE __vector
+    EXTERN  __cmain
+    EXTWEAK __iar_init_core
+    EXTWEAK __iar_init_vfp
     PUBLIC  __iar_program_start
+    EXTERN  lowlevel_init
 
-    IMPORT  OS_CPU_ARM_ExceptUndefInstrHndlr
-    IMPORT  OS_CPU_ARM_ExceptSwiHndlr
-    IMPORT  OS_CPU_ARM_ExceptPrefetchAbortHndlr
-    IMPORT  OS_CPU_ARM_ExceptDataAbortHndlr
-    IMPORT  OS_CPU_ARM_ExceptIrqHndlr
-    IMPORT  OS_CPU_ARM_ExceptFiqHndlr
-    
-    
-                                   ; Level 1 page table descriptor templates
-TTB_ENTRY_SUPERSEC_FAULT  EQU  0x50006
-TTB_ENTRY_SUPERSEC_STRONG EQU  0x50C02
-TTB_ENTRY_SUPERSEC_DEV    EQU  0x50C06
-TTB_ENTRY_SUPERSEC_NORM   EQU  0x51C0E
-TTB_ENTRY_SEC_NORM        EQU  0x0C0E
+    ARM
+__iar_program_start:
+?cstartup:
 
-    ARM             
+                                                ; Add initialization needed before ...
+                                                ; ... setup of stack pointers here.
+                                                ; Disable Addr translation, D cache ...
+                                                ; ... and enable I cache
+    MRC         p15,0,R1,C1,C0,0	 ; Read System Control Register (SCTLR)
+    LDR         R0,=CP_DIS_MASK      ; 0xFFFFEFFA
+    AND         R1,R1,R0
+    ORR         R1,R1,#(1<<12)
+    MCR         p15,0,R1,C1,C0,0	 ; Write System Control Register (SCTLR)
 
-;**************************** Code Seection ***********************************
+
+;********************************************************************************************************
+;                                    STACK POINTER INITIALIZATION
+;********************************************************************************************************
+
+    MRS     r0,CPSR                                             ; Original PSR value
+    BIC     r0,r0,#MODE_BITS                                    ; Clear the mode bits
+    ORR     r0,r0,#SVC_MODE                                     ; Set Supervisor mode bits
+    MSR     CPSR_c,r0                                           ; Change the mode
+    LDR     sp,=SFE(SVC_STACK)                                  ; End of SVC_STACK
+  
+    BIC     r0,r0,#MODE_BITS                                    ; Clear the mode bits
+    ORR     r0,r0,#ABT_MODE                                     ; Set Abort mode bits
+    MSR     CPSR_c,r0                                           ; Change the mode
+    LDR     sp,=SFE(ABT_STACK)                                  ; End of ABT_STACK
+  
+    BIC     r0,r0,#MODE_BITS                                    ; Clear the mode bits
+    ORR     r0,r0,#UND_MODE                                     ; Set Undefined mode bits
+    MSR     CPSR_c,r0                                           ; Change the mode
+    LDR     sp,=SFE(UND_STACK)                                  ; End of UND_STACK
+  
+    BIC     r0,r0,#MODE_BITS                                    ; Clear the mode bits
+    ORR     r0,r0,#FIQ_MODE                                     ; Set FIR mode bits
+    MSR     CPSR_c,r0                                           ; Change the mode
+    LDR     sp,=SFE(FIQ_STACK)                                  ; End of FIQ_STACK
+  
+    BIC     r0,r0,#MODE_BITS                                    ; Clear the mode bits
+    ORR     r0,r0,#IRQ_MODE                                     ; Set IRQ mode bits
+    MSR     CPSR_c,r0                                           ; Change the mode
+    LDR     sp,=SFE(IRQ_STACK)                                  ; End of IRQ_STACK
+  
+    BIC     r0,r0,#MODE_BITS                                    ; Clear the mode bits
+    ORR     r0,r0,#SYS_MODE                                     ; Set System mode bits
+    MSR     CPSR_c,r0                                           ; Change the mode
+    LDR     sp,=SFE(CSTACK)                                     ; End of CSTACK
+  
+  
+    LDR     r0,=SFB(.intvec)
+    MCR     p15, 0, r0, c12, c0, 0								; Set vector address in CP15 VBAR register
         
+        
+    MOV     r0, #0x0
+    MCR     p15, 0, r0, c7, c5, 6                               ; Invalidate branch predictor
 
+    MOV     r0, #0x0
+    MCR     p15, 0, r0, c8, c7, 0                               ; Invalidate TLB
 
-;******************************************************************************
-;
-;******************************************************************************
-;
-; The reset handler in StarterWare is named as 'Entry'.
-; The reset handler sets up the stack pointers for all the modes. The FIQ and
-; IRQ shall be disabled during this. Then clear the BSS sections and finally
-; switch to the function calling the main() function.
-;
-       
-Entry
-;
-; Set up the Stack for Undefined mode
-;
-		 _bss_start: DC32 SFB(.bss)        
-		 _bss_end:   DC32 SFE(.bss)        
-		 _stack:     DC32 SFB(CSTACK)
-		 _und_stack: DC32 SFB(.undstack)
-		 _abt_stack: DC32 SFB(.abtstack)
-		 _fiq_stack: DC32 SFB(.fiqstack)
-		 _irq_stack: DC32 SFB(.irqstack)
-		 _svc_stack: DC32 SFB(.svcstack)
+    MOV     r0, #0
+    MCR     p15, 0, r0, c7, c5, 0                               ; Invalidate instruction cache
+    
+    BL      BSP_DCacheInvalidateAll
 
-         LDR   r0, _stack                      ; Read the stack address
-         MSR   cpsr_c, #MODE_UND|I_F_BIT       ; switch to undef  mode
-		 LDR   r0, _und_stack                  ; Read the undefined stack address
-         MOV   sp,r0                           ; write the stack pointer
-         SUB   r0, r0, #UND_STACK_SIZE         ; give stack space
-;
-; Set up the Stack for abort mode
-;        
-         MSR   cpsr_c, #MODE_ABT|I_F_BIT       ; Change to abort mode
-	     LDR   r0, _abt_stack                  ; Read the abort stack address
-         MOV   sp, r0                          ; write the stack pointer
-         SUB   r0,r0, #ABT_STACK_SIZE          ; give stack space
-;
-; Set up the Stack for FIQ mode
-;       
-         MSR   cpsr_c, #MODE_FIQ|I_F_BIT       ; change to FIQ mode
-		 LDR   r0, _fiq_stack                  ; Read the FIQ stack address
-         MOV   sp,r0                           ; write the stack pointer
-         SUB   r0,r0, #FIQ_STACK_SIZE          ; give stack space
-;
-; Set up the Stack for IRQ mode
-;       
-         MSR   cpsr_c, #MODE_IRQ|I_F_BIT       ; change to IRQ mode
-		 LDR   r0, _irq_stack                  ; Read the IRQ stack address
-         MOV   sp,r0                           ; write the stack pointer
-         SUB   r0,r0, #IRQ_STACK_SIZE          ; give stack space
-;
-; Set up the Stack for SVC mode
-;        
-         MSR   cpsr_c, #MODE_SVC|I_F_BIT       ; change to SVC mode
-		 LDR   r0, _svc_stack                  ; Read the SVC stack address
-         MOV   sp,r0                           ; write the stack pointer
-         SUB   r0,r0, #SVC_STACK_SIZE          ; give stack space
+Clear_Bss_Section:
 
-;
-; Set up the Stack for USer/System mode
-;      
-         MSR   cpsr_c, #MODE_SYS|I_F_BIT       ; change to system mode
-         MOV   sp,r0                           ; write the stack pointer
-
-
-
-
-
-
-; Invalidate and Enable Branch Prediction  
-         MOV     r0, #0
-         MCR     p15, #0, r0, c7, c5, #6
-         ISB
-         MRC     p15, #0, r0, c1, c0, #0
-         ORR     r0, r0, #0x00000800
-         MCR     p15, #0, r0, c1, c0, #0
-
-;
-; Enable Neon/VFP Co-Processor
-;
-        MRC p15, #0, r1, c1, c0, #2           ; r1 = Access Control Register
-        ORR r1, r1, #(0xf << 20)              ; enable full access for p10,11
-        MCR p15, #0, r1, c1, c0, #2           ; Access Control Register = r1
-        MOV r1, #0
-        MCR p15, #0, r1, c7, c5, #4           ;flush prefetch buffer
-        MOV r0,#0x40000000
-        FMXR FPEXC, r0                        ; Set Neon/VFP Enable bit
-
-;
-; Clear the BSS section here
-;
-Clear_Bss_Section
-
-         LDR   r0, _bss_start                 ; Start address of BSS
-         LDR   r1, _bss_end           		  ; End address of BSS
+         LDR   r0, =SFB(.bss)                 ; Start address of BSS
+         LDR   r1, =SFE(.bss)           	  ; End address of BSS
          MOV   r2, #0  
-Loop 
+Loop: 
          STR   r2, [r0], #4                    ; Clear one word in BSS
          CMP   r0, r1
          BLE   Loop                            ; Clear till BSS end
 
-;
-; Enter the start_boot function. The execution still happens in system mode.
-;
-/**
- * \brief   This function does two operations:\n
- *          1> Copies an array which contains vector table values to the
- *             processor's vector table space.\n
- *          2> Then it calls the main() function.\n
- *
- * \param   None.
- *
- * \return  None.
- * 
- * \note    This function is the first function that needs to be called in a
- *          system. This should be set as the entry point in the linker script
- *          file if the ELF executable is to loaded via a debugger on the
- *          target. This function never returns, but gives control to the
- *          application entry point.
- **/        
-Enter_main
-         
-         LDR   r10,=start_boot
-         MOV   lr,pc                           ; Dummy return from start_boot
-         BX    r10                             ; Branch to start_boot
-         SUB   pc, pc, #0x08                   ; looping
 
-start_boot
-        LDR     R0, =CopyVectorTable
-        BLX     R0
-        LDR     R0, =__iar_program_start
-        BX      R0
+; Add more initialization here
 
-;
-; End of the file
-;
-    END
+; Continue to ?main for more IAR specific system startup
+        B       __cmain
+
+BSP_DCacheInvalidateAll:
+    ; Invalidate L1 data cache
+    MOV32     r0, #0x1FF            ; Load set index
+BSP_DCacheInvalidateAll_loop_1:
+    MOV     r1, #0x00000003         ; Load number of ways
+BSP_DCacheInvalidateAll_loop_2:
+    MOV     r2, r1, LSL #30
+    ADD     r2, r2, r0, LSL #5
+    MCR     p15, 0, r2, c7, c6, 2
+    SUBS    r1, r1, #1
+    BGE     BSP_DCacheInvalidateAll_loop_2
+    SUBS    r0, r0, #1
+    BGE     BSP_DCacheInvalidateAll_loop_1
+    DSB
+
+    BX      lr
+    
+                END
     
     
 
