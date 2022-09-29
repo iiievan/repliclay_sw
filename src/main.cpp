@@ -62,7 +62,10 @@ static  void  AppTaskStart (void *p_arg)
 {
     (void)p_arg;
     CPU_INT32U i;
-    
+	
+    ConsoleUtilsPrintf("Enabling timer interrupt!\r\n");
+    DMTimerIntEnable(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_EN_FLAG);
+	
     Mem_Init();                                                 /* Initialize memory managment module                   */
     Math_Init();
     
@@ -77,7 +80,7 @@ static  void  AppTaskStart (void *p_arg)
     
       while (DEF_TRUE) {
         ConsoleUtilsPrintf("Task 1 message %d!\r\n", i++);
-        OSTimeDlyHMSM(0, 0, 1,0);
+        OSTimeDlyHMSM(0, 0, 5,0);
     }
 }
 
@@ -106,9 +109,10 @@ int main()
     CPU_ERR  cpu_err;
 #endif
     init();
-     
+	
+    CPU_IntDis();
     ConsoleUtilsPrintf("Platform initialized.\r\n");
-
+	
     OSInit();                                                   /* Init uC/OS-II                                        */
 
     OSTaskCreateExt(AppTaskStart,                               /* Create the start task.                               */

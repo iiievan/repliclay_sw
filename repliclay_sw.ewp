@@ -2697,9 +2697,6 @@
     <group>
         <name>startup</name>
         <file>
-            <name>$PROJ_DIR$\startup\am335x_startup.cpp</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\startup\amm335x_init.S</name>
         </file>
     </group>
@@ -2744,12 +2741,12 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-d32.asm</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-none.asm</name>
                     <excluded>
                         <configuration>Debug</configuration>
                     </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-none.asm</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_c.c</name>
