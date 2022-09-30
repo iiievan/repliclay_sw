@@ -165,6 +165,18 @@ __iar_program_start:
     MCR     p15, 0, r0, c7, c5, 0                               ; Invalidate instruction cache
     
     BL      BSP_DCacheInvalidateAll
+	
+	; Set domain access
+    MRC     p15, 0, r0, c3, c0, 0								; Read Domain Access Control Register
+    LDR     r0, =0x55555555										; Set all Domains to Client
+    MCR     p15, 0, r0, c3, c0, 0								; Write Domain Access Control Register
+
+
+    ; Turn on core features assumed to be enabled.
+    BL      __iar_init_core
+
+    ; Initialize VFP (if needed).
+    BL      __iar_init_vfp
 
 Clear_Bss_Section:
 
