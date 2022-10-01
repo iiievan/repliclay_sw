@@ -24,6 +24,7 @@
 using namespace std;
 
 DM_Timer dm_timer_0(DMTIMER::AM335X_DMTIMER_0);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
