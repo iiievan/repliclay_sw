@@ -9,6 +9,8 @@
 
 
 #include "hal_bspInit.h"
+#include "AM335x_mem_map.h"
+#include "DM_Timer.h"
 #include  <uC_cpu.h>
 #include  <app_cfg.h>
 #include  <cpu_cfg.h>
@@ -21,6 +23,7 @@
 
 using namespace std;
 
+DM_Timer dm_timer_0(DMTIMER::AM335X_DMTIMER_0);
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -109,6 +112,10 @@ int main()
     CPU_ERR  cpu_err;
 #endif
     init();
+	volatile uint32_t TIDR_val = dm_timer_0.enable();
+	
+	if(TIDR_val == 3)
+	  dm_timer_0.disable();
 	
     CPU_IntDis();
     ConsoleUtilsPrintf("Platform initialized.\r\n");
