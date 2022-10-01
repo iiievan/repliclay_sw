@@ -1,0 +1,73 @@
+/*###ICF### Section handled by ICF editor, don't touch! ****/
+/*-Editor annotation file-*/
+/* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\a_v1_0.xml" */
+/*-Specials-*/
+define symbol __ICFEDIT_intvec_start__       = 0x80000000;
+/*-Memory Regions-*/
+define symbol __ICFEDIT_region_ROM_start__   = 0x00000000;
+define symbol __ICFEDIT_region_ROM_end__     = 0x00000000;
+define symbol __ICFEDIT_region_RAM_start__   = 0x80000000;
+define symbol __ICFEDIT_region_RAM_end__     = 0x8FFFFFFF;
+define symbol __ICFEDIT_region_MMUTT_start__ = 0x402FC000;
+define symbol __ICFEDIT_region_MMUTT_end__   = 0x402FFFFF;
+
+/*-Sizes-*/
+define symbol __ICFEDIT_size_cstack__   = 0x1000;	// 4096
+define symbol __ICFEDIT_size_svcstack__ = 0x100;
+define symbol __ICFEDIT_size_irqstack__ = 0x100;
+define symbol __ICFEDIT_size_fiqstack__ = 0x100;
+define symbol __ICFEDIT_size_undstack__ = 0x100;
+define symbol __ICFEDIT_size_abtstack__ = 0x100;
+define symbol __ICFEDIT_size_heap__     = 0x1000;	// 4096
+define symbol __ICFEDIT_size_mmutt__    = 0x4000;	// 16384
+/**** End of ICF editor section. ###ICF###*/
+
+
+define memory mem with size = 4G;
+define region ROM_region   = mem:[from __ICFEDIT_region_ROM_start__   to __ICFEDIT_region_ROM_end__];
+define region RAM_region   = mem:[from __ICFEDIT_region_RAM_start__   to __ICFEDIT_region_RAM_end__];
+define region MMU_region   = mem:[from __ICFEDIT_region_MMUTT_start__ to __ICFEDIT_region_MMUTT_end__];
+
+define symbol __region_Bootstrap_start__   = 0x402F0400;
+define symbol __region_Bootstrap_end__     = 0x402FEFFF;
+define region Bootstrap_region = mem:[from __region_Bootstrap_start__ to __region_Bootstrap_end__];
+
+define symbol __region_VectorsR_start__   = 0x402FFFE4;
+define symbol __region_VectorsR_end__     = 0x402FFFFF;
+define region VectorsR_region = mem:[from __region_VectorsR_start__ to __region_VectorsR_end__];
+
+define block CSTACK    with alignment = 8, size = __ICFEDIT_size_cstack__   { };
+define block SVC_STACK with alignment = 8, size = __ICFEDIT_size_svcstack__ { };
+define block IRQ_STACK with alignment = 8, size = __ICFEDIT_size_irqstack__ { };
+define block FIQ_STACK with alignment = 8, size = __ICFEDIT_size_fiqstack__ { };
+define block UND_STACK with alignment = 8, size = __ICFEDIT_size_undstack__ { };
+define block ABT_STACK with alignment = 8, size = __ICFEDIT_size_abtstack__ { };
+define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };
+define block VectorsR  with alignment = 4, size = 0x1C {};
+define block MMU_TT    with alignment = 16384, size = __ICFEDIT_size_mmutt__    { };
+
+define symbol __size_svcstack_boot__ = 0x1000;
+define block SVC_STACK_BOOT with alignment = 8, size = __size_svcstack_boot__ { };
+
+initialize by copy {  readwrite };
+do not initialize  { section .noinit };
+
+place at address mem:__ICFEDIT_intvec_start__   { readonly section .intvec };
+place at address mem:__region_Bootstrap_start__ { readonly section .intvec_bootstrap };
+
+keep { section .intvec };
+
+place in Bootstrap_region   {  section .bootstrap_ro, block SVC_STACK_BOOT };
+place in VectorsR_region    { block VectorsR };
+place in RAM_region   { readonly };
+place in RAM_region   { readwrite };
+place in RAM_region   { zi };
+place in RAM_region   { first block CSTACK,
+                        block SVC_STACK,
+                        block IRQ_STACK,
+                        block FIQ_STACK,
+                        block UND_STACK,
+                        block ABT_STACK,
+                        last block HEAP };
+place in MMU_region   { block MMU_TT };
+

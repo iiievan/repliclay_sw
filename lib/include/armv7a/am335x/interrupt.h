@@ -48,6 +48,11 @@
 #include "hw_intc.h"
 #include "hw_types.h"
 
+//#include  <uC_cpu.h>
+//#include  <cpu_cfg.h>
+#include  <cpu_core.h>
+#include  <os.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -176,10 +181,16 @@ extern "C" {
 #define SYS_INT_DMA_INTR_PIN1                  (124)
 #define SYS_INT_SPI1INT                        (125)
 
+#define  SYS_INT_ID_MAX                        (125)
+
 /*****************************************************************************
 **                     API FUNCTION PROTOTYPES
 *****************************************************************************/
 extern void IntAINTCInit (void);
+extern void OS_CPU_ExceptHndlr   (CPU_INT32U  src_id);
+extern void BSP_IntHandler       (CPU_INT32U     src_nbr);
+extern void BSP_IntClr (CPU_INT08U  int_id);
+extern void BSP_IntVectReg (CPU_INT08U  int_id, CPU_FNCT_PTR    isr_fnct);
 extern void IntIfClkFreeRunSet(void);
 extern void IntIfClkAutoGateSet(void);
 extern void IntProtectionEnable(void);

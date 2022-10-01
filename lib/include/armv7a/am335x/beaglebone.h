@@ -40,7 +40,7 @@
 */
 
 
-#ifndef _BEAGLEBONE_H_
+#ifndef _BEALGEBONE_H_
 #define _BEAGLEBONE_H_
 
 #ifdef __cplusplus
@@ -65,23 +65,6 @@ extern "C" {
 #define BOARD_ID_BBB_A6                     (0x5)
 
 /*
-** BeagleBone Black
-*/
-#define BNL_BOARD_NAME                      ("A335BNL")
-#define BNL_A1_VERSION                      ("00A1")
-#define BNL_A2_VERSION                      ("00A2")
-#define BNL_A3_VERSION                      ("00A3")
-#define BNL_A4_VERSION                      ("00A4")
-#define BNL_A5_VERSION                      ("00A5")
-#define BNL_A6_VERSION                      ("00A6")
-#define BOARD_ID_BNL_A1                     (0x1)
-#define BOARD_ID_BNL_A2                     (0x2)
-#define BOARD_ID_BNL_A3                     (0x3)
-#define BOARD_ID_BNL_A4                     (0x4)
-#define BOARD_ID_BNL_A5                     (0x5)
-#define BOARD_ID_BNL_A6                     (0x6)
-
-/*
 ** Structure to map selection of IO Pad for power down configuration
 */
 typedef struct ioPadMap {
@@ -103,18 +86,29 @@ typedef struct ctrlRegContext {
 **                    FUNCTION PROTOTYPES
 *****************************************************************************/
 
-extern unsigned int BoardInfoCheck(unsigned char *boardId,
-                                   unsigned char *boardVer);
+extern unsigned int BoardInfoCheck(unsigned char *boardId, unsigned char *boardVer);
 extern void ControlRegContextSave(CTRLREGCONTEXT *contextPtr);
 extern void ControlRegContextRestore(CTRLREGCONTEXT *contextPtr);
-extern void GPIO1ModuleClkConfig(void);
+extern void IOPadContextSave(CTRLREGCONTEXT *contextPtr, unsigned int ioPadOff);
+extern void IOPadContextRestore(CTRLREGCONTEXT *contextPtr, unsigned int ioPadOff);
+extern void IOPadConfigure(unsigned int ioPadOff, unsigned int ioPadValue);
+extern void IOPadSel(CTRLREGCONTEXT *contextPtr, unsigned int ioPadOff, unsigned int ioPadSel);
+extern void IOPadSelConfigure(CTRLREGCONTEXT *contextPtr, unsigned int ioPadValue);
 extern void GPIO1Pin23PinMuxSetup(void);
 extern void GPIO0ModuleClkConfig(void);
-extern void UART0ModuleClkConfig(void);
+extern void GPIO1ModuleClkConfig(void);
+extern void GPIO1PinMuxSetup(unsigned int pinNo);
+extern void GpioPinMuxSetup(unsigned int offsetAddr, unsigned int padConfValue);
 extern void UARTPinMuxSetup(unsigned int instanceNum);
+extern void UART0ModuleClkConfig(void);
+
+extern void UARTConsolePutc(unsigned char data);
+extern unsigned char UARTConsoleGetc(void);
+extern void UARTConsoleInit(void);
+
 extern void CPSWPinMuxSetup(void);
 extern void CPSWClkEnable(void);
-extern unsigned int RTCRevisionInfoGet(void);
+extern void EVMPortMIIModeSelect(void);
 extern void EDMAModuleClkConfig(void);
 extern void EVMMACAddrGet(unsigned int addrIdx, unsigned char *macAddr);
 extern void WatchdogTimer1ModuleClkConfig(void);
@@ -124,22 +118,16 @@ extern void DMTimer4ModuleClkConfig(void);
 extern void DMTimer6ModuleClkConfig(void);
 extern void DMTimer7ModuleClkConfig(void);
 extern void DMTimer1msModuleClkConfig(unsigned int clkselect);
-extern void EVMPortMIIModeSelect(void);
+extern unsigned int RtcVersionGet(void);
 extern void RTCModuleClkConfig(void);
-extern void HSMMCSDModuleClkConfig(void);
 extern void HSMMCSDPinMuxSetup(void);
-extern void I2C0ModuleClkConfig(void);
-extern void I2C1ModuleClkConfig(void);
+extern void HSMMCSDModuleClkConfig(void);
+
 extern void I2CPinMuxSetup(unsigned int instance);
-extern void GpioPinMuxSetup(unsigned int offsetAddr,
-                            unsigned int padConfValue);
-extern void IOPadContextSave(CTRLREGCONTEXT *contextPtr, unsigned int ioPadOff);
-extern void IOPadContextRestore(CTRLREGCONTEXT *contextPtr,
-                                unsigned int ioPadOff);
-void IOPadConfigure(unsigned int ioPadOff, unsigned int ioPadValue);
-void IOPadSelConfigure(CTRLREGCONTEXT *contextPtr, unsigned int ioPadValue);
-void IOPadSel(CTRLREGCONTEXT *contextPtr, unsigned int ioPadOff,
-              unsigned int ioPadSel);
+extern void I2C1ModuleClkConfig(void);
+extern void I2C0ModuleClkConfig(void);
+
+
 #ifdef __cplusplus
 }
 #endif

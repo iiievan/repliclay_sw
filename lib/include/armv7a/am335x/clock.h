@@ -54,13 +54,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef enum { 
+  
+typedef enum 
+{ 
     FAIL     = 0,
     SUCCESS = 1
 }result;
-
-
 /********************** MACROS ***************************/
 
 /* Configs */
