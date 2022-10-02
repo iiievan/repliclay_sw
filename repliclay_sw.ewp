@@ -2672,7 +2672,13 @@
                 <name>$PROJ_DIR$\src\app\app_hooks.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\app\app_utils.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\app\cpu_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\DM_Timer.cpp</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\app\lib_cfg.h</name>
