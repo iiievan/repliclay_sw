@@ -28,10 +28,7 @@ DM_Timer dm_timer_2(DMTIMER::AM335X_DMTIMER_2);
 #ifdef __cplusplus
 extern "C" {
 #endif
-  
-extern void Entry(void);
-
-/*
+ /*
 *********************************************************************************************************
 *                                             LOCAL DEFINES
 *********************************************************************************************************
@@ -68,7 +65,8 @@ static  void  AppTaskStart (void *p_arg)
     CPU_INT32U i;
 	
     ConsoleUtilsPrintf("Enabling timer interrupt!\r\n");
-    DMTimerIntEnable(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_EN_FLAG);
+    //DMTimerIntEnable(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_EN_FLAG);
+    dm_timer_2.IRQ_enable(DMTIMER::IRQ_OVF);
 	
     Mem_Init();                                                 /* Initialize memory managment module                   */
     Math_Init();
@@ -140,15 +138,18 @@ int main()
 
 }
 
-void DMTimer_irqhandler(uint32_t value)
+void DMTimer_irqhandler(void *p_obj)
 {  
+    /* Disable the DMTimer interrupts */
     dm_timer_2.IRQ_disable(DMTIMER::IRQ_OVF);
+    
+    /* Clear the status of the interrupt flags */
     dm_timer_2.IRQ_clear(DMTIMER::IRQ_OVF);
 
     OSTimeTick();
 
+    /* Enable the DMTimer interrupts */
     dm_timer_2.IRQ_enable(DMTIMER::IRQ_OVF);
-    
     IntSystemEnable(SYS_INT_TINT2);  
 }
 

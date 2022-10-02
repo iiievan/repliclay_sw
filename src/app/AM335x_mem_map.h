@@ -219,6 +219,18 @@ namespace DMTIMER
         uint32_t  reg;                            // Type used for register access 
     } TWPS_reg_t;
 
+    enum e_TWPS_flags: uint32_t
+    {
+        F_PEND_NONE     = 0u,
+        F_PEND_TCLR     = BIT(0),
+        F_PEND_TCRR     = BIT(1),
+        F_PEND_TLDR     = BIT(2),
+        F_PEND_TTGR     = BIT(3),
+        F_PEND_TMAR     = BIT(4), 
+        F_PEND_ALL      = 0x1F  
+    };
+    
+
     /* [reset state = 0x0]*/
     typedef union 
     { 

@@ -31,7 +31,7 @@ public:
               void  GPO_configure(uint32_t gpo_cfg);
               void  compare_set(uint32_t compare_val);
           uint32_t  compare_get();
-              void  set_irq_handler(void(*function)(uint32_t)) { m_irq_handler = function; }
+              void  set_irq_handler(void(*function)(void *p_obj)) { m_irq_handler = function; }
               
               void  IRQ_raw_set(DMTIMER::e_IRQ_flags int_flags);
           uint32_t  IRQ_raw_get();
@@ -53,19 +53,19 @@ public:
             
 private:
                 //IRQn_Type   m_IRQn;         // irq module  
-                  void  m_wait_for_write(bool bit)
+                  void  m_wait_for_write(DMTIMER::e_TWPS_flags twps_mask)
                   {
                       /** Wait for previous write to complete if posted mode enabled**/
                       if(m_pTIMER->TSICR.b.POSTED)
-                          while(bit); /** then wait **/
+                          while(m_pTIMER->TWPS.reg & twps_mask);
                   }
               
 DMTIMER::AM335x_DMTIMER_Type *m_pTIMER;              
-               void (*m_irq_handler)(uint32_t) { nullptr };
+               void (*m_irq_handler)(void *p_obj) { nullptr };
            uint64_t  m_time {0}; // the timer itself
-               bool  m_is_paused { true };
+               bool  m_is_paused { true }; 
 }; 
  
-extern     void DMTimer_irqhandler(uint32_t value);
-extern DM_Timer dm_timer_0;
+extern     void DMTimer_irqhandler(void *p_obj);
+extern DM_Timer dm_timer_2;
 #endif //__DM_TIMER_H
