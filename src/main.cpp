@@ -23,7 +23,7 @@
 
 using namespace std;
 
-DM_Timer dm_timer_0(DMTIMER::AM335X_DMTIMER_0);
+DM_Timer dm_timer_2(DMTIMER::AM335X_DMTIMER_2);
 
 #ifdef __cplusplus
 extern "C" {
@@ -113,10 +113,6 @@ int main()
     CPU_ERR  cpu_err;
 #endif
     init();
-	volatile uint32_t TIDR_val = dm_timer_0.enable();
-	
-	if(TIDR_val == 3)
-	  dm_timer_0.disable();
 	
     CPU_IntDis();
     ConsoleUtilsPrintf("Platform initialized.\r\n");
@@ -142,5 +138,17 @@ int main()
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II.   */
 
 
+}
+
+void DMTimer_irqhandler(uint32_t value)
+{  
+    dm_timer_2.IRQ_disable(DMTIMER::IRQ_OVF);
+    dm_timer_2.IRQ_clear(DMTIMER::IRQ_OVF);
+
+    OSTimeTick();
+
+    dm_timer_2.IRQ_enable(DMTIMER::IRQ_OVF);
+    
+    IntSystemEnable(SYS_INT_TINT2);  
 }
 

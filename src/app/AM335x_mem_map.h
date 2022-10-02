@@ -2,10 +2,11 @@
 #define _AM335X_MEM_MAP_H_
 
 #include <stdint.h>
+#include "app_utils.h"
 
-#define   __R     volatile const       // 'read only' register
-#define   __W     volatile             // 'write only' register 
-#define   __RW    volatile             // 'read / write' register
+#define     __R     volatile const       // 'read only' register
+#define     __W     volatile             // 'write only' register 
+#define     __RW    volatile             // 'read / write' register
 
 namespace DMTIMER
 {
@@ -41,9 +42,9 @@ namespace DMTIMER
     { 
         struct 
         {                                      /* This register allows controlling various parameters of the OCP interface. */
-            uint32_t    SOFTRESET :1;          // bit: 0      Software reset.                   
-            uint32_t    EMUFREE   :1;          // bit: 1      Sensitivity to emulation (debug) suspend event from Debug Subsystem.          
-            uint32_t    IDLEMODE  :2;          // bit: 2,3    Power management, req/ack control
+            uint32_t    SOFTRESET :1;          // bit: 0      Software reset. [0x0 = No action; 0x1 = reset ongoing]                  
+            uint32_t    EMUFREE   :1;          // bit: 1      Sensitivity to emulation (debug) suspend event from Debug Subsystem. [0x0 = frozen during debug; 0x1 = debug suspend ignored]         
+            uint32_t    IDLEMODE  :2;          // bit: 2,3    Power management[0x0 = force-idle mode; 0x1 = No idle mode; 0x2 = Smart-idle mode; 0x3 = smart-idle wakeup capable]
             uint32_t              :28;         // bit: 4..31  Reserved  
         } b;                                   // Structure used for bit access 
         uint32_t  reg;                         // Type used for register access 
@@ -129,6 +130,14 @@ namespace DMTIMER
         uint32_t  reg;                            // Type used for register access 
     } IRQWAKEEN_reg_t;
 
+    enum e_IRQ_flags: uint32_t
+    {
+        IRQ_NONE = 0u,
+        IRQ_MAT   = BIT(0),
+        IRQ_OVF   = BIT(1),
+        IRQ_TCAR  = BIT(2)      
+    };
+
     /* [reset state = 0x0]*/
     typedef union 
     { 
@@ -149,6 +158,13 @@ namespace DMTIMER
         } b;                                      // Structure used for bit access 
         uint32_t  reg;                            // Type used for register access 
     } TCLR_reg_t;
+
+    enum e_DMTIMER_mode: uint32_t
+    {
+        MODE_NONE       = 0u,
+        MODE_AUTORELOAD = BIT(1),
+        MODE_COMPARE    = BIT(6)      
+    };
     
     /* [reset state = 0x0]*/
     typedef union 
@@ -182,6 +198,8 @@ namespace DMTIMER
         } b;                                      // Structure used for bit access 
         uint32_t  reg;                            // Type used for register access 
     } TTGR_reg_t;
+
+    constexpr uint32_t TTGR_DEF_VALUE = 0xFFFFFFFFu;
 
     /* [reset state = 0x0]*/
     typedef union 
@@ -230,9 +248,9 @@ namespace DMTIMER
         {                                         /* Access to this register is not stalled even if the timer is in non-posted mode configuration. */ 
                                                   /* Also in case of a wrong hardware PIFREQRATIO tied the POSTED field can be reprogrammed on */
                                                   /* the fly, so deadlock situation cannot happen */
-            uint32_t                 :1;          // bit: 0      Reserved                   
-            uint32_t    POSTED       :1;          // bit: 1      PIFREQRATIO [0x0 = Posted mode inactive; 0x1 = Posted mode active]           
-            uint32_t    SFT          :1;          // bit: 2      Resets all the function parts of the module. [0x0 = reset enabled; 0x1 = reset disabld]  
+            uint32_t                 :1;          // bit: 0      Reserved      
+            uint32_t    SFT          :1;          // bit: 1      Resets all the function parts of the module. [0x0 = reset enabled; 0x1 = reset disabld]               
+            uint32_t    POSTED       :1;          // bit: 2      PIFREQRATIO [0x0 = Posted mode inactive; 0x1 = Posted mode active] 
             uint32_t                 :29;         // bit: 3..31  Reserved  
         } b;                                      // Structure used for bit access 
         uint32_t  reg;                            // Type used for register access 
