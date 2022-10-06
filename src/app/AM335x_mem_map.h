@@ -313,5 +313,50 @@ namespace DMTIMER
     constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_7 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_7_BASE);
 } 
 
+namespace PRCM
+{  
+    constexpr uint32_t AM335x_CM_PER_BASE       = 0x44E00000;       
+    constexpr uint32_t AM335x_CM_WKUP_BASE      = 0x44E00400;
+    constexpr uint32_t AM335x_CM_DPLL_BASE      = 0x44E00500;
+    constexpr uint32_t AM335x_CM_MPU_BASE       = 0x44E00600;
+    constexpr uint32_t AM335x_CM_DEVICE_BASE    = 0x44E00700;
+    constexpr uint32_t AM335x_CM_RTC_BASE       = 0x44E00800;
+    constexpr uint32_t AM335x_CM_GFX_BASE       = 0x44E00900;
+    constexpr uint32_t AM335x_CM_CEFUSE_BASE    = 0x44E00A00;
+    
+    constexpr uint32_t AM335x_PRM_IRQ_BASE      = 0x44E00B00;    
+    constexpr uint32_t AM335x_PRM_PER_BASE      = 0x44E00C00;    
+    constexpr uint32_t AM335x_PRM_WKUP_BASE     = 0x44E00D00;
+    constexpr uint32_t AM335x_PRM_MPU_BASE      = 0x44E00E00;
+    constexpr uint32_t AM335x_PRM_DEVICE_BASE   = 0x44E00F00;
+    constexpr uint32_t AM335x_PRM_RTC_BASE      = 0x44E01000;
+    constexpr uint32_t AM335x_PRM_GFX_BASE      = 0x44E01100;
+    constexpr uint32_t AM335x_PRM_CEFUSE_BASE   = 0x44E01200;
+    
+    typedef struct 
+    {                                                                                      
+        __RW  uint32_t            CM_PER_L4LS_CLKSTCTRL;                    // (0x00)  Identification Register
+        __R   uint32_t              RESERVED1[3];
+        __RW  uint32_t       TIOCP_CFG;               // (0x10)  Timer OCP Configuration Register
+        __R   uint32_t              RESERVED2[3];
+        __RW  uint32_t         IRQ_EOI;                 // (0x20)  Timer IRQ End-of-Interrupt Register
+        __RW  uint32_t   IRQSTATUS_RAW;           // (0x24)  Timer IRQ Status Raw Register
+        __RW  uint32_t       IRQSTATUS;               // (0x28)  Timer IRQ Status Register
+        __RW  uint32_t   IRQENABLE_SET;           // (0x2C)  Timer Interrupt Enable Set Registerr
+        __RW  uint32_t   IRQENABLE_CLR;           // (0x30)  Timer Interrupt Enable Clear Register
+        __RW  uint32_t       IRQWAKEEN;               // (0x34)  Timer IRQ Wakeup Enable Register
+        __RW  uint32_t            TCLR;                    // (0x38)  Timer Control Register
+        __RW  uint32_t            TCRR;                    // (0x3C)  Timer Counter Register
+        __RW  uint32_t            TLDR;                    // (0x40)  Timer Load Register
+        __W   uint32_t            TTGR;                    // (0x44)  Timer Trigger Register
+        __RW  uint32_t            TWPS;                    // (0x48)  Timer Write Posting Bits Register
+        __RW  uint32_t            TMAR;                    // (0x4C)  Timer Match Register
+        __RW  uint32_t           TCAR1;                   // (0x50)  Timer Capture Register 1
+        __RW  uint32_t           TSICR;                   // (0x54)  Timer Synchronous Interface Control Register
+        __RW  uint32_t           TCAR2;                   // (0x58)  Timer Capture Register 2                                                                                                               
+    } AM335x_CM_PER_Type;
+  
+}
+
 
 #endif //_AM335X_MEM_MAP_H_
