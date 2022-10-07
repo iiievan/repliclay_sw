@@ -313,5 +313,175 @@ namespace DMTIMER
     constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_7 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_7_BASE);
 } 
 
+namespace I2C
+{
+    typedef struct 
+    {                                                                                      
+        __R   I2C_REVNB_LO_reg_t                I2C_REVNB_LO;            // (0x00)  Module Revision Register (low bytes) 
+        __R   I2C_REVNB_HI_reg_t                I2C_REVNB_HI;            // (0x04)  Module Revision Register (high bytes) 
+        __R   uint32_t                          RESERVED1[3];
+        __RW  I2C_SYSC_reg_t                    I2C_SYSC;                // (0x10)  System Configuration Register
+        __RW  I2C_IRQSTATUS_RAW_reg_t           I2C_IRQSTATUS_RAW;       // (0x24)  2C Status Raw Register
+        __R   uint32_t                          RESERVED2[8];
+        __RW  I2C_IRQSTATUS_reg_t               I2C_IRQSTATUS;           // (0x28)  I2C Status Register
+        __RW  I2C_IRQENABLE_SET_reg_t           I2C_IRQENABLE_SET;       // (0x2C)  I2C Interrupt Enable Set Register
+        __RW  I2C_IRQENABLE_CLR_reg_t           I2C_IRQENABLE_CLR;       // (0x30)  I2C Interrupt Enable Clear Register
+        __RW  I2C_WE_reg_t                      I2C_WE;                  // (0x34)  I2C Wakeup Enable Register
+        __RW  I2C_DMARXENABLE_SET_reg_t         I2C_DMARXENABLE_SET;     // (0x38)  Receive DMA Enable Set Register
+        __RW  I2C_DMATXENABLE_SET_reg_t         I2C_DMATXENABLE_SET;     // (0x3C)  Transmit DMA Enable Set Register
+        __RW  I2C_DMARXENABLE_CLR_reg_t         I2C_DMARXENABLE_CLR;     // (0x40)  Receive DMA Enable Clear Register
+        __RW   I2C_DMATXENABLE_CLR_reg_t        I2C_DMATXENABLE_CLR;     // (0x44)  Transmit DMA Enable Clear Register
+        __RW  I2C_DMARXWAKE_EN_reg_t            I2C_DMARXWAKE_EN;        // (0x48)  Receive DMA Wakeup Register
+        __RW  I2C_DMATXWAKE_EN_reg_t            I2C_DMATXWAKE_EN;        // (0x4C)  Transmit DMA Wakeup Register
+        __R   uint32_t                          RESERVED3[17];
+        __RW  I2C_SYSS_reg_t                    I2C_SYSS;                // (0x90)  System Status Register
+        __RW  I2C_BUF_reg_t                     I2C_BUF;                 // (0x94)  Buffer Configuration Register
+        __RW  I2C_CNT_reg_t                     I2C_CNT;                 // (0x98)  Data Counter Register    
+        __RW  I2C_DATA_reg_t                    I2C_DATA;                // (0x9C)  Data Access Register
+        __R   uint32_t                          RESERVED4[2];
+        __RW  I2C_CON_reg_t                     I2C_CON;                 // (0xA4)  I2C Configuration Register
+        __RW  I2C_OA_reg_t                      I2C_OA;                  // (0xA8)  I2C Own Address Register
+        __RW  I2C_SA_reg_t                      I2C_SA;                  // (0xAC)  I2C Slave Address Register
+        __RW  I2C_PSC_reg_t                     I2C_PSC;                 // (0xB0)  I2C Clock Prescaler Register
+        __RW  I2C_SCLL_reg_t                    I2C_SCLL;                // (0xB4)  I2C SCL Low Time Register
+        __RW  I2C_SCLH_reg_t                    I2C_SCLH;                // (0xB8)  I2C SCL High Time Register
+        __RW  I2C_SYSTEST_reg_t                 I2C_SYSTEST;             // (0xBC)  System Test Register
+        __R   I2C_BUFSTAT_reg_t                 I2C_BUFSTAT;             // (0xC0)  I2C Buffer Status Register
+        __RW  I2C_OA1_reg_t                     I2C_OA1;                 // (0xC4)  I2C Own Address 1 Register
+        __RW  I2C_OA2_reg_t                     I2C_OA2;                 // (0xC8)  I2C Own Address 2 Register
+        __RW  I2C_OA3_reg_t                     I2C_OA3;                 // (0xCC)  I2C Own Address 3 Register
+        __R   I2C_ACTOA_reg_t                   I2C_ACTOA;               // (0xD0)  Active Own Address Register
+        __RW  I2C_SBLOCK_reg_t                  I2C_SBLOCK;              // (0xD4)  I2C Clock Blocking Enable Register
+        
+    typedef union 
+    { 
+        struct 
+        {                                      /* This read-only register contains the hard-coded revision number of the module.
+                                                  A write to this register has no effect. I2C controller with interrupt using interrupt vector register (I2C_IV) is revision 1.x.
+                                                 I2C controller with interrupt using status register bits (I2C_IRQSTATUS_RAW) is revision 2.x. */
+                                                               
+            uint32_t    MINOR   :6;            // bit: 0..5    Minor Revision. This field changes when features are scaled up or down. This field does not change due to bug fix, or major feature change.                        
+            uint32_t    CUSTOM  :2;            // bit: 6,7     Indicates a special version for a particular device. Consequence of use may avoid use of standard Chip Support.Library (CSL) / Drivers.0 if non-custom.                                 
+            uint32_t    MAJOR   :3;            // bit: 8..10   Major Revision. This field changes when there is a major feature change. This field does not change due to bug fix, or minor feature change.
+            uint32_t    RTL     :5;            // bit: 11..15  RTL Version.          
+            uint32_t            :16;           // bit: 16..31  Reserved  
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } I2C_REVNB_LO_reg_t;
+          
+    typedef union 
+    { 
+        struct 
+        {                                      /* A reset has no effect on the value returned. */
+                                                               
+            uint32_t    FUNC    :12;           // bit: 0..11   Function: Indicates a software compatible module family.                        
+            uint32_t            :2;            // bit: 12,13   Reserved.                                 
+            uint32_t    SCHEME  :2;            // bit: 14,15   Used to distinguish between old Scheme and current. Spare bit to encode future schemes.       
+            uint32_t            :16;           // bit: 16..31  Reserved  
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } I2C_REVNB_HI_reg_t;
+    
+    typedef union 
+    { 
+        struct 
+        {                                      /* This register allows controlling various parameters of the peripheral interface. */
+                                                               
+            uint32_t    AUTOIDLE       :1;         // bit: 0       Autoidle bit. When this bit is set to 1, the module activates its own idle mode mechanism. By evaluating its internal state, the module can decide to gate part of his internal clock tree in order to improve the overall power consumption.Value after reset is high. 0h = Auto Idle mechanism is disabled. 1h = Auto Idle mechanism is enabled.         
+            uint32_t    SRST           :1;         // bit: 1       SoftReset bit. When this bit is set to 1, entire module is reset as for the hardware reset. This bit is automatically cleared to 0 by the core and it is only reset by the hardware reset. During reads, it always returns 0. Value after reset is low. 0h = Normal mode. 1h = The module is reset.                               
+            uint32_t    ENAWAKEUP      :1;         // bit: 2       Enable Wakeup control bit. When this bit is set to 1, the module enables its own wakeup mechanism. Value after reset is low. 0h = Wakeup mechanism is disabled. 1h = Wakeup mechanism is enabled.
+            uint32_t    IDLEMODE       :2;         // bit: 3,4     Enable Wakeup control bit. When this bit is set to 1, the module enables its own wakeup mechanism. Value after reset is low. 0h = Wakeup mechanism is disabled. 1h = Wakeup mechanism is enabled.
+            uint32_t                   :3;         // bit: 5..7    Reserved
+            uint32_t    CLKACTIVITY    :2;         // bit: 8,9     Clock Activity selection bits.          
+            uint32_t                   :22;        // bit: 10..31  Reserved  
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } I2C_SYSC_reg_t;
+    
+    typedef union 
+    { 
+        struct 
+        {                                      /* This register provides core status information for interrupt handling, showing all active events (enabled and not enabled).
+                                                  The fields are read-write. Writing a 1 to a bit will set it to 1, that is, trigger the IRQ (mostly for debug).
+                                                  Writing a 0 will have no effect, that is, the register value will not be modified. 
+                                                  Only enabled, active events will trigger an actual interrupt request on the IRQ output line. */
+                                                               
+            uint32_t    AL       :1;       // bit: 0       Arbitration lost IRQ status.        
+            uint32_t    NACK     :1;       // bit: 1       No acknowledgment IRQ status.                               
+            uint32_t    ARDY     :1;       // bit: 2       I2C mode only.
+            uint32_t    RRDY     :1;       // bit: 3       Receive mode only (I2C mode).
+            uint32_t    XRDY     :1;       // bit: 4       Transmit data ready IRQ status.
+            uint32_t    GC       :1;       // bit: 5       General call IRQ status.          
+            uint32_t    STC      :1;       // bit: 6       Start Condition IRQ status.  
+            uint32_t    AERR     :1;       // bit: 7       Access Error IRQ status.  
+            uint32_t    BF       :1;       // bit: 8       I2C mode only.  
+            uint32_t    AAS      :1;       // bit: 9       Address recognized as slave IRQ status.  
+            uint32_t    XUDF     :1;       // bit: 10      Transmit underflow status.  
+            uint32_t    ROVR     :1;       // bit: 11      Receive overrun status.  
+            uint32_t    BB       :1;       // bit: 12      This read-only bit indicates the state of the serial bus.
+            uint32_t    RDR      :1;       // bit: 13      Receive draining IRQ status.
+            uint32_t    XDR      :1;       // bit: 14      Transmit draining IRQ status.
+            uint32_t             :17;      // bit: 15..31  Reserved
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } I2C_IRQSTATUS_RAW_reg_t;
+    
+    typedef union 
+    { 
+        struct 
+        {                                      /* This register provides core status information for interrupt handling, showing all active and enabled events and masking the others. 
+                                                  The fields are read-write. Writing a 1 to a bit will clear it to 0, that is, clear the IRQ. 
+                                                  Writing a 0 will have no effect, that is, the register value will not be modified. 
+                                                  Only enabled, active events will trigger an actual interrupt request on the IRQ output line. 
+                                                  For all the internal fields of the I2C_IRQSTATUS register, the descriptions given in the I2C_IRQSTATUS_RAW subsection are valid.*/
+                                                               
+            uint32_t    AL       :1;       // bit: 0       Arbitration lost IRQ enabled status. During reads, it always returns 0. 0h = Normal operation. 1h = Arbitration lost detected
+            uint32_t    NACK     :1;       // bit: 1       No acknowledgment IRQ enabled status. Write '1' to clear this bit. 0h = Normal operation. 1h = Not Acknowledge detected                                
+            uint32_t    ARDY     :1;       // bit: 2       Register access ready IRQ enabled status. 0h = Module busy. 1h = Access ready.
+            uint32_t    RRDY     :1;       // bit: 3       Receive data ready IRQ enabled status. Write '1' to clear. 0h = No data available. 1h = Receive data available.
+            uint32_t    XRDY     :1;       // bit: 4       Transmit data ready IRQ enabled status. 0h = Transmission ongoing. 1h = Transmit data ready.
+            uint32_t    GC       :1;       // bit: 5       General call IRQ enabled status. 0h = No general call detected. 1h = General call address detected.         
+            uint32_t    STC      :1;       // bit: 6       Start Condition IRQ enabled status. 0h = No action. 1h = Start condition detected.
+            uint32_t    AERR     :1;       // bit: 7       Access Error IRQ enabled status. 0h = No action. 1h = Access error.
+            uint32_t    BF       :1;       // bit: 8       Bus Free IRQ enabled status. 0h = No action. 1h = Bus free. 
+            uint32_t    AAS      :1;       // bit: 9       Address recognized as slave IRQ enabled status. 0h = No action. 1h = Address recognized.
+            uint32_t    XUDF     :1;       // bit: 10      Transmit underflow enabled status. Writing into this bit has no effect. 0h = Normal operation. 1h = Transmit underflow
+            uint32_t    ROVR     :1;       // bit: 11      Receive overrun enabled status. Writing into this bit has no effect. 0h = Normal operation. 1h = Receiver overrun.  
+            uint32_t    BB       :1;       // bit: 12      Bus busy enabled status. Writing into this bit has no effect. 0h = Bus is free. 1h = Bus is occupied.
+            uint32_t    RDR      :1;       // bit: 13      Receive draining IRQ enabled status.0h = Receive draining inactive. 1h = Receive draining enabled.
+            uint32_t    XDR      :1;       // bit: 14      Transmit draining IRQ enabled status. 0h = Transmit draining inactive. 1h = Transmit draining enabled.
+            uint32_t             :17;      // bit: 15..31  Reserved
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } I2C_IRQSTATUS_reg_t;
+    
+    typedef union 
+    { 
+        struct 
+        {                                      /* All 1-bit fields enable a specific interrupt event to trigger an interrupt request. Writing a 1 to a bit will enable the field. 
+                                                  Writing a 0 will have no effect, that is, the register value will not be modified. 
+                                                  For all the internal fields of the I2C_IRQENABLE_SET register, the descriptions given in the I2C_IRQSTATUS_RAW subsection are valid.*/
+                                                               
+            uint32_t    AL_IE       :1;       // bit: 0       Arbitration lost interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[AL]. 0h = Arbitration lost interrupt disabled. 1h = Arbitration lost interrupt enabled.
+            uint32_t    NACK_IE     :1;       // bit: 1       No acknowledgment interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[NACK]. 0h = Not Acknowledge interrupt disabled. 1h = Not Acknowledge interrupt enabled.                                
+            uint32_t    ARDY_IE     :1;       // bit: 2       Register access ready interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[ARDY]. 0h = Register access ready interrupt disabled. 1h = Register access ready interrupt enabled.
+            uint32_t    RRDY_IE     :1;       // bit: 3       Receive data ready interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[RRDY]. 0h = Receive data ready interrupt disabled. 1h = Receive data ready interrupt enabled.
+            uint32_t    XRDY_IE     :1;       // bit: 4       Transmit data ready interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[XRDY]. 0h = Transmit data ready interrupt disabled. 1h = Transmit data ready interrupt enabled.
+            uint32_t    GC_IE       :1;       // bit: 5       General call interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[GC]. 0h = General call interrupt disabled. 1h = General call interrupt enabled.
+            uint32_t    STC_IE      :1;       // bit: 6       Start condition interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[STC]. 0h = Start condition interrupt disabled. 1h = Start condition interrupt enabled.
+            uint32_t    AERR_IE     :1;       // bit: 7       Access error interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[AERR]. 0h = Access error interrupt disabled. 1h = Access error interrupt enabled.
+            uint32_t    BF_IE       :1;       // bit: 8       Bus free interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[BF]. 0h = Bus free interrupt disabled. 1h = Bus free interrupt enabled.
+            uint32_t    AAS_IE      :1;       // bit: 9       Addressed as slave interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[AAS]. 0h = Addressed as slave interrupt disabled. 1h = Addressed as slave interrupt enabled.
+            uint32_t    XUDF        :1;       // bit: 10      Transmit underflow enable set. 0h = Transmit underflow interrupt disabled. 1h = Transmit underflow interrupt enabled.
+            uint32_t    ROVR        :1;       // bit: 11      Receive overrun enable set. 0h = Receive overrun interrupt disabled. 1h = Receive draining interrupt enabled.
+            uint32_t                :1;       // bit: 12      Reserved
+            uint32_t    RDR_IE      :1;       // bit: 13      Receive draining interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[RDR]. 0h = Receive draining interrupt disabled. 1h = Receive draining interrupt enabled.
+            uint32_t    XDR_IE      :1;       // bit: 14      Transmit draining interrupt enable set. Mask or unmask the interrupt signaled by bit in I2C_STAT[XDR]. 0h = Transmit draining interrupt disabled. 1h = Transmit draining interrupt enabled.
+            uint32_t                :17;      // bit: 15..31  Reserved
+        } b;                                  // Structure used for bit access 
+        uint32_t  reg;                        // Type used for register access 
+    } I2C_IRQENABLE_SET_reg_t;
+    
+    } AM335x_I2C_Type;
 
 #endif //_AM335X_MEM_MAP_H_
