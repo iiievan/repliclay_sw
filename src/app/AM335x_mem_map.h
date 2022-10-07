@@ -315,7 +315,8 @@ namespace DMTIMER
 
 namespace PRCM
 {  
-    constexpr uint32_t AM335x_CM_PER_BASE       = 0x44E00000;       
+    constexpr uint32_t AM335x_PRCM_BASE         = 0x44E00000; 
+    constexpr uint32_t AM335x_CM_PER_BASE       = AM335x_PRCM_BASE;       
     constexpr uint32_t AM335x_CM_WKUP_BASE      = 0x44E00400;
     constexpr uint32_t AM335x_CM_DPLL_BASE      = 0x44E00500;
     constexpr uint32_t AM335x_CM_MPU_BASE       = 0x44E00600;
@@ -333,28 +334,905 @@ namespace PRCM
     constexpr uint32_t AM335x_PRM_GFX_BASE      = 0x44E01100;
     constexpr uint32_t AM335x_PRM_CEFUSE_BASE   = 0x44E01200;
     
+    /* [reset state = 0xC0102]*/
+    typedef union 
+    { 
+        struct 
+        {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                   /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                                :6;   // bit: 2..7     Reserved                
+            uint32_t    CLKACTIVITY_L4LS_GCLK       :1;   // bit: 8        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]
+            uint32_t                                :1;   // bit: 9        Reserved
+            uint32_t    CLKACTIVITY_UART_GFCLK      :1;   // bit: 10       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_CAN_CLK         :1;   // bit: 11       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                :1;   // bit: 12       Reserved
+            uint32_t    CLKACTIVITY_TIMER7_GCLK     :1;   // bit: 13       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_TIMER2_GCLK     :1;   // bit: 14       (R)state of the clock in domain [0x0 = Inact; 0x1= Act]   
+            uint32_t    CLKACTIVITY_TIMER3_GCLK     :1;   // bit: 15       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_TIMER4_GCLK     :1;   // bit: 16       (R)state of the clock in domain [0x0 = Inact; 0x1= Act]  
+            uint32_t    CLKACTIVITY_LCDC_GCLK       :1;   // bit: 17       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                :1;   // bit: 18       Reserved
+            uint32_t    CLKACTIVITY_GPIO_1_GDBCLK   :1;   // bit: 19       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_GPIO_2_GDBCLK   :1;   // bit: 20       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_GPIO_3_GDBCLK   :1;   // bit: 21       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                :2;   // bit: 22,23    Reserved
+            uint32_t    CLKACTIVITY_I2C_FCLK        :1;   // bit: 24       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_SPI_GCLK        :1;   // bit: 25       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                :1;   // bit: 26       Reserved
+            uint32_t    CLKACTIVITY_TIMER5_GCLK     :1;   // bit: 27       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_TIMER6_GCLK     :1;   // bit: 28       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                :3;   // bit: 29..32   Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L4LS_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0xA]*/
+    typedef union 
+    { 
+        struct 
+        {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                   /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
+            uint32_t    CLKTRCTRL            :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]     
+            uint32_t                         :1;   // bit: 2        Reserved            
+            uint32_t    CLKACTIVITY_L3S_GCLK :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]     
+            uint32_t                         :28;  // bit: 4..31    Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L3S_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x12]*/
+    typedef union 
+    { 
+        struct 
+        {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                   /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                 :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]         
+            uint32_t    CLKACTIVITY_EMIF_GCLK     :1;   // bit: 2        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t    CLKACTIVITY_MMC_FCLK      :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_L3_GCLK       :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                              :1;   // bit: 5        Reserved
+            uint32_t    CLKACTIVITY_CPTS_RFT_GCLK :1;   // bit: 6        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_MCASP_GCLK    :1;   // bit: 7        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                              :24;  // bit: 8..31
+        } b;                                      
+        uint32_t  reg;                           
+    } L3_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x70000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the CPSW clocks. */ 
+                                         /* These bits is warm reset insensitively when CPSW RESET_ISO enabled */
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } CPGMAC0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x70000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the LCD clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } LCDC_CLKCTRL_reg_t;
+
+    /* [reset state = 0x70000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the USB clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } USB0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x70000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TPTC clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TPTC0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the EMIF clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } EMIF_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the OCMC clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } OCMCRAM_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30002]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the GPMC clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GPMC_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the MCASP0 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } MCASP0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the UART5 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } UART5_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the MMC0 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } MMC0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the ELM clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } ELM_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the I2C2 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } I2C2_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the I2C1 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } I2C1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the SPI0 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } SPI0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the SPI1 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } SPI1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the L4LS clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L4LS_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the MCASP1 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } MCASP1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the UART1 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } UART1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the UART2 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } UART2_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the UART3 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } UART3_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the UART4 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } UART4_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TIMER7 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TIMER7_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TIMER2 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TIMER2_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TIMER3 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TIMER3_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TIMER4 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TIMER4_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                                                /* This register manages the GPIO1 clocks. */ 
+            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t                            :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    OPTFCLKEN_GPIO_1_GDBCLK :1;   // bit: 18         (RW)Optional functional clock control [0x0 = FCLK_DIS; 0x1 = FCLK_EN]
+            uint32_t                            :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GPIO1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                                                /* This register manages the GPIO2 clocks. */ 
+            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t                            :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    OPTFCLKEN_GPIO_2_GDBCLK :1;   // bit: 18         (RW)Optional functional clock control [0x0 = FCLK_DIS; 0x1 = FCLK_EN]
+            uint32_t                            :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GPIO2_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                                                /* This register manages the GPIO3 clocks. */ 
+            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t                            :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    OPTFCLKEN_GPIO_3_GDBCLK :1;   // bit: 18         (RW)Optional functional clock control [0x0 = FCLK_DIS; 0x1 = FCLK_EN]
+            uint32_t                            :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GPIO3_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TPCC clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TPCC_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the DCAN0 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } DCAN0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the DCAN1 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } DCAN1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the PWMSS1 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } EPWMSS1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the PWMSS0 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } EPWMSS0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the PWMSS2 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } EPWMSS2_CLKCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the L3 INSTR clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L3_INSTR_CLKCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the L3 Interconnect clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L3_CLKCTRL_reg_t;
+
+    /* [reset state = 0x70002]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the IEEE1500 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } IEEE5000_CLKCTRL_reg_t;
+
+    /* [reset state = 0x70000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the PRU-ICSS clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } PRU_ICSS_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TIMER5 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TIMER5_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TIMER6 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TIMER6_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the MMC1 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } MMC1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the MMC2 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } MMC2_CLKCTRL_reg_t;
+
+    /* [reset state = 0x70000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TPTC1 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TPTC1_CLKCTRL_reg_t;
+
+    /* [reset state = 0x70000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TPTC2 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TPTC2_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the SPINLOCK clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } SPINLOCK_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the MAILBOX0 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } MAILBOX0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x7A]*/
+    typedef union 
+    { 
+        struct 
+        {                                                     /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                              /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                                    :1;   // bit: 2        Reserved        
+            uint32_t    CLKACTIVITY_L4HS_GCLK           :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t    CLKACTIVITY_CPSW_250MHZ_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_CPSW_50MHZ_GCLK     :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_CPSW_5MHZ_GCLK      :1;   // bit: 6        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                    :25;  // bit: 7..31    Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L4HS_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the L4 Fast clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L4HS_CLKCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                                   /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                            /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                                    :2;   // bit: 2,3      Reserved        
+            uint32_t    CLKACTIVITY_OCPWP_L3_GCLK       :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t    CLKACTIVITY_OCPWP_L4_GCLK       :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                    :26;  // bit: 6..31    Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } OCPWP_L3_CLKSTCTRL_reg_t;
+
+
+    /* [reset state = 0x70002]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the OCPWP clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } OCPWP_CLKCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                                   /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                            /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                                    :2;   // bit: 2,3      Reserved        
+            uint32_t    CLKACTIVITY_PRU_ICSS_OCP_GCLK   :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t    CLKACTIVITY_PRU_ICSS_IEP_GCLK   :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_PRU_ICSS_UART_GCLK  :1;   // bit: 6        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                    :25;  // bit: 7..31    Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } PRUICSS_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                                   /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                            /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                                    :2;   // bit: 2,3      Reserved        
+            uint32_t    CLKACTIVITY_CPSW_125MHz_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t                                    :27;  // bit: 5..31    Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } CPSW_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                                     /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                              /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                                    :2;   // bit: 2,3      Reserved        
+            uint32_t    CLKACTIVITY_LCDC_L3_OCP_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t    CLKACTIVITY_LCDC_L4_OCP_GCLK    :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                    :26;  // bit: 6..31    Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } LCDC_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the CLKDIV32K clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKDIV32K_CLKCTRL_reg_t;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                                     /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                              /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                                    :2;   // bit: 2,3      Reserved        
+            uint32_t    CLKACTIVITY_CLK_24MHZ_GCLK      :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t                                    :27;  // bit: 5..31    Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKSTCTRL_24MHz_reg_t;
+
     typedef struct 
     {                                                                                      
-        __RW  uint32_t            CM_PER_L4LS_CLKSTCTRL;                    // (0x00)  Identification Register
-        __R   uint32_t              RESERVED1[3];
-        __RW  uint32_t       TIOCP_CFG;               // (0x10)  Timer OCP Configuration Register
-        __R   uint32_t              RESERVED2[3];
-        __RW  uint32_t         IRQ_EOI;                 // (0x20)  Timer IRQ End-of-Interrupt Register
-        __RW  uint32_t   IRQSTATUS_RAW;           // (0x24)  Timer IRQ Status Raw Register
-        __RW  uint32_t       IRQSTATUS;               // (0x28)  Timer IRQ Status Register
-        __RW  uint32_t   IRQENABLE_SET;           // (0x2C)  Timer Interrupt Enable Set Registerr
-        __RW  uint32_t   IRQENABLE_CLR;           // (0x30)  Timer Interrupt Enable Clear Register
-        __RW  uint32_t       IRQWAKEEN;               // (0x34)  Timer IRQ Wakeup Enable Register
-        __RW  uint32_t            TCLR;                    // (0x38)  Timer Control Register
-        __RW  uint32_t            TCRR;                    // (0x3C)  Timer Counter Register
-        __RW  uint32_t            TLDR;                    // (0x40)  Timer Load Register
-        __W   uint32_t            TTGR;                    // (0x44)  Timer Trigger Register
-        __RW  uint32_t            TWPS;                    // (0x48)  Timer Write Posting Bits Register
-        __RW  uint32_t            TMAR;                    // (0x4C)  Timer Match Register
-        __RW  uint32_t           TCAR1;                   // (0x50)  Timer Capture Register 1
-        __RW  uint32_t           TSICR;                   // (0x54)  Timer Synchronous Interface Control Register
-        __RW  uint32_t           TCAR2;                   // (0x58)  Timer Capture Register 2                                                                                                               
+        __RW  L4LS_CLKSTCTRL_reg_t        L4LS_CLKSTCTRL;      // (0x00)  
+        __RW  L3S_CLKSTCTRL_reg_t         L3S_CLKSTCTRL;       // (0x04) 
+        __R   uint32_t                    RESERVED1[1]; 
+        __RW  L3_CLKSTCTRL_reg_t          L3_CLKSTCTRL;        // (0x0C) 
+        __R   uint32_t                    RESERVED2[1];  
+        __RW  CPGMAC0_CLKCTRL_reg_t       CPGMAC0_CLKCTRL;     // (0x14)  
+        __RW  LCDC_CLKCTRL_reg_t          LCDC_CLKCTRL;        // (0x18)  
+        __RW  USB0_CLKCTRL_reg_t          USB0_CLKCTRL;        // (0x1C)
+        __R   uint32_t                    RESERVED3[1];   
+        __RW  TPTC0_CLKCTRL_reg_t         TPTC0_CLKCTRL;       // (0x24)  
+        __RW  EMIF_CLKCTRL_reg_t          EMIF_CLKCTRL;        // (0x28)  
+        __RW  OCMCRAM_CLKCTRL_reg_t       OCMCRAM_CLKCTRL;     // (0x2C)  
+        __RW  GPMC_CLKCTRL_reg_t          GPMC_CLKCTRL;        // (0x30)  
+        __RW  MCASP0_CLKCTRL_reg_t        MCASP0_CLKCTRL;      // (0x34)  
+        __RW  UART5_CLKCTRL_reg_t         UART5_CLKCTRL;       // (0x38)  
+        __RW  MMC0_CLKCTRL_reg_t          MMC0_CLKCTRL;        // (0x3C)  
+        __RW  ELM_CLKCTRL_reg_t           ELM_CLKCTRL;         // (0x40)  
+        __RW  I2C2_CLKCTRL_reg_t          I2C2_CLKCTRL;        // (0x44)  
+        __RW  I2C1_CLKCTRL_reg_t          I2C1_CLKCTRL;        // (0x48)  
+        __RW  SPI0_CLKCTRL_reg_t          SPI0_CLKCTRL;        // (0x4C) 
+        __RW  SPI1_CLKCTRL_reg_t          SPI1_CLKCTRL;        // (0x50) 
+        __R   uint32_t                    RESERVED4[3];  
+        __RW  L4LS_CLKCTRL_reg_t          L4LS_CLKCTRL;        // (0x60)
+        __R   uint32_t                    RESERVED5[1];   
+        __RW  MCASP1_CLKCTRL_reg_t        MCASP1_CLKCTRL;      // (0x68)  
+        __RW  UART1_CLKCTRL_reg_t         UART1_CLKCTRL;       // (0x6C)  
+        __RW  UART2_CLKCTRL_reg_t         UART2_CLKCTRL;       // (0x70)  
+        __RW  UART3_CLKCTRL_reg_t         UART3_CLKCTRL;       // (0x74)  
+        __RW  UART4_CLKCTRL_reg_t         UART4_CLKCTRL;       // (0x78)  
+        __RW  TIMER7_CLKCTRL_reg_t        TIMER7_CLKCTRL;      // (0x7C)  
+        __RW  TIMER2_CLKCTRL_reg_t        TIMER2_CLKCTRL;      // (0x80)  
+        __RW  TIMER3_CLKCTRL_reg_t        TIMER3_CLKCTRL;      // (0x84)  
+        __RW  TIMER4_CLKCTRL_reg_t        TIMER4_CLKCTRL;      // (0x88)
+        __R   uint32_t                    RESERVED6[8];   
+        __RW  GPIO1_CLKCTRL_reg_t         GPIO1_CLKCTRL;       // (0xAC)  
+        __RW  GPIO2_CLKCTRL_reg_t         GPIO2_CLKCTRL;       // (0xB0)  
+        __RW  GPIO3_CLKCTRL_reg_t         GPIO3_CLKCTRL;       // (0xB4)  
+        __RW  TPCC_CLKCTRL_reg_t          TPCC_CLKCTRL;        // (0xBC)  
+        __RW  DCAN0_CLKCTRL_reg_t         DCAN0_CLKCTRL;       // (0xC0)  
+        __RW  DCAN1_CLKCTRL_reg_t         DCAN1_CLKCTRL;       // (0xC4)  
+        __RW  EPWMSS1_CLKCTRL_reg_t       EPWMSS1_CLKCTRL;     // (0xCC) 
+        __R   uint32_t                    RESERVED7[1]; 
+        __RW  EPWMSS0_CLKCTRL_reg_t       EPWMSS0_CLKCTRL;     // (0xD4)  
+        __RW  EPWMSS2_CLKCTRL_reg_t       EPWMSS2_CLKCTRL;     // (0xD8)  
+        __RW  L3_INSTR_CLKCTRL_reg_t      L3_INSTR_CLKCTRL;    // (0xDC)  
+        __RW  L3_CLKCTRL_reg_t            L3_CLKCTRL;          // (0xE0) 
+        __RW  IEEE5000_CLKCTRL_reg_t      IEEE5000_CLKCTRL;    // (0xE4)  
+        __RW  PRU_ICSS_CLKCTRL_reg_t      PRU_ICSS_CLKCTRL;    // (0xE8)  
+        __RW  TIMER5_CLKCTRL_reg_t        TIMER5_CLKCTRL;      // (0xEC)  
+        __RW  TIMER6_CLKCTRL_reg_t        TIMER6_CLKCTRL;      // (0xF0)  
+        __RW  MMC1_CLKCTRL_reg_t          MMC1_CLKCTRL;        // (0xF4)  
+        __RW  MMC2_CLKCTRL_reg_t          MMC2_CLKCTRL;        // (0xF8) 
+        __RW  TPTC1_CLKCTRL_reg_t         TPTC1_CLKCTRL;       // (0xFC)  
+        __RW  TPTC2_CLKCTRL_reg_t         TPTC2_CLKCTRL;       // (0x100)  
+        __R   uint32_t                    RESERVED8[2]; 
+        __RW  SPINLOCK_CLKCTRL_reg_t      SPINLOCK_CLKCTRL;    // (0x10C)  
+        __RW  MAILBOX0_CLKCTRL_reg_t      MAILBOX0_CLKCTRL;    // (0x110)
+        __R   uint32_t                    RESERVED9[2];  
+        __RW  L4HS_CLKSTCTRL_reg_t        L4HS_CLKSTCTRL;      // (0x11C)  
+        __RW  L4HS_CLKCTRL_reg_t          L4HS_CLKCTRL;        // (0x120)
+        __R   uint32_t                    RESERVED10[2];  
+        __RW  OCPWP_L3_CLKSTCTRL_reg_t    OCPWP_L3_CLKSTCTRL;  // (0x12C) 
+        __RW  OCPWP_CLKCTRL_reg_t         OCPWP_CLKCTRL;       // (0x130) 
+        __R   uint32_t                    RESERVED11[3];  
+        __RW  PRUICSS_CLKSTCTRL_reg_t     PRUICSS_CLKSTCTRL;   // (0x140)  
+        __RW  CPSW_CLKSTCTRL_reg_t        CPSW_CLKSTCTRL;      // (0x144) 
+        __RW  LCDC_CLKSTCTRL_reg_t        LCDC_CLKSTCTRL;      // (0x148)  
+        __RW  CLKDIV32K_CLKCTRL_reg_t     CLKDIV32K_CLKCTRL;   // (0x14C) 
+        __RW  CLKSTCTRL_24MHz_reg_t       CLKSTCTRL_24MHz;     // (0x150)                                                                                     
     } AM335x_CM_PER_Type;
+
+    constexpr AM335x_CM_PER_Type * AM335X_CM_PER = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
+
+    /* [reset state = 0x0]*/
+    //typedef union 
+    //{ 
+    //    struct 
+    //    {               /*  */ 
+    //        uint32_t    R :1;   // bit: 0        
+    //        uint32_t    R :1;   // bit: 1                    
+    //        uint32_t    R :1;   // bit: 2      
+    //        uint32_t    R :1;   // bit: 3
+    //        uint32_t    R :1;   // bit: 4
+    //        uint32_t    R :1;   // bit: 5
+    //        uint32_t    R :1;   // bit: 6
+    //        uint32_t    R :1;   // bit: 7
+    //        uint32_t    R :1;   // bit: 8
+    //    } b;                                      
+    //    uint32_t  reg;                           
+    //} _reg_t;
   
 }
 
