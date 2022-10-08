@@ -1,317 +1,10 @@
-#ifndef _AM335X_MEM_MAP_H_
-#define _AM335X_MEM_MAP_H_
+#ifndef _PRCM_H_
+#define _PRCM_H_
 
 #include <stdint.h>
 #include "app_utils.h"
 
-#define     __R     volatile const       // 'read only' register
-#define     __W     volatile             // 'write only' register 
-#define     __RW    volatile             // 'read / write' register
-
-namespace DMTIMER
-{
-    constexpr uint32_t AM335x_DMTIMER_0_BASE = 0x44E05000;    // only 32KHz RC Clock
-    constexpr uint32_t AM335x_DMTIMER_1_BASE = 0x44E31000;    // 1ms timer
-    constexpr uint32_t AM335x_DMTIMER_2_BASE = 0x48040000;
-    constexpr uint32_t AM335x_DMTIMER_3_BASE = 0x48042000;
-    constexpr uint32_t AM335x_DMTIMER_4_BASE = 0x48044000;
-    constexpr uint32_t AM335x_DMTIMER_5_BASE = 0x48046000;
-    constexpr uint32_t AM335x_DMTIMER_6_BASE = 0x48048000;
-    constexpr uint32_t AM335x_DMTIMER_7_BASE = 0x4804A000;
-
-    /* [reset state = 0x40000100]*/
-    typedef union 
-    { 
-        struct 
-        {                                      /* This read only register contains the revision number of the module.           */
-                                               /* A write to this register has no effect.                                       */
-                                               /* This register is used by software to track features, bugs, and compatibility. */
-            uint32_t    Y_MINOR   :6;          // bit: 0..5    Minor Revision (Y).                   
-            uint32_t    CUSTOM    :2;          // bit: 6,7     Indicates a special version for a particular device.          
-            uint32_t    X_MAJOR   :3;          // bit: 8..10   Major Revision (X).
-            uint32_t    R_RTL     :5;          // bit: 11..15  RTL Version (R).          
-            uint32_t    FUNC      :12;         // bit: 16..27  Function indicates a software compatible module family. 
-            uint32_t              :2;          // bit: 28,29   Reserved  
-            uint32_t    SCHEME    :2;          // bit: 30,31   Used to distinguish between old scheme and current. 
-        } b;                                   // Structure used for bit access 
-        uint32_t  reg;                         // Type used for register access 
-    } TIDR_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                      /* This register allows controlling various parameters of the OCP interface. */
-            uint32_t    SOFTRESET :1;          // bit: 0      Software reset. [0x0 = No action; 0x1 = reset ongoing]                  
-            uint32_t    EMUFREE   :1;          // bit: 1      Sensitivity to emulation (debug) suspend event from Debug Subsystem. [0x0 = frozen during debug; 0x1 = debug suspend ignored]         
-            uint32_t    IDLEMODE  :2;          // bit: 2,3    Power management[0x0 = force-idle mode; 0x1 = No idle mode; 0x2 = Smart-idle mode; 0x3 = smart-idle wakeup capable]
-            uint32_t              :28;         // bit: 4..31  Reserved  
-        } b;                                   // Structure used for bit access 
-        uint32_t  reg;                         // Type used for register access 
-    } TIOCP_CFG_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                      /* This register must be written to after the DMA                                 */
-                                               /* completes in order for subsequent DMA events to be triggered from this module. */
-            uint32_t    DMAEvent_Ack :1;       // bit: 0      Write 0 to acknowledge DMA event has been completed.                   
-            uint32_t                 :31;      // bit: 1..31  Reserved  
-        } b;                                   // Structure used for bit access 
-        uint32_t  reg;                         // Type used for register access 
-    } IRQ_EOI_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* Check the corresponding secondary status register. Raw status is set             */
-                                                  /* even if event is not enabled. Write 1 to set the (raw) status, mostly for debug. */
-            uint32_t    MAT_IT_FLAG  :1;          // bit: 0      IRQ status for Match    [0x0 = No event pending; 0x1 = IRQ event pending]                   
-            uint32_t    OVF_IT_FLAG  :1;          // bit: 1      IRQ status for Overflow [0x0 = No event pending; 0x1 = IRQ event pending]           
-            uint32_t    TCAR_IT_FLAG :1;          // bit: 2      IRQ status for Capture  [0x0 = No event pending; 0x1 = IRQ event pending]  
-            uint32_t                 :29;         // bit: 3..31  Reserved  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } IRQSTATUS_RAW_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* Write 1 to clear the status after interrupt has been serviced. */
-                                                  /* (raw status gets cleared, that is, even if not enabled).       */
-            uint32_t    MAT_IT_FLAG  :1;          // bit: 0      IRQ status for Match    [0x0 = No event pending; 0x1 = IRQ event pending]                   
-            uint32_t    OVF_IT_FLAG  :1;          // bit: 1      IRQ status for Overflow [0x0 = No event pending; 0x1 = IRQ event pending]           
-            uint32_t    TCAR_IT_FLAG :1;          // bit: 2      IRQ status for Capture  [0x0 = No event pending; 0x1 = IRQ event pending]  
-            uint32_t                 :29;         // bit: 3..31  Reserved  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } IRQSTATUS_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* Write 1 to set (enable interrupt).      */
-            uint32_t    MAT_EN_FLAG  :1;          // bit: 0      IRQ enable for Match    [0x0 = disabled; 0x1 = enabled]                   
-            uint32_t    OVF_EN_FLAG  :1;          // bit: 1      IRQ enable for Overflow [0x0 = disabled; 0x1 = enabled]          
-            uint32_t    TCAR_EN_FLAG :1;          // bit: 2      IRQ enable for Capture  [0x0 = disabled; 0x1 = enabled]  
-            uint32_t                 :29;         // bit: 3..31  Reserved  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } IRQENABLE_SET_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* Write 1 to clear (disable interrupt).      */
-            uint32_t    MAT_EN_FLAG  :1;          // bit: 0      IRQ enable for Match    [0x0 = event disabled; 0x1 = Clear IRQ enable]                   
-            uint32_t    OVF_EN_FLAG  :1;          // bit: 1      IRQ enable for Overflow [0x0 = event disabled; 0x1 = Clear IRQ enable]          
-            uint32_t    TCAR_EN_FLAG :1;          // bit: 2      IRQ enable for Capture  [0x0 = event disabled; 0x1 = Clear IRQ enable]  
-            uint32_t                 :29;         // bit: 3..31  Reserved  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } IRQENABLE_CLR_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* Wakeup-enabled events taking place when module is      */ 
-                                                  /* idle will generate an asynchronous wakeup.             */
-            uint32_t    MAT_WUP_ENA  :1;          // bit: 0      Wakeup generation for Match  [0x0 = disabled; 0x1 = enabled]                   
-            uint32_t    OVF_WUP_ENA  :1;          // bit: 1      Wakeup generation for Overflow  [0x0 = disabled; 0x1 = enabled]           
-            uint32_t    TCAR_WUP_ENA :1;          // bit: 2      Wakeup generation for Capture  [0x0 = disabled; 0x1 = enabled]  
-            uint32_t                 :29;         // bit: 3..31  Reserved  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } IRQWAKEEN_reg_t;
-
-    enum e_IRQ_flags: uint32_t
-    {
-        IRQ_NONE = 0u,
-        IRQ_MAT   = BIT(0),
-        IRQ_OVF   = BIT(1),
-        IRQ_TCAR  = BIT(2)      
-    };
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* Timer control register */                      
-            uint32_t    ST        :1;             // bit: 0       automatically reset when the counter is overflowed(if AR = 0) [0x0 = counter is frozen; 0x1 = start timer] 
-            uint32_t    AR        :1;             // bit: 1       [0x0 = One shot timer; 0x1 = Auto-reload timer] 
-            uint32_t    PTV       :3;             // bit: 2..4    Pre-scale clock Timer value 
-            uint32_t    PRE       :1;             // bit: 5       enable prescale  [0x0 = TIMER clock input pin clocks; 0x1 = divided input pin clocks] 
-            uint32_t    CE        :1;             // bit: 6       compare mode [0x0 = disabled; 0x1 = enabled] 
-            uint32_t    SCPWM     :1;             // bit: 7       [0x0 = clear PORTIMERPWM, sel positive pulse; 0x1 = set PORTIMERPWM, sel negative pulse]                   
-            uint32_t    TCM       :2;             // bit: 8,9     Transition on PIEVENTCAPT in  [0x0 = No; 0x1 = low to high; 0x2 = high to low; 0x3 = both edge]           
-            uint32_t    TRG       :2;             // bit: 10,11   Trigger on PORTIMERPWM out  [0x0 = No; 0x1 = on overflow; 0x2 = on overflow and match; 0x3 = Reserved]  
-            uint32_t    PT        :1;             // bit: 12      mode on PORTIMERPWM out [0x0 = Pulse; 0x1 = Toggle] 
-            uint32_t    CAPT_MODE :1;             // bit: 13      Capture mode.  [0x0 = Single capture; 0x1 = Capture on second event] 
-            uint32_t    GPO_CFG   :1;             // bit: 14      drives directly the PORGPOCFG out [0x0 = PORGPOCFG->0, timer pin as out; 0x1 = PORGPOCFG->1, timer pin as in]
-            uint32_t              :17;            // bit: 15..31  Reserved  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TCLR_reg_t;
-
-    enum e_DMTIMER_mode: uint32_t
-    {
-        MODE_NONE       = 0u,
-        MODE_AUTORELOAD = BIT(1),
-        MODE_COMPARE    = BIT(6)      
-    };
-    
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* The MCU can perform a 32-bit access or two  16-bit accesses to access the register */ 
-            uint32_t    TIMER_COUNTER  :32;       // bit: 0..31 Value of TIMER counter                  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TCRR_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* LOAD_VALUE must be different than the timer overflow value (0xFFFFFFFF). */ 
-            uint32_t    LOAD_VALUE  :32;          // bit: 0..31 Timer counter value loaded on overflow in auto-reload mode or on TTGR write access                  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TLDR_reg_t;
-
-   /* [reset state = 0xFFFFFFFF]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* The read value of this register is always 0xFFFFFFFF.                  */ 
-                                                  /* Writing in the TTGR register, TCRR will be loaded from TLDR and        */
-                                                  /* prescaler counter will be cleared.                                     */
-                                                  /* Reload will be done regardless of the AR field value of TCLR register. */
-            uint32_t    TTGR_VALUE  :32;          // bit: 0..31 Timer counter value loaded on overflow in auto-reload mode or on TTGR write access                  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TTGR_reg_t;
-
-    constexpr uint32_t TTGR_DEF_VALUE = 0xFFFFFFFFu;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* In posted mode the software must read the pending write status bits             */ 
-                                                  /* to insure that following write access will not be discarded due to on           */
-                                                  /* going write synchronization process. These bits are automatically cleared       */                               
-                                                  /* by internal logic when the write to the corresponding register is acknowledged. */                    
-            uint32_t    W_PEND_TCLR :1;           // bit: 0  When equal to 1, a write is pending to the TCLR register
-            uint32_t    W_PEND_TCRR :1;           // bit: 1  When equal to 1, a write is pending to the TCRR register
-            uint32_t    W_PEND_TLDR :1;           // bit: 2  When equal to 1, a write is pending to the TLDR register
-            uint32_t    W_PEND_TTGR :1;           // bit: 3  When equal to 1, a write is pending to the TTGR register
-            uint32_t    W_PEND_TMAR :1;           // bit: 4  When equal to 1, a write is pending to the TMAR register
-            uint32_t                :27;          // bit: 15..31  Reserved  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TWPS_reg_t;
-
-    enum e_TWPS_flags: uint32_t
-    {
-        F_PEND_NONE     = 0u,
-        F_PEND_TCLR     = BIT(0),
-        F_PEND_TCRR     = BIT(1),
-        F_PEND_TLDR     = BIT(2),
-        F_PEND_TTGR     = BIT(3),
-        F_PEND_TMAR     = BIT(4), 
-        F_PEND_ALL      = 0x1F  
-    };
-    
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* The compare logic consists of a 32-bit wide, read/write data TMAR register and      */   
-                                                  /* logic to compare counter's current value with the value stored in the TMAR register.*/ 
-            uint32_t    COMPARE_VALUE  :32;       // bit: 0..31 Value to be compared to the timer counter             
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TMAR_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* When the appropriate (rising, falling or both) transition is detected in           */
-                                                  /* the edge detection logic the current counter value is stored to the TCAR1 register */
-            uint32_t    CAPTURED_VALUE  :32;      // bit: 0..31 Timer counter value captured on an external event trigger             
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TCAR1_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* Access to this register is not stalled even if the timer is in non-posted mode configuration. */ 
-                                                  /* Also in case of a wrong hardware PIFREQRATIO tied the POSTED field can be reprogrammed on */
-                                                  /* the fly, so deadlock situation cannot happen */
-            uint32_t                 :1;          // bit: 0      Reserved      
-            uint32_t    SFT          :1;          // bit: 1      Resets all the function parts of the module. [0x0 = reset enabled; 0x1 = reset disabld]               
-            uint32_t    POSTED       :1;          // bit: 2      PIFREQRATIO [0x0 = Posted mode inactive; 0x1 = Posted mode active] 
-            uint32_t                 :29;         // bit: 3..31  Reserved  
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TSICR_reg_t;
-
-    /* [reset state = 0x0]*/
-    typedef union 
-    { 
-        struct 
-        {                                         /* When the appropriate (rising, falling or both) transition is detected in               */
-                                                  /* the edge detection logic and the capture on second event is activated from             */
-                                                  /* the control register (TCLR), the current counter value is stored to the TCAR2 register.*/
-            uint32_t    CAPTURED_VALUE  :32;      // bit: 0..31 Timer counter value captured on an external event trigger             
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } TCAR2_reg_t;
-
-    typedef struct 
-    {                                                                                      
-        __RW  TIDR_reg_t            TIDR;                    // (0x00)  Identification Register
-        __R   uint32_t              RESERVED1[3];
-        __RW  TIOCP_CFG_reg_t       TIOCP_CFG;               // (0x10)  Timer OCP Configuration Register
-        __R   uint32_t              RESERVED2[3];
-        __RW  IRQ_EOI_reg_t         IRQ_EOI;                 // (0x20)  Timer IRQ End-of-Interrupt Register
-        __RW  IRQSTATUS_RAW_reg_t   IRQSTATUS_RAW;           // (0x24)  Timer IRQ Status Raw Register
-        __RW  IRQSTATUS_reg_t       IRQSTATUS;               // (0x28)  Timer IRQ Status Register
-        __RW  IRQENABLE_SET_reg_t   IRQENABLE_SET;           // (0x2C)  Timer Interrupt Enable Set Registerr
-        __RW  IRQENABLE_CLR_reg_t   IRQENABLE_CLR;           // (0x30)  Timer Interrupt Enable Clear Register
-        __RW  IRQWAKEEN_reg_t       IRQWAKEEN;               // (0x34)  Timer IRQ Wakeup Enable Register
-        __RW  TCLR_reg_t            TCLR;                    // (0x38)  Timer Control Register
-        __RW  TCRR_reg_t            TCRR;                    // (0x3C)  Timer Counter Register
-        __RW  TLDR_reg_t            TLDR;                    // (0x40)  Timer Load Register
-        __W   TTGR_reg_t            TTGR;                    // (0x44)  Timer Trigger Register
-        __RW  TWPS_reg_t            TWPS;                    // (0x48)  Timer Write Posting Bits Register
-        __RW  TMAR_reg_t            TMAR;                    // (0x4C)  Timer Match Register
-        __RW  TCAR1_reg_t           TCAR1;                   // (0x50)  Timer Capture Register 1
-        __RW  TSICR_reg_t           TSICR;                   // (0x54)  Timer Synchronous Interface Control Register
-        __RW  TCAR2_reg_t           TCAR2;                   // (0x58)  Timer Capture Register 2                                                                                                               
-    } AM335x_DMTIMER_Type;
-    
-    constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_0 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_0_BASE); // only 32KHz RC Clock
-    constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_1 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_1_BASE); // only 1ms timer
-    constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_2 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_2_BASE);
-    constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_3 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_3_BASE);
-    constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_4 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_4_BASE);
-    constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_5 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_5_BASE);
-    constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_6 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_6_BASE);
-    constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_7 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_7_BASE);
-} 
+//This is power reset clock manager class and his namespace
 
 namespace PRCM
 {  
@@ -1216,6 +909,548 @@ namespace PRCM
 
     constexpr AM335x_CM_PER_Type * AM335X_CM_PER = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
 
+    /* [reset state = 0x6] */
+    typedef union 
+    { 
+        struct 
+        {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                   /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1     (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]              
+            uint32_t    CLKACTIVITY_L4_WKUP_GCLK    :1;   // bit: 2       (R)state of the clock in domain [0x0 = Inact; 0x1= Act]
+            uint32_t    CLKACTIVITY_SR_SYSCLK       :1;   // bit: 3       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_WDT1_GCLK       :1;   // bit: 4       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                :3;   // bit: 5..7    Reserved
+            uint32_t    CLKACTIVITY_GPIO0_GDBCLK    :1;   // bit: 8       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                :1;   // bit: 9       Reserved   
+            uint32_t    CLKACTIVITY_TIMER0_GCLK     :1;   // bit: 10      (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_I2C0_GFCLK      :1;   // bit: 11      (R)state of the clock in domain [0x0 = Inact; 0x1= Act]  
+            uint32_t    CLKACTIVITY_UART0_GFCLK     :1;   // bit: 12      (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_TIMER1_GCLK     :1;   // bit: 13      Reserved
+            uint32_t    CLKACTIVITY_ADC_FCLK        :1;   // bit: 14      (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t                                :17;  // bit: 15..31  (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x30000] */
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the Control Module clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } CONTROL_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000] */
+    typedef union 
+    { 
+        struct 
+        {                                                /* This register manages the GPIO0 clocks. */ 
+            uint32_t    MODULEMODE                 :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t                               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST                     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    OPTFCLKEN_GPIO0_GDBCLK     :1;   // bit: 18         (RW)Optional functional clock control.[0x0 = disabled; 0x1= enabled]
+            uint32_t                               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GPIO0_CLKCTRL_reg_t;
+
+    /* [reset state = 0x2] */
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the L4WKUP clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (R)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L4WKUP_CLKCTRL_reg_t
+
+    /* [reset state = 0x30002] */
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the TIMER0 clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (R)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } TIMER0_CLKCTRL_reg_t
+
+    /* [reset state = 0x52580002] */
+    typedef union 
+    { 
+        struct 
+        {                                                /* This register manages the DEBUGSS clocks. */ 
+            uint32_t    MODULEMODE                 :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t                               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST                     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST                     :1;   // bit: 18         (R)Module standby status.[0x0 = not in stadby; 0x1= stadby]
+            uint32_t    OPTFCLKEN_DBGSYSCLK        :1;   // bit: 19         (RW)Optional functional clock control.[0x0 = disabled; 0x1= enabled]
+            uint32_t    TRC_PMD_CLKSEL             :2;   // bit: 20,21         
+            uint32_t    STM_PMD_CLKSEL             :2;   // bit: 22,23         
+            uint32_t    TRC_PMD_CLKDIVSEL          :3;   // bit: 24..26         
+            uint32_t    STM_PMD_CLKDIVSEL          :3;   // bit: 27..29         
+            uint32_t    OPTCLK_DEBUG_CLKA          :1;   // bit: 30         (RW)Optional functional clock control.[0x0 = disabled.; 0x1= enabled.]
+            uint32_t                               :1;   // bit: 31         Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } DEBUGSS_CLKCTRL_reg_t;
+
+    /* [reset state = 0x1A]*/
+    typedef union 
+    { 
+        struct 
+        {                                                 /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                          /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
+            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]               
+            uint32_t    CLKACTIVITY_DBGSYSCLK       :1;   // bit: 2        (R)state of the Debugss clock in domain [0x0 = gated; 0x1= active]
+            uint32_t    CLKACTIVITY_L3_AON_GCLK     :1;   // bit: 3        (R)state of the L3_AON clock in domain [0x0 = gated; 0x1= active] 
+            uint32_t    CLKACTIVITY_DEBUG_CLKA      :1;   // bit: 4        (R)state of the Debugss CLKA clock in domain [0x0 = gated; 0x1= active] 
+            uint32_t                                :27;  // bit: 5..31    Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L3_AON_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x1A]*/
+    typedef union 
+    { 
+        struct 
+        {                                                 /* This register provides automatic control over the DPLL activity. */
+            uint32_t    AUTO_DPLL_MODE              :3;   // bit: 0..2      (RW)This feature is not supported.              
+            uint32_t                                :29;  // bit: 3..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } AUTOIDLE_DPLL_MPU_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                       /* This register allows monitoring the master clock activity. This register is read only and automatically updated */
+            uint32_t    DPLL              :1;   // bit: 0       (RW)DPLL clock activity [0x0 = in bypass or in stop mode; 0x1= locked]              
+            uint32_t                      :7;   // bit: 1..7    Reserved
+            uint32_t    ST_MN_BYPASS      :8;   // bit: 8       (RW)DPLL MN_BYPASS status [0x0 = not bypass; 0x1= bypass]            
+            uint32_t                      :23;  // bit: 9..31   Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } IDLEST_DPLL_MPU_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the DeltaMStep parameter for Spread Spectrum Clocking technique DeltaMStep is split Interconnect     */
+                                                    /*  fractional and integer part.                                                                                */
+            uint32_t    DELTAMSTEP_FRACTION :18;   // bit: 0..17    (RW)Fractional part for DeltaM coefficient              
+            uint32_t    DELTAMSTEP_INTEGER  :2;    // bit: 18,19    (RW)Integer part for DeltaM coefficient  
+            uint32_t                        :12;   // bit: 20..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_DELTAMSTEP_DPLL_MPU_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the Modulation Frequency (Fm) for Spread Spectrum Clocking technique by defining it as a ratio       */
+                                                    /* of DPLL_REFCLK/4 Fm = [DPLL_REFCLK/4]/MODFREQDIV MODFREQDIV = MODFREQDIV_MANTISSA * 2^MODFREQDIV_EXPONENT    */
+            uint32_t    MODFREQDIV_MANTISSA :7;    // bit: 0..6     (RW)Set the Mantissa component of MODFREQDIV factor 
+            uint32_t                        :1;    // bit: 7        Reserved              
+            uint32_t    MODFREQDIV_EXPONENT :3;    // bit: 8..10    (RW)Set the Exponent component of MODFREQDIV factor  
+            uint32_t                        :21;   // bit: 11..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_MODFREQDIV_DPLL_MPU_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides controls over the DPLL.      */
+            uint32_t    DPLL_DIV            :7;     // bit: 0..6     DPLL divider factor (0 to 127) (equal to input N of DPLL actual division factor is N+1). 
+            uint32_t                        :1;     // bit: 7        Reserved              
+            uint32_t    DPLL_MULT           :11;    // bit: 8..18    DPLL multiplier factor (2 to 2047). [0x0 = 0 reserved; 0x1= 1 reserved] 
+            uint32_t                        :4;     // bit: 19..22   Reserved  
+            uint32_t    DPLL_BYP_CLKSEL     :1;     // bit: 23       [ 0x0 = Selects CLKINP Clock as BYPASS Clock; 0x1 = Selects CLKINPULOW as Bypass Clock ]
+            uint32_t                        :8;     // bit: 24..31   Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKSEL_DPLL_MPU_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides automatic control over the DPLL activity.       */
+            uint32_t    AUTO_DPLL_MODE      :3;     // bit: 0..2     AUTO_DPLL_MODE is not supported. 
+            uint32_t                        :29;    // bit: 3..31    Reserved              
+        } b;                                      
+        uint32_t  reg;                           
+    } AUTOIDLE_DPLL_DDR_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /*This register allows monitoring the master clock activity. This register is read only and automatically updated */
+            uint32_t    ST_DPLL_CLK      :1;     // bit: 0          DPLL clock activity [0x0 = in bypass or in stop mode; 0x1 = locked ] 
+            uint32_t                     :7;     // bit: 1..7       Reserved 
+            uint32_t    ST_MN_BYPASS     :1;     // bit: 8          DPLL MN_BYPASS status [0x0 = not in bypass; 0x1 = bypass ] 
+            uint32_t                     :23;    // bit: 9..31      Reserved             
+        } b;                                      
+        uint32_t  reg;                           
+    } IDLEST_DPLL_DDR_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the DeltaMStep parameter for Spread Spectrum Clocking technique DeltaMStep is split Interconnect     */
+                                                    /*  fractional and integer part.                                                                                */
+            uint32_t    DELTAMSTEP_FRACTION :18;   // bit: 0..17    Fractional part for DeltaM coefficient              
+            uint32_t    DELTAMSTEP_INTEGER  :2;    // bit: 18,19    Integer part for DeltaM coefficient  
+            uint32_t                        :12;   // bit: 20..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_DELTAMSTEP_DPLL_DDR_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the Modulation Frequency (Fm) for Spread Spectrum Clocking technique by defining it as a ratio       */
+                                                    /* of DPLL_REFCLK/4 Fm = [DPLL_REFCLK/4]/MODFREQDIV MODFREQDIV = MODFREQDIV_MANTISSA * 2^MODFREQDIV_EXPONENT    */
+            uint32_t    MODFREQDIV_MANTISSA :7;    // bit: 0..6     Set the Mantissa component of MODFREQDIV factor 
+            uint32_t                        :1;    // bit: 7        Reserved              
+            uint32_t    MODFREQDIV_EXPONENT :3;    // bit: 8..10    Set the Exponent component of MODFREQDIV factor  
+            uint32_t                        :21;   // bit: 11..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_MODFREQDIV_DPLL_DDR_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides controls over the DPLL.      */
+            uint32_t    DPLL_DIV            :7;     // bit: 0..6     DPLL divider factor (0 to 127) (equal to input N of DPLL actual division factor is N+1). 
+            uint32_t                        :1;     // bit: 7        Reserved              
+            uint32_t    DPLL_MULT           :11;    // bit: 8..18    DPLL multiplier factor (2 to 2047). [0x0 = 0 reserved; 0x1= 1 reserved] 
+            uint32_t                        :4;     // bit: 19..22   Reserved  
+            uint32_t    DPLL_BYP_CLKSEL     :1;     // bit: 23       [ 0x0 = Selects CLKINP Clock as BYPASS Clock; 0x1 = Selects CLKINPULOW as Bypass Clock ]
+            uint32_t                        :8;     // bit: 24..31   Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKSEL_DPLL_DDR_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides automatic control over the DPLL activity.       */
+            uint32_t    AUTO_DPLL_MODE      :3;     // bit: 0..2     AUTO_DPLL_MODE is not supported. 
+            uint32_t                        :29;    // bit: 3..31    Reserved              
+        } b;                                      
+        uint32_t  reg;                           
+    } AUTOIDLE_DPLL_DISP_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /*This register allows monitoring the master clock activity. This register is read only and automatically updated */
+            uint32_t    ST_DPLL_CLK      :1;     // bit: 0          DPLL clock activity [0x0 = in bypass or in stop mode; 0x1 = locked ] 
+            uint32_t                     :7;     // bit: 1..7       Reserved 
+            uint32_t    ST_MN_BYPASS     :1;     // bit: 8          DPLL MN_BYPASS status [0x0 = not in bypass; 0x1 = bypass ] 
+            uint32_t                     :23;    // bit: 9..31      Reserved             
+        } b;                                      
+        uint32_t  reg;                           
+    } IDLEST_DPLL_DISP_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the DeltaMStep parameter for Spread Spectrum Clocking technique DeltaMStep is split Interconnect     */
+                                                    /*  fractional and integer part.                                                                                */
+            uint32_t    DELTAMSTEP_FRACTION :18;   // bit: 0..17    (RW)Fractional part for DeltaM coefficient              
+            uint32_t    DELTAMSTEP_INTEGER  :2;    // bit: 18,19    (RW)Integer part for DeltaM coefficient  
+            uint32_t                        :12;   // bit: 20..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_DELTAMSTEP_DPLL_DISP_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the Modulation Frequency (Fm) for Spread Spectrum Clocking technique by defining it as a ratio       */
+                                                    /* of DPLL_REFCLK/4 Fm = [DPLL_REFCLK/4]/MODFREQDIV MODFREQDIV = MODFREQDIV_MANTISSA * 2^MODFREQDIV_EXPONENT    */
+            uint32_t    MODFREQDIV_MANTISSA :7;    // bit: 0..6     (RW)Set the Mantissa component of MODFREQDIV factor 
+            uint32_t                        :1;    // bit: 7        Reserved              
+            uint32_t    MODFREQDIV_EXPONENT :3;    // bit: 8..10    (RW)Set the Exponent component of MODFREQDIV factor  
+            uint32_t                        :21;   // bit: 11..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_MODFREQDIV_DPLL_DISP_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides controls over the DPLL.      */
+            uint32_t    DPLL_DIV            :7;     // bit: 0..6     (RW)DPLL divider factor (0 to 127) (equal to input N of DPLL actual division factor is N+1). 
+            uint32_t                        :1;     // bit: 7        Reserved              
+            uint32_t    DPLL_MULT           :11;    // bit: 8..18    (RW)DPLL multiplier factor (2 to 2047). [0x0 = 0 reserved; 0x1= 1 reserved] 
+            uint32_t                        :4;     // bit: 19..22   Reserved  
+            uint32_t    DPLL_BYP_CLKSEL     :1;     // bit: 23       (RW)SSC_MODFREQDIV_DPLL_DISP_reg_t[ 0x0 = Selects CLKINP Clock as BYPASS Clock; 0x1 = Selects CLKINPULOW as Bypass Clock ]
+            uint32_t                        :8;     // bit: 24..31   Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKSEL_DPLL_DISP_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides automatic control over the DPLL activity.       */
+            uint32_t    AUTO_DPLL_MODE      :3;     // bit: 0..2     AUTO_DPLL_MODE is not supported. 
+            uint32_t                        :29;    // bit: 3..31    Reserved              
+        } b;                                      
+        uint32_t  reg;                           
+    } AUTOIDLE_DPLL_CORE_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /*This register allows monitoring the master clock activity. This register is read only and automatically updated */
+            uint32_t    ST_DPLL_CLK      :1;     // bit: 0          DPLL clock activity [0x0 = in bypass or in stop mode; 0x1 = locked ] 
+            uint32_t                     :7;     // bit: 1..7       Reserved 
+            uint32_t    ST_MN_BYPASS     :1;     // bit: 8          DPLL MN_BYPASS status [0x0 = not in bypass; 0x1 = bypass ] 
+            uint32_t                     :23;    // bit: 9..31      Reserved             
+        } b;                                      
+        uint32_t  reg;                           
+    } IDLEST_DPLL_CORE_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the DeltaMStep parameter for Spread Spectrum Clocking technique DeltaMStep is split Interconnect     */
+                                                    /*  fractional and integer part.                                                                                */
+            uint32_t    DELTAMSTEP_FRACTION :18;   // bit: 0..17    (RW)Fractional part for DeltaM coefficient              
+            uint32_t    DELTAMSTEP_INTEGER  :2;    // bit: 18,19    (RW)Integer part for DeltaM coefficient  
+            uint32_t                        :12;   // bit: 20..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_DELTAMSTEP_DPLL_CORE_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the Modulation Frequency (Fm) for Spread Spectrum Clocking technique by defining it as a ratio       */
+                                                    /* of DPLL_REFCLK/4 Fm = [DPLL_REFCLK/4]/MODFREQDIV MODFREQDIV = MODFREQDIV_MANTISSA * 2^MODFREQDIV_EXPONENT    */
+            uint32_t    MODFREQDIV_MANTISSA :7;    // bit: 0..6     (RW)Set the Mantissa component of MODFREQDIV factor 
+            uint32_t                        :1;    // bit: 7        Reserved              
+            uint32_t    MODFREQDIV_EXPONENT :3;    // bit: 8..10    (RW)Set the Exponent component of MODFREQDIV factor  
+            uint32_t                        :21;   // bit: 11..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_MODFREQDIV_DPLL_CORE_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides controls over the DPLL.      */
+            uint32_t    DPLL_DIV            :7;     // bit: 0..6     (RW)DPLL divider factor (0 to 127) (equal to input N of DPLL actual division factor is N+1). 
+            uint32_t                        :1;     // bit: 7        Reserved              
+            uint32_t    DPLL_MULT           :11;    // bit: 8..18    (RW)DPLL multiplier factor (2 to 2047). [0x0 = 0 reserved; 0x1= 1 reserved] 
+            uint32_t                        :13;    // bit: 19..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKSEL_DPLL_CORE_reg_t;
+
+
+
+
+
+
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides automatic control over the DPLL activity.       */
+            uint32_t    AUTO_DPLL_MODE      :3;     // bit: 0..2     AUTO_DPLL_MODE is not supported. 
+            uint32_t                        :29;    // bit: 3..31    Reserved              
+        } b;                                      
+        uint32_t  reg;                           
+    } AUTOIDLE_DPLL_PER_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /*This register allows monitoring the master clock activity. This register is read only and automatically updated */
+            uint32_t    ST_DPLL_CLK      :1;     // bit: 0          DPLL clock activity [0x0 = in bypass or in stop mode; 0x1 = locked ] 
+            uint32_t                     :7;     // bit: 1..7       Reserved 
+            uint32_t    ST_MN_BYPASS     :1;     // bit: 8          DPLL MN_BYPASS status [0x0 = not in bypass; 0x1 = bypass ] 
+            uint32_t                     :23;    // bit: 9..31      Reserved             
+        } b;                                      
+        uint32_t  reg;                           
+    } IDLEST_DPLL_PER_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the DeltaMStep parameter for Spread Spectrum Clocking technique DeltaMStep is split Interconnect     */
+                                                    /*  fractional and integer part.                                                                                */
+            uint32_t    DELTAMSTEP_FRACTION :18;   // bit: 0..17    (RW)Fractional part for DeltaM coefficient              
+            uint32_t    DELTAMSTEP_INTEGER  :2;    // bit: 18,19    (RW)Integer part for DeltaM coefficient  
+            uint32_t                        :12;   // bit: 20..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_DELTAMSTEP_DPLL_PER_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* Control the Modulation Frequency (Fm) for Spread Spectrum Clocking technique by defining it as a ratio       */
+                                                    /* of DPLL_REFCLK/4 Fm = [DPLL_REFCLK/4]/MODFREQDIV MODFREQDIV = MODFREQDIV_MANTISSA * 2^MODFREQDIV_EXPONENT    */
+            uint32_t    MODFREQDIV_MANTISSA :7;    // bit: 0..6     (RW)Set the Mantissa component of MODFREQDIV factor 
+            uint32_t                        :1;    // bit: 7        Reserved              
+            uint32_t    MODFREQDIV_EXPONENT :3;    // bit: 8..10    (RW)Set the Exponent component of MODFREQDIV factor  
+            uint32_t                        :21;   // bit: 11..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } SSC_MODFREQDIV_DPLL_PER_reg_t;
+
+    /* [reset state = 0x0] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides controls over the DPLL.      */
+            uint32_t                              :8;     // bit: 0..7     Reserved
+            uint32_t    DPLL_CLKDCOLDO_GATE_CTRL  :1;     // bit: 8        (RW) Control gating of DPLL CLKDCOLDO [0x0 = Automatically gate;0x1 = Force this clock]             
+            uint32_t    ST_DPLL_CLKDCOLDO         :1;     // bit: 9        (R) DPLL CLKDCOLDO status[0x0 = gated;0x1 = enabled]  
+            uint32_t                              :2;     // bit: 10,11    Reserved 
+            uint32_t    DPLL_CLKDCOLDO_PWDN       :1;     // bit: 12       (RW)Automatic power down for CLKDCOLDO o/p when it is gated [0x0 = keep powered;0x1 = powerdown] 
+            uint32_t                              :19;    // bit: 13..31   Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKDCOLDO_DPLL_PER_reg_t;
+
+    /* [reset state = 0x4] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides controls over the CLKOUT1 o/p of the HSDIVIDER.*/
+            uint32_t    HSDIVIDER_CLKOUT1_DIV       :5;     // bit: 0..4     (RW)DPLL post-divider factor, M4, for internal clock generation.Divide values from 1 to 31. [0x0 = reserved]
+            uint32_t    HSDIVIDER_CLKOUT1_DIVCHACK  :1;     // bit: 5        (R)indicates that the change in divider HSDIVIDER_CLKOUT1_DIV value has taken effect.           
+            uint32_t                                :2;     // bit: 6,7      Reserved  
+            uint32_t    HSDIVIDER_CLKOUT1_GATE_CTRL :1;     // bit: 8        (RW)Control gating of HSDIVIDER CLKOUT1 [0x0 = auto gated;0x1 = force enabled] 
+            uint32_t    ST_HSDIVIDER_CLKOUT1        :1;     // bit: 9        (R)HSDIVIDER CLKOUT1 status  [0x0 = gated;0x1 = enabled]
+            uint32_t                                :2;     // bit: 10,11    Reserved
+            uint32_t    HSDIVIDER_CLKOUT1_PWDN      :1;     // bit: 12       Automatic power down for HSDIVIDER M4 divider and henceCLKOUT1 output when the o/p clock is gated [0x0 = keep powered;0x1 = powerdown] 
+            uint32_t                                :19;    // bit: 13..31   Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } DIV_M4_DPLL_CORE_reg_t;
+
+    /* [reset state = 0x4] */
+    typedef union 
+    { 
+        struct 
+        {                                           /* This register provides controls over the CLKOUT1 o/p of the HSDIVIDER.*/
+            uint32_t    HSDIVIDER_CLKOUT2_DIV       :5;     // bit: 0..4     (RW)DPLL post-divider factor, M5, for internal clock generation.Divide values from 1 to 31. [0x0 = reserved]
+            uint32_t    HSDIVIDER_CLKOUT2_DIVCHACK  :1;     // bit: 5        (R)indicates that the change in divider HSDIVIDER_CLKOUT2_DIV value has taken effect.           
+            uint32_t                                :2;     // bit: 6,7      Reserved  
+            uint32_t    HSDIVIDER_CLKOUT2_GATE_CTRL :1;     // bit: 8        (RW)Control gating of HSDIVIDER CLKOUT2 [0x0 = auto gated;0x1 = force enabled] 
+            uint32_t    ST_HSDIVIDER_CLKOUT2        :1;     // bit: 9        (R)HSDIVIDER CLKOUT2 status  [0x0 = gated;0x1 = enabled]
+            uint32_t                                :2;     // bit: 10,11    Reserved
+            uint32_t    HSDIVIDER_CLKOUT2_PWDN      :1;     // bit: 12       Automatic power down for HSDIVIDER M5 divider and henceCLKOUT2 output when the o/p clock is gated [0x0 = keep powered;0x1 = powerdown] 
+            uint32_t                                :19;    // bit: 13..31   Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } DIV_M5_DPLL_CORE_reg_t;
+
+    typedef struct 
+    {                                                                                      
+        __RW   CLKSTCTRL_reg_t                    CLKSTCTRL;                 // (0x00)  
+        __RW   CONTROL_CLKCTRL_reg_t              CONTROL_CLKCTRL;           // (0x04) 
+        __RW   GPIO0_CLKCTRL_reg_t                GPIO0_CLKCTRL;             // (0x08) 
+        __RW   L4WKUP_CLKCTRL_reg_t               L4WKUP_CLKCTRL;            // (0x0C) 
+        __RW   TIMER0_CLKCTRL_reg_t               TIMER0_CLKCTRL;            // (0x10) 
+        __RW   DEBUGSS_CLKCTRL_reg_t              DEBUGSS_CLKCTRL;           // (0x14) 
+        __RW   L3_AON_CLKSTCTRL_reg_t             L3_AON_CLKSTCTRL;          // (0x18) 
+        __RW   AUTOIDLE_DPLL_MPU_reg_t            AUTOIDLE_DPLL_MPU;         // (0x1C)  //This feature is not supported!
+        __R    IDLEST_DPLL_MPU_reg_t              IDLEST_DPLL_MPU;           // (0x20) 
+        __RW   SSC_DELTAMSTEP_DPLL_MPU_reg_t      SSC_DELTAMSTEP_DPLL_MPU;   // (0x24) 
+        __RW   SSC_MODFREQDIV_DPLL_MPU_reg_t      SSC_MODFREQDIV_DPLL_MPU;   // (0x28)  
+        __RW   CLKSEL_DPLL_MPU_reg_t              CLKSEL_DPLL_MPU;           // (0x2C) 
+        __RW   AUTOIDLE_DPLL_DDR_reg_t            AUTOIDLE_DPLL_DDR;         // (0x30)  //AUTO_DPLL_MODE is not supported!    
+        __R    IDLEST_DPLL_DDR_reg_t              IDLEST_DPLL_DDR;           // (0x34) 
+        __RW   SSC_DELTAMSTEP_DPLL_DDR_reg_t      SSC_DELTAMSTEP_DPLL_DDR;   // (0x38) 
+        __RW   SSC_MODFREQDIV_DPLL_DDR_reg_t      SSC_MODFREQDIV_DPLL_DDR;   // (0x3C) 
+        __RW   CLKSEL_DPLL_DDR_reg_t              CLKSEL_DPLL_DDR;           // (0x40) 
+        __RW   AUTOIDLE_DPLL_DISP_reg_t           AUTOIDLE_DPLL_DISP;        // (0x44)  //AUTO_DPLL_MODE is not supported!
+        __R    IDLEST_DPLL_DISP_reg_t             IDLEST_DPLL_DISP;          // (0x48) 
+        __RW   SSC_DELTAMSTEP_DPLL_DISP_reg_t     SSC_DELTAMSTEP_DPLL_DISP;  // (0x4C) 
+        __RW   SSC_MODFREQDIV_DPLL_DISP_reg_t     SSC_MODFREQDIV_DPLL_DISP;  // (0x50)  
+        __RW   CLKSEL_DPLL_DISP_reg_t             CLKSEL_DPLL_DISP;          // (0x54) 
+        __RW   AUTOIDLE_DPLL_CORE_reg_t           AUTOIDLE_DPLL_CORE;        // (0x58)  //AUTO_DPLL_MODE is not supported! 
+        __R    IDLEST_DPLL_CORE_reg_t             IDLEST_DPLL_CORE;          // (0x5C) 
+        __RW   SSC_DELTAMSTEP_DPLL_CORE_reg_t     SSC_DELTAMSTEP_DPLL_CORE;  // (0x60) 
+        __RW   SSC_MODFREQDIV_DPLL_CORE_reg_t     SSC_MODFREQDIV_DPLL_CORE;  // (0x64) 
+        __RW   CLKSEL_DPLL_CORE_reg_t             CLKSEL_DPLL_CORE;          // (0x68) 
+        __RW   AUTOIDLE_DPLL_PER_reg_t            AUTOIDLE_DPLL_PER;         // (0x6C)  //AUTO_DPLL_MODE is not supported. 
+        __R    IDLEST_DPLL_PER_reg_t              IDLEST_DPLL_PER;           // (0x70) 
+        __RW   SSC_DELTAMSTEP_DPLL_PER_reg_t      SSC_DELTAMSTEP_DPLL_PER;   // (0x74) 
+        __RW   SSC_MODFREQDIV_DPLL_PER_reg_t      SSC_MODFREQDIV_DPLL_PER;   // (0x78)  
+        __RW   CLKDCOLDO_DPLL_PER_reg_t           CLKDCOLDO_DPLL_PER;        // (0x7C) 
+        __RW   DIV_M4_DPLL_CORE_reg_t             DIV_M4_DPLL_CORE;          // (0x80) 
+        __RW   DIV_M5_DPLL_CORE_reg_t             DIV_M5_DPLL_CORE;          // (0x84) 
+        __   CLKMODE_DPLL_MPU_reg_t             CLKMODE_DPLL_MPU;          // (0x88) 
+        __   CLKMODE_DPLL_PER_reg_t             CLKMODE_DPLL_PER;          // (0x8C) 
+        __   CLKMODE_DPLL_CORE_reg_t            CLKMODE_DPLL_CORE;         // (0x90) 
+        __   CLKMODE_DPLL_DDR_reg_t             CLKMODE_DPLL_DDR;          // (0x94) 
+        __   CLKMODE_DPLL_DISP_reg_t            CLKMODE_DPLL_DISP;         // (0x98) 
+        __   CLKSEL_DPLL_PERIPH_reg_t           CLKSEL_DPLL_PERIPH;        // (0x9C) 
+        __   DIV_M2_DPLL_DDR_reg_t              DIV_M2_DPLL_DDR;           // (0xA0)  
+        __   DIV_M2_DPLL_DISP_reg_t             DIV_M2_DPLL_DISP;          // (0xA4) 
+        __   DIV_M2_DPLL_MPU_reg_t              DIV_M2_DPLL_MPU;           // (0xA8) 
+        __   DIV_M2_DPLL_PER_reg_t              DIV_M2_DPLL_PER;           // (0xAC) 
+        __   WKUP_M3_CLKCTRL_reg_t              WKUP_M3_CLKCTRL;           // (0xB0) 
+        __   UART0_CLKCTRL_reg_t                UART0_CLKCTRL;             // (0xB4) 
+        __   I2C0_CLKCTRL_reg_t                 I2C0_CLKCTRL;              // (0xB8) 
+        __   ADC_TSC_CLKCTRL_reg_t              ADC_TSC_CLKCTRL;           // (0xBC) 
+        __   SMARTREFLEX0_CLKCTRL_reg_t         SMARTREFLEX0_CLKCTRL;      // (0xC0) 
+        __   TIMER1_CLKCTRL_reg_t               TIMER1_CLKCTRL;            // (0xC4)
+        __   SMARTREFLEX1_CLKCTRL_reg_t         SMARTREFLEX1_CLKCTRL;      // (0xC8) 
+        __   L4_WKUP_AON_CLKSTCTRL_reg_t        L4_WKUP_AON_CLKSTCTRL;     // (0xCC) 
+        __R   uint32_t                          RESERVED[1];
+        __   WDT1_CLKCTRL_reg_t                 WDT1_CLKCTRL;              // (0xD4) 
+        __   DIV_M6_DPLL_CORE_reg_t             DIV_M6_DPLL_CORE;          // (0xD8)
+    } AM335x_CM_WKUP_Type
+
+    constexpr AM335x_CM_WKUP_Type * AM335X_CM_WKUP = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
+
+    
+
     /* [reset state = 0x0]*/
     //typedef union 
     //{ 
@@ -1237,4 +1472,4 @@ namespace PRCM
 }
 
 
-#endif //_AM335X_MEM_MAP_H_
+#endif //_PRCM_H_

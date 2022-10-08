@@ -9,8 +9,8 @@
 
 
 #include "hal_bspInit.h"
-#include "AM335x_mem_map.h"
 #include "DM_Timer.h"
+#include "PRCM.h"
 #include  <uC_cpu.h>
 #include  <app_cfg.h>
 #include  <cpu_cfg.h>
