@@ -2686,6 +2686,9 @@
             <file>
                 <name>$PROJ_DIR$\src\app\os_cfg.h</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\PRCM.h</name>
+            </file>
         </group>
         <file>
             <name>$PROJ_DIR$\src\hal_bspInit.c</name>
