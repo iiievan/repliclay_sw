@@ -2230,6 +2230,177 @@ namespace PRCM
         __RW   CEFUSE_CLKCTRL_reg_t         CEFUSE_CLKCTRL;     // (0x20)      
     } AM335x_CM_CEFUSE_Type;
 
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                           /* This register contains the IP revision code for the PRCM */ 
+            uint32_t    REV :8;     // bit: 0..7       (RW)IP revision [7:4] Major revision [3:0] Minor revision Examples: 0x10 for 1.0, 0x21 for 2.1                 
+            uint32_t        :24;    // bit: 8..31      Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } REVISION_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                       /* This register provides status on MPU interrupt events. */ 
+            uint32_t                    :8;     // bit: 0..7    Reserved 
+            uint32_t Transition_st      :1;     // bit: 8       (RW)Software supervised transition completed event interrupt status [0x0 = IRQ_fal : No interrupt; 0x1 = IRQ_tru : Interrupt is pending;]
+            uint32_t                    :1;     // bit: 9       Reserved
+            uint32_t ForceWkup_st       :1;     // bit: 10      (RW)Software supervised wakeup completed event interrupt status [0x0 = IRQ_fal : No interrupt; 0x1 = IRQ_tru : Interrupt is pending;] 
+            uint32_t dpll_mpu_recal_st  :1;     // bit: 11      (RW)interrupt status for mpu dpll recaliberation  [0x0 = disable; 0x1 = enable;] 
+            uint32_t dpll_core_recal_st :1;     // bit: 12      (RW)interrupt status for core dpll recaliberation [0x0 = disable; 0x1 = enable;] 
+            uint32_t dpll_disp_recal_st :1;     // bit: 13      (RW)interrupt status for disp dpll recaliberation [0x0 = disable; 0x1 = enable;] 
+            uint32_t dpll_ddr_recal_st  :1;     // bit: 14      (RW)interrupt status for ddr dpll recaliberation  [0x0 = disable; 0x1 = enable;]
+            uint32_t dpll_per_recal_st  :1;     // bit: 15      (RW)interrupt status for usb dpll recaliberation  [0x0 = disable; 0x1 = enable;]               
+            uint32_t                    :16;    // bit: 16..31  Reserved     
+        } b;                                      
+        uint32_t  reg;                           
+    } IRQSTATUS_MPU_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                       /* This register is used to enable and disable events used to trigger MPU interrupt activation */ 
+            uint32_t                    :8;     // bit: 0..7    Reserved 
+            uint32_t Transition_en      :1;     // bit: 8       (RW)Software supervised transition completed event interrupt enable (anydomain) [0x0 = masked; 0x1 = enabled]
+            uint32_t                    :1;     // bit: 9       Reserved
+            uint32_t ForceWkup_en       :1;     // bit: 10      (RW)Software supervised Froce Wakeup completed event interruptenable [0x0 = masked; 0x1 = enabled] 
+            uint32_t dpll_mpu_recal_en  :1;     // bit: 11      (RW)Interrupt enable for mpu dpll recaliberation  [0x0 = disable ; 0x1 = enable ;] 
+            uint32_t dpll_core_recal_en :1;     // bit: 12      (RW)interrupt status for core dpll recaliberation [0x0 = disable ; 0x1 = enable ;] 
+            uint32_t dpll_per_recal_en  :1;     // bit: 13      (RW)interrupt status for disp dpll recaliberation [0x0 = disable ; 0x1 = enable ;] 
+            uint32_t dpll_ddr_recal_en  :1;     // bit: 14      (RW)interrupt status for ddr dpll recaliberation  [0x0 = disable ; 0x1 = enable ;]
+            uint32_t dpll_disp_recal_en :1;     // bit: 15      (RW)interrupt status for usb dpll recaliberation  [0x0 = disable ; 0x1 = enable ;]               
+            uint32_t                    :16;    // bit: 16..31  Reserved    
+        } b;                                      
+        uint32_t  reg;                           
+    } IRQENABLE_MPU_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                       /* This register provides status on MPU interrupt events. */ 
+            uint32_t                    :8;     // bit: 0..7    Reserved 
+            uint32_t Transition_st      :1;     // bit: 8       (RW)Software supervised transition completed event interrupt status [0x0 = IRQ_fal : No interrupt; 0x1 = IRQ_tru : Interrupt is pending;]
+            uint32_t                    :1;     // bit: 9       Reserved
+            uint32_t ForceWkup_st       :1;     // bit: 10      (RW)Software supervised wakeup completed event interrupt status [0x0 = IRQ_fal : No interrupt; 0x1 = IRQ_tru : Interrupt is pending;] 
+            uint32_t dpll_mpu_recal_st  :1;     // bit: 11      (RW)interrupt status for mpu dpll recaliberation  [0x0 = disable; 0x1 = enable;] 
+            uint32_t dpll_core_recal_st :1;     // bit: 12      (RW)interrupt status for core dpll recaliberation [0x0 = disable; 0x1 = enable;] 
+            uint32_t dpll_disp_recal_st :1;     // bit: 13      (RW)interrupt status for disp dpll recaliberation [0x0 = disable; 0x1 = enable;] 
+            uint32_t dpll_ddr_recal_st  :1;     // bit: 14      (RW)interrupt status for ddr dpll recaliberation  [0x0 = disable; 0x1 = enable;]
+            uint32_t dpll_per_recal_st  :1;     // bit: 15      (RW)interrupt status for usb dpll recaliberation  [0x0 = disable; 0x1 = enable;]               
+            uint32_t                    :16;    // bit: 16..31  Reserved      
+        } b;                                      
+        uint32_t  reg;                           
+    } IRQSTATUS_M3_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                       /* This register is used to enable and disable events used to trigger MPU interrupt activation. */ 
+            uint32_t                    :8;     // bit: 0..7    Reserved 
+            uint32_t Transition_en      :1;     // bit: 8       (RW)Software supervised transition completed event interrupt enable (anydomain) [0x0 = masked; 0x1 = enabled]
+            uint32_t                    :1;     // bit: 9       Reserved
+            uint32_t ForceWkup_en       :1;     // bit: 10      (RW)Software supervised Froce Wakeup completed event interruptenable [0x0 = masked; 0x1 = enabled] 
+            uint32_t dpll_mpu_recal_en  :1;     // bit: 11      (RW)Interrupt enable for mpu dpll recaliberation  [0x0 = disable ; 0x1 = enable ;] 
+            uint32_t dpll_core_recal_en :1;     // bit: 12      (RW)interrupt status for core dpll recaliberation [0x0 = disable ; 0x1 = enable ;] 
+            uint32_t dpll_per_recal_en  :1;     // bit: 13      (RW)interrupt status for disp dpll recaliberation [0x0 = disable ; 0x1 = enable ;] 
+            uint32_t dpll_ddr_recal_en  :1;     // bit: 14      (RW)interrupt status for ddr dpll recaliberation  [0x0 = disable ; 0x1 = enable ;]
+            uint32_t dpll_disp_recal_en :1;     // bit: 15      (RW)interrupt status for usb dpll recaliberation  [0x0 = disable ; 0x1 = enable ;]               
+            uint32_t                    :16;    // bit: 16..31  Reserved     
+        } b;                                      
+        uint32_t  reg;                           
+    } IRQENABLE_M3_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __RW   REVISION_reg_t           REVISION;           // (0x00)  
+        __RW   IRQSTATUS_MPU_reg_t      IRQSTATUS_MPU;      // (0x04) 
+        __RW   IRQENABLE_MPU_reg_t      IRQENABLE_MPU;      // (0x08)
+        __RW   IRQSTATUS_M3_reg_t       IRQSTATUS_M3;       // (0x0C)
+        __RW   IRQENABLE_M3_reg_t       IRQENABLE_M3;       // (0x10)     
+    } AM335x_PRM_IRQ_Type;
+    
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                    /* This register controls the release of the PER Domain resets. */ 
+            uint32_t                  :1;    // bit: 0       Reserved
+            uint32_t    PRU_ICSS_LRST :1;    // bit: 1       (RW)PER domain PRU-ICSS local reset control [0x0 = CLEAR; 0x1 = ASSERT]                 
+            uint32_t                  :30;   // bit: 2..31   Reserved      
+        } b;                                      
+        uint32_t  reg;                           
+    } RSTCTRL_reg_t;
+
+    /* [reset state = 0x1E60007]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register controls the release of the PER Domain resets. */ 
+            uint32_t    PowerStateSt          :2;    // bit: 0,1     (R)Current Power State Status [see e_PWRSTST_MPU]
+            uint32_t    LogicStateSt          :1;    // bit: 2       (R)Logic state status [0x0 = logic in domain OFF; 0x1 = logic in domain ON]                
+            uint32_t                          :14;   // bit: 3..16   Reserved  
+            uint32_t    PER_mem_statest       :2;    // bit: 17,18   (R)PER domain memory state status [see e_PWRSTST_MPU] 
+            uint32_t                          :1;    // bit: 19      Reserved  
+            uint32_t    InTransition          :1;    // bit: 20      (R)Domain transition status [0x0 = No on-going transition on power domain; 0x1 = Power domain transition is in progress] 
+            uint32_t    ram_mem_statest       :2;    // bit: 21,22   (R)OCMC RAM memory state status [see e_PWRSTST_MPU] 
+            uint32_t    pru_icss_mem_statest  :2;    // bit: 23,24   (R)PRU-ICSS memory state status [see e_PWRSTST_MPU]  
+            uint32_t                          :7;    // bit: 25..31  Reserved 
+        } b;                                      
+        uint32_t  reg;                           
+    } PWRSTST_MPU_reg_t;
+
+    enum e_PWRSTST_MPU : uint32_t
+    {
+        MEMORY_OFF          = 0x0,
+        MEMORY_RETENTION    = 0x1,
+        MEMORY_RESERVED     = 0x2,
+        MEMORY_ON           = 0x3
+    };
+
+    /* [reset state = 0xEE0000EB]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register controls the release of the PER Domain resets. */ 
+            uint32_t    PowerState            :2;    // bit: 0,1     (RW) PER domain power state control [see e_PWRSTST_PER]
+            uint32_t                          :1;    // bit: 2       Reserved 
+            uint32_t    LogicRETState         :1;    // bit: 3       (RW) Logic state when power domain is RETENTION [0x0 = logic_off; 0x1 = logic_ret] 
+            uint32_t    LowPowerStateChange   :1;    // bit: 4       (RW) Power state change request when domain has already performed asleep transition [0x0 = Do not request; 0x1 = Req] 
+            uint32_t    pru_icss_mem_ONState  :2;    // bit: 5,6     (RW) PRU-ICSS memory ON state [0x0..0x2 = Reserved; 0x3 = Memory is ON]
+            uint32_t    pru_icss_mem_RETState :1;    // bit: 7       (RW) PRU-ICSS memory RET state [0x0 = off; 0x1 = ret]      
+            uint32_t                          :17;   // bit: 8..24   Reserved  
+            uint32_t    PER_mem_ONState       :2;    // bit: 25,26   (RW) Other memories in PER Domain ON state [0x0..0x2 = Reserved; 0x3 = Memory is ON]
+            uint32_t    ram_mem_RETState      :1;    // bit: 27      (RW) OCMC RAM memory RET state [0x0 = off; 0x1 = ret]   
+            uint32_t                          :1;    // bit: 28      Reserved  
+            uint32_t    PER_mem_RETState      :1;    // bit: 29      (RW) Other memories in PER Domain RET state [0x0 = off; 0x1 = ret]  
+            uint32_t    ram_mem_ONState       :2;    // bit: 30,31   (RW) OCMC RAM memory on state [see e_PWRSTST_PER]  
+        } b;                                      
+        uint32_t  reg;                           
+    } PWRSTCTRL_MPU_reg_t;
+
+    enum e_PWRSTST_PER : uint32_t
+    {
+        PWR_OFF          = 0x0,
+        PWR_RETENTION    = 0x1,
+        PWR_RESERVED     = 0x2,
+        PWR_ON           = 0x3
+    };
+
+    typedef struct 
+    {                                                                 
+        __RW   RSTCTRL_reg_t          RSTCTRL;          // (0x00)
+        __R    uint32_t               RESERVED[1];      // (0x04)   
+        __R    PWRSTST_MPU_reg_t      PWRSTST;          // (0x08) 
+        __RW   PWRSTCTRL_MPU_reg_t    PWRSTCTRL;        // (0x0C)     
+    } AM335x_PRM_PER_Type;
+
     constexpr AM335x_CM_PER_Type * AM335X_CM_PER        = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
     constexpr AM335x_CM_WKUP_Type * AM335X_CM_WKUP      = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
     constexpr AM335x_CM_DPLL_Type * AM335X_CM_DPLL      = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE);
@@ -2237,7 +2408,17 @@ namespace PRCM
     constexpr AM335x_CM_DEVICE_Type * AM335x_CM_DEVICE  = ((AM335x_CM_DEVICE_Type *) AM335x_CM_DEVICE_BASE);
     constexpr AM335x_CM_RTC_Type * AM335x_CM_RTC        = ((AM335x_CM_RTC_Type *) AM335x_CM_RTC_BASE);
     constexpr AM335x_CM_GFX_Type * AM335x_CM_GFX        = ((AM335x_CM_GFX_Type *) AM335x_CM_GFX_BASE);
-    constexpr AM335x_CM_CEFUSE_Type * AM335x_CM_CEFUSE  = ((AM335x_CM_CEFUSE_Type *) AM335x_CM_CEFUSE_BASE);  
+    constexpr AM335x_CM_CEFUSE_Type * AM335x_CM_CEFUSE  = ((AM335x_CM_CEFUSE_Type *) AM335x_CM_CEFUSE_BASE); 
+
+    constexpr AM335x_PRM_IRQ_Type * AM335x_PRM_IRQ  = ((AM335x_PRM_IRQ_Type *) AM335x_PRM_IRQ_BASE);  
+    constexpr AM335x_PRM_PER_Type * AM335x_PRM_PER  = ((AM335x_PRM_PER_Type *) AM335x_PRM_PER_BASE); 
+     
+    //constexpr uint32_t AM335x_PRM_WKUP_BASE     = 0x44E00D00;
+    //constexpr uint32_t AM335x_PRM_MPU_BASE      = 0x44E00E00;
+    //constexpr uint32_t AM335x_PRM_DEVICE_BASE   = 0x44E00F00;
+    //constexpr uint32_t AM335x_PRM_RTC_BASE      = 0x44E01000;
+    //constexpr uint32_t AM335x_PRM_GFX_BASE      = 0x44E01100;
+    //constexpr uint32_t AM335x_PRM_CEFUSE_BASE   = 0x44E01200;
 }
 
 
