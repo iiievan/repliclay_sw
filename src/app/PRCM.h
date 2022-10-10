@@ -907,8 +907,6 @@ namespace PRCM
         __RW  CLKSTCTRL_24MHz_reg_t       CLKSTCTRL_24MHz;     // (0x150)                                                                                     
     } AM335x_CM_PER_Type;
 
-    constexpr AM335x_CM_PER_Type * AM335X_CM_PER = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
-
     /* [reset state = 0x6] */
     typedef union 
     { 
@@ -1741,7 +1739,6 @@ namespace PRCM
         uint32_t  reg;                           
     } DIV_M6_DPLL_CORE_reg_t;
 
-
     typedef struct 
     {                                                                                      
         __RW   CLKSTCTRL_reg_t                    CLKSTCTRL;                 // (0x00)  
@@ -1800,10 +1797,6 @@ namespace PRCM
         __RW   WDT1_CLKCTRL_reg_t                 WDT1_CLKCTRL;              // (0xD4) 
         __RW   DIV_M6_DPLL_CORE_reg_t             DIV_M6_DPLL_CORE;          // (0xD8)
     } AM335x_CM_WKUP_Type;
-
-    constexpr AM335x_CM_WKUP_Type * AM335X_CM_WKUP = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
-
-
 
     /* [reset state = 0x1]*/
     typedef union 
@@ -1992,7 +1985,6 @@ namespace PRCM
         GPIO0_32KHZ_CRYSTAL     = 0x1,
         GPIO0_32KHZ_CLOCK_DIV   = 0x2,
     };
-
     
     typedef struct 
     {    
@@ -2012,29 +2004,240 @@ namespace PRCM
         __RW   LCDC_PIXEL_CLK_reg_t       LCDC_PIXEL_CLK;     // (0x34)  
         __RW   WDT1_CLK_reg_t             WDT1_CLK;           // (0x38) 
         __RW   GPIO0_DBCLK_reg_t          GPIO0_DBCLK;        // (0x3C)     
-    } AM335x_CM_DPLL_Type;
+    } AM335x_CM_DPLL_Type; 
 
-    constexpr AM335x_CM_DPLL_Type * AM335X_CM_DPLL = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE); 
+    /* [reset state = 0x6]*/
+    typedef union 
+    { 
+        struct 
+        {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                   /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
+            uint32_t    CLKTRCTRL            :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]               
+            uint32_t    CLKACTIVITY_MPU_CLK  :1;   // bit: 2        (R)This field indicates the state of the MPU Clock [0x0 = Inact; 0x1= Act]     
+            uint32_t                         :28;  // bit: 3..31    Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } MPU_CLKSTCTRL_reg_t;
 
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the CPSW clocks. */ 
+                                         /* These bits is warm reset insensitively when CPSW RESET_ISO enabled */
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } MPU_CLKCTRL_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __RW   MPU_CLKSTCTRL_reg_t  MPU_CLKSTCTRL;  // (0x00)  
+        __RW   MPU_CLKCTRL_reg_t    MPU_CLKCTRL;    // (0x04)      
+    } AM335x_CM_MPU_Type;
 
     /* [reset state = 0x0]*/
-    //typedef union 
-    //{ 
-    //    struct 
-    //    {               /*  */ 
-    //        uint32_t    R :1;   // bit: 0        
-    //        uint32_t    R :1;   // bit: 1                    
-    //        uint32_t    R :1;   // bit: 2      
-    //        uint32_t    R :1;   // bit: 3
-    //        uint32_t    R :1;   // bit: 4
-    //        uint32_t    R :1;   // bit: 5
-    //        uint32_t    R :1;   // bit: 6
-    //        uint32_t    R :1;   // bit: 7
-    //        uint32_t    R :1;   // bit: 8
-    //    } b;                                      
-    //    uint32_t  reg;                           
-    //} _reg_t;
-  
+    typedef union 
+    { 
+        struct 
+        {                                   /* This register manages the CPSW clocks. */ 
+                                            /* These bits is warm reset insensitively when CPSW RESET_ISO enabled */
+            uint32_t    CLKOUT2SOURCE :3;   // bit: 0..2      (RW)This field selects the external output clock source. [see e_MPU_CLKOUT2SOURCE]
+            uint32_t    CLKOUT2DIV    :3;   // bit: 3..5      (RW)THis field controls the external clock divison factor [see e_MPU_CLKOUT2DIV]                    
+            uint32_t                  :1;   // bit: 6         Reserved
+            uint32_t    CLKOUT2EN     :1;   // bit: 7         (RW)This bit controls the external clock activity [0x0 = SYS_CLKOUT2 is disabled; 0x1 = SYS_CLKOUT2 is enabled]
+            uint32_t                  :24;  // bit: 19..31    Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } CLKOUT_CTRL_reg_t;
+
+    enum e_MPU_CLKOUT2DIV : uint32_t
+    {
+        MPU_SYS_CLKOUT2_1         = 0x0,
+        MPU_SYS_CLKOUT2_2         = 0x1,
+        MPU_SYS_CLKOUT2_3         = 0x2,
+        MPU_SYS_CLKOUT2_4         = 0x3,
+        MPU_SYS_CLKOUT2_5         = 0x4,
+        MPU_SYS_CLKOUT2_6         = 0x5,
+        MPU_SYS_CLKOUT2_7         = 0x6,
+        MPU_RESERVED              = 0x7
+    };
+
+    enum e_MPU_CLKOUT2SOURCE : uint32_t
+    {
+        MPU_32KHz_OSCILLATOR_O_P  = 0x0,
+        MPU_L3_CLOCK              = 0x1,
+        MPU_DDR_PHY_CLOCK         = 0x2,
+        MPU_192MHz_PER_PLL        = 0x3,
+        MPU_LCD_PIXEL_CLOCK       = 0x4
+    };
+
+    typedef struct 
+    {                                                                 
+        __RW   CLKOUT_CTRL_reg_t  CLKOUT_CTRL;  // (0x00)       
+    } AM335x_CM_DEVICE_Type;
+
+    /* [reset state = 0x30002]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the RTC clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } RTC_CLKCTRL_reg_t;
+
+    /* [reset state = 0x102]*/
+    typedef union 
+    { 
+        struct 
+        {                                              /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                       /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
+            uint32_t    CLKTRCTRL                :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                             :6;   // bit: 2..7     Reserved              
+            uint32_t    CLKACTIVITY_L4_RTC_GCLK  :1;   // bit: 8        (R)This field indicates the state of the L4 RTC clock in the domain. [0x0 = Inact; 0x1 = Act]  
+            uint32_t    CLKACTIVITY_RTC_32KCLK   :1;   // bit: 9        (R)This field indicates the state of the 32K RTC clock in the domain [0x0 = Inact; 0x1 = Act]     
+            uint32_t                             :22;  // bit: 10..31   Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } RTC_CLKSTCTRL_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __RW   RTC_CLKCTRL_reg_t      RTC_CLKCTRL;  // (0x00)  
+        __RW   RTC_CLKSTCTRL_reg_t    CLKSTCTRL;    // (0x04)      
+    } AM335x_CM_RTC_Type;
+
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                              /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                       /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
+            uint32_t    CLKTRCTRL                :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                             :6;   // bit: 2..7     Reserved              
+            uint32_t    CLKACTIVITY_GFX_L3_GCLK  :1;   // bit: 8        (R)This field indicates the state of the GFX_L3_GCLK clock in the domain.[0x0 = Inact; 0x1 = Act]  
+            uint32_t    CLKACTIVITY_GFX_FCLK     :1;   // bit: 9        (R)This field indicates the state of the GFX_GCLK clock in the domain. [0x0 = Inact; 0x1 = Act]     
+            uint32_t                             :22;  // bit: 10..31   Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GFX_L3_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x70000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the GFX clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t               :13;  // bit: 19..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GFX_CLKCTRL_reg_t;
+
+
+    /* [reset state = 0x102]*/
+    typedef union 
+    { 
+        struct 
+        {                                              /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                       /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
+            uint32_t    CLKTRCTRL                  :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                               :6;   // bit: 2..7     Reserved              
+            uint32_t    CLKACTIVITY_L4LS_GFX_GCLK  :1;   // bit: 8        (R)This field indicates the state of the L4_LS clock in the domain.[0x0 = Inact; 0x1 = Act]     
+            uint32_t                               :23;  // bit: 9..31   Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } L4LS_GFX_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the MMU CFG clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GFX_MMUCFG_CLKCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the MMU clocks. */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } GFX_MMUDATA_CLKCTRL_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __RW   GFX_L3_CLKSTCTRL_reg_t       GFX_L3_CLKSTCTRL;       // (0x00)  
+        __RW   GFX_CLKCTRL_reg_t            GFX_CLKCTRL;            // (0x04) 
+        __R    uint32_t                     RESERVED[1];            // (0x08) 
+        __RW   L4LS_GFX_CLKSTCTRL_reg_t     L4LS_GFX_CLKSTCTRL;     // (0x0Ñ)  
+        __RW   GFX_MMUCFG_CLKCTRL_reg_t     GFX_MMUCFG_CLKCTRL;     // (0x10)
+        __RW   GFX_MMUDATA_CLKCTRL_reg_t    CLKSTCTRL;              // (0x14)     
+    } AM335x_CM_GFX_Type;    
+    
+    /* [reset state = 0x2]*/
+    typedef union 
+    { 
+        struct 
+        {                                                     /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
+                                                              /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t                                    :6;   // bit: 2..7     Reserved              
+            uint32_t    CLKACTIVITY_L4_CEFUSE_GICLK     :1;   // bit: 8        (R)This field indicates the state of the L4_CEFUSE_GCLK clock input of the domain.[0x0 = Inact; 0x1 = Act]  
+            uint32_t    CLKACTIVITY_CUST_EFUSE_SYS_CLK  :1;   // bit: 9        (R)This field indicates the state of the Cust_Efuse_SYSCLK clock input of the domain.[0x0 = Inact; 0x1 = Act]     
+            uint32_t                                    :22;  // bit: 10..31   Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } CEFUSE_CLKSTCTRL_reg_t;
+
+    /* [reset state = 0x30000]*/
+    typedef union 
+    { 
+        struct 
+        {                                /* This register manages the CEFUSE clocks */ 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t               :14;  // bit: 2..15      Reserved                    
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t               :14;  // bit: 18..31     Reserved
+        } b;                                      
+        uint32_t  reg;                           
+    } CEFUSE_CLKCTRL_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __RW   CEFUSE_CLKSTCTRL_reg_t       CEFUSE_CLKSTCTRL;   // (0x00)
+        __R    uint32_t                     RESERVED[7];        // (0x04)   
+        __RW   CEFUSE_CLKCTRL_reg_t         CEFUSE_CLKCTRL;     // (0x20)      
+    } AM335x_CM_CEFUSE_Type;
+
+    constexpr AM335x_CM_PER_Type * AM335X_CM_PER        = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
+    constexpr AM335x_CM_WKUP_Type * AM335X_CM_WKUP      = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
+    constexpr AM335x_CM_DPLL_Type * AM335X_CM_DPLL      = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE);
+    constexpr AM335x_CM_MPU_Type * AM335x_CM_MPU        = ((AM335x_CM_MPU_Type *) AM335x_CM_MPU_BASE);
+    constexpr AM335x_CM_DEVICE_Type * AM335x_CM_DEVICE  = ((AM335x_CM_DEVICE_Type *) AM335x_CM_DEVICE_BASE);
+    constexpr AM335x_CM_RTC_Type * AM335x_CM_RTC        = ((AM335x_CM_RTC_Type *) AM335x_CM_RTC_BASE);
+    constexpr AM335x_CM_GFX_Type * AM335x_CM_GFX        = ((AM335x_CM_GFX_Type *) AM335x_CM_GFX_BASE);
+    constexpr AM335x_CM_CEFUSE_Type * AM335x_CM_CEFUSE  = ((AM335x_CM_CEFUSE_Type *) AM335x_CM_CEFUSE_BASE);  
 }
 
 
