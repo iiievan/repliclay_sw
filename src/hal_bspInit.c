@@ -109,8 +109,8 @@ void configure_platform(void)
     ConsoleUtilsSetType(CONSOLE_UART);
 
     /* This function will enable clocks for the DMTimer2 instance */
-    DMTimer2ModuleClkConfig();
-    
+    //DMTimer2ModuleClkConfig();
+    dm_timer_2.clk_config();
     /* Register DMTimer2 interrupts on to AINTC */
     DMTimerAintcConfigure();
 

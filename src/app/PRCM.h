@@ -33,7 +33,7 @@ namespace PRCM
         struct 
         {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                :6;   // bit: 2..7     Reserved                
             uint32_t    CLKACTIVITY_L4LS_GCLK       :1;   // bit: 8        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]
             uint32_t                                :1;   // bit: 9        Reserved
@@ -66,13 +66,21 @@ namespace PRCM
         struct 
         {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
-            uint32_t    CLKTRCTRL            :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]     
+            uint32_t    CLKTRCTRL            :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL]     
             uint32_t                         :1;   // bit: 2        Reserved            
             uint32_t    CLKACTIVITY_L3S_GCLK :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]     
             uint32_t                         :28;  // bit: 4..31    Reserved
         } b;                                      
         uint32_t  reg;                           
     } L3S_CLKSTCTRL_reg_t;
+    
+    enum e_PRCM_CLKTRCTRL : uint32_t
+    {
+        NO_SLEEP           = 0x0,
+        SW_SLEEP           = 0x1,
+        SW_WKUP            = 0x2,
+        CLKTRCTRL_RESERVED = 0x3        
+    };
 
     /* [reset state = 0x12]*/
     typedef union 
@@ -80,7 +88,7 @@ namespace PRCM
         struct 
         {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                 :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]         
+            uint32_t    CLKTRCTRL                 :2;   // bit: 0,1      (RW)Clock state transition[see e_PRCM_CLKTRCTRL]         
             uint32_t    CLKACTIVITY_EMIF_GCLK     :1;   // bit: 2        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
             uint32_t    CLKACTIVITY_MMC_FCLK      :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
             uint32_t    CLKACTIVITY_L3_GCLK       :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
@@ -98,23 +106,39 @@ namespace PRCM
         struct 
         {                                /* This register manages the CPSW clocks. */ 
                                          /* These bits is warm reset insensitively when CPSW RESET_ISO enabled */
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } CPGMAC0_CLKCTRL_reg_t;
+    
+    enum e_PRCM_IDLEST : uint32_t
+    {
+        IDLEST_FUNC    = 0x0,   // Module is fully functional, including OCP
+        IDLEST_TRANS   = 0x1,   // Module is performing transition: wakeup, or sleep, or sleep abortion
+        IDLEST_IDLE    = 0x2,   // Module is in Idle mode (only OCP part). It is functional if using separate functional clock
+        IDLEST_DISABLE = 0x3    // Module is disabled and cannot be accessed
+    };
+
+    enum e_PRCM_MODULEMODE : uint32_t
+    {
+        MODULEMODE_DISABLED  = 0x0,
+        MODULEMODE_RESERVED  = 0x1,
+        MODULEMODE_ENABLE    = 0x2,
+        MODULEMODE_RESERVED1 = 0x3        
+    };
 
     /* [reset state = 0x70000]*/
     typedef union 
     { 
         struct 
         {                                /* This register manages the LCD clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -126,9 +150,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the USB clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -140,9 +164,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TPTC clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -154,9 +178,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the EMIF clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -167,9 +191,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the OCMC clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -180,9 +204,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the GPMC clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -193,9 +217,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the MCASP0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -206,9 +230,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the UART5 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -219,9 +243,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the MMC0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -232,9 +256,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the ELM clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -245,9 +269,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the I2C2 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -258,9 +282,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the I2C1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -271,9 +295,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the SPI0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -284,9 +308,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the SPI1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -297,9 +321,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the L4LS clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -310,9 +334,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the MCASP1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -323,9 +347,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the UART1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -336,9 +360,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the UART2 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -349,9 +373,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the UART3 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -362,9 +386,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the UART4 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -375,9 +399,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TIMER7 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -388,9 +412,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TIMER2 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -401,9 +425,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TIMER3 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -414,9 +438,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TIMER4 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -427,9 +451,9 @@ namespace PRCM
     { 
         struct 
         {                                                                /* This register manages the GPIO1 clocks. */ 
-            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t                            :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    OPTFCLKEN_GPIO_1_GDBCLK :1;   // bit: 18         (RW)Optional functional clock control [0x0 = FCLK_DIS; 0x1 = FCLK_EN]
             uint32_t                            :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -441,9 +465,9 @@ namespace PRCM
     { 
         struct 
         {                                                                /* This register manages the GPIO2 clocks. */ 
-            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t                            :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    OPTFCLKEN_GPIO_2_GDBCLK :1;   // bit: 18         (RW)Optional functional clock control [0x0 = FCLK_DIS; 0x1 = FCLK_EN]
             uint32_t                            :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -455,9 +479,9 @@ namespace PRCM
     { 
         struct 
         {                                                                /* This register manages the GPIO3 clocks. */ 
-            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE              :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t                            :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST                  :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    OPTFCLKEN_GPIO_3_GDBCLK :1;   // bit: 18         (RW)Optional functional clock control [0x0 = FCLK_DIS; 0x1 = FCLK_EN]
             uint32_t                            :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -469,9 +493,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TPCC clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -482,9 +506,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the DCAN0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -495,9 +519,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the DCAN1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -508,9 +532,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the PWMSS1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -521,9 +545,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the PWMSS0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -534,9 +558,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the PWMSS2 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[right_interpreter] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -547,9 +571,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the L3 INSTR clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW,0x2)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -560,9 +584,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the L3 Interconnect clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -573,9 +597,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the IEEE1500 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -587,9 +611,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the PRU-ICSS clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -601,9 +625,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TIMER5 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -614,9 +638,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TIMER6 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -627,9 +651,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the MMC1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -640,9 +664,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the MMC2 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -653,9 +677,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TPTC1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -667,9 +691,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TPTC2 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -681,9 +705,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the SPINLOCK clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -694,9 +718,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the MAILBOX0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -708,7 +732,7 @@ namespace PRCM
         struct 
         {                                                     /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                               /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :1;   // bit: 2        Reserved        
             uint32_t    CLKACTIVITY_L4HS_GCLK           :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
             uint32_t    CLKACTIVITY_CPSW_250MHZ_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
@@ -724,9 +748,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the L4 Fast clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -738,7 +762,7 @@ namespace PRCM
         struct 
         {                                                   /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                             /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
             uint32_t    CLKACTIVITY_OCPWP_L3_GCLK       :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
             uint32_t    CLKACTIVITY_OCPWP_L4_GCLK       :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
@@ -753,9 +777,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the OCPWP clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -768,7 +792,7 @@ namespace PRCM
         struct 
         {                                                   /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                             /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
             uint32_t    CLKACTIVITY_PRU_ICSS_OCP_GCLK   :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
             uint32_t    CLKACTIVITY_PRU_ICSS_IEP_GCLK   :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
@@ -784,7 +808,7 @@ namespace PRCM
         struct 
         {                                                   /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                             /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
             uint32_t    CLKACTIVITY_CPSW_125MHz_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
             uint32_t                                    :27;  // bit: 5..31    Reserved 
@@ -798,7 +822,7 @@ namespace PRCM
         struct 
         {                                                     /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                               /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
             uint32_t    CLKACTIVITY_LCDC_L3_OCP_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
             uint32_t    CLKACTIVITY_LCDC_L4_OCP_GCLK    :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
@@ -812,9 +836,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the CLKDIV32K clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -826,7 +850,7 @@ namespace PRCM
         struct 
         {                                                     /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                               /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
             uint32_t    CLKACTIVITY_CLK_24MHZ_GCLK      :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
             uint32_t                                    :27;  // bit: 5..31    Reserved 
@@ -913,7 +937,7 @@ namespace PRCM
         struct 
         {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1     (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]              
+            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1     (RW)Clock state transition [see e_PRCM_CLKTRCTRL]              
             uint32_t    CLKACTIVITY_L4_WKUP_GCLK    :1;   // bit: 2       (R)state of the clock in domain [0x0 = Inact; 0x1= Act]
             uint32_t    CLKACTIVITY_SR_SYSCLK       :1;   // bit: 3       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
             uint32_t    CLKACTIVITY_WDT1_GCLK       :1;   // bit: 4       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
@@ -935,9 +959,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the Control Module clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -948,9 +972,9 @@ namespace PRCM
     { 
         struct 
         {                                                /* This register manages the GPIO0 clocks. */ 
-            uint32_t    MODULEMODE                 :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE                 :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t                               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST                     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST                     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    OPTFCLKEN_GPIO0_GDBCLK     :1;   // bit: 18         (RW)Optional functional clock control.[0x0 = disabled; 0x1= enabled]
             uint32_t                               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -962,9 +986,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the L4WKUP clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (R)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (R)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -975,9 +999,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TIMER0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (R)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (R)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -988,9 +1012,9 @@ namespace PRCM
     { 
         struct 
         {                                                /* This register manages the DEBUGSS clocks. */ 
-            uint32_t    MODULEMODE                 :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE                 :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t                               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST                     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST                     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST                     :1;   // bit: 18         (R)Module standby status.[0x0 = not in stadby; 0x1= stadby]
             uint32_t    OPTFCLKEN_DBGSYSCLK        :1;   // bit: 19         (RW)Optional functional clock control.[0x0 = disabled; 0x1= enabled]
             uint32_t    TRC_PMD_CLKSEL             :2;   // bit: 20,21         
@@ -1009,7 +1033,7 @@ namespace PRCM
         struct 
         {                                                 /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                           /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
-            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]               
+            uint32_t    CLKTRCTRL                   :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL]               
             uint32_t    CLKACTIVITY_DBGSYSCLK       :1;   // bit: 2        (R)state of the Debugss clock in domain [0x0 = gated; 0x1= active]
             uint32_t    CLKACTIVITY_L3_AON_GCLK     :1;   // bit: 3        (R)state of the L3_AON clock in domain [0x0 = gated; 0x1= active] 
             uint32_t    CLKACTIVITY_DEBUG_CLKA      :1;   // bit: 4        (R)state of the Debugss CLKA clock in domain [0x0 = gated; 0x1= active] 
@@ -1610,7 +1634,7 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the WKUP M3 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :16;  // bit: 2..17      Reserved                    
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
@@ -1623,9 +1647,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the UART0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :13;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1636,9 +1660,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the I2C0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :13;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1649,9 +1673,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the ADC clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :13;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1662,9 +1686,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the SmartReflex0 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :13;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1675,9 +1699,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the TIMER1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :13;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1688,9 +1712,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the SmartReflex1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :13;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1702,7 +1726,7 @@ namespace PRCM
         struct 
         {                                                  /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                            /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
-            uint32_t    CLKTRCTRL                    :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]               
+            uint32_t    CLKTRCTRL                    :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL]               
             uint32_t    CLKACTIVITY_L4_WKUP_AON_GCLK :1;   // bit: 3        (R)state of the clock in domain [0x0 = gated; 0x1= Act]     
             uint32_t                                 :29;  // bit: 3..31    Reserved
         } b;                                      
@@ -1714,9 +1738,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the SmartReflex1 clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :13;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1727,7 +1751,7 @@ namespace PRCM
     { 
         struct 
         {                                                /* This register provides controls over the CLKOUT3 o/p of the HSDIVIDER. [warm reset insensitive] */ 
-            uint32_t    HSDIVIDER_CLKOUT3_DIV       :5;  // bit: 0..4    (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    HSDIVIDER_CLKOUT3_DIV       :5;  // bit: 0..4    (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t    HSDIVIDER_CLKOUT3_DIVCHACK  :1;  // bit: 5       (R)indicates that the change in divider HSDIVIDER_CLKOUT3_DIV value has taken effect 
             uint32_t                                :2;  // bit: 6,7     Reserved                    
             uint32_t    HSDIVIDER_CLKOUT3_GATE_CTRL :1;  // bit: 8       (RW)Control gating of HSDIVIDER CLKOUT3 [0x0 = autogate; 0x1 = force enabled;] 
@@ -1813,7 +1837,7 @@ namespace PRCM
     {
         TCLKIN          = 0x0,
         CLK_M_OSC       = 0x1,
-        CLK_32KHZ       = 0x1,
+        CLK_32KHZ       = 0x2,
         CLKSEL_RESERVED = 0x3
     };
 
@@ -2012,7 +2036,7 @@ namespace PRCM
         struct 
         {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
-            uint32_t    CLKTRCTRL            :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED]               
+            uint32_t    CLKTRCTRL            :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL]               
             uint32_t    CLKACTIVITY_MPU_CLK  :1;   // bit: 2        (R)This field indicates the state of the MPU Clock [0x0 = Inact; 0x1= Act]     
             uint32_t                         :28;  // bit: 3..31    Reserved
         } b;                                      
@@ -2025,9 +2049,9 @@ namespace PRCM
         struct 
         {                                /* This register manages the CPSW clocks. */ 
                                          /* These bits is warm reset insensitively when CPSW RESET_ISO enabled */
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -2086,9 +2110,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the RTC clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -2100,7 +2124,7 @@ namespace PRCM
         struct 
         {                                              /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                        /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
-            uint32_t    CLKTRCTRL                :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                             :6;   // bit: 2..7     Reserved              
             uint32_t    CLKACTIVITY_L4_RTC_GCLK  :1;   // bit: 8        (R)This field indicates the state of the L4 RTC clock in the domain. [0x0 = Inact; 0x1 = Act]  
             uint32_t    CLKACTIVITY_RTC_32KCLK   :1;   // bit: 9        (R)This field indicates the state of the 32K RTC clock in the domain [0x0 = Inact; 0x1 = Act]     
@@ -2121,7 +2145,7 @@ namespace PRCM
         struct 
         {                                              /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                        /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
-            uint32_t    CLKTRCTRL                :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                             :6;   // bit: 2..7     Reserved              
             uint32_t    CLKACTIVITY_GFX_L3_GCLK  :1;   // bit: 8        (R)This field indicates the state of the GFX_L3_GCLK clock in the domain.[0x0 = Inact; 0x1 = Act]  
             uint32_t    CLKACTIVITY_GFX_FCLK     :1;   // bit: 9        (R)This field indicates the state of the GFX_GCLK clock in the domain. [0x0 = Inact; 0x1 = Act]     
@@ -2135,9 +2159,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the GFX clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
@@ -2151,7 +2175,7 @@ namespace PRCM
         struct 
         {                                              /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                        /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
-            uint32_t    CLKTRCTRL                  :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                  :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                               :6;   // bit: 2..7     Reserved              
             uint32_t    CLKACTIVITY_L4LS_GFX_GCLK  :1;   // bit: 8        (R)This field indicates the state of the L4_LS clock in the domain.[0x0 = Inact; 0x1 = Act]     
             uint32_t                               :23;  // bit: 9..31   Reserved
@@ -2164,9 +2188,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the MMU CFG clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -2177,9 +2201,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the MMU clocks. */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -2201,7 +2225,7 @@ namespace PRCM
         struct 
         {                                                     /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                               /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
-            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition[0x0 = NO_SLEEP; 0x1 = SW_SLEEP; 0x2 = SW_WKUP; 0x3 = RESERVED] 
+            uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :6;   // bit: 2..7     Reserved              
             uint32_t    CLKACTIVITY_L4_CEFUSE_GICLK     :1;   // bit: 8        (R)This field indicates the state of the L4_CEFUSE_GCLK clock input of the domain.[0x0 = Inact; 0x1 = Act]  
             uint32_t    CLKACTIVITY_CUST_EFUSE_SYS_CLK  :1;   // bit: 9        (R)This field indicates the state of the Cust_Efuse_SYSCLK clock input of the domain.[0x0 = Inact; 0x1 = Act]     
@@ -2215,9 +2239,9 @@ namespace PRCM
     { 
         struct 
         {                                /* This register manages the CEFUSE clocks */ 
-            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[0x0 = DISABLED; 0x1 = RESERVED_1; 0x2 = ENABLE; 0x3 = RESERVED] 
+            uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
-            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[0x0 = Func; 0x1 = Trans; 0x2 = Idle; 0x3 = Disable] 
+            uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
             uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           

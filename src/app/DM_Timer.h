@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "app_utils.h"
+#include "PRCM.h"
 
 namespace DMTIMER
 {
@@ -326,7 +327,7 @@ public:
 
 		      void  enable();
               void  disable();
-
+              void  clk_config(void);
               void  mode_configure(DMTIMER::e_DMTIMER_mode mode);              
               void  prescaler_clk_enable(uint8_t ptv);
               void  prescaler_clk_disable();
@@ -366,7 +367,10 @@ private:
                           while(m_pTIMER->TWPS.reg & twps_mask);
                   }
               
-DMTIMER::AM335x_DMTIMER_Type *m_pTIMER;              
+DMTIMER::AM335x_DMTIMER_Type *m_pTIMER; 
+    PRCM::AM335x_CM_PER_Type &m_sCM_PER;
+   PRCM::AM335x_CM_DPLL_Type &m_sCM_DPLL;
+    
                void (*m_irq_handler)(void *p_obj) { nullptr };
            uint64_t  m_time {0}; // the timer itself
                bool  m_is_paused { true }; 
