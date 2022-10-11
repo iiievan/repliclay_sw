@@ -2401,24 +2401,495 @@ namespace PRCM
         __RW   PWRSTCTRL_MPU_reg_t    PWRSTCTRL;        // (0x0C)     
     } AM335x_PRM_PER_Type;
 
-    constexpr AM335x_CM_PER_Type * AM335X_CM_PER        = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
-    constexpr AM335x_CM_WKUP_Type * AM335X_CM_WKUP      = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
-    constexpr AM335x_CM_DPLL_Type * AM335X_CM_DPLL      = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE);
-    constexpr AM335x_CM_MPU_Type * AM335x_CM_MPU        = ((AM335x_CM_MPU_Type *) AM335x_CM_MPU_BASE);
-    constexpr AM335x_CM_DEVICE_Type * AM335x_CM_DEVICE  = ((AM335x_CM_DEVICE_Type *) AM335x_CM_DEVICE_BASE);
-    constexpr AM335x_CM_RTC_Type * AM335x_CM_RTC        = ((AM335x_CM_RTC_Type *) AM335x_CM_RTC_BASE);
-    constexpr AM335x_CM_GFX_Type * AM335x_CM_GFX        = ((AM335x_CM_GFX_Type *) AM335x_CM_GFX_BASE);
-    constexpr AM335x_CM_CEFUSE_Type * AM335x_CM_CEFUSE  = ((AM335x_CM_CEFUSE_Type *) AM335x_CM_CEFUSE_BASE); 
+    /* [reset state = 0x8]*/
+    typedef union 
+    { 
+        struct 
+        {                                   /* This register controls the release of the ALWAYS ON Domain resets. */ 
+            uint32_t                 :3;    // bit: 0..2       Reserved
+            uint32_t    WKUP_M3_LRST :1;    // bit: 3          (RW)Assert Reset to WKUP_M3 [0x0 = CLEAR; 0x1 = ASSERT]                
+            uint32_t                 :28;   // bit: 4..31      Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } WKUP_RSTCTRL_reg_t;
 
-    constexpr AM335x_PRM_IRQ_Type * AM335x_PRM_IRQ  = ((AM335x_PRM_IRQ_Type *) AM335x_PRM_IRQ_BASE);  
-    constexpr AM335x_PRM_PER_Type * AM335x_PRM_PER  = ((AM335x_PRM_PER_Type *) AM335x_PRM_PER_BASE); 
-     
-    //constexpr uint32_t AM335x_PRM_WKUP_BASE     = 0x44E00D00;
-    //constexpr uint32_t AM335x_PRM_MPU_BASE      = 0x44E00E00;
-    //constexpr uint32_t AM335x_PRM_DEVICE_BASE   = 0x44E00F00;
-    //constexpr uint32_t AM335x_PRM_RTC_BASE      = 0x44E01000;
-    //constexpr uint32_t AM335x_PRM_GFX_BASE      = 0x44E01100;
-    //constexpr uint32_t AM335x_PRM_CEFUSE_BASE   = 0x44E01200;
+    /* [reset state = 0x8]*/
+    typedef union 
+    { 
+        struct 
+        {                                          /* Controls power state of WKUP power domain */ 
+            uint32_t                        :3;    // bit: 0..2       Reserved
+            uint32_t    LogicRETState       :1;    // bit: 3          (RW) Logic state when power domain is RETENTION [0x0 = logic off; 0x1 = logic_ret]   
+            uint32_t    LowPowerStateChange :1;    // bit: 4          (RW) Power state change request when domain has already performed a sleep transition [0x0 = Do not request; 0x1 = Request a low power state change]               
+            uint32_t                        :27;   // bit: 5..31      Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } WKUP_PWRSTCTRL_reg_t;
+
+    /* [reset state = 0x60004]*/
+    typedef union 
+    { 
+        struct 
+        {                                          /* This register provides a status on the current WKUP power domain state. [warm reset insensitive] */ 
+            uint32_t                        :2;    // bit: 0..1       Reserved
+            uint32_t    LogicStateSt        :1;    // bit: 2          (RW) Logic state status [0x0 = Logic in domain is OFF; 0x1 = Logic in domain is ON]  
+            uint32_t                        :14;   // bit: 3..16      Reserved 
+            uint32_t    Debugss_mem_statest :2;    // bit: 17,18      (RW) WKUP domain memory state status [see e_WKUP_DOMAIN_MEM_STATE]               
+            uint32_t                        :1;    // bit: 19          Reserved 
+            uint32_t    InTransition        :1;    // bit: 20          (RW) Domain transition status [0x0 = No on-going transition; 0x1 = Power domain transition is in progress]
+            uint32_t                        :11;    // bit: 21..31      Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } WKUP_PWRSTST_reg_t;
+
+    enum e_WKUP_DOMAIN_MEM_STATE : uint32_t
+    {
+        WKUP_MEMORY_IS_OFF   = 0x0,
+        WKUP_DOMAIN_Reserved = 0x2,
+        WKUP_MEMORY_IS_ON    = 0x3       
+    };
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                          /*This register logs the different reset sources of the ALWON domain */ 
+            uint32_t                        :5;    // bit: 0..4       Reserved
+            uint32_t    WKUP_M3_LRST        :1;    // bit: 5          (RW) M3 Processor has been reset [0x0 = No reset; 0x1 = M3 Processor has been reset]  
+            uint32_t    EMULATION_M3_RST    :1;    // bit: 6          (RW) M3 Processor has been reset due to emulation reset source e.g.assert reset command initiated by the icepick module [0x0 = No reset; 0x1 = M3 Processor has been reset] 
+            uint32_t    ICECRUSHER_M3_RST   :1;    // bit: 7          (RW) M3 Processor has been reset due to M3 ICECRUSHER1 reset event [0x0 = No reset; 0x1 = M3 Processor has been reset]               
+            uint32_t                        :24;   // bit: 8..31      Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } WKUP_RSTST_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __RW   WKUP_RSTCTRL_reg_t          WKUP_RSTCTRL;       // (0x00)
+        __RW   WKUP_PWRSTCTRL_reg_t        WKUP_PWRSTCTRL;      // (0x04)   
+        __RW   WKUP_PWRSTST_reg_t          WKUP_PWRSTST;       // (0x08) 
+        __RW   WKUP_RSTST_reg_t            WKUP_RSTST;         // (0x0C)     
+    } AM335x_PRM_WKUP_Type;
+
+
+    /* [reset state = 0x1FF0007]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register controls the MPU power state to reach upon mpu domain sleep transition */ 
+            uint32_t    PowerState            :2;    // bit: 0,1     (RW) Power state control [see e_PWR_STATE_CTRL]
+            uint32_t    LogicRETState         :1;    // bit: 2       (RW) Logic state when power domain is RETENTION [0x0 = logic_off; 0x1 = logic_ret]  
+            uint32_t                          :1;    // bit: 3       Reserved 
+            uint32_t    LowPowerStateChange   :1;    // bit: 4       (RW) Power state change request when domain has already performed a sleep transition [0x0 = Do not request; 0x1 = Request a low power state change]  
+            uint32_t                          :11;   // bit: 5..15   Reserved 
+            uint32_t    MPU_RAM_ONState       :2;    // bit: 16,17   (RW) Default power domain memory state when domain is ON [see e_PWR_CTRL_MEM_STATE] 
+            uint32_t    MPU_L1_ONState        :2;    // bit: 18,19   (R) Default power domain memory state when domain is ON. 
+            uint32_t    MPU_L2_ONState        :2;    // bit: 20,21   (R) Default power domain memory state when domain is ON.   
+            uint32_t    mpu_l1_RETState       :1;    // bit: 22      Reserved  
+            uint32_t    mpu_l2_RETState       :1;    // bit: 23      (RW) Default power domain memory(L1) retention state when power domain is in retention
+            uint32_t    mpu_ram_RETState      :1;    // bit: 24      (RW) Default power domain memory(L2) retention state when power domain is in retention  
+            uint32_t                          :7;    // bit: 25..31  (RW) Default power domain memory(ram) retention state when power domain is in retention 
+        } b;                                      
+        uint32_t  reg;                           
+    } MPU_PWRSTCTRL_reg_t;
+
+    enum e_PWR_STATE_CTRL : uint32_t
+    {
+        PWR_CTRL_OFF_STATE  = 0x0,
+        PWR_CTRL_RET        = 0x1, 
+        PWR_CTRL_RESERVED   = 0x2,
+        PWR_CTRL_ON_STATE   = 0x3      
+    };
+
+    enum e_PWR_CTRL_MEM_STATE : uint32_t
+    {
+        PWR_CTRL_MEMORY_IS_OFF   = 0x0,
+        PWR_CTRL_RESERVED2       = 0x2,
+        PWR_CTRL_MEMORY_IS_ON    = 0x3       
+    };
+
+    /* [reset state = 0x157]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register provides a status on the current MPU power domain state0. [warm reset insensitive] */ 
+            uint32_t    PowerStateSt          :2;    // bit: 0,1     (R) Current Power State Status [see e_PWR_STATE_STS]
+            uint32_t    LogicStateSt          :1;    // bit: 2       (R) Logic state status [0x0 = logic_off; 0x1 = logic_on]  
+            uint32_t                          :1;    // bit: 3       Reserved 
+            uint32_t    MPU_RAM_StateSt       :2;    // bit: 5,4     (R) MPU_RAM memory state status [see e_PWR_STATE_MEM_STS]  
+            uint32_t    MPU_L1_StateSt        :2;    // bit: 6,7     (R) MPU L1 memory state status [see e_PWR_STATE_MEM_STS] 
+            uint32_t    MPU_L2_StateSt        :2;    // bit: 8,9     (R) MPU L2 memory state status [see e_PWR_STATE_MEM_STS] 
+            uint32_t                          :10;   // bit: 10..19  Reserved
+            uint32_t    MPU_L1_ONState        :1;    // bit: 20      (R) Domain transition status [0x0 = No on-going transition; 0x1 = transition is in progress.]  
+            uint32_t                          :11;   // bit: 22      Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } MPU_PWRSTST_reg_t;
+
+    enum e_PWR_STATE_STS : uint32_t
+    {
+        PWR_STS_OFF_STATE   = 0x0,
+        PWR_STS_RET_STATE   = 0x1,
+        PWR_STS_ON_STATE    = 0x3       
+    };
+
+    enum e_PWR_STATE_MEM_STS : uint32_t
+    {
+        PWR_STS_MEMORY_IS_OFF   = 0x0,
+        PWR_STS_RESERVED        = 0x2,
+        PWR_STS_MEMORY_IS_ON    = 0x3       
+    };
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                          /* This register logs the different reset sources of the ALWON domain. Each bit is set upon release of the domain reset signal. */
+                                                   /*  Must be cleared by software. [warm reset insensitive] */ 
+            uint32_t                        :5;    // bit: 0..4       Reserved
+            uint32_t    EMULATION_MPU_RST   :1;    // bit: 5          (RW) MPU Processor has been reset due to emulation reset source e.g. assert reset command initiated by the icepick module [0x0 = RESET_NO; 0x1 = RESET_YES] 
+            uint32_t    ICECRUSHER_MPU_RST  :1;    // bit: 6          (RW) MPU Processor has been reset due to MPU ICECRUSHER1 resetevent [0x0 = RESET_NO; 0x1 = RESET_YES]               
+            uint32_t                        :25;   // bit: 7..31      Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } MPU_RSTST_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __RW   MPU_PWRSTCTRL_reg_t      MPU_PWRSTCTRL;    // (0x00)
+        __RW   MPU_PWRSTST_reg_t        MPU_PWRSTST;      // (0x04)   
+        __RW   MPU_RSTST_reg_t          MPU_RSTST;        // (0x08)      
+    } AM335x_PRM_MPU_Type;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                           /* Global software cold and warm reset control. This register is auto-cleared. Only write 1 is possible. A readreturns 0 only. */
+            uint32_t    RST_GLOBAL_WARM_SW   :1;    // bit: 0          (W) Global WARM software reset control. [0x0 = Global COLD; 0x1 = Asserts a global COLD software reset.] 
+            uint32_t    RST_GLOBAL_COLD_SW   :1;    // bit: 1          (W) Global COLD software reset control. [0x0 = Global warm software reset is cleared.; 0x1 = Asserts a global warm software reset.]                
+            uint32_t                         :25;   // bit: 2..31      Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } PRM_RSTCTRL_reg_t;
+
+    /* [reset state = 0x1006]*/
+    typedef union 
+    { 
+        struct 
+        {                                 /* Reset duration control. [warm reset insensitive] */
+            uint32_t    RSTTIME1   :8;    // bit: 0..7      (RW) (Power domain) reset duration 2 (number of CLK_M_OSC clockcycles) 
+            uint32_t    RSTTIME2   :5;    // bit: 8..12     (RW) (Global) reset duration 1 (number of CLK_M_OSC clock cycles)               
+            uint32_t               :19;   // bit: 13..31    Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } PRM_RSTTIME_reg_t;
+
+
+    /* [reset state = 0x1]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register logs the global reset sources. Each bit is set upon release of the domain reset signal. Must  */
+                                                     /* be cleared by software. [warm reset insensitive]                                                            */ 
+            uint32_t    GLOBAL_COLD_RST       :1;    // bit: 0          (RW) Power-on (cold) reset event [warm reset insensitive] [0x0 = No power-on reset.; 0x1 = Power-on reset has occurred.]
+            uint32_t    GLOBAL_WARM_SW_RS     :1;    // bit: 1          (RW) Global warm software reset event [warm reset insensitive] [0x0 = No global warm SW reset; 0x1 = Global warm SW reset has occurred.] 
+            uint32_t                          :2;    // bit: 2,3        Reserved 
+            uint32_t    WDT1_RST              :1;    // bit: 4          (RW) Watchdog1 timer reset event. [0x0 = No watchdog reset.; 0x1 = watchdog reset has occurred.]
+            uint32_t    EXTERNAL_WARM_RST     :2;    // bit: 5          (RW) External warm reset event [warm reset insensitive] [0x0 = No global warm reset.; 0x1 = Global external warm reset has occurred.]
+            uint32_t                          :3;    // bit: 6..8       Reserved
+            uint32_t    ICEPICK_RST           :1;    // bit: 9          (RW) IcePick reset event. [0x0 = No ICEPICK reset.; 0x1 = IcePick reset has occurred.]
+            uint32_t                          :22;   // bit: 10..31     Reserved        
+        } b;                                      
+        uint32_t  reg;                           
+    } PRM_RSTST_reg_t;
+
+    /* [reset state = 0x78000017]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* Common setup for SRAM LDO transition counters. Applies to all voltage domains. [warm reset insensitive]  */
+            uint32_t    PCHARGECNT_VALUE      :6;    // bit: 0..5       (RW) Delay between de-assertion of standby_rta_ret_on and standby_rta_ret_good. Counting on system clock.Target is 600ns.
+            uint32_t                          :2;    // bit: 6,7        Reserved  
+            uint32_t    VSETUPCNT_VALUE       :8;    // bit: 8..15      (RW) SRAM LDO rampup time from retention to active mode.The duration is computed as 8 x NbCycles of system clock cycles.Target is 30us.
+            uint32_t    SLPCNT_VALUE          :8;    // bit: 16..23     (RW) Delay between retention/off assertion of last SRAM bank and SRAMALLRET signal to LDO is driven high. Counting on system clock.Target is 2us.
+            uint32_t    StartUp_Count         :8;    // bit: 24.31      (RW) Determines the start-up duration of SRAM and ABB LDO.The duration is computed as 16 x NbCycles of system clock cycles.Target is 50us.     
+        } b;                                      
+        uint32_t  reg;                           
+    } PRM_SRAM_COUNT_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* Setup of the SRAM LDO for CORE voltage domain. [warm reset insensitive] */
+            uint32_t    DISABLE_RTA_EXPORT    :1;    // bit: 0     (RW) Control for HD memory RTA feature. [0x0 = RTA_ENABLED; 0x1 = RTA_DISABLED]
+            uint32_t    ABBOFF_ACT_EXPORT     :1;    // bit: 1     (RW) Determines whether SRAMNWA is supplied by VDDS or VDDAR during active mode. [0x0 = SRAMNWA supplied with VDDS; 0x1 = SRAMNW_ACT_VDDASRAMNWA supplied with VDDAR]
+            uint32_t    ABBOFF_SLEEP_EXPORT   :1;    // bit: 2     (RW) Determines whether SRAMNWA is supplied by VDDS or VDDAR during deep-sleep. [0x0 = SRAMNWA supplied with VDDS; 0x1 = SRAMNW_ACT_VDDASRAMNWA supplied with VDDAR]
+            uint32_t    ENFUNC1_EXPORT        :1;    // bit: 3     (RW) ENFUNC1 input of SRAM LDO. [0x0 = Short_prot_disabled; 0x1 = Short_prot_enabled]
+            uint32_t    ENFUNC2_EXPORT        :1;    // bit: 4     (RW) ENFUNC2 input of SRAM LDO. [0x0 = Ext_cap; 0x1 = No_ext_cap]
+            uint32_t    ENFUNC3_EXPORT        :1;    // bit: 5     (RW) ENFUNC3 input of SRAM LDO. [0x0 = Sub_regul_disabled; 0x1 = Sub_regul_enabled]
+            uint32_t    ENFUNC4               :1;    // bit: 6     (RW) ENFUNC4 input of SRAM LDO. [0x0 = Ext_clock; 0x1 = No_ext_clock]
+            uint32_t    ENFUNC5               :1;    // bit: 7     (RW) ENFUNC5 input of SRAM LDO. [0x0 = One_step; 0x1 = Two_step]
+            uint32_t    AIPOFF                :1;    // bit: 8     (RW) Override on AIPOFF input of SRAM LDO.  [0x0 = AIPOFF signal is not overriden; 0x1 = AIPOFF signal is overriden to '1'.]
+            uint32_t                          :23;   // bit: 9..31 Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } PRM_LDO_SRAM_CORE_SETUP_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* Setup of the SRAM LDO for CORE voltage domain. [warm reset insensitive] */
+            uint32_t    RETMODE_ENABLE        :1;    // bit: 0      (RW) Control if the SRAM LDO retention mode is used or not. [0x0 = Disabled; 0x1 = Enabled]
+            uint32_t                          :7;    // bit: 1..7   Reserve
+            uint32_t    SRAMLDO_STATUS        :1;    // bit: 8      (R)  SRAMLDO status [0x0 = ACTIVE; 0x1 = RETENTION]
+            uint32_t    SRAM_IN_TRANSITION    :1;    // bit: 9      (R)  Status indicating SRAM LDO state machine state. [0x0 = IDLE; 0x1 = IN_TRANSITION]
+            uint32_t                          :22;   // bit: 10..31 Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } PRM_LDO_SRAM_CORE_CTRL_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* Setup of the SRAM LDO for MPU voltage domain. [warm reset insensitive] */
+            uint32_t    DISABLE_RTA_EXPORT    :1;    // bit: 0     (RW) Control for HD memory RTA feature. [0x0 = RTA_ENABLED; 0x1 = RTA_DISABLED]
+            uint32_t    ABBOFF_ACT_EXPORT     :1;    // bit: 1     (RW) Determines whether SRAMNWA is supplied by VDDS or VDDAR during active mode. [0x0 = SRAMNWA supplied with VDDS; 0x1 = SRAMNW_ACT_VDDASRAMNWA supplied with VDDAR]
+            uint32_t    ABBOFF_SLEEP_EXPORT   :1;    // bit: 2     (RW) Determines whether SRAMNWA is supplied by VDDS or VDDAR during deep-sleep. [0x0 = SRAMNWA supplied with VDDS; 0x1 = SRAMNW_ACT_VDDASRAMNWA supplied with VDDAR]
+            uint32_t    ENFUNC1_EXPORT        :1;    // bit: 3     (RW) ENFUNC1 input of SRAM LDO. [0x0 = Short_prot_disabled; 0x1 = Short_prot_enabled]
+            uint32_t    ENFUNC2_EXPORT        :1;    // bit: 4     (RW) ENFUNC2 input of SRAM LDO. [0x0 = Ext_cap; 0x1 = No_ext_cap]
+            uint32_t    ENFUNC3_EXPORT        :1;    // bit: 5     (RW) ENFUNC3 input of SRAM LDO. [0x0 = Sub_regul_disabled; 0x1 = Sub_regul_enabled]
+            uint32_t    ENFUNC4               :1;    // bit: 6     (RW) ENFUNC4 input of SRAM LDO. [0x0 = Ext_clock; 0x1 = No_ext_clock]
+            uint32_t    ENFUNC5               :1;    // bit: 7     (RW) ENFUNC5 input of SRAM LDO. [0x0 = One_step; 0x1 = Two_step]
+            uint32_t    AIPOFF                :1;    // bit: 8     (RW) Override on AIPOFF input of SRAM LDO.  [0x0 = AIPOFF signal is not overriden; 0x1 = AIPOFF signal is overriden to '1'.]
+            uint32_t                          :23;   // bit: 9..31 Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } PRM_LDO_SRAM_MPU_SETUP_reg_t;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* Control and status of the SRAM LDO for MPU voltage domain. [warm reset insensitive] */
+            uint32_t    RETMODE_ENABLE        :1;    // bit: 0      (RW) Control if the SRAM LDO retention mode is used or not. [0x0 = Disabled; 0x1 = Enabled]
+            uint32_t                          :7;    // bit: 1..7   Reserve
+            uint32_t    SRAMLDO_STATUS        :1;    // bit: 8      (R)  SRAMLDO status [0x0 = ACTIVE; 0x1 = RETENTION]
+            uint32_t    SRAM_IN_TRANSITION    :1;    // bit: 9      (R)  Status indicating SRAM LDO state machine state. [0x0 = IDLE; 0x1 = IN_TRANSITION]
+            uint32_t                          :22;   // bit: 10..31 Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } PRM_LDO_SRAM_MPU_CTRL_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __W    PRM_RSTCTRL_reg_t                  PRM_RSTCTRL;                 // (0x00)
+        __RW   PRM_RSTTIME_reg_t                  PRM_RSTTIME;                 // (0x04)   
+        __RW   PRM_RSTST_reg_t                    PRM_RSTST;                   // (0x08)
+        __RW   PRM_SRAM_COUNT_reg_t               PRM_SRAM_COUNT;              // (0x0C)
+        __RW   PRM_LDO_SRAM_CORE_SETUP_reg_t      PRM_LDO_SRAM_CORE_SETUP;     // (0x10)   
+        __RW   PRM_LDO_SRAM_CORE_CTRL_reg_t       PRM_LDO_SRAM_CORE_CTRL;      // (0x14) 
+        __RW   PRM_LDO_SRAM_MPU_SETUP_reg_t       PRM_LDO_SRAM_MPU_SETUP;      // (0x18)   
+        __RW   PRM_LDO_SRAM_MPU_CTRL_reg_t        PRM_LDO_SRAM_MPU_CTRL;       // (0x1C)      
+    } AM335x_PRM_DEVICE_Type;
+
+
+    /* [reset state = 0x4]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register controls the RTC power state to reach upon mpu domain sleep transition */
+            uint32_t                          :2;    // bit: 0,1    Reserve
+            uint32_t    LogicRETState         :1;    // bit: 2      (RW) Logic state when power domain is RETENTION [0x0 = logic_off; 0x1 = logic_on]
+            uint32_t                          :1;    // bit: 3      Reserve
+            uint32_t    LowPowerStateChange   :1;    // bit: 4      (RW)  Power state change request when domain has already performed a sleep transition. [0x0 = Do not request; 0x1 = Request a low power state change]
+            uint32_t                          :27;   // bit: 5..31 Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } RTC_PWRSTCTRL_reg_t;
+
+    /* [reset state = 0x4]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register provides a status on the current RTC power domain state0. [warm reset insensitive] */
+            uint32_t                          :2;    // bit: 0,1    Reserved
+            uint32_t    LogicStateSt          :1;    // bit: 2      (R) Logic state status [0x0 = Logic in domain is OFF; 0x1 = Logic in domain is ON]
+            uint32_t                          :17;   // bit: 3..19  Reserve
+            uint32_t    InTransition          :1;    // bit: 20     (R)Domain transition status [ 0x0 = No on-going transition; 0x1 = transition is in progress.]
+            uint32_t                          :11;   // bit: 5..31  Reserved   
+        } b;                                      
+        uint32_t  reg;                           
+    } RTC_PWRSTST_reg_t;
+
+    typedef struct 
+    {                                                                 
+        __RW    RTC_PWRSTCTRL_reg_t     RTC_PWRSTCTRL; // (0x00)
+        __R     RTC_PWRSTST_reg_t       RTC_PWRSTST;   // (0x04)        
+    } AM335x_PRM_RTC_Type;
+
+    /* [reset state = 0x60044]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register controls the GFX power state to reach upon a domain sleep transition */ 
+            uint32_t    PowerState            :2;    // bit: 0,1     (RW) Power state control [see e_PWR_STATE_CTRL]
+            uint32_t    LogicRETState         :1;    // bit: 2       (RW) Logic state when power domain is RETENTION [0x0 = logic_off; 0x1 = logic_ret]  
+            uint32_t                          :1;    // bit: 3       Reserved 
+            uint32_t    LowPowerStateChange   :1;    // bit: 4       (RW) Power state change request when domain has already performed a sleep transition [0x0 = Do not request; 0x1 = Request a low power state change]  
+            uint32_t                          :1;    // bit: 5       Reserved 
+            uint32_t    GFX_MEM_RETState      :1;    // bit: 6       (RW) 
+            uint32_t                          :10;   // bit: 7..16   Reserved
+            uint32_t    GFX_MEM_ONState       :2;    // bit: 17,18   (R) GFX memory state when domain is ON.   
+            uint32_t                          :13;   // bit: 19..31  Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } PM_GFX_PWRSTCTRL_reg_t;   
+
+    enum e_GFX_POWER_STATE : uint32_t
+    {
+        GFX_OFF_STATE  = 0x0,
+        GFX_RET        = 0x1, 
+        GFX_RESERVED   = 0x2,
+        GFX_ON_STATE   = 0x3      
+    };
+
+    /* [reset state = 0x1]*/
+    typedef union 
+    { 
+        struct 
+        {                              /* This register controls the release of the GFX Domain resets. */ 
+            uint32_t    GFX_RST :1;    // bit: 0       (RW) GFX domain local reset control for (SGX 530) [0x0 = CLEAR; 0x1 = ASSERT]
+            uint32_t            :31;   // bit: 1..31   Reserved
+ 
+        } b;                                      
+        uint32_t  reg;                           
+    } RM_GFX_RSTCTRL_reg_t; 
+
+    /* [reset state = 0x17]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register provides a status on the current GFX power domain state. [warm reset insensitive] */ 
+            uint32_t    PowerStateSt          :2;    // bit: 0,1     (R)Current Power State Status [see e_GFX_PWRSTST]
+            uint32_t    LogicStateSt          :1;    // bit: 2       (R)Logic state status [0x0 = logic in domain OFF; 0x1 = logic in domain ON]                
+            uint32_t                          :1;    // bit: 3       Reserved  
+            uint32_t    GFX_MEM_StateSt       :2;    // bit: 4,5     (R)GFX memory state status [see e_GFX_MEMSTST] 
+            uint32_t                          :14;   // bit: 6..19   Reserved  
+            uint32_t    InTransition          :1;    // bit: 20      (R)Domain transition status [0x0 = No on-going transition on power domain; 0x1 = Power domain transition is in progress] 
+            uint32_t                          :11;   // bit: 21..31  Reserved
+
+        } b;                                      
+        uint32_t  reg;                           
+    } PM_GFX_PWRSTST_reg_t;
+
+    enum e_GFX_PWRSTST : uint32_t
+    {
+        GFX_PWRSTS_OFF          = 0x0,
+        GFX_PWRSTS_RETENTION    = 0x1,
+        GFX_PWRSTS_ON           = 0x3
+    };
+
+    enum e_GFX_MEMSTST : uint32_t
+    {
+        GFX_MEM_OFF          = 0x0,
+        GFX_MEM_RESERVED     = 0x2,
+        GFX_MEM_ON           = 0x3
+    };
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                              /* This register logs the different reset sources of the GFX domain. */ 
+            uint32_t    GFX_RST :1;    // bit: 0       (RW) GFX Domain Logic Reset [0x0 = RESET_NO; 0x1 = RESET_YES]
+            uint32_t            :31;   // bit: 1..31   Reserved
+ 
+        } b;                                      
+        uint32_t  reg;                           
+    } RM_GFX_RSTST_reg_t; 
+
+    typedef struct 
+    {                                                                 
+        __RW    PM_GFX_PWRSTCTRL_reg_t    PM_GFX_PWRSTCTRL; // (0x00)
+        __RW    RM_GFX_RSTCTRL_reg_t      RM_GFX_RSTCTRL;   // (0x04)
+        __R     uint32_t                  RESERVED[2];
+        __R     PM_GFX_PWRSTST_reg_t      PM_GFX_PWRSTST;   // (0x10)
+        __RW    RM_GFX_RSTST_reg_t        RM_GFX_RSTST;     // (0x14)         
+    } AM335x_PRM_GFX_Type;
+
+    /* [reset state = 0x0]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register controls the CEFUSE power state to reach upon a domain sleep transition */ 
+            uint32_t    PowerState            :2;    // bit: 0,1     (RW) Power state control [see e_CEFUSE_PWRSTATE_CTRL]
+            uint32_t                          :2;    // bit: 2,3     Reserved 
+            uint32_t    LowPowerStateChange   :1;    // bit: 4       (RW) Power state change request when domain has already performed a sleep transition [0x0 = Do not request; 0x1 = Request a low power state change]  
+            uint32_t                          :27;   // bit: 5..31   Reserved  
+        } b;                                      
+        uint32_t  reg;                           
+    } CEFUSE_PWRSTCTRL_reg_t;   
+
+    enum e_CEFUSE_PWRSTATE_CTRL : uint32_t
+    {
+        CEFUSE_OFF_STATE  = 0x0,
+        CEFUSE_RESERVED   = 0x1, 
+        CEFUSE_INACTIVE   = 0x2,
+        CEFUSE_ON_STATE   = 0x3      
+    };
+
+    /* [reset state = 0x7]*/
+    typedef union 
+    { 
+        struct 
+        {                                            /* This register provides a status on the current CEFUSE power domain state. [warm reset insensitive] */ 
+            uint32_t    PowerStateSt          :2;    // bit: 0,1     (R)Current Power State Status [see e_CEFUSE_PWRSTST]
+            uint32_t    LogicStateSt          :1;    // bit: 2       (R)Logic state status [0x0 = logic in domain OFF; 0x1 = logic in domain ON]                
+            uint32_t                          :17;   // bit: 3..19   Reserved  
+            uint32_t    InTransition          :1;    // bit: 20      (R)Domain transition status [0x0 = No on-going transition; 0x1 = transition is in progress.] 
+            uint32_t                          :3;    // bit: 21..23  Reserved  
+            uint32_t    LastPowerStateEntered :2;    // bit: 24,25   (RW)Last low power state entered.Set to 0x3 upon write of the same only.  [0x0 = OFF; 0x1 = ON] 
+            uint32_t                          :6;    // bit: 26..31  Reserved
+
+        } b;                                      
+        uint32_t  reg;                           
+    } CEFUSE_PWRSTST_reg_t;
+
+    enum e_CEFUSE_PWRSTST : uint32_t
+    {
+        CEFUSE_STS_OFF_STATE  = 0x0,
+        CEFUSE_STS_RETENTION  = 0x1, 
+        CEFUSE_STS_INACTIVE   = 0x2,
+        CEFUSE_STS_ON_STATE   = 0x3      
+    };
+
+    typedef struct 
+    {                                                                 
+        __RW    CEFUSE_PWRSTCTRL_reg_t    CEFUSE_PWRSTCTRL; // (0x00)
+        __RW    CEFUSE_PWRSTST_reg_t      CEFUSE_PWRSTST;   // (0x04)         
+    } AM335x_PRM_CEFUSE_Type;
+
+    constexpr AM335x_CM_PER_Type * AM335X_CM_PER            = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
+    constexpr AM335x_CM_WKUP_Type * AM335X_CM_WKUP          = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
+    constexpr AM335x_CM_DPLL_Type * AM335X_CM_DPLL          = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE);
+    constexpr AM335x_CM_MPU_Type * AM335x_CM_MPU            = ((AM335x_CM_MPU_Type *) AM335x_CM_MPU_BASE);
+    constexpr AM335x_CM_DEVICE_Type * AM335x_CM_DEVICE      = ((AM335x_CM_DEVICE_Type *) AM335x_CM_DEVICE_BASE);
+    constexpr AM335x_CM_RTC_Type * AM335x_CM_RTC            = ((AM335x_CM_RTC_Type *) AM335x_CM_RTC_BASE);
+    constexpr AM335x_CM_GFX_Type * AM335x_CM_GFX            = ((AM335x_CM_GFX_Type *) AM335x_CM_GFX_BASE);
+    constexpr AM335x_CM_CEFUSE_Type * AM335x_CM_CEFUSE      = ((AM335x_CM_CEFUSE_Type *) AM335x_CM_CEFUSE_BASE); 
+    
+    constexpr AM335x_PRM_IRQ_Type * AM335x_PRM_IRQ          = ((AM335x_PRM_IRQ_Type *) AM335x_PRM_IRQ_BASE);  
+    constexpr AM335x_PRM_PER_Type * AM335x_PRM_PER          = ((AM335x_PRM_PER_Type *) AM335x_PRM_PER_BASE);
+    constexpr AM335x_PRM_WKUP_Type * AM335x_PRM_WKUP        = ((AM335x_PRM_WKUP_Type *) AM335x_PRM_WKUP_BASE); 
+    constexpr AM335x_PRM_MPU_Type * AM335x_PRM_MPU          = ((AM335x_PRM_MPU_Type *) AM335x_PRM_MPU_BASE); 
+    constexpr AM335x_PRM_DEVICE_Type * AM335x_PRM_DEVICE    = ((AM335x_PRM_DEVICE_Type *) AM335x_PRM_DEVICE_BASE); 
+    constexpr AM335x_PRM_RTC_Type * AM335x_PRM_RTC          = ((AM335x_PRM_RTC_Type *) AM335x_PRM_RTC_BASE); 
+    constexpr AM335x_PRM_GFX_Type * AM335x_PRM_GFX          = ((AM335x_PRM_GFX_Type *) AM335x_PRM_GFX_BASE); 
+    constexpr AM335x_PRM_CEFUSE_Type * AM335x_PRM_CEFUSE    = ((AM335x_PRM_CEFUSE_Type *) AM335x_PRM_CEFUSE_BASE);
 }
 
 
