@@ -27,6 +27,79 @@ void  DM_Timer::disable()
 
 void DM_Timer::clk_config(void)
 {  
+  /*
+    PRCM::AM335x_CM_PER_Type CMPERTST =
+    {
+         .L4LS_CLKSTCTRL.reg = 0xFFFFFFFF,        
+         .L3S_CLKSTCTRL.reg = 0xFFFFFFFF,         
+         .L3_CLKSTCTRL.reg = 0xFFFFFFFF,  
+         .CPGMAC0_CLKCTRL.reg = 0xFFFFFFFF, 
+         .LCDC_CLKCTRL.reg = 0xFFFFFFFF,  
+         .USB0_CLKCTRL.reg = 0xFFFFFFFF,   
+         .TPTC0_CLKCTRL.reg = 0xFFFFFFFF, 
+         .EMIF_CLKCTRL.reg = 0xFFFFFFFF, 
+         .OCMCRAM_CLKCTRL.reg = 0xFFFFFFFF,  
+         .GPMC_CLKCTRL.reg = 0xFFFFFFFF, 
+         .MCASP0_CLKCTRL.reg = 0xFFFFFFFF,  
+         .UART5_CLKCTRL.reg = 0xFFFFFFFF,  
+         .MMC0_CLKCTRL.reg = 0xFFFFFFFF,  
+         .ELM_CLKCTRL.reg = 0xFFFFFFFF,  
+         .I2C2_CLKCTRL.reg = 0xFFFFFFFF,  
+         .I2C1_CLKCTRL.reg = 0xFFFFFFFF,  
+         .SPI0_CLKCTRL.reg = 0xFFFFFFFF, 
+         .SPI1_CLKCTRL.reg = 0xFFFFFFFF,  
+         .L4LS_CLKCTRL.reg = 0xFFFFFFFF,   
+         .MCASP1_CLKCTRL.reg = 0xFFFFFFFF,  
+         .UART1_CLKCTRL.reg = 0xFFFFFFFF,  
+         .UART2_CLKCTRL.reg = 0xFFFFFFFF,  
+         .UART3_CLKCTRL.reg = 0xFFFFFFFF,  
+         .UART4_CLKCTRL.reg = 0xFFFFFFFF,  
+         .TIMER7_CLKCTRL.reg = 0xFFFFFFFF, 
+         .TIMER2_CLKCTRL.reg = 0xFFFFFFFF,  
+         .TIMER3_CLKCTRL.reg = 0xFFFFFFFF,  
+         .TIMER4_CLKCTRL.reg = 0xFFFFFFFF,  
+         .GPIO1_CLKCTRL.reg = 0xFFFFFFFF, 
+         .GPIO2_CLKCTRL.reg = 0xFFFFFFFF,  
+         .GPIO3_CLKCTRL.reg = 0xFFFFFFFF,  
+         .TPCC_CLKCTRL.reg = 0xFFFFFFFF,  
+         .DCAN0_CLKCTRL.reg = 0xFFFFFFFF, 
+         .DCAN1_CLKCTRL.reg = 0xFFFFFFFF,  
+         .EPWMSS1_CLKCTRL.reg = 0xFFFFFFFF,  
+         .EPWMSS0_CLKCTRL.reg = 0xFFFFFFFF,  
+         .EPWMSS2_CLKCTRL.reg = 0xFFFFFFFF,  
+         .L3_INSTR_CLKCTRL.reg = 0xFFFFFFFF,  
+         .L3_CLKCTRL.reg = 0xFFFFFFFF,
+         .IEEE5000_CLKCTRL.reg = 0xFFFFFFFF, 
+         .PRU_ICSS_CLKCTRL.reg = 0xFFFFFFFF,  
+         .TIMER5_CLKCTRL.reg = 0xFFFFFFFF,  
+         .TIMER6_CLKCTRL.reg = 0xFFFFFFFF,  
+         .MMC1_CLKCTRL.reg = 0xFFFFFFFF,  
+         .MMC2_CLKCTRL.reg = 0xFFFFFFFF, 
+         .TPTC1_CLKCTRL.reg = 0xFFFFFFFF,  
+         .TPTC2_CLKCTRL.reg = 0xFFFFFFFF,  
+         .SPINLOCK_CLKCTRL.reg = 0xFFFFFFFF,  
+         .MAILBOX0_CLKCTRL.reg = 0xFFFFFFFF,  
+         .L4HS_CLKSTCTRL.reg = 0xFFFFFFFF,  
+         .L4HS_CLKCTRL.reg = 0xFFFFFFFF, 
+         .OCPWP_L3_CLKSTCTRL.reg = 0xFFFFFFFF, 
+         .OCPWP_CLKCTRL.reg = 0xFFFFFFFF,   
+         .PRUICSS_CLKSTCTRL.reg = 0xFFFFFFFF,  
+         .CPSW_CLKSTCTRL.reg = 0xFFFFFFFF, 
+         .LCDC_CLKSTCTRL.reg = 0xFFFFFFFF,  
+         .CLKDIV32K_CLKCTRL.reg = 0xFFFFFFFF, 
+         .CLKSTCTRL_24MHz.reg = 0xFFFFFFFF
+    };
+    
+    volatile uint32_t CMPERTST_ARR[86] = {0};
+    uint32_t *pCMPERTST = (uint32_t *)&CMPERTST;
+    
+    for(uint32_t i = 0 ; i < sizeof(PRCM::AM335x_CM_PER_Type)/sizeof(uint32_t); i++)
+    {
+        CMPERTST_ARR[i] = pCMPERTST[i];
+    }
+   */ 
+    
+    
     m_sCM_PER.L3S_CLKSTCTRL.b.CLKTRCTRL = PRCM::SW_WKUP;    
     while(m_sCM_PER.L3S_CLKSTCTRL.b.CLKTRCTRL != PRCM::SW_WKUP);    
     //HWREG(SOC_CM_PER_REGS + CM_PER_L3S_CLKSTCTRL) = CM_PER_L3S_CLKSTCTRL_CLKTRCTRL_SW_WKUP;
@@ -47,8 +120,8 @@ void DM_Timer::clk_config(void)
     //HWREG(SOC_CM_PER_REGS + CM_PER_L3_CLKCTRL) = CM_PER_L3_CLKCTRL_MODULEMODE_ENABLE;
     //while((HWREG(SOC_CM_PER_REGS + CM_PER_L3_CLKCTRL) & CM_PER_L3_CLKCTRL_MODULEMODE) != CM_PER_L3_CLKCTRL_MODULEMODE_ENABLE);
 
-    m_sCM_PER.L3_CLKSTCTRL.b.CLKTRCTRL = PRCM::SW_WKUP;    
-    while(m_sCM_PER.L3_CLKSTCTRL.b.CLKTRCTRL != PRCM::SW_WKUP);
+    m_sCM_PER.OCPWP_L3_CLKSTCTRL.b.CLKTRCTRL = PRCM::SW_WKUP;    
+    while(m_sCM_PER.OCPWP_L3_CLKSTCTRL.b.CLKTRCTRL != PRCM::SW_WKUP);
     //HWREG(SOC_CM_PER_REGS + CM_PER_OCPWP_L3_CLKSTCTRL) =  CM_PER_OCPWP_L3_CLKSTCTRL_CLKTRCTRL_SW_WKUP;
     //while((HWREG(SOC_CM_PER_REGS + CM_PER_OCPWP_L3_CLKSTCTRL) & CM_PER_OCPWP_L3_CLKSTCTRL_CLKTRCTRL) != CM_PER_OCPWP_L3_CLKSTCTRL_CLKTRCTRL_SW_WKUP);
 
@@ -65,7 +138,7 @@ void DM_Timer::clk_config(void)
     /* Select the clock source for the Timer2 instance. */
     m_sCM_DPLL.TIMER2_CLK.b.CLKSEL = 0;
     m_sCM_DPLL.TIMER2_CLK.b.CLKSEL = PRCM::CLK_M_OSC;
-    while(m_sCM_PER.L4LS_CLKCTRL.b.MODULEMODE != PRCM::CLK_M_OSC);    
+    while(m_sCM_DPLL.TIMER2_CLK.b.CLKSEL != PRCM::CLK_M_OSC);    
     //HWREG(SOC_CM_DPLL_REGS + CM_DPLL_CLKSEL_TIMER2_CLK) &=~(CM_DPLL_CLKSEL_TIMER2_CLK_CLKSEL);
     //HWREG(SOC_CM_DPLL_REGS + CM_DPLL_CLKSEL_TIMER2_CLK) |= CM_DPLL_CLKSEL_TIMER2_CLK_CLKSEL_CLK_M_OSC;
     //while((HWREG(SOC_CM_DPLL_REGS + CM_DPLL_CLKSEL_TIMER2_CLK) & CM_DPLL_CLKSEL_TIMER2_CLK_CLKSEL) != CM_DPLL_CLKSEL_TIMER2_CLK_CLKSEL_CLK_M_OSC);
@@ -75,8 +148,26 @@ void DM_Timer::clk_config(void)
     while(m_sCM_PER.TIMER2_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);
     while(!m_sCM_PER.L3S_CLKSTCTRL.b.CLKACTIVITY_L3S_GCLK);
     while(!m_sCM_PER.L3_CLKSTCTRL.b.CLKACTIVITY_L3_GCLK);
-    while(!m_sCM_PER.OCPWP_L3_CLKSTCTRL.b.CLKACTIVITY_OCPWP_L3_GCLK);
-    while(!m_sCM_PER.OCPWP_L3_CLKSTCTRL.b.CLKACTIVITY_OCPWP_L4_GCLK);
+
+/*     
+    volatile uint32_t TSTREG[86] = {0};
+    volatile uint32_t TSTREG1 = (uint32_t)m_sCM_PER.GPIO1_CLKCTRL.reg;
+    volatile uint32_t TSTREG2 = (uint32_t)m_sCM_PER.GPIO2_CLKCTRL.reg;
+    volatile uint32_t TSTREG3 = (uint32_t)m_sCM_PER.GPIO3_CLKCTRL.reg;
+    volatile uint32_t TSTREG4 = (uint32_t)m_sCM_PER.EPWMSS1_CLKCTRL.reg;
+    volatile uint32_t SIZECMPER = sizeof(PRCM::AM335x_CM_PER_Type);
+   
+    uint32_t *pAM335x_CM_PER = (uint32_t *)PRCM::AM335X_CM_PER;
+    
+    for(uint32_t i = 0 ; i < sizeof(PRCM::AM335x_CM_PER_Type)/sizeof(uint32_t); i++)
+    {
+        TSTREG[i] = pAM335x_CM_PER[i];
+    }
+*/    
+    while(!m_sCM_PER.OCPWP_L3_CLKSTCTRL.b.CLKACTIVITY_OCPWP_L3_GCLK & 
+          !m_sCM_PER.OCPWP_L3_CLKSTCTRL.b.CLKACTIVITY_OCPWP_L4_GCLK);
+    while(!m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_L4LS_GCLK &
+          !m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_TIMER2_GCLK);
     //HWREG(SOC_CM_PER_REGS + CM_PER_TIMER2_CLKCTRL) |= CM_PER_TIMER2_CLKCTRL_MODULEMODE_ENABLE;    
     //while((HWREG(SOC_CM_PER_REGS + CM_PER_TIMER2_CLKCTRL) & CM_PER_TIMER2_CLKCTRL_MODULEMODE) != CM_PER_TIMER2_CLKCTRL_MODULEMODE_ENABLE);
     //while((HWREG(SOC_CM_PER_REGS + CM_PER_TIMER2_CLKCTRL) & CM_PER_TIMER2_CLKCTRL_IDLEST) != CM_PER_TIMER2_CLKCTRL_IDLEST_FUNC);
