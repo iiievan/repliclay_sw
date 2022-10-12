@@ -7,7 +7,7 @@
 //This is power reset clock manager class and his namespace
 
 namespace PRCM
-{  
+{   
     constexpr uint32_t AM335x_PRCM_BASE         = 0x44E00000; 
     constexpr uint32_t AM335x_CM_PER_BASE       = AM335x_PRCM_BASE;       
     constexpr uint32_t AM335x_CM_WKUP_BASE      = 0x44E00400;
@@ -931,8 +931,8 @@ namespace PRCM
         __RW  LCDC_CLKSTCTRL_reg_t        LCDC_CLKSTCTRL;      // (0x148)  
         __RW  CLKDIV32K_CLKCTRL_reg_t     CLKDIV32K_CLKCTRL;   // (0x14C) 
         __RW  CLKSTCTRL_24MHz_reg_t       CLKSTCTRL_24MHz;     // (0x150)                                                                                     
-    } AM335x_CM_PER_Type;
-
+    } AM335x_CM_PER_Type; 
+    
     /* [reset state = 0x6] */
     typedef union 
     { 
@@ -2899,9 +2899,9 @@ namespace PRCM
         __RW    CEFUSE_PWRSTST_reg_t      CEFUSE_PWRSTST;   // (0x04)         
     } AM335x_PRM_CEFUSE_Type;
 
-    constexpr AM335x_CM_PER_Type * AM335X_CM_PER            = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
-    constexpr AM335x_CM_WKUP_Type * AM335X_CM_WKUP          = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
-    constexpr AM335x_CM_DPLL_Type * AM335X_CM_DPLL          = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE);
+    constexpr AM335x_CM_PER_Type * AM335x_CM_PER            = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
+    constexpr AM335x_CM_WKUP_Type * AM335x_CM_WKUP          = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
+    constexpr AM335x_CM_DPLL_Type * AM335x_CM_DPLL          = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE);
     constexpr AM335x_CM_MPU_Type * AM335x_CM_MPU            = ((AM335x_CM_MPU_Type *) AM335x_CM_MPU_BASE);
     constexpr AM335x_CM_DEVICE_Type * AM335x_CM_DEVICE      = ((AM335x_CM_DEVICE_Type *) AM335x_CM_DEVICE_BASE);
     constexpr AM335x_CM_RTC_Type * AM335x_CM_RTC            = ((AM335x_CM_RTC_Type *) AM335x_CM_RTC_BASE);
@@ -2916,6 +2916,28 @@ namespace PRCM
     constexpr AM335x_PRM_RTC_Type * AM335x_PRM_RTC          = ((AM335x_PRM_RTC_Type *) AM335x_PRM_RTC_BASE); 
     constexpr AM335x_PRM_GFX_Type * AM335x_PRM_GFX          = ((AM335x_PRM_GFX_Type *) AM335x_PRM_GFX_BASE); 
     constexpr AM335x_PRM_CEFUSE_Type * AM335x_PRM_CEFUSE    = ((AM335x_PRM_CEFUSE_Type *) AM335x_PRM_CEFUSE_BASE);
+    
+    uint32_t debug_dump_CM_PER(AM335x_CM_PER_Type &sCM_PER = *AM335x_CM_PER);
+    /* for testing purpose */
+    inline uint32_t debug_dump_CM_PER(AM335x_CM_PER_Type &sCM_PER)
+    {
+          constexpr uint32_t COUNTOF_CM_PER = sizeof(AM335x_CM_PER_Type)/sizeof(uint32_t);
+          volatile uint32_t TSTREG[COUNTOF_CM_PER] = {0};          
+          uint32_t *pAM335x_CM_PER = (uint32_t *)&sCM_PER;
+          
+          //volatile uint32_t TSTREG1 = (uint32_t)m_sCM_PER.GPIO1_CLKCTRL.reg;
+          //volatile uint32_t TSTREG2 = (uint32_t)m_sCM_PER.GPIO2_CLKCTRL.reg;
+          //volatile uint32_t TSTREG3 = (uint32_t)sCM_PER.GPIO3_CLKCTRL.reg;
+          //volatile uint32_t TSTREG4 = (uint32_t)sCM_PER.EPWMSS1_CLKCTRL.reg;
+          volatile uint32_t SIZEOF_CM_PER = sizeof(AM335x_CM_PER_Type); 
+          
+          for(uint32_t i = 0 ; i < COUNTOF_CM_PER; i++)
+          {   
+                TSTREG[i] = pAM335x_CM_PER[i];
+          }
+          
+          return SIZEOF_CM_PER;
+    }
 }
 
 
