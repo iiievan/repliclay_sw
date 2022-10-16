@@ -1,3 +1,5 @@
+
+
 #ifndef _PRCM_H_
 #define _PRCM_H_
 
@@ -5,28 +7,19 @@
 #include "app_utils.h"
 
 //This is power reset clock manager class and his namespace
-
 namespace PRCM
-{   
-    constexpr uint32_t AM335x_PRCM_BASE         = 0x44E00000; 
-    constexpr uint32_t AM335x_CM_PER_BASE       = AM335x_PRCM_BASE;       
-    constexpr uint32_t AM335x_CM_WKUP_BASE      = 0x44E00400;
-    constexpr uint32_t AM335x_CM_DPLL_BASE      = 0x44E00500;
-    constexpr uint32_t AM335x_CM_MPU_BASE       = 0x44E00600;
-    constexpr uint32_t AM335x_CM_DEVICE_BASE    = 0x44E00700;
-    constexpr uint32_t AM335x_CM_RTC_BASE       = 0x44E00800;
-    constexpr uint32_t AM335x_CM_GFX_BASE       = 0x44E00900;
-    constexpr uint32_t AM335x_CM_CEFUSE_BASE    = 0x44E00A00;
-    
-    constexpr uint32_t AM335x_PRM_IRQ_BASE      = 0x44E00B00;    
-    constexpr uint32_t AM335x_PRM_PER_BASE      = 0x44E00C00;    
-    constexpr uint32_t AM335x_PRM_WKUP_BASE     = 0x44E00D00;
-    constexpr uint32_t AM335x_PRM_MPU_BASE      = 0x44E00E00;
-    constexpr uint32_t AM335x_PRM_DEVICE_BASE   = 0x44E00F00;
-    constexpr uint32_t AM335x_PRM_RTC_BASE      = 0x44E01000;
-    constexpr uint32_t AM335x_PRM_GFX_BASE      = 0x44E01100;
-    constexpr uint32_t AM335x_PRM_CEFUSE_BASE   = 0x44E01200;
-    
+{  
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_CM_PER_Type Registers **********************************************************************/ 
+
+/*******************************************************************************************************************************************************************************/      
     /* [reset state = 0xC0102]*/
     typedef union 
     { 
@@ -35,30 +28,38 @@ namespace PRCM
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                   :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                :6;   // bit: 2..7     Reserved                
-            uint32_t    CLKACTIVITY_L4LS_GCLK       :1;   // bit: 8        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]
+            uint32_t    CLKACTIVITY_L4LS_GCLK       :1;   // bit: 8        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]
             uint32_t                                :1;   // bit: 9        Reserved
-            uint32_t    CLKACTIVITY_UART_GFCLK      :1;   // bit: 10       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_CAN_CLK         :1;   // bit: 11       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_UART_GFCLK      :1;   // bit: 10       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_CAN_CLK         :1;   // bit: 11       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                :1;   // bit: 12       Reserved
-            uint32_t    CLKACTIVITY_TIMER7_GCLK     :1;   // bit: 13       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_TIMER2_GCLK     :1;   // bit: 14       (R)state of the clock in domain [0x0 = Inact; 0x1= Act]   
-            uint32_t    CLKACTIVITY_TIMER3_GCLK     :1;   // bit: 15       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_TIMER4_GCLK     :1;   // bit: 16       (R)state of the clock in domain [0x0 = Inact; 0x1= Act]  
-            uint32_t    CLKACTIVITY_LCDC_GCLK       :1;   // bit: 17       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_TIMER7_GCLK     :1;   // bit: 13       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_TIMER2_GCLK     :1;   // bit: 14       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]   
+            uint32_t    CLKACTIVITY_TIMER3_GCLK     :1;   // bit: 15       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_TIMER4_GCLK     :1;   // bit: 16       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]  
+            uint32_t    CLKACTIVITY_LCDC_GCLK       :1;   // bit: 17       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                :1;   // bit: 18       Reserved
-            uint32_t    CLKACTIVITY_GPIO_1_GDBCLK   :1;   // bit: 19       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_GPIO_2_GDBCLK   :1;   // bit: 20       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_GPIO_3_GDBCLK   :1;   // bit: 21       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_GPIO_1_GDBCLK   :1;   // bit: 19       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_GPIO_2_GDBCLK   :1;   // bit: 20       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_GPIO_3_GDBCLK   :1;   // bit: 21       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                :2;   // bit: 22,23    Reserved
-            uint32_t    CLKACTIVITY_I2C_FCLK        :1;   // bit: 24       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_SPI_GCLK        :1;   // bit: 25       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_I2C_FCLK        :1;   // bit: 24       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_SPI_GCLK        :1;   // bit: 25       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                :1;   // bit: 26       Reserved
-            uint32_t    CLKACTIVITY_TIMER5_GCLK     :1;   // bit: 27       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_TIMER6_GCLK     :1;   // bit: 28       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t                                :3;   // bit: 29..32   Reserved
+            uint32_t    CLKACTIVITY_TIMER5_GCLK     :1;   // bit: 27       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_TIMER6_GCLK     :1;   // bit: 28       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t                                :3;   // bit: 29..31   Reserved
         } b;                                      
         uint32_t  reg;                           
     } L4LS_CLKSTCTRL_reg_t;
+
+    enum e_PRCM_CLKTRCTRL : uint32_t
+    {
+        NO_SLEEP           = 0x0,
+        SW_SLEEP           = 0x1,
+        SW_WKUP            = 0x2,
+        CLKTRCTRL_RESERVED = 0x3        
+    };
 
     /* [reset state = 0xA]*/
     typedef union 
@@ -68,19 +69,11 @@ namespace PRCM
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
             uint32_t    CLKTRCTRL            :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL]     
             uint32_t                         :1;   // bit: 2        Reserved            
-            uint32_t    CLKACTIVITY_L3S_GCLK :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]     
+            uint32_t    CLKACTIVITY_L3S_GCLK :1;   // bit: 3        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]     
             uint32_t                         :28;  // bit: 4..31    Reserved
         } b;                                      
         uint32_t  reg;                           
-    } L3S_CLKSTCTRL_reg_t;
-    
-    enum e_PRCM_CLKTRCTRL : uint32_t
-    {
-        NO_SLEEP           = 0x0,
-        SW_SLEEP           = 0x1,
-        SW_WKUP            = 0x2,
-        CLKTRCTRL_RESERVED = 0x3        
-    };
+    } L3S_CLKSTCTRL_reg_t; 
 
     /* [reset state = 0x12]*/
     typedef union 
@@ -89,12 +82,12 @@ namespace PRCM
         {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                 :2;   // bit: 0,1      (RW)Clock state transition[see e_PRCM_CLKTRCTRL]         
-            uint32_t    CLKACTIVITY_EMIF_GCLK     :1;   // bit: 2        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
-            uint32_t    CLKACTIVITY_MMC_FCLK      :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_L3_GCLK       :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_EMIF_GCLK     :1;   // bit: 2        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]             
+            uint32_t    CLKACTIVITY_MMC_FCLK      :1;   // bit: 3        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_L3_GCLK       :1;   // bit: 4        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                              :1;   // bit: 5        Reserved
-            uint32_t    CLKACTIVITY_CPTS_RFT_GCLK :1;   // bit: 6        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_MCASP_GCLK    :1;   // bit: 7        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_CPTS_RFT_GCLK :1;   // bit: 6        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_MCASP_GCLK    :1;   // bit: 7        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                              :24;  // bit: 8..31
         } b;                                      
         uint32_t  reg;                           
@@ -109,11 +102,19 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } CPGMAC0_CLKCTRL_reg_t;
+
+    enum e_PRCM_MODULEMODE : uint32_t
+    {
+        MODULEMODE_DISABLED  = 0x0,     // Module is disable by SW. Any OCP access to module results in an error, except if resulting from a module wakeup(asynchronous wakeup).
+        MODULEMODE_RESERVED  = 0x1,     // Reserved
+        MODULEMODE_ENABLE    = 0x2,     // Module is explicitly enabled. Interface clock (if not used for functions) may be gated according to the clock domain state.
+        MODULEMODE_RESERVED1 = 0x3      // Reserved       
+    };
     
     enum e_PRCM_IDLEST : uint32_t
     {
@@ -123,12 +124,10 @@ namespace PRCM
         IDLEST_DISABLE = 0x3    // Module is disabled and cannot be accessed
     };
 
-    enum e_PRCM_MODULEMODE : uint32_t
+    enum e_PRCM_STBYST : uint32_t
     {
-        MODULEMODE_DISABLED  = 0x0,
-        MODULEMODE_RESERVED  = 0x1,
-        MODULEMODE_ENABLE    = 0x2,
-        MODULEMODE_RESERVED1 = 0x3        
+        STBYST_FUNC    = 0x0,
+        STBYST_STNDBY  = 0x1      
     };
 
     /* [reset state = 0x70000]*/
@@ -139,7 +138,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -153,7 +152,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -167,7 +166,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -190,7 +189,7 @@ namespace PRCM
     typedef union 
     { 
         struct 
-        {                                /* This register manages the OCMC clocks. */ 
+        {                                /* This register manages the OCMC(on chip memmory controller) clocks. */ 
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
@@ -600,7 +599,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -614,7 +613,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -680,7 +679,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -694,7 +693,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -734,10 +733,10 @@ namespace PRCM
                                                               /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :1;   // bit: 2        Reserved        
-            uint32_t    CLKACTIVITY_L4HS_GCLK           :1;   // bit: 3        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
-            uint32_t    CLKACTIVITY_CPSW_250MHZ_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_CPSW_50MHZ_GCLK     :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_CPSW_5MHZ_GCLK      :1;   // bit: 6        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_L4HS_GCLK           :1;   // bit: 3        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]             
+            uint32_t    CLKACTIVITY_CPSW_250MHZ_GCLK    :1;   // bit: 4        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_CPSW_50MHZ_GCLK     :1;   // bit: 5        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_CPSW_5MHZ_GCLK      :1;   // bit: 6        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                    :25;  // bit: 7..31    Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -764,8 +763,8 @@ namespace PRCM
                                                             /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
-            uint32_t    CLKACTIVITY_OCPWP_L3_GCLK       :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
-            uint32_t    CLKACTIVITY_OCPWP_L4_GCLK       :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_OCPWP_L3_GCLK       :1;   // bit: 4        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]             
+            uint32_t    CLKACTIVITY_OCPWP_L4_GCLK       :1;   // bit: 5        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                    :26;  // bit: 6..31    Reserved 
         } b;                                      
         uint32_t  reg;                           
@@ -780,7 +779,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -794,9 +793,9 @@ namespace PRCM
                                                             /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
-            uint32_t    CLKACTIVITY_PRU_ICSS_OCP_GCLK   :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
-            uint32_t    CLKACTIVITY_PRU_ICSS_IEP_GCLK   :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_PRU_ICSS_UART_GCLK  :1;   // bit: 6        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_PRU_ICSS_OCP_GCLK   :1;   // bit: 4        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]             
+            uint32_t    CLKACTIVITY_PRU_ICSS_IEP_GCLK   :1;   // bit: 5        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_PRU_ICSS_UART_GCLK  :1;   // bit: 6        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                    :25;  // bit: 7..31    Reserved 
         } b;                                      
         uint32_t  reg;                           
@@ -810,7 +809,7 @@ namespace PRCM
                                                             /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
-            uint32_t    CLKACTIVITY_CPSW_125MHz_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t    CLKACTIVITY_CPSW_125MHz_GCLK    :1;   // bit: 4        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]             
             uint32_t                                    :27;  // bit: 5..31    Reserved 
         } b;                                      
         uint32_t  reg;                           
@@ -824,8 +823,8 @@ namespace PRCM
                                                               /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
-            uint32_t    CLKACTIVITY_LCDC_L3_OCP_GCLK    :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
-            uint32_t    CLKACTIVITY_LCDC_L4_OCP_GCLK    :1;   // bit: 5        (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_LCDC_L3_OCP_GCLK    :1;   // bit: 4        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]             
+            uint32_t    CLKACTIVITY_LCDC_L4_OCP_GCLK    :1;   // bit: 5        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                    :26;  // bit: 6..31    Reserved 
         } b;                                      
         uint32_t  reg;                           
@@ -852,87 +851,23 @@ namespace PRCM
                                                               /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                       :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL] 
             uint32_t                                    :2;   // bit: 2,3      Reserved        
-            uint32_t    CLKACTIVITY_CLK_24MHZ_GCLK      :1;   // bit: 4        (R)state of the clock in domain [0x0 = Inact; 0x1= Act]             
+            uint32_t    CLKACTIVITY_CLK_24MHZ_GCLK      :1;   // bit: 4        (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]             
             uint32_t                                    :27;  // bit: 5..31    Reserved 
         } b;                                      
         uint32_t  reg;                           
     } CLKSTCTRL_24MHz_reg_t;
 
-    typedef struct 
-    {                                                                                      
-        __RW  L4LS_CLKSTCTRL_reg_t        L4LS_CLKSTCTRL;      // (0x00)  
-        __RW  L3S_CLKSTCTRL_reg_t         L3S_CLKSTCTRL;       // (0x04) 
-        __R   uint32_t                    RESERVED1[1]; 
-        __RW  L3_CLKSTCTRL_reg_t          L3_CLKSTCTRL;        // (0x0C) 
-        __R   uint32_t                    RESERVED2[1];  
-        __RW  CPGMAC0_CLKCTRL_reg_t       CPGMAC0_CLKCTRL;     // (0x14)  
-        __RW  LCDC_CLKCTRL_reg_t          LCDC_CLKCTRL;        // (0x18)  
-        __RW  USB0_CLKCTRL_reg_t          USB0_CLKCTRL;        // (0x1C)
-        __R   uint32_t                    RESERVED3[1];   
-        __RW  TPTC0_CLKCTRL_reg_t         TPTC0_CLKCTRL;       // (0x24)  
-        __RW  EMIF_CLKCTRL_reg_t          EMIF_CLKCTRL;        // (0x28)  
-        __RW  OCMCRAM_CLKCTRL_reg_t       OCMCRAM_CLKCTRL;     // (0x2C)  
-        __RW  GPMC_CLKCTRL_reg_t          GPMC_CLKCTRL;        // (0x30)  
-        __RW  MCASP0_CLKCTRL_reg_t        MCASP0_CLKCTRL;      // (0x34)  
-        __RW  UART5_CLKCTRL_reg_t         UART5_CLKCTRL;       // (0x38)  
-        __RW  MMC0_CLKCTRL_reg_t          MMC0_CLKCTRL;        // (0x3C)  
-        __RW  ELM_CLKCTRL_reg_t           ELM_CLKCTRL;         // (0x40)  
-        __RW  I2C2_CLKCTRL_reg_t          I2C2_CLKCTRL;        // (0x44)  
-        __RW  I2C1_CLKCTRL_reg_t          I2C1_CLKCTRL;        // (0x48)  
-        __RW  SPI0_CLKCTRL_reg_t          SPI0_CLKCTRL;        // (0x4C) 
-        __RW  SPI1_CLKCTRL_reg_t          SPI1_CLKCTRL;        // (0x50) 
-        __R   uint32_t                    RESERVED4[3];  
-        __RW  L4LS_CLKCTRL_reg_t          L4LS_CLKCTRL;        // (0x60)
-        __R   uint32_t                    RESERVED5[1];   
-        __RW  MCASP1_CLKCTRL_reg_t        MCASP1_CLKCTRL;      // (0x68)  
-        __RW  UART1_CLKCTRL_reg_t         UART1_CLKCTRL;       // (0x6C)  
-        __RW  UART2_CLKCTRL_reg_t         UART2_CLKCTRL;       // (0x70)  
-        __RW  UART3_CLKCTRL_reg_t         UART3_CLKCTRL;       // (0x74)  
-        __RW  UART4_CLKCTRL_reg_t         UART4_CLKCTRL;       // (0x78)  
-        __RW  TIMER7_CLKCTRL_reg_t        TIMER7_CLKCTRL;      // (0x7C)  
-        __RW  TIMER2_CLKCTRL_reg_t        TIMER2_CLKCTRL;      // (0x80)  
-        __RW  TIMER3_CLKCTRL_reg_t        TIMER3_CLKCTRL;      // (0x84)  
-        __RW  TIMER4_CLKCTRL_reg_t        TIMER4_CLKCTRL;      // (0x88)
-        __R   uint32_t                    RESERVED6[8];   
-        __RW  GPIO1_CLKCTRL_reg_t         GPIO1_CLKCTRL;       // (0xAC)  
-        __RW  GPIO2_CLKCTRL_reg_t         GPIO2_CLKCTRL;       // (0xB0)  
-        __RW  GPIO3_CLKCTRL_reg_t         GPIO3_CLKCTRL;       // (0xB4)
-        __R   uint32_t                    RESERVED7[1];
-        __RW  TPCC_CLKCTRL_reg_t          TPCC_CLKCTRL;        // (0xBC)  
-        __RW  DCAN0_CLKCTRL_reg_t         DCAN0_CLKCTRL;       // (0xC0)  
-        __RW  DCAN1_CLKCTRL_reg_t         DCAN1_CLKCTRL;       // (0xC4)
-        __R   uint32_t                    RESERVED8[1];
-        __RW  EPWMSS1_CLKCTRL_reg_t       EPWMSS1_CLKCTRL;     // (0xCC) 
-        __R   uint32_t                    RESERVED9[1]; 
-        __RW  EPWMSS0_CLKCTRL_reg_t       EPWMSS0_CLKCTRL;     // (0xD4)  
-        __RW  EPWMSS2_CLKCTRL_reg_t       EPWMSS2_CLKCTRL;     // (0xD8)  
-        __RW  L3_INSTR_CLKCTRL_reg_t      L3_INSTR_CLKCTRL;    // (0xDC)  
-        __RW  L3_CLKCTRL_reg_t            L3_CLKCTRL;          // (0xE0) 
-        __RW  IEEE5000_CLKCTRL_reg_t      IEEE5000_CLKCTRL;    // (0xE4)  
-        __RW  PRU_ICSS_CLKCTRL_reg_t      PRU_ICSS_CLKCTRL;    // (0xE8)  
-        __RW  TIMER5_CLKCTRL_reg_t        TIMER5_CLKCTRL;      // (0xEC)  
-        __RW  TIMER6_CLKCTRL_reg_t        TIMER6_CLKCTRL;      // (0xF0)  
-        __RW  MMC1_CLKCTRL_reg_t          MMC1_CLKCTRL;        // (0xF4)  
-        __RW  MMC2_CLKCTRL_reg_t          MMC2_CLKCTRL;        // (0xF8) 
-        __RW  TPTC1_CLKCTRL_reg_t         TPTC1_CLKCTRL;       // (0xFC)  
-        __RW  TPTC2_CLKCTRL_reg_t         TPTC2_CLKCTRL;       // (0x100)  
-        __R   uint32_t                    RESERVED10[2]; 
-        __RW  SPINLOCK_CLKCTRL_reg_t      SPINLOCK_CLKCTRL;    // (0x10C)  
-        __RW  MAILBOX0_CLKCTRL_reg_t      MAILBOX0_CLKCTRL;    // (0x110)
-        __R   uint32_t                    RESERVED11[2];  
-        __RW  L4HS_CLKSTCTRL_reg_t        L4HS_CLKSTCTRL;      // (0x11C)  
-        __RW  L4HS_CLKCTRL_reg_t          L4HS_CLKCTRL;        // (0x120)
-        __R   uint32_t                    RESERVED12[2];  
-        __RW  OCPWP_L3_CLKSTCTRL_reg_t    OCPWP_L3_CLKSTCTRL;  // (0x12C) 
-        __RW  OCPWP_CLKCTRL_reg_t         OCPWP_CLKCTRL;       // (0x130) 
-        __R   uint32_t                    RESERVED13[3];  
-        __RW  PRUICSS_CLKSTCTRL_reg_t     PRUICSS_CLKSTCTRL;   // (0x140)  
-        __RW  CPSW_CLKSTCTRL_reg_t        CPSW_CLKSTCTRL;      // (0x144) 
-        __RW  LCDC_CLKSTCTRL_reg_t        LCDC_CLKSTCTRL;      // (0x148)  
-        __RW  CLKDIV32K_CLKCTRL_reg_t     CLKDIV32K_CLKCTRL;   // (0x14C) 
-        __RW  CLKSTCTRL_24MHz_reg_t       CLKSTCTRL_24MHz;     // (0x150)                                                                                     
-    } AM335x_CM_PER_Type; 
-    
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_CM_WKUP_Type Registers *********************************************************************/ 
+
+/*******************************************************************************************************************************************************************************/    
     /* [reset state = 0x6] */
     typedef union 
     { 
@@ -940,21 +875,27 @@ namespace PRCM
         {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */
             uint32_t    CLKTRCTRL                   :2;   // bit: 0,1     (RW)Clock state transition [see e_PRCM_CLKTRCTRL]              
-            uint32_t    CLKACTIVITY_L4_WKUP_GCLK    :1;   // bit: 2       (R)state of the clock in domain [0x0 = Inact; 0x1= Act]
-            uint32_t    CLKACTIVITY_SR_SYSCLK       :1;   // bit: 3       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_WDT1_GCLK       :1;   // bit: 4       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_L4_WKUP_GCLK    :1;   // bit: 2       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]
+            uint32_t    CLKACTIVITY_SR_SYSCLK       :1;   // bit: 3       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_WDT1_GCLK       :1;   // bit: 4       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                :3;   // bit: 5..7    Reserved
-            uint32_t    CLKACTIVITY_GPIO0_GDBCLK    :1;   // bit: 8       (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_GPIO0_GDBCLK    :1;   // bit: 8       (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t                                :1;   // bit: 9       Reserved   
-            uint32_t    CLKACTIVITY_TIMER0_GCLK     :1;   // bit: 10      (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t    CLKACTIVITY_I2C0_GFCLK      :1;   // bit: 11      (R)state of the clock in domain [0x0 = Inact; 0x1= Act]  
-            uint32_t    CLKACTIVITY_UART0_GFCLK     :1;   // bit: 12      (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_TIMER0_GCLK     :1;   // bit: 10      (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t    CLKACTIVITY_I2C0_GFCLK      :1;   // bit: 11      (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST]  
+            uint32_t    CLKACTIVITY_UART0_GFCLK     :1;   // bit: 12      (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
             uint32_t    CLKACTIVITY_TIMER1_GCLK     :1;   // bit: 13      Reserved
-            uint32_t    CLKACTIVITY_ADC_FCLK        :1;   // bit: 14      (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
-            uint32_t                                :17;  // bit: 15..31  (R)state of the clock in domain [0x0 = Inact; 0x1= Act] 
+            uint32_t    CLKACTIVITY_ADC_FCLK        :1;   // bit: 14      (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
+            uint32_t                                :17;  // bit: 15..31  (R)state of the clock in domain [see e_PRCM_CLK_DOMAIN_ST] 
         } b;                                      
         uint32_t  reg;                           
     } CLKSTCTRL_reg_t;
+
+    enum e_PRCM_CLK_DOMAIN_ST : uint32_t
+    {
+        CLK_INACT = 0x0,
+        CLK_ACT   = 0x1
+    };
 
     /* [reset state = 0x30000] */
     typedef union 
@@ -1017,7 +958,7 @@ namespace PRCM
             uint32_t    MODULEMODE                 :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t                               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST                     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST                     :1;   // bit: 18         (R)Module standby status.[0x0 = not in stadby; 0x1= stadby]
+            uint32_t    STBYST                     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t    OPTFCLKEN_DBGSYSCLK        :1;   // bit: 19         (RW)Optional functional clock control.[0x0 = disabled; 0x1= enabled]
             uint32_t    TRC_PMD_CLKSEL             :2;   // bit: 20,21         
             uint32_t    STM_PMD_CLKSEL             :2;   // bit: 22,23         
@@ -1257,7 +1198,7 @@ namespace PRCM
     typedef union 
     { 
         struct 
-        {                                           /*This register allows monitoring the master clock activity. This register is read only and automatically updated */
+        {                                        /*This register allows monitoring the master clock activity. This register is read only and automatically updated */
             uint32_t    ST_DPLL_CLK      :1;     // bit: 0          DPLL clock activity [0x0 = in bypass or in stop mode; 0x1 = locked ] 
             uint32_t                     :7;     // bit: 1..7       Reserved 
             uint32_t    ST_MN_BYPASS     :1;     // bit: 8          DPLL MN_BYPASS status [0x0 = not in bypass; 0x1 = bypass ] 
@@ -1305,12 +1246,6 @@ namespace PRCM
         } b;                                      
         uint32_t  reg;                           
     } CLKSEL_DPLL_CORE_reg_t;
-
-
-
-
-
-
 
     /* [reset state = 0x0] */
     typedef union 
@@ -1621,9 +1556,8 @@ namespace PRCM
     { 
         struct 
         {                                             /* This register provides controls over the M2 divider of the DPLL..*/
-            uint32_t    DPLL_CLKOUT_DIV       :5;     // bit: 0..4     (RW)DPLL M2 post-divider factor (1 to 31). [0x0 = reserved]
-            uint32_t    DPLL_CLKOUT_DIVCHACK  :1;     // bit: 5        (R)indicates that the change in divider DPLL_CLKOUT_DIV value has taken effect.           
-            uint32_t                          :2;     // bit: 6,7      Reserved  
+            uint32_t    DPLL_CLKOUT_DIV       :7;     // bit: 0..6     (RW)DPLL M2 post-divider factor (1 to 31). [0x0 = reserved]
+            uint32_t    DPLL_CLKOUT_DIVCHACK  :1;     // bit: 7        (R)indicates that the change in divider DPLL_CLKOUT_DIV value has taken effect.           
             uint32_t    DPLL_CLKOUT_GATE_CTRL :1;     // bit: 8        (RW)Control gating of DPLL CLKOUT [0x0 = auto gated;0x1 = force enabled] 
             uint32_t    ST_DPLL_CLKOUT        :1;     // bit: 9        (R)DPLL CLKOUT status  [0x0 = gated;0x1 = enabled]
             uint32_t                          :22;    // bit: 10..31   Reserved
@@ -1638,7 +1572,7 @@ namespace PRCM
         {                                /* This register manages the WKUP M3 clocks. */ 
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :16;  // bit: 2..17      Reserved                    
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1652,7 +1586,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t               :13;  // bit: 18..31     Reserved
+            uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } UART0_CLKCTRL_reg_t;
@@ -1665,7 +1599,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t               :13;  // bit: 18..31     Reserved
+            uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } I2C0_CLKCTRL_reg_t;
@@ -1678,7 +1612,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t               :13;  // bit: 18..31     Reserved
+            uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } ADC_TSC_CLKCTRL_reg_t;
@@ -1691,7 +1625,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t               :13;  // bit: 18..31     Reserved
+            uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } SMARTREFLEX0_CLKCTRL_reg_t;
@@ -1704,7 +1638,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t               :13;  // bit: 18..31     Reserved
+            uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } TIMER1_CLKCTRL_reg_t;
@@ -1717,7 +1651,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t               :13;  // bit: 18..31     Reserved
+            uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } SMARTREFLEX1_CLKCTRL_reg_t;
@@ -1729,7 +1663,7 @@ namespace PRCM
         {                                                  /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                            /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
             uint32_t    CLKTRCTRL                    :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL]               
-            uint32_t    CLKACTIVITY_L4_WKUP_AON_GCLK :1;   // bit: 3        (R)state of the clock in domain [0x0 = gated; 0x1= Act]     
+            uint32_t    CLKACTIVITY_L4_WKUP_AON_GCLK :1;   // bit: 2        (R)state of the clock in domain [0x0 = gated; 0x1= Act]     
             uint32_t                                 :29;  // bit: 3..31    Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -1743,7 +1677,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t               :13;  // bit: 18..31     Reserved
+            uint32_t               :14;  // bit: 18..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } WDT1_CLKCTRL_reg_t;
@@ -1765,64 +1699,16 @@ namespace PRCM
         uint32_t  reg;                           
     } DIV_M6_DPLL_CORE_reg_t;
 
-    typedef struct 
-    {                                                                                      
-        __RW   CLKSTCTRL_reg_t                    CLKSTCTRL;                 // (0x00)  
-        __RW   CONTROL_CLKCTRL_reg_t              CONTROL_CLKCTRL;           // (0x04) 
-        __RW   GPIO0_CLKCTRL_reg_t                GPIO0_CLKCTRL;             // (0x08) 
-        __RW   L4WKUP_CLKCTRL_reg_t               L4WKUP_CLKCTRL;            // (0x0C) 
-        __RW   TIMER0_CLKCTRL_reg_t               TIMER0_CLKCTRL;            // (0x10) 
-        __RW   DEBUGSS_CLKCTRL_reg_t              DEBUGSS_CLKCTRL;           // (0x14) 
-        __RW   L3_AON_CLKSTCTRL_reg_t             L3_AON_CLKSTCTRL;          // (0x18) 
-        __RW   AUTOIDLE_DPLL_MPU_reg_t            AUTOIDLE_DPLL_MPU;         // (0x1C)  //This feature is not supported!
-        __R    IDLEST_DPLL_MPU_reg_t              IDLEST_DPLL_MPU;           // (0x20) 
-        __RW   SSC_DELTAMSTEP_DPLL_MPU_reg_t      SSC_DELTAMSTEP_DPLL_MPU;   // (0x24) 
-        __RW   SSC_MODFREQDIV_DPLL_MPU_reg_t      SSC_MODFREQDIV_DPLL_MPU;   // (0x28)  
-        __RW   CLKSEL_DPLL_MPU_reg_t              CLKSEL_DPLL_MPU;           // (0x2C) 
-        __RW   AUTOIDLE_DPLL_DDR_reg_t            AUTOIDLE_DPLL_DDR;         // (0x30)  //AUTO_DPLL_MODE is not supported!    
-        __R    IDLEST_DPLL_DDR_reg_t              IDLEST_DPLL_DDR;           // (0x34) 
-        __RW   SSC_DELTAMSTEP_DPLL_DDR_reg_t      SSC_DELTAMSTEP_DPLL_DDR;   // (0x38) 
-        __RW   SSC_MODFREQDIV_DPLL_DDR_reg_t      SSC_MODFREQDIV_DPLL_DDR;   // (0x3C) 
-        __RW   CLKSEL_DPLL_DDR_reg_t              CLKSEL_DPLL_DDR;           // (0x40) 
-        __RW   AUTOIDLE_DPLL_DISP_reg_t           AUTOIDLE_DPLL_DISP;        // (0x44)  //AUTO_DPLL_MODE is not supported!
-        __R    IDLEST_DPLL_DISP_reg_t             IDLEST_DPLL_DISP;          // (0x48) 
-        __RW   SSC_DELTAMSTEP_DPLL_DISP_reg_t     SSC_DELTAMSTEP_DPLL_DISP;  // (0x4C) 
-        __RW   SSC_MODFREQDIV_DPLL_DISP_reg_t     SSC_MODFREQDIV_DPLL_DISP;  // (0x50)  
-        __RW   CLKSEL_DPLL_DISP_reg_t             CLKSEL_DPLL_DISP;          // (0x54) 
-        __RW   AUTOIDLE_DPLL_CORE_reg_t           AUTOIDLE_DPLL_CORE;        // (0x58)  //AUTO_DPLL_MODE is not supported! 
-        __R    IDLEST_DPLL_CORE_reg_t             IDLEST_DPLL_CORE;          // (0x5C) 
-        __RW   SSC_DELTAMSTEP_DPLL_CORE_reg_t     SSC_DELTAMSTEP_DPLL_CORE;  // (0x60) 
-        __RW   SSC_MODFREQDIV_DPLL_CORE_reg_t     SSC_MODFREQDIV_DPLL_CORE;  // (0x64) 
-        __RW   CLKSEL_DPLL_CORE_reg_t             CLKSEL_DPLL_CORE;          // (0x68) 
-        __RW   AUTOIDLE_DPLL_PER_reg_t            AUTOIDLE_DPLL_PER;         // (0x6C)  //AUTO_DPLL_MODE is not supported. 
-        __R    IDLEST_DPLL_PER_reg_t              IDLEST_DPLL_PER;           // (0x70) 
-        __RW   SSC_DELTAMSTEP_DPLL_PER_reg_t      SSC_DELTAMSTEP_DPLL_PER;   // (0x74) 
-        __RW   SSC_MODFREQDIV_DPLL_PER_reg_t      SSC_MODFREQDIV_DPLL_PER;   // (0x78)  
-        __RW   CLKDCOLDO_DPLL_PER_reg_t           CLKDCOLDO_DPLL_PER;        // (0x7C) 
-        __RW   DIV_M4_DPLL_CORE_reg_t             DIV_M4_DPLL_CORE;          // (0x80) 
-        __RW   DIV_M5_DPLL_CORE_reg_t             DIV_M5_DPLL_CORE;          // (0x84) 
-        __RW   CLKMODE_DPLL_MPU_reg_t             CLKMODE_DPLL_MPU;          // (0x88) 
-        __RW   CLKMODE_DPLL_PER_reg_t             CLKMODE_DPLL_PER;          // (0x8C) 
-        __RW   CLKMODE_DPLL_CORE_reg_t            CLKMODE_DPLL_CORE;         // (0x90) 
-        __RW   CLKMODE_DPLL_DDR_reg_t             CLKMODE_DPLL_DDR;          // (0x94) 
-        __RW   CLKMODE_DPLL_DISP_reg_t            CLKMODE_DPLL_DISP;         // (0x98) 
-        __RW   CLKSEL_DPLL_PERIPH_reg_t           CLKSEL_DPLL_PERIPH;        // (0x9C) 
-        __RW   DIV_M2_DPLL_DDR_reg_t              DIV_M2_DPLL_DDR;           // (0xA0)  
-        __RW   DIV_M2_DPLL_DISP_reg_t             DIV_M2_DPLL_DISP;          // (0xA4) 
-        __RW   DIV_M2_DPLL_MPU_reg_t              DIV_M2_DPLL_MPU;           // (0xA8) 
-        __RW   DIV_M2_DPLL_PER_reg_t              DIV_M2_DPLL_PER;           // (0xAC) 
-        __RW   WKUP_M3_CLKCTRL_reg_t              WKUP_M3_CLKCTRL;           // (0xB0) 
-        __RW   UART0_CLKCTRL_reg_t                UART0_CLKCTRL;             // (0xB4) 
-        __RW   I2C0_CLKCTRL_reg_t                 I2C0_CLKCTRL;              // (0xB8) 
-        __RW   ADC_TSC_CLKCTRL_reg_t              ADC_TSC_CLKCTRL;           // (0xBC) 
-        __RW   SMARTREFLEX0_CLKCTRL_reg_t         SMARTREFLEX0_CLKCTRL;      // (0xC0) 
-        __RW   TIMER1_CLKCTRL_reg_t               TIMER1_CLKCTRL;            // (0xC4)
-        __RW   SMARTREFLEX1_CLKCTRL_reg_t         SMARTREFLEX1_CLKCTRL;      // (0xC8) 
-        __RW   L4_WKUP_AON_CLKSTCTRL_reg_t        L4_WKUP_AON_CLKSTCTRL;     // (0xCC) 
-        __R    uint32_t                           RESERVED[1];
-        __RW   WDT1_CLKCTRL_reg_t                 WDT1_CLKCTRL;              // (0xD4) 
-        __RW   DIV_M6_DPLL_CORE_reg_t             DIV_M6_DPLL_CORE;          // (0xD8)
-    } AM335x_CM_WKUP_Type;
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_CM_DPLL_Type Registers *********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/
 
     /* [reset state = 0x1]*/
     typedef union 
@@ -1837,10 +1723,10 @@ namespace PRCM
 
     enum e_TIMER_CLKSEL : uint32_t
     {
-        TCLKIN          = 0x0,
-        CLK_M_OSC       = 0x1,
-        CLK_32KHZ       = 0x2,
-        CLKSEL_RESERVED = 0x3
+        TCLKIN          = 0x0,  // Select TCLKIN clock
+        CLK_M_OSC       = 0x1,  // Select CLK_M_OSC clock
+        CLK_32KHZ       = 0x2,  // Select CLK_32KHZ clock
+        CLKSEL_RESERVED = 0x3   // Reserved
     };
 
     /* [reset state = 0x1]*/
@@ -1934,11 +1820,11 @@ namespace PRCM
 
     enum e_TIMER1MS_CLKSEL : uint32_t
     {
-        MS1_M_OSC   = 0x0,
-        MS1_32KHZ   = 0x1,
-        MS1_TCLKIN  = 0x2,
-        MS1_RC32K   = 0x3,
-        MS1_32768HZ = 0x4
+        MS1_M_OSC   = 0x0,      // Select CLK_M_OSC clock
+        MS1_32KHZ   = 0x1,      // Select CLK_32KHZ clock
+        MS1_TCLKIN  = 0x2,      // Select TCLKIN clock
+        MS1_RC32K   = 0x3,      // Select CLK_RC32K clock
+        MS1_32768HZ = 0x4       // Selects the CLK_32768 from 32KHz Crystal Osc
     };
 
     /* [reset state = 0x0]*/
@@ -1980,7 +1866,7 @@ namespace PRCM
         LCD_DISP_PLL_CLKOUTM2 = 0x0,
         LCD_CORE_PLL_CLKOUTM5 = 0x1,
         LCD_PER_PLL_CLKOUTM2  = 0x2,
-        LCD_RESERVED          = 0x3
+        LCD_PLL_RESERVED      = 0x3
     };
 
     /* [reset state = 0x1]*/
@@ -2007,30 +1893,21 @@ namespace PRCM
 
     enum e_GPIO0_CLKSEL : uint32_t
     {
-        GPIO0_32KHZ_RC          = 0x0,
-        GPIO0_32KHZ_CRYSTAL     = 0x1,
-        GPIO0_32KHZ_CLOCK_DIV   = 0x2,
+        GPIO0_32KHZ_RC          = 0x0,  // Select 32KHZ clock from RC Oscillator
+        GPIO0_32KHZ_CRYSTAL     = 0x1,  // Select 32KHZ from 32K Crystal Oscillator
+        GPIO0_32KHZ_CLOCK_DIV   = 0x2,  // Select 32KHz from Clock Divider
     };
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_CM_MPU_Type Registers **********************************************************************/ 
     
-    typedef struct 
-    {    
-        __R    uint32_t                   RESERVED1[1];       // (0x00)                                                              
-        __RW   TIMER7_CLK_reg_t           TIMER7_CLK;         // (0x04)  
-        __RW   TIMER2_CLK_reg_t           TIMER2_CLK;         // (0x08) 
-        __RW   TIMER3_CLK_reg_t           TIMER3_CLK;         // (0x0C) 
-        __RW   TIMER4_CLK_reg_t           TIMER4_CLK;         // (0x10) 
-        __RW   MAC_CLKSEL_reg_t           MAC_CLKSEL;         // (0x14) 
-        __RW   TIMER5_CLK_reg_t           TIMER5_CLK;         // (0x18) 
-        __RW   TIMER6_CLK_reg_t           TIMER6_CLK;         // (0x1C) 
-        __RW   CPTS_RFT_CLKSEL_reg_t      CPTS_RFT_CLKSEL;    // (0x20)
-        __R    uint32_t                   RESERVED2[1];       // (0x24)  
-        __RW   TIMER1MS_CLK_reg_t         TIMER1MS_CLK;       // (0x28) 
-        __RW   GFX_FCLK_reg_t             GFX_FCLK;           // (0x2C) 
-        __RW   PRU_ICSS_OCP_CLK_reg_t     PRU_ICSS_OCP_CLK;   // (0x30) 
-        __RW   LCDC_PIXEL_CLK_reg_t       LCDC_PIXEL_CLK;     // (0x34)  
-        __RW   WDT1_CLK_reg_t             WDT1_CLK;           // (0x38) 
-        __RW   GPIO0_DBCLK_reg_t          GPIO0_DBCLK;        // (0x3C)     
-    } AM335x_CM_DPLL_Type; 
+/*******************************************************************************************************************************************************************************/ 
 
     /* [reset state = 0x6]*/
     typedef union 
@@ -2039,7 +1916,7 @@ namespace PRCM
         {                                          /* This register enables the domain power state transition. It controls the SW supervised clock domain state */
                                                    /* transition between ON-ACTIVE and ON-INACTIVE states.                                                      */ 
             uint32_t    CLKTRCTRL            :2;   // bit: 0,1      (RW)Clock state transition [see e_PRCM_CLKTRCTRL]               
-            uint32_t    CLKACTIVITY_MPU_CLK  :1;   // bit: 2        (R)This field indicates the state of the MPU Clock [0x0 = Inact; 0x1= Act]     
+            uint32_t    CLKACTIVITY_MPU_CLK  :1;   // bit: 2        (R)This field indicates the state of the MPU Clock [see e_PRCM_CLK_DOMAIN_ST]     
             uint32_t                         :28;  // bit: 3..31    Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -2054,17 +1931,22 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
     } MPU_CLKCTRL_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __RW   MPU_CLKSTCTRL_reg_t  MPU_CLKSTCTRL;  // (0x00)  
-        __RW   MPU_CLKCTRL_reg_t    MPU_CLKCTRL;    // (0x04)      
-    } AM335x_CM_MPU_Type;
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_CM_DEVICE_Type Registers *******************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/ 
 
     /* [reset state = 0x0]*/
     typedef union 
@@ -2102,10 +1984,16 @@ namespace PRCM
         MPU_LCD_PIXEL_CLOCK       = 0x4
     };
 
-    typedef struct 
-    {                                                                 
-        __RW   CLKOUT_CTRL_reg_t  CLKOUT_CTRL;  // (0x00)       
-    } AM335x_CM_DEVICE_Type;
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_CM_RTC_Type Registers **********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/ 
 
     /* [reset state = 0x30002]*/
     typedef union 
@@ -2135,11 +2023,17 @@ namespace PRCM
         uint32_t  reg;                           
     } RTC_CLKSTCTRL_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __RW   RTC_CLKCTRL_reg_t      RTC_CLKCTRL;  // (0x00)  
-        __RW   RTC_CLKSTCTRL_reg_t    CLKSTCTRL;    // (0x04)      
-    } AM335x_CM_RTC_Type;
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_CM_GFX_Type Registers **********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/ 
 
     /* [reset state = 0x2]*/
     typedef union 
@@ -2164,7 +2058,7 @@ namespace PRCM
             uint32_t    MODULEMODE :2;   // bit: 0,1        (RW)Control the way mandatory clocks are managed.[see e_PRCM_MODULEMODE] 
             uint32_t               :14;  // bit: 2..15      Reserved                    
             uint32_t    IDLEST     :2;   // bit: 16,17      (R)Module idle status.[see e_PRCM_IDLEST] 
-            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[0x0 = Func; 0x1= Standby]
+            uint32_t    STBYST     :1;   // bit: 18         (R)Module standby status.[see e_PRCM_STBYST]
             uint32_t               :13;  // bit: 19..31     Reserved
         } b;                                      
         uint32_t  reg;                           
@@ -2211,15 +2105,16 @@ namespace PRCM
         uint32_t  reg;                           
     } GFX_MMUDATA_CLKCTRL_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __RW   GFX_L3_CLKSTCTRL_reg_t       GFX_L3_CLKSTCTRL;       // (0x00)  
-        __RW   GFX_CLKCTRL_reg_t            GFX_CLKCTRL;            // (0x04) 
-        __R    uint32_t                     RESERVED[1];            // (0x08) 
-        __RW   L4LS_GFX_CLKSTCTRL_reg_t     L4LS_GFX_CLKSTCTRL;     // (0x0Ñ)  
-        __RW   GFX_MMUCFG_CLKCTRL_reg_t     GFX_MMUCFG_CLKCTRL;     // (0x10)
-        __RW   GFX_MMUDATA_CLKCTRL_reg_t    CLKSTCTRL;              // (0x14)     
-    } AM335x_CM_GFX_Type;    
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_CM_CEFUSE_Type Registers *******************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/    
     
     /* [reset state = 0x2]*/
     typedef union 
@@ -2249,12 +2144,16 @@ namespace PRCM
         uint32_t  reg;                           
     } CEFUSE_CLKCTRL_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __RW   CEFUSE_CLKSTCTRL_reg_t       CEFUSE_CLKSTCTRL;   // (0x00)
-        __R    uint32_t                     RESERVED[7];        // (0x04)   
-        __RW   CEFUSE_CLKCTRL_reg_t         CEFUSE_CLKCTRL;     // (0x20)      
-    } AM335x_CM_CEFUSE_Type;
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_PRM_IRQ_Type Registers *********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/ 
 
     /* [reset state = 0x0]*/
     typedef union 
@@ -2343,14 +2242,16 @@ namespace PRCM
         uint32_t  reg;                           
     } IRQENABLE_M3_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __RW   REVISION_reg_t           REVISION;           // (0x00)  
-        __RW   IRQSTATUS_MPU_reg_t      IRQSTATUS_MPU;      // (0x04) 
-        __RW   IRQENABLE_MPU_reg_t      IRQENABLE_MPU;      // (0x08)
-        __RW   IRQSTATUS_M3_reg_t       IRQSTATUS_M3;       // (0x0C)
-        __RW   IRQENABLE_M3_reg_t       IRQENABLE_M3;       // (0x10)     
-    } AM335x_PRM_IRQ_Type;
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_PRM_PER_Type Registers *********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/ 
     
     /* [reset state = 0x2]*/
     typedef union 
@@ -2362,7 +2263,7 @@ namespace PRCM
             uint32_t                  :30;   // bit: 2..31   Reserved      
         } b;                                      
         uint32_t  reg;                           
-    } RSTCTRL_reg_t;
+    } PER_RSTCTRL_reg_t;
 
     /* [reset state = 0x1E60007]*/
     typedef union 
@@ -2375,12 +2276,12 @@ namespace PRCM
             uint32_t    PER_mem_statest       :2;    // bit: 17,18   (R)PER domain memory state status [see e_PWRSTST_MPU] 
             uint32_t                          :1;    // bit: 19      Reserved  
             uint32_t    InTransition          :1;    // bit: 20      (R)Domain transition status [0x0 = No on-going transition on power domain; 0x1 = Power domain transition is in progress] 
-            uint32_t    ram_mem_statest       :2;    // bit: 21,22   (R)OCMC RAM memory state status [see e_PWRSTST_MPU] 
+            uint32_t    ram_mem_statest       :2;    // bit: 21,22   (R)OCMC(on chip memmory controller) RAM memory state status [see e_PWRSTST_MPU] 
             uint32_t    pru_icss_mem_statest  :2;    // bit: 23,24   (R)PRU-ICSS memory state status [see e_PWRSTST_MPU]  
             uint32_t                          :7;    // bit: 25..31  Reserved 
         } b;                                      
         uint32_t  reg;                           
-    } PWRSTST_MPU_reg_t;
+    } PER_PWRSTST_reg_t;
 
     enum e_PWRSTST_MPU : uint32_t
     {
@@ -2403,13 +2304,13 @@ namespace PRCM
             uint32_t    pru_icss_mem_RETState :1;    // bit: 7       (RW) PRU-ICSS memory RET state [0x0 = off; 0x1 = ret]      
             uint32_t                          :17;   // bit: 8..24   Reserved  
             uint32_t    PER_mem_ONState       :2;    // bit: 25,26   (RW) Other memories in PER Domain ON state [0x0..0x2 = Reserved; 0x3 = Memory is ON]
-            uint32_t    ram_mem_RETState      :1;    // bit: 27      (RW) OCMC RAM memory RET state [0x0 = off; 0x1 = ret]   
+            uint32_t    ram_mem_RETState      :1;    // bit: 27      (RW) OCMC(on chip memmory controller) RAM memory RET state [0x0 = off; 0x1 = ret]   
             uint32_t                          :1;    // bit: 28      Reserved  
             uint32_t    PER_mem_RETState      :1;    // bit: 29      (RW) Other memories in PER Domain RET state [0x0 = off; 0x1 = ret]  
-            uint32_t    ram_mem_ONState       :2;    // bit: 30,31   (RW) OCMC RAM memory on state [see e_PWRSTST_PER]  
+            uint32_t    ram_mem_ONState       :2;    // bit: 30,31   (RW) OCMC(on chip memmory controller) RAM memory on state [see e_PWRSTST_PER]  
         } b;                                      
         uint32_t  reg;                           
-    } PWRSTCTRL_MPU_reg_t;
+    } PER_PWRSTCTRL_reg_t;
 
     enum e_PWRSTST_PER : uint32_t
     {
@@ -2419,13 +2320,16 @@ namespace PRCM
         PWR_ON           = 0x3
     };
 
-    typedef struct 
-    {                                                                 
-        __RW   RSTCTRL_reg_t          RSTCTRL;          // (0x00)
-        __R    uint32_t               RESERVED[1];      // (0x04)   
-        __R    PWRSTST_MPU_reg_t      PWRSTST;          // (0x08) 
-        __RW   PWRSTCTRL_MPU_reg_t    PWRSTCTRL;        // (0x0C)     
-    } AM335x_PRM_PER_Type;
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_PRM_WKUP_Type Registers ********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/
 
     /* [reset state = 0x8]*/
     typedef union 
@@ -2463,7 +2367,7 @@ namespace PRCM
             uint32_t    Debugss_mem_statest :2;    // bit: 17,18      (RW) WKUP domain memory state status [see e_WKUP_DOMAIN_MEM_STATE]               
             uint32_t                        :1;    // bit: 19          Reserved 
             uint32_t    InTransition        :1;    // bit: 20          (RW) Domain transition status [0x0 = No on-going transition; 0x1 = Power domain transition is in progress]
-            uint32_t                        :11;    // bit: 21..31      Reserved   
+            uint32_t                        :11;   // bit: 21..31      Reserved   
         } b;                                      
         uint32_t  reg;                           
     } WKUP_PWRSTST_reg_t;
@@ -2489,13 +2393,16 @@ namespace PRCM
         uint32_t  reg;                           
     } WKUP_RSTST_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __RW   WKUP_RSTCTRL_reg_t          WKUP_RSTCTRL;       // (0x00)
-        __RW   WKUP_PWRSTCTRL_reg_t        WKUP_PWRSTCTRL;      // (0x04)   
-        __RW   WKUP_PWRSTST_reg_t          WKUP_PWRSTST;       // (0x08) 
-        __RW   WKUP_RSTST_reg_t            WKUP_RSTST;         // (0x0C)     
-    } AM335x_PRM_WKUP_Type;
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_PRM_MPU_Type Registers *********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/
 
 
     /* [reset state = 0x1FF0007]*/
@@ -2546,7 +2453,7 @@ namespace PRCM
             uint32_t    MPU_L1_StateSt        :2;    // bit: 6,7     (R) MPU L1 memory state status [see e_PWR_STATE_MEM_STS] 
             uint32_t    MPU_L2_StateSt        :2;    // bit: 8,9     (R) MPU L2 memory state status [see e_PWR_STATE_MEM_STS] 
             uint32_t                          :10;   // bit: 10..19  Reserved
-            uint32_t    MPU_L1_ONState        :1;    // bit: 20      (R) Domain transition status [0x0 = No on-going transition; 0x1 = transition is in progress.]  
+            uint32_t    InTransition          :1;    // bit: 20      (R) Domain transition status [0x0 = No on-going transition; 0x1 = transition is in progress.]  
             uint32_t                          :11;   // bit: 22      Reserved  
         } b;                                      
         uint32_t  reg;                           
@@ -2580,12 +2487,16 @@ namespace PRCM
         uint32_t  reg;                           
     } MPU_RSTST_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __RW   MPU_PWRSTCTRL_reg_t      MPU_PWRSTCTRL;    // (0x00)
-        __RW   MPU_PWRSTST_reg_t        MPU_PWRSTST;      // (0x04)   
-        __RW   MPU_RSTST_reg_t          MPU_RSTST;        // (0x08)      
-    } AM335x_PRM_MPU_Type;
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_PRM_DEVICE_Type Registers ******************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/
 
     /* [reset state = 0x0]*/
     typedef union 
@@ -2594,7 +2505,7 @@ namespace PRCM
         {                                           /* Global software cold and warm reset control. This register is auto-cleared. Only write 1 is possible. A readreturns 0 only. */
             uint32_t    RST_GLOBAL_WARM_SW   :1;    // bit: 0          (W) Global WARM software reset control. [0x0 = Global COLD; 0x1 = Asserts a global COLD software reset.] 
             uint32_t    RST_GLOBAL_COLD_SW   :1;    // bit: 1          (W) Global COLD software reset control. [0x0 = Global warm software reset is cleared.; 0x1 = Asserts a global warm software reset.]                
-            uint32_t                         :25;   // bit: 2..31      Reserved   
+            uint32_t                         :30;   // bit: 2..31      Reserved   
         } b;                                      
         uint32_t  reg;                           
     } PRM_RSTCTRL_reg_t;
@@ -2710,19 +2621,16 @@ namespace PRCM
         uint32_t  reg;                           
     } PRM_LDO_SRAM_MPU_CTRL_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __W    PRM_RSTCTRL_reg_t                  PRM_RSTCTRL;                 // (0x00)
-        __RW   PRM_RSTTIME_reg_t                  PRM_RSTTIME;                 // (0x04)   
-        __RW   PRM_RSTST_reg_t                    PRM_RSTST;                   // (0x08)
-        __RW   PRM_SRAM_COUNT_reg_t               PRM_SRAM_COUNT;              // (0x0C)
-        __RW   PRM_LDO_SRAM_CORE_SETUP_reg_t      PRM_LDO_SRAM_CORE_SETUP;     // (0x10)   
-        __RW   PRM_LDO_SRAM_CORE_CTRL_reg_t       PRM_LDO_SRAM_CORE_CTRL;      // (0x14) 
-        __RW   PRM_LDO_SRAM_MPU_SETUP_reg_t       PRM_LDO_SRAM_MPU_SETUP;      // (0x18)   
-        __RW   PRM_LDO_SRAM_MPU_CTRL_reg_t        PRM_LDO_SRAM_MPU_CTRL;       // (0x1C)      
-    } AM335x_PRM_DEVICE_Type;
 
 
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_PRM_RTC_Type Registers *********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/
     /* [reset state = 0x4]*/
     typedef union 
     { 
@@ -2751,11 +2659,17 @@ namespace PRCM
         uint32_t  reg;                           
     } RTC_PWRSTST_reg_t;
 
-    typedef struct 
-    {                                                                 
-        __RW    RTC_PWRSTCTRL_reg_t     RTC_PWRSTCTRL; // (0x00)
-        __R     RTC_PWRSTST_reg_t       RTC_PWRSTST;   // (0x04)        
-    } AM335x_PRM_RTC_Type;
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_PRM_GFX_Type Registers *********************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/
 
     /* [reset state = 0x60044]*/
     typedef union 
@@ -2838,14 +2752,17 @@ namespace PRCM
         uint32_t  reg;                           
     } RM_GFX_RSTST_reg_t; 
 
-    typedef struct 
-    {                                                                 
-        __RW    PM_GFX_PWRSTCTRL_reg_t    PM_GFX_PWRSTCTRL; // (0x00)
-        __RW    RM_GFX_RSTCTRL_reg_t      RM_GFX_RSTCTRL;   // (0x04)
-        __R     uint32_t                  RESERVED[2];
-        __R     PM_GFX_PWRSTST_reg_t      PM_GFX_PWRSTST;   // (0x10)
-        __RW    RM_GFX_RSTST_reg_t        RM_GFX_RSTST;     // (0x14)         
-    } AM335x_PRM_GFX_Type;
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/  
+
+/*************************************************************************** AM335x_PRM_CEFUSE_Type Registers ******************************************************************/ 
+    
+/*******************************************************************************************************************************************************************************/
 
     /* [reset state = 0x0]*/
     typedef union 
@@ -2893,29 +2810,305 @@ namespace PRCM
         CEFUSE_STS_ON_STATE   = 0x3      
     };
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////    ALL PRCM MODULE REGISTERS BLOCKS   //////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    typedef struct 
+    {                                                                                      
+        __RW  L4LS_CLKSTCTRL_reg_t        L4LS_CLKSTCTRL;      // (0x00)  
+        __RW  L3S_CLKSTCTRL_reg_t         L3S_CLKSTCTRL;       // (0x04) 
+        __R   uint32_t                    RESERVED1[1]; 
+        __RW  L3_CLKSTCTRL_reg_t          L3_CLKSTCTRL;        // (0x0C) 
+        __R   uint32_t                    RESERVED2[1];  
+        __RW  CPGMAC0_CLKCTRL_reg_t       CPGMAC0_CLKCTRL;     // (0x14)  
+        __RW  LCDC_CLKCTRL_reg_t          LCDC_CLKCTRL;        // (0x18)  
+        __RW  USB0_CLKCTRL_reg_t          USB0_CLKCTRL;        // (0x1C)
+        __R   uint32_t                    RESERVED3[1];   
+        __RW  TPTC0_CLKCTRL_reg_t         TPTC0_CLKCTRL;       // (0x24)  
+        __RW  EMIF_CLKCTRL_reg_t          EMIF_CLKCTRL;        // (0x28)  
+        __RW  OCMCRAM_CLKCTRL_reg_t       OCMCRAM_CLKCTRL;     // (0x2C)  
+        __RW  GPMC_CLKCTRL_reg_t          GPMC_CLKCTRL;        // (0x30)  
+        __RW  MCASP0_CLKCTRL_reg_t        MCASP0_CLKCTRL;      // (0x34)  
+        __RW  UART5_CLKCTRL_reg_t         UART5_CLKCTRL;       // (0x38)  
+        __RW  MMC0_CLKCTRL_reg_t          MMC0_CLKCTRL;        // (0x3C)  
+        __RW  ELM_CLKCTRL_reg_t           ELM_CLKCTRL;         // (0x40)  
+        __RW  I2C2_CLKCTRL_reg_t          I2C2_CLKCTRL;        // (0x44)  
+        __RW  I2C1_CLKCTRL_reg_t          I2C1_CLKCTRL;        // (0x48)  
+        __RW  SPI0_CLKCTRL_reg_t          SPI0_CLKCTRL;        // (0x4C) 
+        __RW  SPI1_CLKCTRL_reg_t          SPI1_CLKCTRL;        // (0x50) 
+        __R   uint32_t                    RESERVED4[3];  
+        __RW  L4LS_CLKCTRL_reg_t          L4LS_CLKCTRL;        // (0x60)
+        __R   uint32_t                    RESERVED5[1];   
+        __RW  MCASP1_CLKCTRL_reg_t        MCASP1_CLKCTRL;      // (0x68)  
+        __RW  UART1_CLKCTRL_reg_t         UART1_CLKCTRL;       // (0x6C)  
+        __RW  UART2_CLKCTRL_reg_t         UART2_CLKCTRL;       // (0x70)  
+        __RW  UART3_CLKCTRL_reg_t         UART3_CLKCTRL;       // (0x74)  
+        __RW  UART4_CLKCTRL_reg_t         UART4_CLKCTRL;       // (0x78)  
+        __RW  TIMER7_CLKCTRL_reg_t        TIMER7_CLKCTRL;      // (0x7C)  
+        __RW  TIMER2_CLKCTRL_reg_t        TIMER2_CLKCTRL;      // (0x80)  
+        __RW  TIMER3_CLKCTRL_reg_t        TIMER3_CLKCTRL;      // (0x84)  
+        __RW  TIMER4_CLKCTRL_reg_t        TIMER4_CLKCTRL;      // (0x88)
+        __R   uint32_t                    RESERVED6[8];   
+        __RW  GPIO1_CLKCTRL_reg_t         GPIO1_CLKCTRL;       // (0xAC)  
+        __RW  GPIO2_CLKCTRL_reg_t         GPIO2_CLKCTRL;       // (0xB0)  
+        __RW  GPIO3_CLKCTRL_reg_t         GPIO3_CLKCTRL;       // (0xB4)
+        __R   uint32_t                    RESERVED7[1];
+        __RW  TPCC_CLKCTRL_reg_t          TPCC_CLKCTRL;        // (0xBC)  
+        __RW  DCAN0_CLKCTRL_reg_t         DCAN0_CLKCTRL;       // (0xC0)  
+        __RW  DCAN1_CLKCTRL_reg_t         DCAN1_CLKCTRL;       // (0xC4)
+        __R   uint32_t                    RESERVED8[1];
+        __RW  EPWMSS1_CLKCTRL_reg_t       EPWMSS1_CLKCTRL;     // (0xCC) 
+        __R   uint32_t                    RESERVED9[1]; 
+        __RW  EPWMSS0_CLKCTRL_reg_t       EPWMSS0_CLKCTRL;     // (0xD4)  
+        __RW  EPWMSS2_CLKCTRL_reg_t       EPWMSS2_CLKCTRL;     // (0xD8)  
+        __RW  L3_INSTR_CLKCTRL_reg_t      L3_INSTR_CLKCTRL;    // (0xDC)  
+        __RW  L3_CLKCTRL_reg_t            L3_CLKCTRL;          // (0xE0) 
+        __RW  IEEE5000_CLKCTRL_reg_t      IEEE5000_CLKCTRL;    // (0xE4)  
+        __RW  PRU_ICSS_CLKCTRL_reg_t      PRU_ICSS_CLKCTRL;    // (0xE8)  
+        __RW  TIMER5_CLKCTRL_reg_t        TIMER5_CLKCTRL;      // (0xEC)  
+        __RW  TIMER6_CLKCTRL_reg_t        TIMER6_CLKCTRL;      // (0xF0)  
+        __RW  MMC1_CLKCTRL_reg_t          MMC1_CLKCTRL;        // (0xF4)  
+        __RW  MMC2_CLKCTRL_reg_t          MMC2_CLKCTRL;        // (0xF8) 
+        __RW  TPTC1_CLKCTRL_reg_t         TPTC1_CLKCTRL;       // (0xFC)  
+        __RW  TPTC2_CLKCTRL_reg_t         TPTC2_CLKCTRL;       // (0x100)  
+        __R   uint32_t                    RESERVED10[2]; 
+        __RW  SPINLOCK_CLKCTRL_reg_t      SPINLOCK_CLKCTRL;    // (0x10C)  
+        __RW  MAILBOX0_CLKCTRL_reg_t      MAILBOX0_CLKCTRL;    // (0x110)
+        __R   uint32_t                    RESERVED11[2];  
+        __RW  L4HS_CLKSTCTRL_reg_t        L4HS_CLKSTCTRL;      // (0x11C)  
+        __RW  L4HS_CLKCTRL_reg_t          L4HS_CLKCTRL;        // (0x120)
+        __R   uint32_t                    RESERVED12[2];  
+        __RW  OCPWP_L3_CLKSTCTRL_reg_t    OCPWP_L3_CLKSTCTRL;  // (0x12C) 
+        __RW  OCPWP_CLKCTRL_reg_t         OCPWP_CLKCTRL;       // (0x130) 
+        __R   uint32_t                    RESERVED13[3];  
+        __RW  PRUICSS_CLKSTCTRL_reg_t     PRUICSS_CLKSTCTRL;   // (0x140)  
+        __RW  CPSW_CLKSTCTRL_reg_t        CPSW_CLKSTCTRL;      // (0x144) 
+        __RW  LCDC_CLKSTCTRL_reg_t        LCDC_CLKSTCTRL;      // (0x148)  
+        __RW  CLKDIV32K_CLKCTRL_reg_t     CLKDIV32K_CLKCTRL;   // (0x14C) 
+        __RW  CLKSTCTRL_24MHz_reg_t       CLKSTCTRL_24MHz;     // (0x150)                                                                                     
+    } AM335x_CM_PER_Type; 
+
+    typedef struct 
+    {                                                                                      
+        __RW   CLKSTCTRL_reg_t                    CLKSTCTRL;                 // (0x00)  
+        __RW   CONTROL_CLKCTRL_reg_t              CONTROL_CLKCTRL;           // (0x04) 
+        __RW   GPIO0_CLKCTRL_reg_t                GPIO0_CLKCTRL;             // (0x08) 
+        __RW   L4WKUP_CLKCTRL_reg_t               L4WKUP_CLKCTRL;            // (0x0C) 
+        __RW   TIMER0_CLKCTRL_reg_t               TIMER0_CLKCTRL;            // (0x10) 
+        __RW   DEBUGSS_CLKCTRL_reg_t              DEBUGSS_CLKCTRL;           // (0x14) 
+        __RW   L3_AON_CLKSTCTRL_reg_t             L3_AON_CLKSTCTRL;          // (0x18) 
+        __RW   AUTOIDLE_DPLL_MPU_reg_t            AUTOIDLE_DPLL_MPU;         // (0x1C)  //This feature is not supported!
+        __R    IDLEST_DPLL_MPU_reg_t              IDLEST_DPLL_MPU;           // (0x20) 
+        __RW   SSC_DELTAMSTEP_DPLL_MPU_reg_t      SSC_DELTAMSTEP_DPLL_MPU;   // (0x24) 
+        __RW   SSC_MODFREQDIV_DPLL_MPU_reg_t      SSC_MODFREQDIV_DPLL_MPU;   // (0x28)  
+        __RW   CLKSEL_DPLL_MPU_reg_t              CLKSEL_DPLL_MPU;           // (0x2C) 
+        __RW   AUTOIDLE_DPLL_DDR_reg_t            AUTOIDLE_DPLL_DDR;         // (0x30)  //AUTO_DPLL_MODE is not supported!    
+        __R    IDLEST_DPLL_DDR_reg_t              IDLEST_DPLL_DDR;           // (0x34) 
+        __RW   SSC_DELTAMSTEP_DPLL_DDR_reg_t      SSC_DELTAMSTEP_DPLL_DDR;   // (0x38) 
+        __RW   SSC_MODFREQDIV_DPLL_DDR_reg_t      SSC_MODFREQDIV_DPLL_DDR;   // (0x3C) 
+        __RW   CLKSEL_DPLL_DDR_reg_t              CLKSEL_DPLL_DDR;           // (0x40) 
+        __RW   AUTOIDLE_DPLL_DISP_reg_t           AUTOIDLE_DPLL_DISP;        // (0x44)  //AUTO_DPLL_MODE is not supported!
+        __R    IDLEST_DPLL_DISP_reg_t             IDLEST_DPLL_DISP;          // (0x48) 
+        __RW   SSC_DELTAMSTEP_DPLL_DISP_reg_t     SSC_DELTAMSTEP_DPLL_DISP;  // (0x4C) 
+        __RW   SSC_MODFREQDIV_DPLL_DISP_reg_t     SSC_MODFREQDIV_DPLL_DISP;  // (0x50)  
+        __RW   CLKSEL_DPLL_DISP_reg_t             CLKSEL_DPLL_DISP;          // (0x54) 
+        __RW   AUTOIDLE_DPLL_CORE_reg_t           AUTOIDLE_DPLL_CORE;        // (0x58)  //AUTO_DPLL_MODE is not supported! 
+        __R    IDLEST_DPLL_CORE_reg_t             IDLEST_DPLL_CORE;          // (0x5C) 
+        __RW   SSC_DELTAMSTEP_DPLL_CORE_reg_t     SSC_DELTAMSTEP_DPLL_CORE;  // (0x60) 
+        __RW   SSC_MODFREQDIV_DPLL_CORE_reg_t     SSC_MODFREQDIV_DPLL_CORE;  // (0x64) 
+        __RW   CLKSEL_DPLL_CORE_reg_t             CLKSEL_DPLL_CORE;          // (0x68) 
+        __RW   AUTOIDLE_DPLL_PER_reg_t            AUTOIDLE_DPLL_PER;         // (0x6C)  //AUTO_DPLL_MODE is not supported. 
+        __R    IDLEST_DPLL_PER_reg_t              IDLEST_DPLL_PER;           // (0x70) 
+        __RW   SSC_DELTAMSTEP_DPLL_PER_reg_t      SSC_DELTAMSTEP_DPLL_PER;   // (0x74) 
+        __RW   SSC_MODFREQDIV_DPLL_PER_reg_t      SSC_MODFREQDIV_DPLL_PER;   // (0x78)  
+        __RW   CLKDCOLDO_DPLL_PER_reg_t           CLKDCOLDO_DPLL_PER;        // (0x7C) 
+        __RW   DIV_M4_DPLL_CORE_reg_t             DIV_M4_DPLL_CORE;          // (0x80) 
+        __RW   DIV_M5_DPLL_CORE_reg_t             DIV_M5_DPLL_CORE;          // (0x84) 
+        __RW   CLKMODE_DPLL_MPU_reg_t             CLKMODE_DPLL_MPU;          // (0x88) 
+        __RW   CLKMODE_DPLL_PER_reg_t             CLKMODE_DPLL_PER;          // (0x8C) 
+        __RW   CLKMODE_DPLL_CORE_reg_t            CLKMODE_DPLL_CORE;         // (0x90) 
+        __RW   CLKMODE_DPLL_DDR_reg_t             CLKMODE_DPLL_DDR;          // (0x94) 
+        __RW   CLKMODE_DPLL_DISP_reg_t            CLKMODE_DPLL_DISP;         // (0x98) 
+        __RW   CLKSEL_DPLL_PERIPH_reg_t           CLKSEL_DPLL_PERIPH;        // (0x9C) 
+        __RW   DIV_M2_DPLL_DDR_reg_t              DIV_M2_DPLL_DDR;           // (0xA0)  
+        __RW   DIV_M2_DPLL_DISP_reg_t             DIV_M2_DPLL_DISP;          // (0xA4) 
+        __RW   DIV_M2_DPLL_MPU_reg_t              DIV_M2_DPLL_MPU;           // (0xA8) 
+        __RW   DIV_M2_DPLL_PER_reg_t              DIV_M2_DPLL_PER;           // (0xAC) 
+        __RW   WKUP_M3_CLKCTRL_reg_t              WKUP_M3_CLKCTRL;           // (0xB0) 
+        __RW   UART0_CLKCTRL_reg_t                UART0_CLKCTRL;             // (0xB4) 
+        __RW   I2C0_CLKCTRL_reg_t                 I2C0_CLKCTRL;              // (0xB8) 
+        __RW   ADC_TSC_CLKCTRL_reg_t              ADC_TSC_CLKCTRL;           // (0xBC) 
+        __RW   SMARTREFLEX0_CLKCTRL_reg_t         SMARTREFLEX0_CLKCTRL;      // (0xC0) 
+        __RW   TIMER1_CLKCTRL_reg_t               TIMER1_CLKCTRL;            // (0xC4)
+        __RW   SMARTREFLEX1_CLKCTRL_reg_t         SMARTREFLEX1_CLKCTRL;      // (0xC8) 
+        __RW   L4_WKUP_AON_CLKSTCTRL_reg_t        L4_WKUP_AON_CLKSTCTRL;     // (0xCC) 
+        __R    uint32_t                           RESERVED[1];
+        __RW   WDT1_CLKCTRL_reg_t                 WDT1_CLKCTRL;              // (0xD4) 
+        __RW   DIV_M6_DPLL_CORE_reg_t             DIV_M6_DPLL_CORE;          // (0xD8)
+    } AM335x_CM_WKUP_Type;
+
+    typedef struct 
+    {    
+        __R    uint32_t                   RESERVED1[1];       // (0x00)                                                              
+        __RW   TIMER7_CLK_reg_t           TIMER7_CLK;         // (0x04)  
+        __RW   TIMER2_CLK_reg_t           TIMER2_CLK;         // (0x08) 
+        __RW   TIMER3_CLK_reg_t           TIMER3_CLK;         // (0x0C) 
+        __RW   TIMER4_CLK_reg_t           TIMER4_CLK;         // (0x10) 
+        __RW   MAC_CLKSEL_reg_t           MAC_CLKSEL;         // (0x14) 
+        __RW   TIMER5_CLK_reg_t           TIMER5_CLK;         // (0x18) 
+        __RW   TIMER6_CLK_reg_t           TIMER6_CLK;         // (0x1C) 
+        __RW   CPTS_RFT_CLKSEL_reg_t      CPTS_RFT_CLKSEL;    // (0x20)
+        __R    uint32_t                   RESERVED2[1];       // (0x24)  
+        __RW   TIMER1MS_CLK_reg_t         TIMER1MS_CLK;       // (0x28) 
+        __RW   GFX_FCLK_reg_t             GFX_FCLK;           // (0x2C) 
+        __RW   PRU_ICSS_OCP_CLK_reg_t     PRU_ICSS_OCP_CLK;   // (0x30) 
+        __RW   LCDC_PIXEL_CLK_reg_t       LCDC_PIXEL_CLK;     // (0x34)  
+        __RW   WDT1_CLK_reg_t             WDT1_CLK;           // (0x38) 
+        __RW   GPIO0_DBCLK_reg_t          GPIO0_DBCLK;        // (0x3C)     
+    } AM335x_CM_DPLL_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   MPU_CLKSTCTRL_reg_t  MPU_CLKSTCTRL;  // (0x00)  
+        __RW   MPU_CLKCTRL_reg_t    MPU_CLKCTRL;    // (0x04)      
+    } AM335x_CM_MPU_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   CLKOUT_CTRL_reg_t  CLKOUT_CTRL;  // (0x00)       
+    } AM335x_CM_DEVICE_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   RTC_CLKCTRL_reg_t      RTC_CLKCTRL;  // (0x00)  
+        __RW   RTC_CLKSTCTRL_reg_t    CLKSTCTRL;    // (0x04)      
+    } AM335x_CM_RTC_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   GFX_L3_CLKSTCTRL_reg_t       GFX_L3_CLKSTCTRL;       // (0x00)  
+        __RW   GFX_CLKCTRL_reg_t            GFX_CLKCTRL;            // (0x04) 
+        __R    uint32_t                     RESERVED[1];            // (0x08) 
+        __RW   L4LS_GFX_CLKSTCTRL_reg_t     L4LS_GFX_CLKSTCTRL;     // (0x0Ñ)  
+        __RW   GFX_MMUCFG_CLKCTRL_reg_t     GFX_MMUCFG_CLKCTRL;     // (0x10)
+        __RW   GFX_MMUDATA_CLKCTRL_reg_t    CLKSTCTRL;              // (0x14)     
+    } AM335x_CM_GFX_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   CEFUSE_CLKSTCTRL_reg_t       CEFUSE_CLKSTCTRL;   // (0x00)
+        __R    uint32_t                     RESERVED[7];        // (0x04..0x1C) 
+        __RW   CEFUSE_CLKCTRL_reg_t         CEFUSE_CLKCTRL;     // (0x20)      
+    } AM335x_CM_CEFUSE_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   REVISION_reg_t           REVISION;           // (0x00)  
+        __RW   IRQSTATUS_MPU_reg_t      IRQSTATUS_MPU;      // (0x04) 
+        __RW   IRQENABLE_MPU_reg_t      IRQENABLE_MPU;      // (0x08)
+        __RW   IRQSTATUS_M3_reg_t       IRQSTATUS_M3;       // (0x0C)
+        __RW   IRQENABLE_M3_reg_t       IRQENABLE_M3;       // (0x10)     
+    } AM335x_PRM_IRQ_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   PER_RSTCTRL_reg_t      PER_RSTCTRL;      // (0x00)
+        __R    uint32_t               RESERVED[1];      // (0x04)   
+        __R    PER_PWRSTST_reg_t      PER_PWRSTST;      // (0x08) 
+        __RW   PER_PWRSTCTRL_reg_t    PER_PWRSTCTRL;    // (0x0C)     
+    } AM335x_PRM_PER_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   WKUP_RSTCTRL_reg_t          WKUP_RSTCTRL;       // (0x00)
+        __RW   WKUP_PWRSTCTRL_reg_t        WKUP_PWRSTCTRL;      // (0x04)   
+        __RW   WKUP_PWRSTST_reg_t          WKUP_PWRSTST;       // (0x08) 
+        __RW   WKUP_RSTST_reg_t            WKUP_RSTST;         // (0x0C)     
+    } AM335x_PRM_WKUP_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW   MPU_PWRSTCTRL_reg_t      MPU_PWRSTCTRL;    // (0x00)
+        __RW   MPU_PWRSTST_reg_t        MPU_PWRSTST;      // (0x04)   
+        __RW   MPU_RSTST_reg_t          MPU_RSTST;        // (0x08)      
+    } AM335x_PRM_MPU_Type;
+
+    typedef struct 
+    {                                                                 
+        __W    PRM_RSTCTRL_reg_t                  PRM_RSTCTRL;                 // (0x00)
+        __RW   PRM_RSTTIME_reg_t                  PRM_RSTTIME;                 // (0x04)   
+        __RW   PRM_RSTST_reg_t                    PRM_RSTST;                   // (0x08)
+        __RW   PRM_SRAM_COUNT_reg_t               PRM_SRAM_COUNT;              // (0x0C)
+        __RW   PRM_LDO_SRAM_CORE_SETUP_reg_t      PRM_LDO_SRAM_CORE_SETUP;     // (0x10)   
+        __RW   PRM_LDO_SRAM_CORE_CTRL_reg_t       PRM_LDO_SRAM_CORE_CTRL;      // (0x14) 
+        __RW   PRM_LDO_SRAM_MPU_SETUP_reg_t       PRM_LDO_SRAM_MPU_SETUP;      // (0x18)   
+        __RW   PRM_LDO_SRAM_MPU_CTRL_reg_t        PRM_LDO_SRAM_MPU_CTRL;       // (0x1C)      
+    } AM335x_PRM_DEVICE_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW    RTC_PWRSTCTRL_reg_t     RTC_PWRSTCTRL; // (0x00)
+        __R     RTC_PWRSTST_reg_t       RTC_PWRSTST;   // (0x04)        
+    } AM335x_PRM_RTC_Type;
+
+    typedef struct 
+    {                                                                 
+        __RW    PM_GFX_PWRSTCTRL_reg_t    PM_GFX_PWRSTCTRL; // (0x00)
+        __RW    RM_GFX_RSTCTRL_reg_t      RM_GFX_RSTCTRL;   // (0x04)
+        __R     uint32_t                  RESERVED[2];
+        __R     PM_GFX_PWRSTST_reg_t      PM_GFX_PWRSTST;   // (0x10)
+        __RW    RM_GFX_RSTST_reg_t        RM_GFX_RSTST;     // (0x14)         
+    } AM335x_PRM_GFX_Type;
+
     typedef struct 
     {                                                                 
         __RW    CEFUSE_PWRSTCTRL_reg_t    CEFUSE_PWRSTCTRL; // (0x00)
         __RW    CEFUSE_PWRSTST_reg_t      CEFUSE_PWRSTST;   // (0x04)         
     } AM335x_PRM_CEFUSE_Type;
 
-    constexpr AM335x_CM_PER_Type * AM335x_CM_PER            = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
-    constexpr AM335x_CM_WKUP_Type * AM335x_CM_WKUP          = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
-    constexpr AM335x_CM_DPLL_Type * AM335x_CM_DPLL          = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE);
-    constexpr AM335x_CM_MPU_Type * AM335x_CM_MPU            = ((AM335x_CM_MPU_Type *) AM335x_CM_MPU_BASE);
-    constexpr AM335x_CM_DEVICE_Type * AM335x_CM_DEVICE      = ((AM335x_CM_DEVICE_Type *) AM335x_CM_DEVICE_BASE);
-    constexpr AM335x_CM_RTC_Type * AM335x_CM_RTC            = ((AM335x_CM_RTC_Type *) AM335x_CM_RTC_BASE);
-    constexpr AM335x_CM_GFX_Type * AM335x_CM_GFX            = ((AM335x_CM_GFX_Type *) AM335x_CM_GFX_BASE);
-    constexpr AM335x_CM_CEFUSE_Type * AM335x_CM_CEFUSE      = ((AM335x_CM_CEFUSE_Type *) AM335x_CM_CEFUSE_BASE); 
+
+    constexpr uint32_t AM335x_PRCM_BASE         = 0x44E00000; 
+    constexpr uint32_t AM335x_CM_PER_BASE       = AM335x_PRCM_BASE;       
+    constexpr uint32_t AM335x_CM_WKUP_BASE      = 0x44E00400;
+    constexpr uint32_t AM335x_CM_DPLL_BASE      = 0x44E00500;
+    constexpr uint32_t AM335x_CM_MPU_BASE       = 0x44E00600;
+    constexpr uint32_t AM335x_CM_DEVICE_BASE    = 0x44E00700;
+    constexpr uint32_t AM335x_CM_RTC_BASE       = 0x44E00800;
+    constexpr uint32_t AM335x_CM_GFX_BASE       = 0x44E00900;
+    constexpr uint32_t AM335x_CM_CEFUSE_BASE    = 0x44E00A00;
     
-    constexpr AM335x_PRM_IRQ_Type * AM335x_PRM_IRQ          = ((AM335x_PRM_IRQ_Type *) AM335x_PRM_IRQ_BASE);  
-    constexpr AM335x_PRM_PER_Type * AM335x_PRM_PER          = ((AM335x_PRM_PER_Type *) AM335x_PRM_PER_BASE);
-    constexpr AM335x_PRM_WKUP_Type * AM335x_PRM_WKUP        = ((AM335x_PRM_WKUP_Type *) AM335x_PRM_WKUP_BASE); 
-    constexpr AM335x_PRM_MPU_Type * AM335x_PRM_MPU          = ((AM335x_PRM_MPU_Type *) AM335x_PRM_MPU_BASE); 
-    constexpr AM335x_PRM_DEVICE_Type * AM335x_PRM_DEVICE    = ((AM335x_PRM_DEVICE_Type *) AM335x_PRM_DEVICE_BASE); 
-    constexpr AM335x_PRM_RTC_Type * AM335x_PRM_RTC          = ((AM335x_PRM_RTC_Type *) AM335x_PRM_RTC_BASE); 
-    constexpr AM335x_PRM_GFX_Type * AM335x_PRM_GFX          = ((AM335x_PRM_GFX_Type *) AM335x_PRM_GFX_BASE); 
-    constexpr AM335x_PRM_CEFUSE_Type * AM335x_PRM_CEFUSE    = ((AM335x_PRM_CEFUSE_Type *) AM335x_PRM_CEFUSE_BASE);
+    constexpr uint32_t AM335x_PRM_IRQ_BASE      = 0x44E00B00;    
+    constexpr uint32_t AM335x_PRM_PER_BASE      = 0x44E00C00;    
+    constexpr uint32_t AM335x_PRM_WKUP_BASE     = 0x44E00D00;
+    constexpr uint32_t AM335x_PRM_MPU_BASE      = 0x44E00E00;
+    constexpr uint32_t AM335x_PRM_DEVICE_BASE   = 0x44E00F00;
+    constexpr uint32_t AM335x_PRM_RTC_BASE      = 0x44E01000;
+    constexpr uint32_t AM335x_PRM_GFX_BASE      = 0x44E01100;
+    constexpr uint32_t AM335x_PRM_CEFUSE_BASE   = 0x44E01200;
+
+    /************************************************************************ ALL POINTERS ON PRCM MODULE BLOCKS ***********************************************************************************************/
+
+    constexpr AM335x_CM_PER_Type        *AM335x_CM_PER      = ((AM335x_CM_PER_Type *) AM335x_CM_PER_BASE); 
+    constexpr AM335x_CM_WKUP_Type       *AM335x_CM_WKUP     = ((AM335x_CM_WKUP_Type *) AM335x_CM_WKUP_BASE); 
+    constexpr AM335x_CM_DPLL_Type       *AM335x_CM_DPLL     = ((AM335x_CM_DPLL_Type *) AM335x_CM_DPLL_BASE);
+    constexpr AM335x_CM_MPU_Type        *AM335x_CM_MPU      = ((AM335x_CM_MPU_Type *) AM335x_CM_MPU_BASE);
+    constexpr AM335x_CM_DEVICE_Type     *AM335x_CM_DEVICE   = ((AM335x_CM_DEVICE_Type *) AM335x_CM_DEVICE_BASE);
+    constexpr AM335x_CM_RTC_Type        *AM335x_CM_RTC      = ((AM335x_CM_RTC_Type *) AM335x_CM_RTC_BASE);
+    constexpr AM335x_CM_GFX_Type        *AM335x_CM_GFX      = ((AM335x_CM_GFX_Type *) AM335x_CM_GFX_BASE);
+    constexpr AM335x_CM_CEFUSE_Type     *AM335x_CM_CEFUSE   = ((AM335x_CM_CEFUSE_Type *) AM335x_CM_CEFUSE_BASE); 
+    
+    constexpr AM335x_PRM_IRQ_Type       *AM335x_PRM_IRQ     = ((AM335x_PRM_IRQ_Type *) AM335x_PRM_IRQ_BASE);  
+    constexpr AM335x_PRM_PER_Type       *AM335x_PRM_PER     = ((AM335x_PRM_PER_Type *) AM335x_PRM_PER_BASE);
+    constexpr AM335x_PRM_WKUP_Type      *AM335x_PRM_WKUP    = ((AM335x_PRM_WKUP_Type *) AM335x_PRM_WKUP_BASE); 
+    constexpr AM335x_PRM_MPU_Type       *AM335x_PRM_MPU     = ((AM335x_PRM_MPU_Type *) AM335x_PRM_MPU_BASE); 
+    constexpr AM335x_PRM_DEVICE_Type    *AM335x_PRM_DEVICE  = ((AM335x_PRM_DEVICE_Type *) AM335x_PRM_DEVICE_BASE); 
+    constexpr AM335x_PRM_RTC_Type       *AM335x_PRM_RTC     = ((AM335x_PRM_RTC_Type *) AM335x_PRM_RTC_BASE); 
+    constexpr AM335x_PRM_GFX_Type       *AM335x_PRM_GFX     = ((AM335x_PRM_GFX_Type *) AM335x_PRM_GFX_BASE); 
+    constexpr AM335x_PRM_CEFUSE_Type    *AM335x_PRM_CEFUSE  = ((AM335x_PRM_CEFUSE_Type *) AM335x_PRM_CEFUSE_BASE);
     
     uint32_t debug_dump_CM_PER(AM335x_CM_PER_Type &sCM_PER = *AM335x_CM_PER);
     /* for testing purpose */
