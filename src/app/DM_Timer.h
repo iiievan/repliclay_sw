@@ -322,11 +322,26 @@ public:
                         uint32_t tclr;
                     }DMTIMERCONTEXT;
                     
+                    enum e_TIMER_NUM : uint8_t
+                    {   
+                        TIMER_NA  = 0x0,
+                        TIMER_0   = 0x1,
+                        TIMER_1ms = 0x2,
+                        TIMER_2   = 0x3,
+                        TIMER_3   = 0x4,
+                        TIMER_4   = 0x5,
+                        TIMER_5   = 0x6,
+                        TIMER_6   = 0x7,
+                        TIMER_7   = 0x8                      
+                    };
+                      
+                    
                     DM_Timer(DMTIMER::AM335x_DMTIMER_Type * p_tmr);
                    ~DM_Timer() {}
 
 		      void  enable();
               void  disable();
+              void  timer1ms_clk_config(PRCM::e_TIMER1MS_CLKSEL clk_sel = PRCM::MS1_M_OSC);
               void  clk_config(void);
               void  mode_configure(DMTIMER::e_DMTIMER_mode mode);              
               void  prescaler_clk_enable(uint8_t ptv);
@@ -368,8 +383,10 @@ private:
                   }
               
 DMTIMER::AM335x_DMTIMER_Type *m_pTIMER; 
+                 e_TIMER_NUM  m_timer_num { TIMER_NA };
     PRCM::AM335x_CM_PER_Type &m_sCM_PER;
    PRCM::AM335x_CM_DPLL_Type &m_sCM_DPLL;
+   PRCM::AM335x_CM_WKUP_Type &m_sCM_WKUP;
     
                void (*m_irq_handler)(void *p_obj) { nullptr };
            uint64_t  m_time {0}; // the timer itself
@@ -377,5 +394,11 @@ DMTIMER::AM335x_DMTIMER_Type *m_pTIMER;
 }; 
  
 extern     void DMTimer_irqhandler(void *p_obj);
+extern DM_Timer dm_timer_1ms;
 extern DM_Timer dm_timer_2;
+extern DM_Timer dm_timer_3;
+extern DM_Timer dm_timer_4;
+extern DM_Timer dm_timer_5;
+extern DM_Timer dm_timer_6;
+extern DM_Timer dm_timer_7;
 #endif //__DM_TIMER_H

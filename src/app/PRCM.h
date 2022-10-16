@@ -1723,10 +1723,10 @@ namespace PRCM
 
     enum e_TIMER_CLKSEL : uint32_t
     {
-        TCLKIN          = 0x0,  // Select TCLKIN clock
-        CLK_M_OSC       = 0x1,  // Select CLK_M_OSC clock
-        CLK_32KHZ       = 0x2,  // Select CLK_32KHZ clock
-        CLKSEL_RESERVED = 0x3   // Reserved
+        TCLKIN          = 0x0,  // SEL1: Select TCLKIN clock
+        CLK_M_OSC       = 0x1,  // SEL2: Select CLK_M_OSC clock
+        CLK_32KHZ       = 0x2,  // SEL3: Select CLK_32KHZ clock
+        CLKSEL_RESERVED = 0x3   // SEL4 : Reserved
     };
 
     /* [reset state = 0x1]*/
