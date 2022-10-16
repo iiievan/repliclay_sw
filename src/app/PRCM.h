@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 #include "app_utils.h"
+#include "DM_Timer.h"
+
 
 //This is power reset clock manager class and his namespace
 namespace PRCM
@@ -3132,6 +3134,37 @@ namespace PRCM
           return SIZEOF_CM_PER;
     }
 }
+
+class power_reset_clock_control
+{
+public:
+        enum e_TIMER_NUM : uint8_t
+        {   
+            TIMER_NA  = 0x0,
+            TIMER_0   = 0x1,
+            TIMER_1ms = 0x2,
+            TIMER_2   = 0x3,
+            TIMER_3   = 0x4,
+            TIMER_4   = 0x5,
+            TIMER_5   = 0x6,
+            TIMER_6   = 0x7,
+            TIMER_7   = 0x8                      
+        };
+  
+        power_reset_clock_control();
+        ~power_reset_clock_control(){}
+        
+    void run_clk_interconnects();
+    void define_DMTIMER_number(DMTIMER::AM335x_DMTIMER_Type * p_tmr);
+    void run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type * p_tmr);
+    void run_clk_DMTIMER_1ms(); // only for DMTIMER 1
+    void run_clk_DMTIMER_6();   
+private:
+   e_TIMER_NUM  m_timer_num { TIMER_NA };
+   PRCM::AM335x_CM_PER_Type &m_sCM_PER;
+   PRCM::AM335x_CM_DPLL_Type &m_sCM_DPLL;
+   PRCM::AM335x_CM_WKUP_Type &m_sCM_WKUP;
+};
 
 
 #endif //_PRCM_H_
