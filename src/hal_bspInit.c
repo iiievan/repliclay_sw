@@ -110,7 +110,7 @@ void configure_platform(void)
 
     /* This function will enable clocks for the DMTimer2 instance */
     //DMTimer2ModuleClkConfig();
-    dm_timer_2.init();
+    OS_TIMER.init();
     /* Register DMTimer2 interrupts on to AINTC */
     DMTimerAintcConfigure();
 
@@ -162,11 +162,11 @@ static void DMTimerSetUp(void)
 {
     uint32_t dmtimer_mode =  DMTIMER::MODE_AUTORELOAD | (!DMTIMER::MODE_COMPARE); //  mode : autoreload and no compare
     /* Load the counter with the initial count value */
-    dm_timer_2.counter_set(DMTIMER2_INITIAL_COUNT);
+    OS_TIMER.counter_set(DMTIMER2_INITIAL_COUNT);
     /* Load the load register with the reload count value */
-    dm_timer_2.reload_set(DMTIMER2_RLD_COUNT);
+    OS_TIMER.reload_set(DMTIMER2_RLD_COUNT);
     /* Configure the DMTimer for Auto-reload and compare mode */
-    dm_timer_2.mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode);
+    OS_TIMER.mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode);
 }
 
 static void GPIOModuleClkConfig(CPU_INT32U x)

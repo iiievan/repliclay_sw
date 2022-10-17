@@ -385,4 +385,6 @@ extern DM_Timer dm_timer_4;
 extern DM_Timer dm_timer_5;
 extern DM_Timer dm_timer_6;
 extern DM_Timer dm_timer_7;
+
+#define OS_TIMER dm_timer_4
 #endif //__DM_TIMER_H
