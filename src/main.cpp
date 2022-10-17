@@ -23,13 +23,13 @@
 
 using namespace std;
 
-//DM_Timer dm_timer_1ms(DMTIMER::AM335X_DMTIMER_1);
-DM_Timer dm_timer_2(DMTIMER::AM335X_DMTIMER_2);
-//DM_Timer dm_timer_3(DMTIMER::AM335X_DMTIMER_3);
-//DM_Timer dm_timer_4(DMTIMER::AM335X_DMTIMER_4);
-//DM_Timer dm_timer_5(DMTIMER::AM335X_DMTIMER_5);
-//DM_Timer dm_timer_6(DMTIMER::AM335X_DMTIMER_6);
-//DM_Timer dm_timer_7(DMTIMER::AM335X_DMTIMER_7);
+//DM_Timer dm_timer_1ms(*DMTIMER::AM335X_DMTIMER_1);
+DM_Timer dm_timer_2(*DMTIMER::AM335X_DMTIMER_2);
+//DM_Timer dm_timer_3(*DMTIMER::AM335X_DMTIMER_3);
+//DM_Timer dm_timer_4(*DMTIMER::AM335X_DMTIMER_4);
+//DM_Timer dm_timer_5(*DMTIMER::AM335X_DMTIMER_5);
+//DM_Timer dm_timer_6(*DMTIMER::AM335X_DMTIMER_6);
+//DM_Timer dm_timer_7(*DMTIMER::AM335X_DMTIMER_7);
 
 #ifdef __cplusplus
 extern "C" {

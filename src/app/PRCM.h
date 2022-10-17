@@ -1,5 +1,3 @@
-
-
 #ifndef _PRCM_H_
 #define _PRCM_H_
 
@@ -7,16 +5,9 @@
 #include "app_utils.h"
 #include "DM_Timer.h"
 
-
 //This is power reset clock manager class and his namespace
 namespace PRCM
-{  
-
-
-
-
-
-
+{ 
 /*******************************************************************************************************************************************************************************/  
 
 /*************************************************************************** AM335x_CM_PER_Type Registers **********************************************************************/ 
@@ -2819,7 +2810,7 @@ namespace PRCM
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    typedef struct 
+    struct AM335x_CM_PER_Type
     {                                                                                      
         __RW  L4LS_CLKSTCTRL_reg_t        L4LS_CLKSTCTRL;      // (0x00)  
         __RW  L3S_CLKSTCTRL_reg_t         L3S_CLKSTCTRL;       // (0x04) 
@@ -2892,9 +2883,9 @@ namespace PRCM
         __RW  LCDC_CLKSTCTRL_reg_t        LCDC_CLKSTCTRL;      // (0x148)  
         __RW  CLKDIV32K_CLKCTRL_reg_t     CLKDIV32K_CLKCTRL;   // (0x14C) 
         __RW  CLKSTCTRL_24MHz_reg_t       CLKSTCTRL_24MHz;     // (0x150)                                                                                     
-    } AM335x_CM_PER_Type; 
+    }; 
 
-    typedef struct 
+    struct AM335x_CM_WKUP_Type 
     {                                                                                      
         __RW   CLKSTCTRL_reg_t                    CLKSTCTRL;                 // (0x00)  
         __RW   CONTROL_CLKCTRL_reg_t              CONTROL_CLKCTRL;           // (0x04) 
@@ -2951,9 +2942,9 @@ namespace PRCM
         __R    uint32_t                           RESERVED[1];
         __RW   WDT1_CLKCTRL_reg_t                 WDT1_CLKCTRL;              // (0xD4) 
         __RW   DIV_M6_DPLL_CORE_reg_t             DIV_M6_DPLL_CORE;          // (0xD8)
-    } AM335x_CM_WKUP_Type;
+    };
 
-    typedef struct 
+    struct AM335x_CM_DPLL_Type
     {    
         __R    uint32_t                   RESERVED1[1];       // (0x00)                                                              
         __RW   TIMER7_CLK_reg_t           TIMER7_CLK;         // (0x04)  
@@ -2971,26 +2962,26 @@ namespace PRCM
         __RW   LCDC_PIXEL_CLK_reg_t       LCDC_PIXEL_CLK;     // (0x34)  
         __RW   WDT1_CLK_reg_t             WDT1_CLK;           // (0x38) 
         __RW   GPIO0_DBCLK_reg_t          GPIO0_DBCLK;        // (0x3C)     
-    } AM335x_CM_DPLL_Type;
+    };
 
-    typedef struct 
+    struct AM335x_CM_MPU_Type
     {                                                                 
         __RW   MPU_CLKSTCTRL_reg_t  MPU_CLKSTCTRL;  // (0x00)  
         __RW   MPU_CLKCTRL_reg_t    MPU_CLKCTRL;    // (0x04)      
-    } AM335x_CM_MPU_Type;
+    };
 
-    typedef struct 
+    struct AM335x_CM_DEVICE_Type
     {                                                                 
         __RW   CLKOUT_CTRL_reg_t  CLKOUT_CTRL;  // (0x00)       
-    } AM335x_CM_DEVICE_Type;
+    };
 
-    typedef struct 
+    struct AM335x_CM_RTC_Type
     {                                                                 
         __RW   RTC_CLKCTRL_reg_t      RTC_CLKCTRL;  // (0x00)  
         __RW   RTC_CLKSTCTRL_reg_t    CLKSTCTRL;    // (0x04)      
-    } AM335x_CM_RTC_Type;
+    };
 
-    typedef struct 
+    struct AM335x_CM_GFX_Type 
     {                                                                 
         __RW   GFX_L3_CLKSTCTRL_reg_t       GFX_L3_CLKSTCTRL;       // (0x00)  
         __RW   GFX_CLKCTRL_reg_t            GFX_CLKCTRL;            // (0x04) 
@@ -2998,48 +2989,48 @@ namespace PRCM
         __RW   L4LS_GFX_CLKSTCTRL_reg_t     L4LS_GFX_CLKSTCTRL;     // (0x0Ñ)  
         __RW   GFX_MMUCFG_CLKCTRL_reg_t     GFX_MMUCFG_CLKCTRL;     // (0x10)
         __RW   GFX_MMUDATA_CLKCTRL_reg_t    CLKSTCTRL;              // (0x14)     
-    } AM335x_CM_GFX_Type;
+    };
 
-    typedef struct 
+    struct AM335x_CM_CEFUSE_Type 
     {                                                                 
         __RW   CEFUSE_CLKSTCTRL_reg_t       CEFUSE_CLKSTCTRL;   // (0x00)
         __R    uint32_t                     RESERVED[7];        // (0x04..0x1C) 
         __RW   CEFUSE_CLKCTRL_reg_t         CEFUSE_CLKCTRL;     // (0x20)      
-    } AM335x_CM_CEFUSE_Type;
+    };
 
-    typedef struct 
+    struct AM335x_PRM_IRQ_Type
     {                                                                 
         __RW   REVISION_reg_t           REVISION;           // (0x00)  
         __RW   IRQSTATUS_MPU_reg_t      IRQSTATUS_MPU;      // (0x04) 
         __RW   IRQENABLE_MPU_reg_t      IRQENABLE_MPU;      // (0x08)
         __RW   IRQSTATUS_M3_reg_t       IRQSTATUS_M3;       // (0x0C)
         __RW   IRQENABLE_M3_reg_t       IRQENABLE_M3;       // (0x10)     
-    } AM335x_PRM_IRQ_Type;
+    };
 
-    typedef struct 
+    struct AM335x_PRM_PER_Type
     {                                                                 
         __RW   PER_RSTCTRL_reg_t      PER_RSTCTRL;      // (0x00)
         __R    uint32_t               RESERVED[1];      // (0x04)   
         __R    PER_PWRSTST_reg_t      PER_PWRSTST;      // (0x08) 
         __RW   PER_PWRSTCTRL_reg_t    PER_PWRSTCTRL;    // (0x0C)     
-    } AM335x_PRM_PER_Type;
+    };
 
-    typedef struct 
+    struct AM335x_PRM_WKUP_Type
     {                                                                 
         __RW   WKUP_RSTCTRL_reg_t          WKUP_RSTCTRL;       // (0x00)
         __RW   WKUP_PWRSTCTRL_reg_t        WKUP_PWRSTCTRL;      // (0x04)   
         __RW   WKUP_PWRSTST_reg_t          WKUP_PWRSTST;       // (0x08) 
         __RW   WKUP_RSTST_reg_t            WKUP_RSTST;         // (0x0C)     
-    } AM335x_PRM_WKUP_Type;
+    };
 
-    typedef struct 
+    struct AM335x_PRM_MPU_Type
     {                                                                 
         __RW   MPU_PWRSTCTRL_reg_t      MPU_PWRSTCTRL;    // (0x00)
         __RW   MPU_PWRSTST_reg_t        MPU_PWRSTST;      // (0x04)   
         __RW   MPU_RSTST_reg_t          MPU_RSTST;        // (0x08)      
-    } AM335x_PRM_MPU_Type;
+    };
 
-    typedef struct 
+    struct AM335x_PRM_DEVICE_Type
     {                                                                 
         __W    PRM_RSTCTRL_reg_t                  PRM_RSTCTRL;                 // (0x00)
         __RW   PRM_RSTTIME_reg_t                  PRM_RSTTIME;                 // (0x04)   
@@ -3049,29 +3040,28 @@ namespace PRCM
         __RW   PRM_LDO_SRAM_CORE_CTRL_reg_t       PRM_LDO_SRAM_CORE_CTRL;      // (0x14) 
         __RW   PRM_LDO_SRAM_MPU_SETUP_reg_t       PRM_LDO_SRAM_MPU_SETUP;      // (0x18)   
         __RW   PRM_LDO_SRAM_MPU_CTRL_reg_t        PRM_LDO_SRAM_MPU_CTRL;       // (0x1C)      
-    } AM335x_PRM_DEVICE_Type;
+    };
 
-    typedef struct 
+    struct AM335x_PRM_RTC_Type
     {                                                                 
         __RW    RTC_PWRSTCTRL_reg_t     RTC_PWRSTCTRL; // (0x00)
         __R     RTC_PWRSTST_reg_t       RTC_PWRSTST;   // (0x04)        
-    } AM335x_PRM_RTC_Type;
+    };
 
-    typedef struct 
+    struct AM335x_PRM_GFX_Type
     {                                                                 
         __RW    PM_GFX_PWRSTCTRL_reg_t    PM_GFX_PWRSTCTRL; // (0x00)
         __RW    RM_GFX_RSTCTRL_reg_t      RM_GFX_RSTCTRL;   // (0x04)
         __R     uint32_t                  RESERVED[2];
         __R     PM_GFX_PWRSTST_reg_t      PM_GFX_PWRSTST;   // (0x10)
         __RW    RM_GFX_RSTST_reg_t        RM_GFX_RSTST;     // (0x14)         
-    } AM335x_PRM_GFX_Type;
+    };
 
-    typedef struct 
+    struct AM335x_PRM_CEFUSE_Type
     {                                                                 
         __RW    CEFUSE_PWRSTCTRL_reg_t    CEFUSE_PWRSTCTRL; // (0x00)
         __RW    CEFUSE_PWRSTST_reg_t      CEFUSE_PWRSTST;   // (0x04)         
-    } AM335x_PRM_CEFUSE_Type;
-
+    };
 
     constexpr uint32_t AM335x_PRCM_BASE         = 0x44E00000; 
     constexpr uint32_t AM335x_CM_PER_BASE       = AM335x_PRCM_BASE;       
@@ -3135,6 +3125,11 @@ namespace PRCM
     }
 }
 
+namespace DMTIMER
+{
+    struct AM335x_DMTIMER_Type;
+}
+
 class power_reset_clock_control
 {
 public:
@@ -3152,19 +3147,41 @@ public:
         };
   
         power_reset_clock_control();
-        ~power_reset_clock_control(){}
+       ~power_reset_clock_control(){}
         
-    void run_clk_interconnects();
-    void define_DMTIMER_number(DMTIMER::AM335x_DMTIMER_Type * p_tmr);
-    void run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type * p_tmr);
-    void run_clk_DMTIMER_1ms(); // only for DMTIMER 1
-    void run_clk_DMTIMER_6();   
+    void run_clk_interconnects(); // run L3S,L3,L4,L4LS interconnects clock
+    
+    void define_DMTIMER_number(DMTIMER::AM335x_DMTIMER_Type &p_tmr);
+    void run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type &p_tmr);
+    void run_clk_DMTIMER_1ms(PRCM::e_TIMER1MS_CLKSEL clk_sel); // only for DMTIMER 1
+    void run_clk_DMTIMER_6(); 
+    
+    void run_clk_GPIO0(); 
+    void run_clk_GPIO1();
+    
 private:
-   e_TIMER_NUM  m_timer_num { TIMER_NA };
-   PRCM::AM335x_CM_PER_Type &m_sCM_PER;
-   PRCM::AM335x_CM_DPLL_Type &m_sCM_DPLL;
-   PRCM::AM335x_CM_WKUP_Type &m_sCM_WKUP;
+    e_TIMER_NUM  m_timer_num     { TIMER_NA };
+    
+    PRCM::AM335x_CM_PER_Type     &m_sCM_PER;
+    PRCM::AM335x_CM_DPLL_Type    &m_sCM_DPLL;  
+    PRCM::AM335x_CM_WKUP_Type    &m_sCM_WKUP;   
+    PRCM::AM335x_CM_MPU_Type     &m_sCM_MPU;
+    PRCM::AM335x_CM_DEVICE_Type  &m_sCM_DEVICE;
+    PRCM::AM335x_CM_RTC_Type     &m_sCM_RTC;
+    PRCM::AM335x_CM_GFX_Type     &m_sCM_GFX;
+    PRCM::AM335x_CM_CEFUSE_Type  &m_sCM_CEFUSE;
+    
+    PRCM::AM335x_PRM_IRQ_Type    &m_sPRM_IRQ;
+    PRCM::AM335x_PRM_PER_Type    &m_sPRM_PER;
+    PRCM::AM335x_PRM_WKUP_Type   &m_sPRM_WKUP;   
+    PRCM::AM335x_PRM_MPU_Type    &m_sPRM_MPU;
+    PRCM::AM335x_PRM_DEVICE_Type &m_sPRM_DEVICE;
+    PRCM::AM335x_PRM_RTC_Type    &m_sPRM_RTC;
+    PRCM::AM335x_PRM_GFX_Type    &m_sPRM_GFX;
+    PRCM::AM335x_PRM_CEFUSE_Type &m_sPRM_CEFUSE;
 };
+
+extern power_reset_clock_control prcm_module;
 
 
 #endif //_PRCM_H_

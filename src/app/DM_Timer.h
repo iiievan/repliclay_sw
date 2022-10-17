@@ -277,7 +277,7 @@ namespace DMTIMER
         uint32_t  reg;                            // Type used for register access 
     } TCAR2_reg_t;
 
-    typedef struct 
+    struct AM335x_DMTIMER_Type 
     {                                                                                      
         __RW  TIDR_reg_t            TIDR;                    // (0x00)  Identification Register
         __R   uint32_t              RESERVED1[3];
@@ -298,7 +298,7 @@ namespace DMTIMER
         __RW  TCAR1_reg_t           TCAR1;                   // (0x50)  Timer Capture Register 1
         __RW  TSICR_reg_t           TSICR;                   // (0x54)  Timer Synchronous Interface Control Register
         __RW  TCAR2_reg_t           TCAR2;                   // (0x58)  Timer Capture Register 2                                                                                                               
-    } AM335x_DMTIMER_Type;
+    };
     
     constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_0 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_0_BASE); // only 32KHz RC Clock
     constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_1 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_1_BASE); // only 1ms timer
@@ -309,6 +309,8 @@ namespace DMTIMER
     constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_6 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_6_BASE);
     constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_7 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_7_BASE);
 } 
+
+class power_reset_clock_control;
 
 class DM_Timer
 {
@@ -322,7 +324,7 @@ public:
                         uint32_t tclr;
                     }DMTIMERCONTEXT;                      
                     
-                    DM_Timer(DMTIMER::AM335x_DMTIMER_Type * p_tmr);
+                    DM_Timer(DMTIMER::AM335x_DMTIMER_Type &p_tmr);
                    ~DM_Timer() {}
 
 		      void  enable();
@@ -363,12 +365,13 @@ private:
                   void  m_wait_for_write(DMTIMER::e_TWPS_flags twps_mask)
                   {
                       /** Wait for previous write to complete if posted mode enabled**/
-                      if(m_pTIMER->TSICR.b.POSTED)
-                          while(m_pTIMER->TWPS.reg & twps_mask);
+                      if(m_sTIMER.TSICR.b.POSTED)
+                          while(m_sTIMER.TWPS.reg & twps_mask);
                   }
               
-DMTIMER::AM335x_DMTIMER_Type *m_pTIMER; 
-    
+   DMTIMER::AM335x_DMTIMER_Type  &m_sTIMER; 
+      power_reset_clock_control  &m_sPRCM;
+
                void (*m_irq_handler)(void *p_obj) { nullptr };
            uint64_t  m_time {0}; // the timer itself
                bool  m_is_paused { true }; 

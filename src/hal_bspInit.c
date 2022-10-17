@@ -110,7 +110,7 @@ void configure_platform(void)
 
     /* This function will enable clocks for the DMTimer2 instance */
     //DMTimer2ModuleClkConfig();
-    dm_timer_2.clk_config();
+    dm_timer_2.init();
     /* Register DMTimer2 interrupts on to AINTC */
     DMTimerAintcConfigure();
 
