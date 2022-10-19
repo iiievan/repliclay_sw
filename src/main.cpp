@@ -23,7 +23,15 @@
 
 using namespace std;
 
-DM_Timer dm_timer_2(DMTIMER::AM335X_DMTIMER_2);
+#ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
+    DM_Timer dm_timer_1ms(*DMTIMER::AM335X_DMTIMER_1);
+#endif
+//DM_Timer dm_timer_2(*DMTIMER::AM335X_DMTIMER_2);
+//DM_Timer dm_timer_3(*DMTIMER::AM335X_DMTIMER_3);
+//DM_Timer dm_timer_4(*DMTIMER::AM335X_DMTIMER_4);
+DM_Timer dm_timer_5(*DMTIMER::AM335X_DMTIMER_5);
+//DM_Timer dm_timer_6(*DMTIMER::AM335X_DMTIMER_6);
+//DM_Timer dm_timer_7(*DMTIMER::AM335X_DMTIMER_7);
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,7 +74,7 @@ static  void  AppTaskStart (void *p_arg)
 	
     ConsoleUtilsPrintf("Enabling timer interrupt!\r\n");
     //DMTimerIntEnable(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_EN_FLAG);
-    dm_timer_2.IRQ_enable(DMTIMER::IRQ_OVF);
+    OS_TIMER.IRQ_enable(DMTIMER::IRQ_OVF);
 	
     Mem_Init();                                                 /* Initialize memory managment module                   */
     Math_Init();
@@ -141,15 +149,15 @@ int main()
 void DMTimer_irqhandler(void *p_obj)
 {  
     /* Disable the DMTimer interrupts */
-    dm_timer_2.IRQ_disable(DMTIMER::IRQ_OVF);
+    OS_TIMER.IRQ_disable(DMTIMER::IRQ_OVF);
     
     /* Clear the status of the interrupt flags */
-    dm_timer_2.IRQ_clear(DMTIMER::IRQ_OVF);
+    OS_TIMER.IRQ_clear(DMTIMER::IRQ_OVF);
 
     OSTimeTick();
 
     /* Enable the DMTimer interrupts */
-    dm_timer_2.IRQ_enable(DMTIMER::IRQ_OVF);
-    IntSystemEnable(SYS_INT_TINT2);  
+    OS_TIMER.IRQ_enable(DMTIMER::IRQ_OVF);
+    IntSystemEnable(OS_TIMER_INTERRUPT);  
 }
 

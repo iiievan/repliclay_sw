@@ -225,6 +225,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>am335x</state>
+                    <state>beaglebone_black</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -2685,6 +2686,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\src\app\os_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\PRCM.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\PRCM.h</name>
             </file>
         </group>
         <file>

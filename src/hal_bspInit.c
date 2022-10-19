@@ -109,8 +109,8 @@ void configure_platform(void)
     ConsoleUtilsSetType(CONSOLE_UART);
 
     /* This function will enable clocks for the DMTimer2 instance */
-    DMTimer2ModuleClkConfig();
-    
+    //DMTimer2ModuleClkConfig();
+    OS_TIMER.init();
     /* Register DMTimer2 interrupts on to AINTC */
     DMTimerAintcConfigure();
 
@@ -141,12 +141,12 @@ static void DMTimerAintcConfigure(void)
 {
     /* Registering DMTimerIsr */
     //IntRegister(SYS_INT_TINT2, DMTimerIsr);
-    BSP_IntVectReg(SYS_INT_TINT2,(CPU_FNCT_PTR)DMTimer_irqhandler);
+    BSP_IntVectReg(OS_TIMER_INTERRUPT,(CPU_FNCT_PTR)DMTimer_irqhandler);
     /* Set the priority */
-    IntPrioritySet(SYS_INT_TINT2,(configMAX_IRQ_PRIORITIES -1), AINTC_HOSTINT_ROUTE_IRQ); /* Lowest Priority */
+    IntPrioritySet(OS_TIMER_INTERRUPT,(configMAX_IRQ_PRIORITIES -1), AINTC_HOSTINT_ROUTE_IRQ); /* Lowest Priority */
 
     /* Enable the system interrupt */
-    IntSystemEnable(SYS_INT_TINT2);
+    IntSystemEnable(OS_TIMER_INTERRUPT);
 }
 
 
@@ -162,11 +162,12 @@ static void DMTimerSetUp(void)
 {
     uint32_t dmtimer_mode =  DMTIMER::MODE_AUTORELOAD | (!DMTIMER::MODE_COMPARE); //  mode : autoreload and no compare
     /* Load the counter with the initial count value */
-    dm_timer_2.counter_set(DMTIMER2_INITIAL_COUNT);
+    OS_TIMER.counter_set(DMTIMER2_INITIAL_COUNT);
     /* Load the load register with the reload count value */
-    dm_timer_2.reload_set(DMTIMER2_RLD_COUNT);
+    OS_TIMER.reload_set(DMTIMER2_RLD_COUNT);
     /* Configure the DMTimer for Auto-reload and compare mode */
-    dm_timer_2.mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode);
+    OS_TIMER.mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode);
+    OS_TIMER.enable();
 }
 
 static void GPIOModuleClkConfig(CPU_INT32U x)
