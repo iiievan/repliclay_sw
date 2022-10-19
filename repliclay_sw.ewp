@@ -225,6 +225,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>am335x</state>
+                    <state>beaglebone_black</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

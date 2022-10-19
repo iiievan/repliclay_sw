@@ -3154,6 +3154,7 @@ public:
     void define_DMTIMER_number(DMTIMER::AM335x_DMTIMER_Type &p_tmr);
     void run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type &p_tmr);
     void run_clk_DMTIMER_1ms(PRCM::e_TIMER1MS_CLKSEL clk_sel); // only for DMTIMER 1
+    void run_clk_DMTIMER_5(); 
     void run_clk_DMTIMER_6(); 
     
     void run_clk_GPIO0(); 

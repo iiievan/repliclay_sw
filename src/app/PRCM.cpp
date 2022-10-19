@@ -89,14 +89,27 @@ void power_reset_clock_control::run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type &p_
 {
     define_DMTIMER_number(p_tmr);
 
+    switch(m_timer_num)
+    {
+       case TIMER_5:
+            run_clk_DMTIMER_5();
+            return; // no need to run run_clk_interconnects() and other stuff below
+       case TIMER_6:
+            run_clk_DMTIMER_6();
+            return; // no need to run run_clk_interconnects() and other stuff below
+        case TIMER_1ms:
+        #ifndef beaglebone_black
+            run_clk_DMTIMER_1ms(PRCM::MS1_M_OSC); // such a timer has not yet been described in DM_Timer.h
+        #endif
+            return; // no need to run run_clk_interconnects() and other stuff below
+        default:
+            break;    
+    }
+    
     run_clk_interconnects();
 
     switch(m_timer_num)
     {
-        case TIMER_0:
-            break;
-        case TIMER_1ms:
-            break;
         case TIMER_2:
                 /* Select the clock source for the Timer2 instance. */
                 m_sCM_DPLL.TIMER2_CLK.b.CLKSEL = LOW;               // clear bitfield
@@ -118,7 +131,7 @@ void power_reset_clock_control::run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type &p_
                 while(m_sCM_PER.TIMER3_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);
             break;
         case TIMER_4:
-                /* Select the clock source for the Timer2 instance. */
+                /* Select the clock source for the Timer4 instance. */
                 m_sCM_DPLL.TIMER4_CLK.b.CLKSEL = LOW;               // clear bitfield
                 m_sCM_DPLL.TIMER4_CLK.b.CLKSEL = PRCM::CLK_M_OSC;   // and then set it to the desired value
                 while(m_sCM_DPLL.TIMER4_CLK.b.CLKSEL != PRCM::CLK_M_OSC);    
@@ -126,28 +139,6 @@ void power_reset_clock_control::run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type &p_
                 m_sCM_PER.TIMER4_CLKCTRL.b.MODULEMODE = PRCM::MODULEMODE_ENABLE;    
                 while(m_sCM_PER.TIMER4_CLKCTRL.b.MODULEMODE != PRCM::MODULEMODE_ENABLE);    
                 while(m_sCM_PER.TIMER4_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);
-            break;
-        case TIMER_5:
-                /* Select the clock source for the Timer5 instance. */
-                #warning Need to test, there is a discrepancy with the starterware
-                m_sCM_DPLL.TIMER5_CLK.b.CLKSEL = LOW;               // clear bitfield
-                m_sCM_DPLL.TIMER5_CLK.b.CLKSEL = PRCM::CLK_M_OSC;   // and then set it to the desired value
-                while(m_sCM_DPLL.TIMER5_CLK.b.CLKSEL != PRCM::CLK_M_OSC);    
-
-                m_sCM_PER.TIMER5_CLKCTRL.b.MODULEMODE = PRCM::MODULEMODE_ENABLE;    
-                while(m_sCM_PER.TIMER5_CLKCTRL.b.MODULEMODE != PRCM::MODULEMODE_ENABLE);    
-                while(m_sCM_PER.TIMER5_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);
-            break;
-        case TIMER_6:
-                /* Select the clock source for the Timer6 instance. */
-                #warning Need to test, there is a discrepancy with the starterware
-                m_sCM_DPLL.TIMER6_CLK.b.CLKSEL = LOW;               // clear bitfield
-                m_sCM_DPLL.TIMER6_CLK.b.CLKSEL = PRCM::CLK_M_OSC;   // and then set it to the desired value
-                while(m_sCM_DPLL.TIMER6_CLK.b.CLKSEL != PRCM::CLK_M_OSC);    
-
-                m_sCM_PER.TIMER6_CLKCTRL.b.MODULEMODE = PRCM::MODULEMODE_ENABLE;    
-                while(m_sCM_PER.TIMER6_CLKCTRL.b.MODULEMODE != PRCM::MODULEMODE_ENABLE);    
-                while(m_sCM_PER.TIMER6_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);
             break;
         case TIMER_7:
                 /* Select the clock source for the Timer7 instance. */
@@ -183,16 +174,6 @@ void power_reset_clock_control::run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type &p_
                 while((m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_L4LS_GCLK | 
                 m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_TIMER4_GCLK) == false);
             break;
-        case TIMER_5:
-                #warning Need to test, there is a discrepancy with the starterware
-                while((m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_L4LS_GCLK | 
-                m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_TIMER5_GCLK) == false);
-            break;
-        case TIMER_6:
-                #warning Need to test, there is a discrepancy with the starterware
-                while((m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_L4LS_GCLK | 
-                m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_TIMER6_GCLK) == false);
-            break;
         case TIMER_7:
                 while((m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_L4LS_GCLK | 
                 m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_TIMER7_GCLK) == false);
@@ -216,6 +197,20 @@ void power_reset_clock_control::run_clk_DMTIMER_1ms(PRCM::e_TIMER1MS_CLKSEL clk_
     m_sCM_WKUP.TIMER1_CLKCTRL.b.MODULEMODE = PRCM::MODULEMODE_ENABLE;
     while(m_sCM_WKUP.TIMER1_CLKCTRL.b.MODULEMODE != PRCM::MODULEMODE_ENABLE); 
     while(m_sCM_WKUP.TIMER1_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);
+}
+
+void power_reset_clock_control::run_clk_DMTIMER_5()
+{
+    /* Select the clock source for the Timer5 instance. */
+    m_sCM_DPLL.TIMER5_CLK.b.CLKSEL = LOW;               // clear bitfield
+    m_sCM_DPLL.TIMER5_CLK.b.CLKSEL = PRCM::CLK_M_OSC;   // and then set it to the desired value
+    while(m_sCM_DPLL.TIMER5_CLK.b.CLKSEL != PRCM::CLK_M_OSC);    
+    
+    m_sCM_PER.TIMER5_CLKCTRL.b.MODULEMODE = PRCM::MODULEMODE_ENABLE;    
+    while(m_sCM_PER.TIMER5_CLKCTRL.b.MODULEMODE != PRCM::MODULEMODE_ENABLE); 
+    
+    while((m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_L4LS_GCLK | 
+    m_sCM_PER.L4LS_CLKSTCTRL.b.CLKACTIVITY_TIMER5_GCLK) == false);
 }
 
 void power_reset_clock_control::run_clk_DMTIMER_6()

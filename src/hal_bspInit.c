@@ -141,12 +141,12 @@ static void DMTimerAintcConfigure(void)
 {
     /* Registering DMTimerIsr */
     //IntRegister(SYS_INT_TINT2, DMTimerIsr);
-    BSP_IntVectReg(SYS_INT_TINT2,(CPU_FNCT_PTR)DMTimer_irqhandler);
+    BSP_IntVectReg(OS_TIMER_INTERRUPT,(CPU_FNCT_PTR)DMTimer_irqhandler);
     /* Set the priority */
-    IntPrioritySet(SYS_INT_TINT2,(configMAX_IRQ_PRIORITIES -1), AINTC_HOSTINT_ROUTE_IRQ); /* Lowest Priority */
+    IntPrioritySet(OS_TIMER_INTERRUPT,(configMAX_IRQ_PRIORITIES -1), AINTC_HOSTINT_ROUTE_IRQ); /* Lowest Priority */
 
     /* Enable the system interrupt */
-    IntSystemEnable(SYS_INT_TINT2);
+    IntSystemEnable(OS_TIMER_INTERRUPT);
 }
 
 
@@ -167,6 +167,7 @@ static void DMTimerSetUp(void)
     OS_TIMER.reload_set(DMTIMER2_RLD_COUNT);
     /* Configure the DMTimer for Auto-reload and compare mode */
     OS_TIMER.mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode);
+    OS_TIMER.enable();
 }
 
 static void GPIOModuleClkConfig(CPU_INT32U x)

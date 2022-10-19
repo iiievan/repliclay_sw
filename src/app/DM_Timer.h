@@ -378,7 +378,9 @@ private:
 }; 
  
 extern     void DMTimer_irqhandler(void *p_obj);
-extern DM_Timer dm_timer_1ms;
+#ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
+    extern DM_Timer dm_timer_1ms;
+#endif
 extern DM_Timer dm_timer_2;
 extern DM_Timer dm_timer_3;
 extern DM_Timer dm_timer_4;
@@ -386,5 +388,6 @@ extern DM_Timer dm_timer_5;
 extern DM_Timer dm_timer_6;
 extern DM_Timer dm_timer_7;
 
-#define OS_TIMER dm_timer_4
+#define OS_TIMER dm_timer_5
+#define OS_TIMER_INTERRUPT  SYS_INT_TINT5
 #endif //__DM_TIMER_H
