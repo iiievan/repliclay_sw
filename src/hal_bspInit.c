@@ -37,6 +37,7 @@
 #include "interrupt.h"
 
 #include "dmtimer.h"
+#include "DM_Timer.h"
 #include "error.h"
 #include "cp15.h"
 #include "hal_mmu.h"
@@ -51,8 +52,7 @@
 /**************************************************************************************************************************/
 /*                                                         MACROS                                                         */
 /**************************************************************************************************************************/
-#define TIMER_INITIAL_COUNT             (0xffffa261) // 1ms approximate
-#define TIMER_RLD_COUNT                 (0xffffa261) // 1ms approximate
+
 
 /**************************************************************************************************************************/
 /*                                                        LITERALS                                                        */
@@ -70,7 +70,6 @@
 
 static void DMTimerAintcConfigure(void);
 static void DMTimerSetUp(void);
-static void DMTimerIsr(void);
 static void GPIOModuleClkConfig(CPU_INT32U x);
 
 /**************************************************************************************************************************/
@@ -110,8 +109,8 @@ void configure_platform(void)
     ConsoleUtilsSetType(CONSOLE_UART);
 
     /* This function will enable clocks for the DMTimer2 instance */
-    DMTimer2ModuleClkConfig();
-    
+    //DMTimer2ModuleClkConfig();
+    OS_TIMER.init();
     /* Register DMTimer2 interrupts on to AINTC */
     DMTimerAintcConfigure();
 
@@ -137,16 +136,17 @@ void halBspInit(void)
 ** Do the necessary DMTimer configurations on to AINTC.
 */
 #define configMAX_IRQ_PRIORITIES                ((CPU_INT32U)(0x3Ful))
+
 static void DMTimerAintcConfigure(void)
 {
     /* Registering DMTimerIsr */
     //IntRegister(SYS_INT_TINT2, DMTimerIsr);
-    BSP_IntVectReg(SYS_INT_TINT2,(CPU_FNCT_PTR)DMTimerIsr);
+    BSP_IntVectReg(OS_TIMER_INTERRUPT,(CPU_FNCT_PTR)DMTimer_irqhandler);
     /* Set the priority */
-    IntPrioritySet(SYS_INT_TINT2,(configMAX_IRQ_PRIORITIES -1), AINTC_HOSTINT_ROUTE_IRQ); /* Lowest Priority */
+    IntPrioritySet(OS_TIMER_INTERRUPT,(configMAX_IRQ_PRIORITIES -1), AINTC_HOSTINT_ROUTE_IRQ); /* Lowest Priority */
 
     /* Enable the system interrupt */
-    IntSystemEnable(SYS_INT_TINT2);
+    IntSystemEnable(OS_TIMER_INTERRUPT);
 }
 
 
@@ -154,37 +154,20 @@ static void DMTimerAintcConfigure(void)
 ** Setup the timer for one-shot and compare mode.
 ** Setup the timer 2 to generate the tick interrupts at the required frequency.
  */
+
+#define DMTIMER2_INITIAL_COUNT             (0xffffa261) // 1ms approximate
+#define DMTIMER2_RLD_COUNT                 (0xffffa261) // 1ms approximate
+
 static void DMTimerSetUp(void)
 {
+    uint32_t dmtimer_mode =  DMTIMER::MODE_AUTORELOAD | (!DMTIMER::MODE_COMPARE); //  mode : autoreload and no compare
     /* Load the counter with the initial count value */
-    DMTimerCounterSet(SOC_DMTIMER_2_REGS, TIMER_INITIAL_COUNT);
-
+    OS_TIMER.counter_set(DMTIMER2_INITIAL_COUNT);
     /* Load the load register with the reload count value */
-    DMTimerReloadSet(SOC_DMTIMER_2_REGS, TIMER_RLD_COUNT);
-
+    OS_TIMER.reload_set(DMTIMER2_RLD_COUNT);
     /* Configure the DMTimer for Auto-reload and compare mode */
-    DMTimerModeConfigure(SOC_DMTIMER_2_REGS, DMTIMER_AUTORLD_NOCMP_ENABLE);
-}
-
-
-/*
-** DMTimer interrupt service routine.
-*/
-
-static void DMTimerIsr(void)
-{
-    /* Disable the DMTimer interrupts */
-    DMTimerIntDisable(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_EN_FLAG);
-
-    /* Clear the status of the interrupt flags */
-    DMTimerIntStatusClear(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_IT_FLAG);
-
-     OSTimeTick();
-
-    /* Enable the DMTimer interrupts */
-
-    DMTimerIntEnable(SOC_DMTIMER_2_REGS, DMTIMER_INT_OVF_EN_FLAG);
-    IntSystemEnable(SYS_INT_TINT2);
+    OS_TIMER.mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode);
+    OS_TIMER.enable();
 }
 
 static void GPIOModuleClkConfig(CPU_INT32U x)

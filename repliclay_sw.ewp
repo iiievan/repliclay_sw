@@ -225,6 +225,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>am335x</state>
+                    <state>beaglebone_black</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -2684,10 +2685,19 @@
                 <name>$PROJ_DIR$\src\app\HS_I2C.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\app\DM_Timer.cpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\app\lib_cfg.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\app\os_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\PRCM.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\app\PRCM.h</name>
             </file>
         </group>
         <file>
