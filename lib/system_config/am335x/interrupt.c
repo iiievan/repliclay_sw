@@ -115,11 +115,12 @@ void  BSP_IntVectReg (CPU_INT08U     int_id,
     CPU_SR_ALLOC();
 
 
-    if (int_id > SYS_INT_ID_MAX) {
+    if (int_id > SYS_INT_ID_MAX) 
         return;
-    }
 
-    if (int_id < SYS_INT_ID_MAX) {
+
+    if (int_id < SYS_INT_ID_MAX) 
+    {
         CPU_CRITICAL_ENTER();
         BSP_IntVectTbl[int_id] = isr;
         CPU_CRITICAL_EXIT();

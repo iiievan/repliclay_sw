@@ -11,6 +11,7 @@
 #include "hal_bspInit.h"
 #include "DM_Timer.h"
 #include "PRCM.h"
+#include "INTC.h"
 #include  <uC_cpu.h>
 #include  <app_cfg.h>
 #include  <cpu_cfg.h>

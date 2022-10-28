@@ -2679,13 +2679,16 @@
                 <name>$PROJ_DIR$\src\app\cpu_cfg.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\app\DM_Timer.cpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\app\HS_I2C.cpp</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\app\HS_I2C.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\app\DM_Timer.cpp</name>
+                <name>$PROJ_DIR$\src\app\INTC.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\app\lib_cfg.h</name>
