@@ -589,4 +589,53 @@ namespace INTC
     }
 }
 
+class Interrupt_controller  
+{
+public:
+              Interrupt_controller()
+              :m_sINTC(*INTC::AM335x_INTC) {}
+              ~Interrupt_controller() {}
+
+        void  init (void);
+        void  OS_CPU_except_handler(int32_t  src_id);
+        void  BSP_int_handler(int32_t  src_nbr);
+        void  BSP_int_clr (int8_t  int_id);
+        void  BSP_int_vect_reg (int8_t  int_id, CPU_FNCT_PTR    isr_fnct);
+        void  if_clk_free_run_set(void);
+        void  if_clk_auto_gate_set(void);
+        void  protection_enable(void);
+        void  protection_disable(void);
+        void  sync_clk_free_run_set(void);
+        void  sync_clk_auto_gate_set(void);
+        void  func_clk_free_run_set(void);
+        void  func_clk_auto_gate_set(void);
+        void  priority_threshold_set(uint32_t threshold);
+        void  software_int_set(uint32_t intr_num);
+        void  software_int_clear(uint32_t intr_num);
+        void  master_IRQ_enable(void);
+        void  master_IRQ_disable(void);
+        void  master_FIQ_enable(void);
+        void  master_FIQ_disable(void);
+        void  system_enable(uint32_t intr_num);
+        void  system_disable(uint32_t intr_num);
+        void  unregister_handler(uint32_t intr_num);
+        void  enable(uint8_t  status);
+        void  register_handler(uint32_t intr_num, void (*pfn_handler)(void));
+        void  priority_set(uint32_t intr_num, uint32_t priority, uint32_t host_int_route);
+     uint8_t  disable(void);
+    uint32_t  master_status_get(void);
+    uint32_t  active_IRQ_num_get(void);
+    uint32_t  active_FIQ_num_get(void);
+    uint32_t  spur_IRQ_flag_get(void);
+    uint32_t  spur_FIQ_flag_get(void);
+    uint32_t  curr_IRQ_priorigty_get(void);
+    uint32_t  curr_FIQ_priority_get(void);
+    uint32_t  priority_threshold_get(void);
+    uint32_t  raw_status_get(unsigned int intr_num);
+    uint32_t  pending_IRQ_masked_status_get(unsigned int intr_num);
+    uint32_t  pending_FIQ_masked_status_get(unsigned int intr_num);
+private:
+    INTC::AM335x_INTC_Type &m_sINTC;//+79216498217
+}
+
 #endif //_INTC_H_
