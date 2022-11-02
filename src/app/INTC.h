@@ -634,8 +634,9 @@ public:
     uint32_t  raw_status_get(unsigned int intr_num);
     uint32_t  pending_IRQ_masked_status_get(unsigned int intr_num);
     uint32_t  pending_FIQ_masked_status_get(unsigned int intr_num);
+
 private:
     INTC::AM335x_INTC_Type &m_sINTC;//+79216498217
-}
+};
 
 #endif //_INTC_H_

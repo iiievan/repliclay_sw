@@ -69,6 +69,20 @@
 //void (*fnRAMVectors[NUM_INTERRUPTS])(void);
 CPU_FNCT_PTR BSP_IntVectTbl[SYS_INT_ID_MAX];
 
+static  void  OS_BSP_ExceptHandler (CPU_INT08U  except_type)
+{
+    switch (except_type) {
+        case OS_CPU_ARM_EXCEPT_RESET:
+        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
+        case OS_CPU_ARM_EXCEPT_SWI:
+        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
+        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
+             while (DEF_TRUE) {
+                 ;
+             }
+    }
+}
+
 /******************************************************************************
 **                STATIC FUNCTION DECLARATIONS
 ******************************************************************************/
@@ -88,60 +102,6 @@ static void IntDefaultHandler(void)
 {
     /* Go Back. Nothing to be done */
     ;
-}
-
-/**
- * \brief    Registers an interrupt Handler in the interrupt vector table for
- *           system interrupts. 
- * 
- * \param    intrNum - Interrupt Number
- * \param    fnHandler - Function pointer to the ISR
- * 
- * Note: When the interrupt occurs for the sytem interrupt number indicated,
- * the control goes to the ISR given as the parameter.
- * 
- * \return      None.
- **/
-void IntRegister(unsigned int intrNum, void (*fnHandler)(void))
-{
-    /* Assign ISR */
-    //fnRAMVectors[intrNum] = fnHandler;
-    BSP_IntVectTbl[intrNum] = (CPU_FNCT_PTR)fnHandler;
-}
-
-void  BSP_IntVectReg (CPU_INT08U     int_id,
-                      CPU_FNCT_PTR  isr)
-{
-    CPU_SR_ALLOC();
-
-
-    if (int_id > SYS_INT_ID_MAX) 
-        return;
-
-
-    if (int_id < SYS_INT_ID_MAX) 
-    {
-        CPU_CRITICAL_ENTER();
-        BSP_IntVectTbl[int_id] = isr;
-        CPU_CRITICAL_EXIT();
-    }
-}
-
-/**
- * \brief   Unregisters an interrupt
- * 
- * \param   intrNum - Interrupt Number
- * 
- * Note: Once an interrupt is unregistered it will enter infinite loop once
- * an interrupt occurs
- * 
- * \return      None.
- **/
-void IntUnRegister(unsigned int intrNum)
-{
-    /* Assign default ISR */
-    //fnRAMVectors[intrNum] = IntDefaultHandler;
-    BSP_IntVectTbl[intrNum] = (CPU_FNCT_PTR)IntDefaultHandler;
 }
 
 /**
@@ -180,20 +140,6 @@ void IntAINTCInit(void)
     REG_INTCPS_CONTROL = (INTC_CONTROL_NEWFIQAGR | INTC_CONTROL_NEWIRQAGR);
 }
 
-static  void  OS_BSP_ExceptHandler (CPU_INT08U  except_type)
-{
-    switch (except_type) {
-        case OS_CPU_ARM_EXCEPT_RESET:
-        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
-        case OS_CPU_ARM_EXCEPT_SWI:
-        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
-        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
-             while (DEF_TRUE) {
-                 ;
-             }
-    }
-}
-
 void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
 {
     switch (src_id) {
@@ -212,20 +158,6 @@ void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
              OS_BSP_ExceptHandler((CPU_INT08U)src_id);
              break;
     }
-}
-
-void  BSP_IntClr (CPU_INT08U  int_id)
-{
-    CPU_INT08U  reg_nbr;
-
-
-    if (int_id > SYS_INT_ID_MAX) {
-        return;
-    }
-
-    reg_nbr = int_id / 32;
-
-    REG_INTCPS_ISR_CLEAR(reg_nbr) = DEF_BIT(int_id % 32);
 }
 
 void  BSP_IntHandler (CPU_INT32U  src_nbr)
@@ -264,69 +196,36 @@ void  BSP_IntHandler (CPU_INT32U  src_nbr)
     }
 }
 
-/**
- * \brief   This API assigns a priority to an interrupt and routes it to
- *          either IRQ or to FIQ. Priority 0 is the highest priority level
- *          Among the host interrupts, FIQ has more priority than IRQ.
- *
- * \param   intrNum  - Interrupt number
- * \param   priority - Interrupt priority level
- * \param   hostIntRoute - The host interrupt IRQ/FIQ to which the interrupt
- *                         is to be routed.
- *     'priority' can take any value from 0 to 127, 0 being the highest and
- *     127 being the lowest priority.              
- *
- *     'hostIntRoute' can take one of the following values \n
- *             AINTC_HOSTINT_ROUTE_IRQ - To route the interrupt to IRQ \n
- *             AINTC_HOSTINT_ROUTE_FIQ - To route the interrupt to FIQ
- *
- * \return  None.
- *
- **/
-void IntPrioritySet(unsigned int intrNum, unsigned int priority,
-                    unsigned int hostIntRoute)
+void  BSP_IntClr (CPU_INT08U  int_id)
 {
-    HWREG(SOC_AINTC_REGS + INTC_ILR(intrNum)) =
-                                 ((priority << INTC_ILR_PRIORITY_SHIFT)
-                                   & INTC_ILR_PRIORITY)
-                                 | hostIntRoute ;
+    CPU_INT08U  reg_nbr;
+
+
+    if (int_id > SYS_INT_ID_MAX) {
+        return;
+    }
+
+    reg_nbr = int_id / 32;
+
+    REG_INTCPS_ISR_CLEAR(reg_nbr) = DEF_BIT(int_id % 32);
 }
 
-/**
- * \brief   This API enables the system interrupt in AINTC. However, for 
- *          the interrupt generation, make sure that the interrupt is 
- *          enabled at the peripheral level also. 
- *
- * \param   intrNum  - Interrupt number
- *
- * \return  None.
- *
- **/
-void IntSystemEnable(unsigned int intrNum)
+void  BSP_IntVectReg (CPU_INT08U     int_id,
+                      CPU_FNCT_PTR  isr)
 {
-    __asm(" dsb");
-    
-    /* Disable the system interrupt in the corresponding MIR_CLEAR register */
-    HWREG(SOC_AINTC_REGS + INTC_MIR_CLEAR(intrNum >> REG_IDX_SHIFT))
-                                   = (0x01 << (intrNum & REG_BIT_MASK));
-}
+    CPU_SR_ALLOC();
 
-/**
- * \brief   This API disables the system interrupt in AINTC. 
- *
- * \param   intrNum  - Interrupt number
- *
- * \return  None.
- *
- **/
-void IntSystemDisable(unsigned int intrNum)
-{
 
-    __asm(" dsb");
-    
-    /* Enable the system interrupt in the corresponding MIR_SET register */
-    HWREG(SOC_AINTC_REGS + INTC_MIR_SET(intrNum >> REG_IDX_SHIFT)) 
-                                   = (0x01 << (intrNum & REG_BIT_MASK));
+    if (int_id > SYS_INT_ID_MAX) 
+        return;
+
+
+    if (int_id < SYS_INT_ID_MAX) 
+    {
+        CPU_CRITICAL_ENTER();
+        BSP_IntVectTbl[int_id] = isr;
+        CPU_CRITICAL_EXIT();
+    }
 }
 
 /**
@@ -354,35 +253,6 @@ void IntIfClkFreeRunSet(void)
 void IntIfClkAutoGateSet(void)
 {
     HWREG(SOC_AINTC_REGS + INTC_SYSCONFIG)|= INTC_SYSCONFIG_AUTOIDLE; 
-}
-
-/**
- * \brief   Reads the active IRQ number.
- *
- * \param   None
- *
- * \return  Active IRQ number.
- *
- **/
-unsigned int IntActiveIrqNumGet(void)
-{
-    return (HWREG(SOC_AINTC_REGS + INTC_SIR_IRQ) &  INTC_SIR_IRQ_ACTIVEIRQ);
-}
-
-/**
- * \brief   Reads the spurious IRQ Flag. Spurious IRQ flag is reflected in both
- *          SIR_IRQ and IRQ_PRIORITY registers of the interrupt controller.
- *
- * \param   None
- *
- * \return  Spurious IRQ Flag.
- *
- **/
-unsigned int IntSpurIrqFlagGet(void)
-{
-    return ((HWREG(SOC_AINTC_REGS + INTC_SIR_IRQ) 
-             & INTC_SIR_IRQ_SPURIOUSIRQ) 
-            >> INTC_SIR_IRQ_SPURIOUSIRQ_SHIFT);
 }
 
 /**
@@ -470,34 +340,6 @@ void IntFuncClkAutoGateSet(void)
 }
 
 /**
- * \brief   Returns the currently active IRQ priority level.
- *
- * \param   None
- *
- * \return  Current IRQ priority 
- *
- **/
-unsigned int IntCurrIrqPriorityGet(void)
-{
-    return (HWREG(SOC_AINTC_REGS + INTC_IRQ_PRIORITY) 
-            & INTC_IRQ_PRIORITY_IRQPRIORITY);
-}
-
-/**
- * \brief   Returns the priority threshold.
- *
- * \param   None
- *
- * \return  Priority threshold value.
- *
- **/
-unsigned int IntPriorityThresholdGet(void)
-{
-    return (HWREG(SOC_AINTC_REGS + INTC_THRESHOLD) 
-            & INTC_THRESHOLD_PRIORITYTHRESHOLD);
-}
-
-/**
  * \brief   Sets the given priority threshold value. 
  *
  * \param   threshold - Priority threshold value
@@ -512,21 +354,6 @@ void IntPriorityThresholdSet(unsigned int threshold)
 {
     HWREG(SOC_AINTC_REGS + INTC_THRESHOLD) = 
                      threshold & INTC_THRESHOLD_PRIORITYTHRESHOLD;
-}
-
-/**
- * \brief   Returns the raw interrupt status before masking.
- *
- * \param   intrNum - the system interrupt number.
- *
- * \return  TRUE - if the raw status is set \n
- *          FALSE - if the raw status is not set.   
- *
- **/
-unsigned int IntRawStatusGet(unsigned int intrNum)
-{
-    return ((0 == ((HWREG(SOC_AINTC_REGS + INTC_ITR(intrNum >> REG_IDX_SHIFT))
-                    >> (intrNum & REG_BIT_MASK))& 0x01)) ? FALSE : TRUE);
 }
 
 /**
@@ -561,21 +388,6 @@ void IntSoftwareIntClear(unsigned int intrNum)
     HWREG(SOC_AINTC_REGS + INTC_ISR_CLEAR(intrNum >> REG_IDX_SHIFT))
                                    = (0x01 << (intrNum & REG_BIT_MASK));
 
-}
-
-/**
- * \brief   Returns the IRQ status after masking.
- *
- * \param   intrNum - the system interrupt number
- *
- * \return  TRUE - if interrupt is pending \n
- *          FALSE - in no interrupt is pending
- *
- **/
-unsigned int IntPendingIrqMaskedStatusGet(unsigned int intrNum)
-{
-    return ((0 ==(HWREG(SOC_AINTC_REGS + INTC_PENDING_IRQ(intrNum >> REG_IDX_SHIFT))
-                  >> (((intrNum & REG_BIT_MASK)) & 0x01))) ? FALSE : TRUE);
 }
 
 /**
@@ -648,18 +460,125 @@ void IntMasterFIQDisable(void)
 }
 
 /**
- * \brief   Returns the status of the interrupts FIQ and IRQ.
+ * \brief   This API enables the system interrupt in AINTC. However, for 
+ *          the interrupt generation, make sure that the interrupt is 
+ *          enabled at the peripheral level also. 
  *
- * \param    None
+ * \param   intrNum  - Interrupt number
  *
- * \return   Status of interrupt as in CPSR.
+ * \return  None.
+ *
+ **/
+void IntSystemEnable(unsigned int intrNum)
+{
+    __asm(" dsb");
+    
+    /* Disable the system interrupt in the corresponding MIR_CLEAR register */
+    HWREG(SOC_AINTC_REGS + INTC_MIR_CLEAR(intrNum >> REG_IDX_SHIFT))
+                                   = (0x01 << (intrNum & REG_BIT_MASK));
+}
+
+
+/**
+ * \brief   This API disables the system interrupt in AINTC. 
+ *
+ * \param   intrNum  - Interrupt number
+ *
+ * \return  None.
+ *
+ **/
+void IntSystemDisable(unsigned int intrNum)
+{
+
+    __asm(" dsb");
+    
+    /* Enable the system interrupt in the corresponding MIR_SET register */
+    HWREG(SOC_AINTC_REGS + INTC_MIR_SET(intrNum >> REG_IDX_SHIFT)) 
+                                   = (0x01 << (intrNum & REG_BIT_MASK));
+}
+
+/**
+ * \brief   Unregisters an interrupt
+ * 
+ * \param   intrNum - Interrupt Number
+ * 
+ * Note: Once an interrupt is unregistered it will enter infinite loop once
+ * an interrupt occurs
+ * 
+ * \return      None.
+ **/
+void IntUnRegister(unsigned int intrNum)
+{
+    /* Assign default ISR */
+    //fnRAMVectors[intrNum] = IntDefaultHandler;
+    BSP_IntVectTbl[intrNum] = (CPU_FNCT_PTR)IntDefaultHandler;
+}
+
+/**
+ * \brief  Restore the processor IRQ only status. This does not affect 
+ *          the set of interrupts enabled/disabled in the AINTC.
+ *
+ * \param    The status returned by the IntDisable fundtion.
+ *
+ * \return   None
  *
  *  Note: This function call shall be done only in previleged mode of ARM
  **/
-unsigned int IntMasterStatusGet(void)
+void IntEnable(unsigned char  status)
 {
-    return CPUIntStatus();
+    if((status & 0x80) == 0) 
+    {
+        IntMasterIRQEnable();
+    } 
 }
+
+/**
+ * \brief    Registers an interrupt Handler in the interrupt vector table for
+ *           system interrupts. 
+ * 
+ * \param    intrNum - Interrupt Number
+ * \param    fnHandler - Function pointer to the ISR
+ * 
+ * Note: When the interrupt occurs for the sytem interrupt number indicated,
+ * the control goes to the ISR given as the parameter.
+ * 
+ * \return      None.
+ **/
+void IntRegister(unsigned int intrNum, void (*fnHandler)(void))
+{
+    /* Assign ISR */
+    //fnRAMVectors[intrNum] = fnHandler;
+    BSP_IntVectTbl[intrNum] = (CPU_FNCT_PTR)fnHandler;
+}
+
+/**
+ * \brief   This API assigns a priority to an interrupt and routes it to
+ *          either IRQ or to FIQ. Priority 0 is the highest priority level
+ *          Among the host interrupts, FIQ has more priority than IRQ.
+ *
+ * \param   intrNum  - Interrupt number
+ * \param   priority - Interrupt priority level
+ * \param   hostIntRoute - The host interrupt IRQ/FIQ to which the interrupt
+ *                         is to be routed.
+ *     'priority' can take any value from 0 to 127, 0 being the highest and
+ *     127 being the lowest priority.              
+ *
+ *     'hostIntRoute' can take one of the following values \n
+ *             AINTC_HOSTINT_ROUTE_IRQ - To route the interrupt to IRQ \n
+ *             AINTC_HOSTINT_ROUTE_FIQ - To route the interrupt to FIQ
+ *
+ * \return  None.
+ *
+ **/
+void IntPrioritySet(unsigned int intrNum, unsigned int priority,
+                    unsigned int hostIntRoute)
+{
+    HWREG(SOC_AINTC_REGS + INTC_ILR(intrNum)) =
+                                 ((priority << INTC_ILR_PRIORITY_SHIFT)
+                                   & INTC_ILR_PRIORITY)
+                                 | hostIntRoute ;
+}
+
 
 /**
  * \brief  Read and save the stasus and Disables the processor IRQ .
@@ -685,23 +604,109 @@ unsigned char IntDisable(void)
 }
 
 /**
- * \brief  Restore the processor IRQ only status. This does not affect 
- *          the set of interrupts enabled/disabled in the AINTC.
+ * \brief   Returns the status of the interrupts FIQ and IRQ.
  *
- * \param    The status returned by the IntDisable fundtion.
+ * \param    None
  *
- * \return   None
+ * \return   Status of interrupt as in CPSR.
  *
  *  Note: This function call shall be done only in previleged mode of ARM
  **/
-void IntEnable(unsigned char  status)
+unsigned int IntMasterStatusGet(void)
 {
-    if((status & 0x80) == 0) 
-    {
-        IntMasterIRQEnable();
-    } 
+    return CPUIntStatus();
 }
 
-/********************************** End Of File ******************************/
+/**
+ * \brief   Reads the active IRQ number.
+ *
+ * \param   None
+ *
+ * \return  Active IRQ number.
+ *
+ **/
+unsigned int IntActiveIrqNumGet(void)
+{
+    return (HWREG(SOC_AINTC_REGS + INTC_SIR_IRQ) &  INTC_SIR_IRQ_ACTIVEIRQ);
+}
+
+/**
+ * \brief   Reads the spurious IRQ Flag. Spurious IRQ flag is reflected in both
+ *          SIR_IRQ and IRQ_PRIORITY registers of the interrupt controller.
+ *
+ * \param   None
+ *
+ * \return  Spurious IRQ Flag.
+ *
+ **/
+unsigned int IntSpurIrqFlagGet(void)
+{
+    return ((HWREG(SOC_AINTC_REGS + INTC_SIR_IRQ) 
+             & INTC_SIR_IRQ_SPURIOUSIRQ) 
+            >> INTC_SIR_IRQ_SPURIOUSIRQ_SHIFT);
+}
+
+/**
+ * \brief   Returns the currently active IRQ priority level.
+ *
+ * \param   None
+ *
+ * \return  Current IRQ priority 
+ *
+ **/
+unsigned int IntCurrIrqPriorityGet(void)
+{
+    return (HWREG(SOC_AINTC_REGS + INTC_IRQ_PRIORITY) 
+            & INTC_IRQ_PRIORITY_IRQPRIORITY);
+}
+
+/**
+ * \brief   Returns the priority threshold.
+ *
+ * \param   None
+ *
+ * \return  Priority threshold value.
+ *
+ **/
+unsigned int IntPriorityThresholdGet(void)
+{
+    return (HWREG(SOC_AINTC_REGS + INTC_THRESHOLD) 
+            & INTC_THRESHOLD_PRIORITYTHRESHOLD);
+}
+
+
+
+/**
+ * \brief   Returns the raw interrupt status before masking.
+ *
+ * \param   intrNum - the system interrupt number.
+ *
+ * \return  TRUE - if the raw status is set \n
+ *          FALSE - if the raw status is not set.   
+ *
+ **/
+unsigned int IntRawStatusGet(unsigned int intrNum)
+{
+    return ((0 == ((HWREG(SOC_AINTC_REGS + INTC_ITR(intrNum >> REG_IDX_SHIFT))
+                    >> (intrNum & REG_BIT_MASK))& 0x01)) ? FALSE : TRUE);
+}
+
+
+/**
+ * \brief   Returns the IRQ status after masking.
+ *
+ * \param   intrNum - the system interrupt number
+ *
+ * \return  TRUE - if interrupt is pending \n
+ *          FALSE - in no interrupt is pending
+ *
+ **/
+unsigned int IntPendingIrqMaskedStatusGet(unsigned int intrNum)
+{
+    return ((0 ==(HWREG(SOC_AINTC_REGS + INTC_PENDING_IRQ(intrNum >> REG_IDX_SHIFT))
+                  >> (((intrNum & REG_BIT_MASK)) & 0x01))) ? FALSE : TRUE);
+}
+
+
 
 
