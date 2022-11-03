@@ -405,7 +405,6 @@ void IntMasterIRQEnable(void)
 {
     /* Enable IRQ in CPSR.*/
     CPUirqe();
-
 }
 
 /**

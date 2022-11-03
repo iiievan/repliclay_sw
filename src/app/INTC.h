@@ -71,8 +71,8 @@ namespace INTC
         struct 
         {                                         /* This register supplies the currently active FIQ interrupt number */
              
-            uint32_t    ActiveIRQ    :7;         // bit: 0..6    (R) Active FIQ number   
-            uint32_t    SpuriousIRQ  :25;        // bit: 7..31   (R) Spurious FIQ flag             
+            uint32_t    ActiveFIQ    :7;         // bit: 0..6    (R) Active FIQ number   
+            uint32_t    SpuriousFIQ  :25;        // bit: 7..31   (R) Spurious FIQ flag             
         } b;                                     // Structure used for bit access 
         uint32_t  reg;                           // Type used for register access 
     } SIR_FIQ_reg_t;
@@ -83,8 +83,8 @@ namespace INTC
         struct 
         {                                         /* This register contains the new interrupt agreement bits */
              
-            uint32_t    NewIRQAgr  :1;         // bit: 0        (W) New IRQ generation  [0x0 = no function effect, 0x1 = generate IRQ]
-            uint32_t    NewFIQAgr  :1;         // bit: 1        (W) Reset FIQ output and enable new FIQ generation [0x0 = no function effect, 0x1 = generate IRQ]
+            uint32_t    NewIRQAgr  :1;         // bit: 0        (W) Reset IRQ output and enable new IRQ generation  [0x0 = no function effect, 0x1 = generate IRQ]
+            uint32_t    NewFIQAgr  :1;         // bit: 1        (W) Reset FIQ output and enable new FIQ generation [0x0 = no function effect, 0x1 = generate FIQ]
             uint32_t               :30;        // bit: 2..31    Reserved             
         } b;                                   // Structure used for bit access 
         uint32_t  reg;                         // Type used for register access 
@@ -570,7 +570,18 @@ namespace INTC
     constexpr         uint32_t  AM335x_INTC_BASE     = 0x48200000;
     constexpr AM335x_INTC_Type *AM335x_INTC          = ((AM335x_INTC_Type *) AM335x_INTC_BASE); 
     
-    uint32_t debug_dump_INTC(AM335x_INTC_Type &sINTC = *AM335x_INTC);
+    constexpr          uint8_t PRIORITY_THRESHOLD = 0xFF;
+    typedef            void      (*Handler_ptr_t )(void *p_obj);
+    
+           uint32_t debug_dump_INTC(AM335x_INTC_Type &sINTC = *AM335x_INTC);
+     ISR_SET_reg_t& get_ISR_SET_reference(uint32_t int_id);
+   ISR_CLEAR_reg_t& get_ISR_CLEAR_reference(uint32_t int_id);
+     MIR_SET_reg_t& get_MIR_SET_reference(uint32_t int_id);
+   MIR_CLEAR_reg_t& get_MIR_CLEAR_reference(uint32_t int_id);
+    INTC_ILR_reg_t& get_ILR_reference(uint32_t int_id);
+         ITR_reg_t& get_ITR_reference(uint32_t int_id);
+ PENDING_IRQ_reg_t& get_pending_IRQ_reference(uint32_t int_id);
+ PENDING_FIQ_reg_t& get_pending_FIQ_reference(uint32_t int_id);
     
     /* for testing purpose */
     inline uint32_t debug_dump_INTC(AM335x_INTC_Type &sINTC)
@@ -587,6 +598,54 @@ namespace INTC
         
         return SIZEOF_INTC;
     }
+
+    inline ISR_SET_reg_t& get_ISR_SET_reference(uint32_t int_id) 
+    {
+        uint32_t sISR_SET= (AM335x_INTC_BASE + 0x90 + (int_id * 0x20));
+        return (ISR_SET_reg_t&)sISR_SET;
+    }
+    
+    inline ISR_CLEAR_reg_t& get_ISR_CLEAR_reference(uint32_t int_id) 
+    {
+        uint32_t sISR_CLEAR = (AM335x_INTC_BASE + 0x94 + (int_id * 0x20));
+        return (ISR_CLEAR_reg_t&)sISR_CLEAR;
+    }
+
+    inline MIR_SET_reg_t& get_MIR_SET_reference(uint32_t int_id)
+    {
+        uint32_t sMIR_SET = (AM335x_INTC_BASE + 0x8c + (int_id * 0x20));
+        return (MIR_SET_reg_t&)sMIR_SET;
+    }
+    
+    inline MIR_CLEAR_reg_t& get_MIR_CLEAR_reference(uint32_t int_id)
+    {
+        uint32_t sMIR_CLEAR = (AM335x_INTC_BASE + 0x88 + (int_id * 0x20));
+        return (MIR_CLEAR_reg_t&)sMIR_CLEAR;
+    }
+       
+    inline INTC_ILR_reg_t& get_ILR_reference(uint32_t int_id) 
+    {
+        uint32_t ILR = (AM335x_INTC_BASE + 0x100 + (int_id * 0x04));
+        return (INTC_ILR_reg_t&)ILR;
+    }
+    
+    inline ITR_reg_t& get_ITR_reference(uint32_t int_id) 
+    {
+        uint32_t ITR = (AM335x_INTC_BASE + 0x80 + (int_id * 0x20));
+        return (ITR_reg_t&)ITR;
+    }
+      
+    inline PENDING_IRQ_reg_t& get_pending_IRQ_reference(uint32_t int_id) 
+    {
+        uint32_t PENDING = (AM335x_INTC_BASE + 0x98 + (int_id * 0x20));
+        return (PENDING_IRQ_reg_t&)PENDING;
+    }
+    
+    inline PENDING_FIQ_reg_t& get_pending_FIQ_reference(uint32_t int_id) 
+    {
+        uint32_t PENDING = (AM335x_INTC_BASE + 0x9c + (int_id * 0x20));
+        return (PENDING_FIQ_reg_t&)PENDING;
+    }
 }
 
 class Interrupt_controller  
@@ -597,10 +656,10 @@ public:
               ~Interrupt_controller() {}
 
         void  init (void);
-        void  OS_CPU_except_handler(int32_t  src_id);
-        void  BSP_int_handler(int32_t  src_nbr);
-        void  BSP_int_clr (int8_t  int_id);
-        void  BSP_int_vect_reg (int8_t  int_id, CPU_FNCT_PTR    isr_fnct);
+        void  OS_CPU_except_handler(uint32_t  src_id);
+        void  BSP_int_handler(uint32_t  src_nbr);
+        void  BSP_int_clr (uint8_t  int_id);
+        void  BSP_int_vect_reg (uint8_t  int_id,  INTC::Handler_ptr_t isr_fnct);
         void  if_clk_free_run_set(void);
         void  if_clk_auto_gate_set(void);
         void  protection_enable(void);
@@ -609,20 +668,20 @@ public:
         void  sync_clk_auto_gate_set(void);
         void  func_clk_free_run_set(void);
         void  func_clk_auto_gate_set(void);
-        void  priority_threshold_set(uint32_t threshold);
-        void  software_int_set(uint32_t intr_num);
-        void  software_int_clear(uint32_t intr_num);
+        void  priority_threshold_set(uint8_t threshold);
+        void  software_int_set(uint32_t int_id);
+        void  software_int_clear(uint32_t int_id);
         void  master_IRQ_enable(void);
         void  master_IRQ_disable(void);
         void  master_FIQ_enable(void);
         void  master_FIQ_disable(void);
-        void  system_enable(uint32_t intr_num);
-        void  system_disable(uint32_t intr_num);
-        void  unregister_handler(uint32_t intr_num);
+        void  system_enable(uint32_t int_id);
+        void  system_disable(uint32_t int_id);
+        void  register_handler(uint32_t int_id, void (*pfn_handler)(void));
+        void  unregister_handler(uint32_t int_id);
         void  enable(uint8_t  status);
-        void  register_handler(uint32_t intr_num, void (*pfn_handler)(void));
-        void  priority_set(uint32_t intr_num, uint32_t priority, uint32_t host_int_route);
-     uint8_t  disable(void);
+     uint8_t  disable(void);        
+        void  priority_set(uint32_t int_id, uint32_t priority, uint32_t host_int_route);
     uint32_t  master_status_get(void);
     uint32_t  active_IRQ_num_get(void);
     uint32_t  active_FIQ_num_get(void);
@@ -630,13 +689,15 @@ public:
     uint32_t  spur_FIQ_flag_get(void);
     uint32_t  curr_IRQ_priorigty_get(void);
     uint32_t  curr_FIQ_priority_get(void);
-    uint32_t  priority_threshold_get(void);
-    uint32_t  raw_status_get(unsigned int intr_num);
-    uint32_t  pending_IRQ_masked_status_get(unsigned int intr_num);
-    uint32_t  pending_FIQ_masked_status_get(unsigned int intr_num);
+     uint8_t  priority_threshold_get(void);
+        bool  raw_status_get(uint32_t int_id);
+        bool  pending_IRQ_masked_status_get(uint32_t int_id);
+        bool  pending_FIQ_masked_status_get(uint32_t int_id);
 
 private:
-    INTC::AM335x_INTC_Type &m_sINTC;//+79216498217
+    INTC::AM335x_INTC_Type &m_sINTC;
 };
+
+static void interrupt_default_handler(void);
 
 #endif //_INTC_H_
