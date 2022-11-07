@@ -1,9 +1,32 @@
 #include "DM_Timer.h"
 
 
+/*
+** Setup the timer for one-shot and compare mode.
+** Setup the timer 2 to generate the tick interrupts at the required frequency.
+ */
+
+#define DMTIMER2_INITIAL_COUNT             (0xffffa261) // 1ms approximate
+#define DMTIMER2_RLD_COUNT                 (0xffffa261) // 1ms approximate
+
+void DM_Timer_setup(void)
+{
+    uint32_t dmtimer_mode =  DMTIMER::MODE_AUTORELOAD | (!DMTIMER::MODE_COMPARE); //  mode : autoreload and no compare
+
+    OS_TIMER.init(); //This function will enable clocks and interrupt for the DM_Timer instance
+    /* Register DMTimer2 interrupts on to AINTC */
+    //DMTimerAintcConfigure();
+    
+    OS_TIMER.counter_set(DMTIMER2_INITIAL_COUNT); //Load the counter with the initial count value
+    OS_TIMER.reload_set(DMTIMER2_RLD_COUNT);    //Load the load register with the reload count value
+    OS_TIMER.mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode); //Configure the DMTimer for Auto-reload and compare mode
+    OS_TIMER.enable();
+}
+
 DM_Timer::DM_Timer(DMTIMER::AM335x_DMTIMER_Type &p_tmr)
 :m_sTIMER(p_tmr),
-m_sPRCM(prcm_module)
+m_sPRCM(prcm_module),
+m_sINTC(intc)
 {
 
 }
@@ -27,6 +50,11 @@ void  DM_Timer::disable()
 void DM_Timer::init(void)
 {     
     m_sPRCM.run_clk_DMTIMER(m_sTIMER); 
+
+    // setup timer interrupt
+    m_sINTC.register_handler(OS_TIMER_INTERRUPT,(INTC::Handler_ptr_t)DMTimer_irqhandler);            // Registering DMTimer_irqhandler
+    m_sINTC.priority_set(OS_TIMER_INTERRUPT,(INTC::MAX_IRQ_PRIORITIES -1), INTC::HOSTINT_ROUTE_IRQ); // Set the lowest priority
+    m_sINTC.system_enable(OS_TIMER_INTERRUPT);                                                       // Enable the system interrupt
 }
  
 void  DM_Timer::mode_configure(DMTIMER::e_DMTIMER_mode mode)

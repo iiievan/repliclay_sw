@@ -4,6 +4,7 @@
 #include "cpu.h"
 //#include "uC_cpu.h"
 
+Interrupt_controller intc;
 INTC::Handler_ptr_t interrupt_vector_table[INTC::INTERRUPTS_NUM_MAX];
 
 static  void  OS_exept_handler (uint8_t  except_type)
@@ -66,7 +67,7 @@ void  Interrupt_controller::init (void)
 
     for (uint32_t int_id = 0; int_id < INTC::INTERRUPTS_NUM_MAX; int_id++) 
     {
-        BSP_int_vect_reg((uint8_t)int_id,(INTC::Handler_ptr_t)interrupt_default_handler);
+        register_handler((uint8_t)int_id,(INTC::Handler_ptr_t)interrupt_default_handler);
     }
     
     //REG_INTCPS_CONTROL = (INTC_CONTROL_NEWFIQAGR | INTC_CONTROL_NEWIRQAGR);
@@ -152,7 +153,19 @@ void  Interrupt_controller::BSP_int_clr (uint8_t  int_id)
     s_isr_clear.b.IsrClear = BIT(int_id % 32);
 }
 
-void  Interrupt_controller::BSP_int_vect_reg (uint8_t  int_id, INTC::Handler_ptr_t isr_fnct)
+/**
+ * \brief    Registers an interrupt Handler in the interrupt vector table for
+ *           system interrupts. 
+ * 
+ * \param    int_id - Interrupt Number
+ * \param    pfn_handler - Function pointer to the ISR
+ * 
+ * Note: When the interrupt occurs for the sytem interrupt number indicated,
+ * the control goes to the ISR given as the parameter.
+ * 
+ * \return      None.
+ **/
+void  Interrupt_controller::register_handler(uint8_t  int_id, INTC::Handler_ptr_t isr_fnct)
 {
     CPU_SR_ALLOC();
 
@@ -164,6 +177,32 @@ void  Interrupt_controller::BSP_int_vect_reg (uint8_t  int_id, INTC::Handler_ptr
     {
         CPU_CRITICAL_ENTER();
         interrupt_vector_table[int_id] = isr_fnct;
+        CPU_CRITICAL_EXIT();
+    }
+}
+
+/**
+ * \brief   Unregisters an interrupt
+ * 
+ * \param   int_id - Interrupt Number
+ * 
+ * Note: Once an interrupt is unregistered it will enter infinite loop once
+ * an interrupt occurs
+ * 
+ * \return      None.
+ **/
+void  Interrupt_controller::unregister_handler(uint32_t int_id)
+{
+    CPU_SR_ALLOC();
+
+    if (int_id > INTC::INTERRUPTS_NUM_MAX) 
+        return;
+
+    if (int_id < INTC::INTERRUPTS_NUM_MAX) 
+    {
+        CPU_CRITICAL_ENTER();
+        /* Assign default ISR */
+        interrupt_vector_table[int_id] = (INTC::Handler_ptr_t)interrupt_default_handler; 
         CPU_CRITICAL_EXIT();
     }
 }
@@ -429,7 +468,7 @@ void  Interrupt_controller::master_FIQ_disable(void)
  * \return  None.
  *
  **/
-void  Interrupt_controller::system_enable(uint32_t int_id)
+void  Interrupt_controller::system_enable(INTC::e_SYS_INTERRUPT int_id)
 {
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
@@ -450,7 +489,7 @@ void  Interrupt_controller::system_enable(uint32_t int_id)
  * \return  None.
  *
  **/
-void  Interrupt_controller::system_disable(uint32_t int_id)
+void  Interrupt_controller::system_disable(INTC::e_SYS_INTERRUPT int_id)
 {
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
@@ -463,39 +502,6 @@ void  Interrupt_controller::system_disable(uint32_t int_id)
     s_mir_set.b.MirSet = BIT(int_id % 32);   
 }
 
-/**
- * \brief    Registers an interrupt Handler in the interrupt vector table for
- *           system interrupts. 
- * 
- * \param    int_id - Interrupt Number
- * \param    pfn_handler - Function pointer to the ISR
- * 
- * Note: When the interrupt occurs for the sytem interrupt number indicated,
- * the control goes to the ISR given as the parameter.
- * 
- * \return      None.
- **/
-void  Interrupt_controller::register_handler(uint32_t int_id, void (*pfn_handler)(void))
-{
-    /* Assign ISR */
-    interrupt_vector_table[int_id] = (INTC::Handler_ptr_t)pfn_handler;
-}
-
-/**
- * \brief   Unregisters an interrupt
- * 
- * \param   int_id - Interrupt Number
- * 
- * Note: Once an interrupt is unregistered it will enter infinite loop once
- * an interrupt occurs
- * 
- * \return      None.
- **/
-void  Interrupt_controller::unregister_handler(uint32_t int_id)
-{
-    /* Assign default ISR */
-    interrupt_vector_table[int_id] = (INTC::Handler_ptr_t)interrupt_default_handler;
-}
 
 /**
  * \brief  Restore the processor IRQ only status. This does not affect 

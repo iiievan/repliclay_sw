@@ -2682,6 +2682,9 @@
                 <name>$PROJ_DIR$\src\app\DM_Timer.cpp</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\app\DM_Timer.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\app\HS_I2C.cpp</name>
             </file>
             <file>

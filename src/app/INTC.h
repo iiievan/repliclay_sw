@@ -570,7 +570,12 @@ namespace INTC
     constexpr         uint32_t  AM335x_INTC_BASE     = 0x48200000;
     constexpr AM335x_INTC_Type *AM335x_INTC          = ((AM335x_INTC_Type *) AM335x_INTC_BASE); 
     
-    constexpr          uint8_t PRIORITY_THRESHOLD = 0xFF;
+    constexpr  uint8_t PRIORITY_THRESHOLD = 0xFF;
+    constexpr uint32_t MAX_IRQ_PRIORITIES = 0x3F;
+
+    constexpr uint32_t HOSTINT_ROUTE_IRQ = 0;  // To route an interrupt to IRQ    
+    constexpr uint32_t HOSTINT_ROUTE_FIQ = 1;  // To route an interrupt to FIQ
+      
     typedef            void      (*Handler_ptr_t )(void *p_obj);
     
            uint32_t debug_dump_INTC(AM335x_INTC_Type &sINTC = *AM335x_INTC);
@@ -611,13 +616,13 @@ namespace INTC
         return (ISR_CLEAR_reg_t&)sISR_CLEAR;
     }
 
-    inline MIR_SET_reg_t& get_MIR_SET_reference(uint32_t int_id)
+    inline MIR_SET_reg_t& get_MIR_SET_reference(INTC::e_SYS_INTERRUPT int_id)
     {
         uint32_t sMIR_SET = (AM335x_INTC_BASE + 0x8c + (int_id * 0x20));
         return (MIR_SET_reg_t&)sMIR_SET;
     }
     
-    inline MIR_CLEAR_reg_t& get_MIR_CLEAR_reference(uint32_t int_id)
+    inline MIR_CLEAR_reg_t& get_MIR_CLEAR_reference(INTC::e_SYS_INTERRUPT int_id)
     {
         uint32_t sMIR_CLEAR = (AM335x_INTC_BASE + 0x88 + (int_id * 0x20));
         return (MIR_CLEAR_reg_t&)sMIR_CLEAR;
@@ -659,7 +664,8 @@ public:
         void  OS_CPU_except_handler(uint32_t  src_id);
         void  BSP_int_handler(uint32_t  src_nbr);
         void  BSP_int_clr (uint8_t  int_id);
-        void  BSP_int_vect_reg (uint8_t  int_id,  INTC::Handler_ptr_t isr_fnct);
+        void  register_handler(uint8_t  int_id,  INTC::Handler_ptr_t isr_fnct);
+        void  unregister_handler(uint32_t int_id);
         void  if_clk_free_run_set(void);
         void  if_clk_auto_gate_set(void);
         void  protection_enable(void);
@@ -675,10 +681,9 @@ public:
         void  master_IRQ_disable(void);
         void  master_FIQ_enable(void);
         void  master_FIQ_disable(void);
-        void  system_enable(uint32_t int_id);
-        void  system_disable(uint32_t int_id);
-        void  register_handler(uint32_t int_id, void (*pfn_handler)(void));
-        void  unregister_handler(uint32_t int_id);
+        void  system_enable(INTC::e_SYS_INTERRUPT int_id);
+        void  system_disable(INTC::e_SYS_INTERRUPT int_id);
+
         void  enable(uint8_t  status);
      uint8_t  disable(void);        
         void  priority_set(uint32_t int_id, uint32_t priority, uint32_t host_int_route);
@@ -699,5 +704,6 @@ private:
 };
 
 static void interrupt_default_handler(void);
+extern Interrupt_controller intc;
 
 #endif //_INTC_H_

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "app_utils.h"
 #include "PRCM.h"
+#include "INTC.h"
 
 namespace DMTIMER
 {
@@ -311,6 +312,7 @@ namespace DMTIMER
 } 
 
 class power_reset_clock_control;
+void DM_Timer_setup(void);
 
 class DM_Timer
 {
@@ -369,8 +371,9 @@ private:
                           while(m_sTIMER.TWPS.reg & twps_mask);
                   }
               
-   DMTIMER::AM335x_DMTIMER_Type  &m_sTIMER; 
-      power_reset_clock_control  &m_sPRCM;
+   DMTIMER::AM335x_DMTIMER_Type  &m_sTIMER;     // DM_Timer registers
+      power_reset_clock_control  &m_sPRCM;      // for clock contrlol setup and management
+      Interrupt_controller       &m_sINTC;      // for interrupt setup and management
 
                void (*m_irq_handler)(void *p_obj) { nullptr };
            uint64_t  m_time {0}; // the timer itself
@@ -389,5 +392,5 @@ extern DM_Timer dm_timer_6;
 extern DM_Timer dm_timer_7;
 
 #define OS_TIMER dm_timer_5
-#define OS_TIMER_INTERRUPT  SYS_INT_TINT5
+#define OS_TIMER_INTERRUPT  INTC::TINT5
 #endif //__DM_TIMER_H
