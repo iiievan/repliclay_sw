@@ -49,6 +49,7 @@ void  DM_Timer::disable()
 
 void DM_Timer::init(void)
 {     
+    // run clock for timer instance
     m_sPRCM.run_clk_DMTIMER(m_sTIMER); 
 
     // setup timer interrupt

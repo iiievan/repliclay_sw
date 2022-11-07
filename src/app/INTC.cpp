@@ -67,7 +67,7 @@ void  Interrupt_controller::init (void)
 
     for (uint32_t int_id = 0; int_id < INTC::INTERRUPTS_NUM_MAX; int_id++) 
     {
-        register_handler((uint8_t)int_id,(INTC::Handler_ptr_t)interrupt_default_handler);
+        register_handler((INTC::e_SYS_INTERRUPT)int_id,(INTC::Handler_ptr_t)interrupt_default_handler);
     }
     
     //REG_INTCPS_CONTROL = (INTC_CONTROL_NEWFIQAGR | INTC_CONTROL_NEWIRQAGR);
@@ -100,14 +100,14 @@ void  Interrupt_controller::OS_CPU_except_handler(uint32_t  src_id)
  
 void  Interrupt_controller::BSP_int_handler(uint32_t  src_nbr)
 {
-               uint8_t  int_nbr;
+  INTC::e_SYS_INTERRUPT  int_nbr;
     INTC::Handler_ptr_t  isr;
 
     switch (src_nbr) 
     {
         case OS_CPU_ARM_EXCEPT_IRQ:
              //int_nbr = REG_INTCPS_SIR_IRQ;
-             int_nbr = m_sINTC.SIR_IRQ.b.ActiveIRQ;
+             int_nbr = (INTC::e_SYS_INTERRUPT)m_sINTC.SIR_IRQ.b.ActiveIRQ;
 
              isr = interrupt_vector_table[int_nbr];
              if (isr != nullptr) 
@@ -123,7 +123,7 @@ void  Interrupt_controller::BSP_int_handler(uint32_t  src_nbr)
 
         case OS_CPU_ARM_EXCEPT_FIQ:
              //int_nbr = REG_INTCPS_SIR_FIQ;
-             int_nbr =  m_sINTC.SIR_FIQ.b.ActiveFIQ;
+             int_nbr =  (INTC::e_SYS_INTERRUPT)m_sINTC.SIR_FIQ.b.ActiveFIQ;
 
              isr = interrupt_vector_table[int_nbr];
              if (isr != nullptr) 
@@ -142,15 +142,15 @@ void  Interrupt_controller::BSP_int_handler(uint32_t  src_nbr)
     }
 }
 
-void  Interrupt_controller::BSP_int_clr (uint8_t  int_id)
+void  Interrupt_controller::BSP_int_clr (INTC::e_SYS_INTERRUPT  int_id)
 {    
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
 
-    INTC::ISR_CLEAR_reg_t &s_isr_clear = INTC::get_ISR_CLEAR_reference(int_id);   
+    INTC::ISR_CLEAR_reg_t *&s_isr_clear = INTC::get_ISR_CLEAR_reference(int_id);   
         
     //REG_INTCPS_ISR_CLEAR(reg_nbr) = BIT(int_id % 32);
-    s_isr_clear.b.IsrClear = BIT(int_id % 32);
+    s_isr_clear->b.IsrClear = BIT(int_id % 32);
 }
 
 /**
@@ -165,7 +165,7 @@ void  Interrupt_controller::BSP_int_clr (uint8_t  int_id)
  * 
  * \return      None.
  **/
-void  Interrupt_controller::register_handler(uint8_t  int_id, INTC::Handler_ptr_t isr_fnct)
+void  Interrupt_controller::register_handler(INTC::e_SYS_INTERRUPT  int_id, INTC::Handler_ptr_t isr_fnct)
 {
     CPU_SR_ALLOC();
 
@@ -191,7 +191,7 @@ void  Interrupt_controller::register_handler(uint8_t  int_id, INTC::Handler_ptr_
  * 
  * \return      None.
  **/
-void  Interrupt_controller::unregister_handler(uint32_t int_id)
+void  Interrupt_controller::unregister_handler(INTC::e_SYS_INTERRUPT int_id)
 {
     CPU_SR_ALLOC();
 
@@ -354,7 +354,7 @@ void  Interrupt_controller::priority_threshold_set(uint8_t threshold)
  * \return  None
  *
  **/
-void  Interrupt_controller::software_int_set(uint32_t int_id)
+void  Interrupt_controller::software_int_set(INTC::e_SYS_INTERRUPT int_id)
 {    
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
@@ -362,8 +362,8 @@ void  Interrupt_controller::software_int_set(uint32_t int_id)
     /* Enable the software interrupt in the corresponding ISR_SET register */
     //HWREG(SOC_AINTC_REGS + INTC_ISR_SET(intrNum >> REG_IDX_SHIFT)) = (0x01 << (intrNum & REG_BIT_MASK));
 
-    INTC::ISR_SET_reg_t &s_isr_set = INTC::get_ISR_SET_reference(int_id);           
-    s_isr_set.b.IsrSet = BIT(int_id % 32);
+    INTC::ISR_SET_reg_t *&s_isr_set = INTC::get_ISR_SET_reference(int_id);           
+    s_isr_set->b.IsrSet = BIT(int_id % 32);
 }
 
 /**
@@ -375,7 +375,7 @@ void  Interrupt_controller::software_int_set(uint32_t int_id)
  * \return  None
  *
  **/
-void  Interrupt_controller::software_int_clear(uint32_t int_id)
+void  Interrupt_controller::software_int_clear(INTC::e_SYS_INTERRUPT int_id)
 {
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
@@ -383,10 +383,10 @@ void  Interrupt_controller::software_int_clear(uint32_t int_id)
     /* Disable the software interrupt in the corresponding ISR_CLEAR register */
     //HWREG(SOC_AINTC_REGS + INTC_ISR_CLEAR(intrNum >> REG_IDX_SHIFT)) = (0x01 << (intrNum & REG_BIT_MASK));   
    
-    INTC::ISR_CLEAR_reg_t &s_isr_clear = INTC::get_ISR_CLEAR_reference(int_id);   
+    INTC::ISR_CLEAR_reg_t *&s_isr_clear = INTC::get_ISR_CLEAR_reference(int_id);   
         
     //REG_INTCPS_ISR_CLEAR(reg_nbr) = BIT(int_id % 32);
-    s_isr_clear.b.IsrClear = BIT(int_id % 32);
+    s_isr_clear->b.IsrClear = BIT(int_id % 32);
 }
 
 /**
@@ -470,6 +470,7 @@ void  Interrupt_controller::master_FIQ_disable(void)
  **/
 void  Interrupt_controller::system_enable(INTC::e_SYS_INTERRUPT int_id)
 {
+    volatile uint32_t mir_clear = BIT(int_id % 32);
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
     
@@ -477,8 +478,9 @@ void  Interrupt_controller::system_enable(INTC::e_SYS_INTERRUPT int_id)
     /* Disable the system interrupt in the corresponding MIR_CLEAR register */
     //HWREG(SOC_AINTC_REGS + INTC_MIR_CLEAR(intrNum >> REG_IDX_SHIFT)) = (0x01 << (intrNum & REG_BIT_MASK));
 
-    INTC::MIR_CLEAR_reg_t &s_mir_clear = INTC::get_MIR_CLEAR_reference(int_id);          
-    s_mir_clear.b.MirClear = BIT(int_id % 32);
+    INTC::MIR_CLEAR_reg_t *&s_mir_clear = INTC::get_MIR_CLEAR_reference(int_id);          
+    //s_mir_clear->b.MirClear = BIT(int_id % 32);
+    s_mir_clear->b.MirClear = mir_clear;
 }
 
 /**
@@ -498,8 +500,8 @@ void  Interrupt_controller::system_disable(INTC::e_SYS_INTERRUPT int_id)
     /* Enable the system interrupt in the corresponding MIR_SET register */
    // HWREG(SOC_AINTC_REGS + INTC_MIR_SET(intrNum >> REG_IDX_SHIFT)) = (0x01 << (intrNum & REG_BIT_MASK));
 
-    INTC::MIR_SET_reg_t &s_mir_set = INTC::get_MIR_SET_reference(int_id);          
-    s_mir_set.b.MirSet = BIT(int_id % 32);   
+    INTC::MIR_SET_reg_t *&s_mir_set = INTC::get_MIR_SET_reference(int_id);          
+    s_mir_set->b.MirSet = BIT(int_id % 32);   
 }
 
 
@@ -561,12 +563,12 @@ uint8_t  Interrupt_controller::disable(void)
  * \return  None.
  *
  **/
-void  Interrupt_controller::priority_set(uint32_t int_id, uint32_t priority, uint32_t host_int_route)
+void  Interrupt_controller::priority_set(INTC::e_SYS_INTERRUPT int_id, uint32_t priority, uint32_t host_int_route)
 {
     //HWREG(SOC_AINTC_REGS + INTC_ILR(intrNum)) = ((priority << INTC_ILR_PRIORITY_SHIFT)& INTC_ILR_PRIORITY) | hostIntRoute ;
-    INTC::INTC_ILR_reg_t &sILR = INTC::get_ILR_reference(int_id);
-    sILR.b.Priority = priority;
-    sILR.b.FIQnIRQ  = host_int_route;
+    INTC::INTC_ILR_reg_t *&sILR = INTC::get_ILR_reference(int_id);
+    sILR->b.Priority = priority;
+    sILR->b.FIQnIRQ  = host_int_route;
 }
 
 /**
@@ -665,12 +667,12 @@ uint8_t  Interrupt_controller::priority_threshold_get(void)
  *          FALSE - if the raw status is not set.   
  *
  **/
-bool  Interrupt_controller::raw_status_get(uint32_t int_id)
+bool  Interrupt_controller::raw_status_get(INTC::e_SYS_INTERRUPT int_id)
 {
     // return ((0 == ((HWREG(SOC_AINTC_REGS + INTC_ITR(intrNum >> REG_IDX_SHIFT)) >> (intrNum & REG_BIT_MASK))& 0x01)) ? FALSE : TRUE);
-    INTC::ITR_reg_t &s_raw_sts = INTC::get_ITR_reference(int_id);
+    INTC::ITR_reg_t *&s_raw_sts = INTC::get_ITR_reference(int_id);
     
-    if(s_raw_sts.b.Itr & BIT(int_id))
+    if(s_raw_sts->b.Itr & BIT(int_id))
         return true;
     else
         return false;
@@ -685,22 +687,22 @@ bool  Interrupt_controller::raw_status_get(uint32_t int_id)
  *          FALSE - in no interrupt is pending
  *
  **/
-bool  Interrupt_controller::pending_IRQ_masked_status_get(uint32_t int_id)
+bool  Interrupt_controller::pending_IRQ_masked_status_get(INTC::e_SYS_INTERRUPT int_id)
 {
     // return ((0 ==(HWREG(SOC_AINTC_REGS + INTC_PENDING_IRQ(intrNum >> REG_IDX_SHIFT)) >> (((intrNum & REG_BIT_MASK)) & 0x01))) ? FALSE : TRUE); 
-    INTC::PENDING_IRQ_reg_t &s_pending = INTC::get_pending_IRQ_reference(int_id);
+    INTC::PENDING_IRQ_reg_t *&s_pending = INTC::get_pending_IRQ_reference(int_id);
     
-    if(s_pending.b.PendingIRQ & BIT(int_id))
+    if(s_pending->b.PendingIRQ & BIT(int_id))
         return true;
     else
         return false;
 }
 
-bool  Interrupt_controller::pending_FIQ_masked_status_get(uint32_t int_id)
+bool  Interrupt_controller::pending_FIQ_masked_status_get(INTC::e_SYS_INTERRUPT int_id)
 {
-    INTC::PENDING_FIQ_reg_t &s_pending = INTC::get_pending_FIQ_reference(int_id);
+    INTC::PENDING_FIQ_reg_t *&s_pending = INTC::get_pending_FIQ_reference(int_id);
     
-    if(s_pending.b.PendingFIQ & BIT(int_id))
+    if(s_pending->b.PendingFIQ & BIT(int_id))
         return true;
     else
         return false;

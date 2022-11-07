@@ -578,15 +578,17 @@ namespace INTC
       
     typedef            void      (*Handler_ptr_t )(void *p_obj);
     
-           uint32_t debug_dump_INTC(AM335x_INTC_Type &sINTC = *AM335x_INTC);
-     ISR_SET_reg_t& get_ISR_SET_reference(uint32_t int_id);
-   ISR_CLEAR_reg_t& get_ISR_CLEAR_reference(uint32_t int_id);
-     MIR_SET_reg_t& get_MIR_SET_reference(uint32_t int_id);
-   MIR_CLEAR_reg_t& get_MIR_CLEAR_reference(uint32_t int_id);
-    INTC_ILR_reg_t& get_ILR_reference(uint32_t int_id);
-         ITR_reg_t& get_ITR_reference(uint32_t int_id);
- PENDING_IRQ_reg_t& get_pending_IRQ_reference(uint32_t int_id);
- PENDING_FIQ_reg_t& get_pending_FIQ_reference(uint32_t int_id);
+            uint32_t debug_dump_INTC(AM335x_INTC_Type &sINTC = *AM335x_INTC);
+ 
+         ITR_reg_t*& get_ITR_reference(INTC::e_SYS_INTERRUPT int_id);
+         MIR_reg_t*& get_MIR_reference(INTC::e_SYS_INTERRUPT int_id);
+   MIR_CLEAR_reg_t*& get_MIR_CLEAR_reference(INTC::e_SYS_INTERRUPT int_id);
+     MIR_SET_reg_t*& get_MIR_SET_reference(INTC::e_SYS_INTERRUPT int_id);            
+     ISR_SET_reg_t*& get_ISR_SET_reference(INTC::e_SYS_INTERRUPT int_id);
+   ISR_CLEAR_reg_t*& get_ISR_CLEAR_reference(INTC::e_SYS_INTERRUPT int_id);
+ PENDING_IRQ_reg_t*& get_pending_IRQ_reference(INTC::e_SYS_INTERRUPT int_id);
+ PENDING_FIQ_reg_t*& get_pending_FIQ_reference(INTC::e_SYS_INTERRUPT int_id);
+    INTC_ILR_reg_t*& get_ILR_reference(INTC::e_SYS_INTERRUPT int_id);
     
     /* for testing purpose */
     inline uint32_t debug_dump_INTC(AM335x_INTC_Type &sINTC)
@@ -603,53 +605,67 @@ namespace INTC
         
         return SIZEOF_INTC;
     }
-
-    inline ISR_SET_reg_t& get_ISR_SET_reference(uint32_t int_id) 
+    
+    inline ITR_reg_t*& get_ITR_reference(INTC::e_SYS_INTERRUPT int_id) 
     {
-        uint32_t sISR_SET= (AM335x_INTC_BASE + 0x90 + (int_id * 0x20));
-        return (ISR_SET_reg_t&)sISR_SET;
+        uint32_t n = ((uint32_t)int_id)/32;
+        uint32_t ITR = (AM335x_INTC_BASE + 0x80 + (n * 0x20));
+        return (ITR_reg_t*&)ITR;
     }
     
-    inline ISR_CLEAR_reg_t& get_ISR_CLEAR_reference(uint32_t int_id) 
+    inline MIR_reg_t*& get_MIR_reference(INTC::e_SYS_INTERRUPT int_id) 
     {
-        uint32_t sISR_CLEAR = (AM335x_INTC_BASE + 0x94 + (int_id * 0x20));
-        return (ISR_CLEAR_reg_t&)sISR_CLEAR;
-    }
-
-    inline MIR_SET_reg_t& get_MIR_SET_reference(INTC::e_SYS_INTERRUPT int_id)
-    {
-        uint32_t sMIR_SET = (AM335x_INTC_BASE + 0x8c + (int_id * 0x20));
-        return (MIR_SET_reg_t&)sMIR_SET;
+        uint32_t n = ((uint32_t)int_id)/32;
+        uint32_t MIR = (AM335x_INTC_BASE + 0x84 + (n * 0x20));
+        return (MIR_reg_t*&)MIR;
     }
     
-    inline MIR_CLEAR_reg_t& get_MIR_CLEAR_reference(INTC::e_SYS_INTERRUPT int_id)
+    inline MIR_CLEAR_reg_t*& get_MIR_CLEAR_reference(INTC::e_SYS_INTERRUPT int_id)
     {
-        uint32_t sMIR_CLEAR = (AM335x_INTC_BASE + 0x88 + (int_id * 0x20));
-        return (MIR_CLEAR_reg_t&)sMIR_CLEAR;
-    }
-       
-    inline INTC_ILR_reg_t& get_ILR_reference(uint32_t int_id) 
-    {
-        uint32_t ILR = (AM335x_INTC_BASE + 0x100 + (int_id * 0x04));
-        return (INTC_ILR_reg_t&)ILR;
+        uint32_t n = ((uint32_t)int_id)/32;
+        uint32_t sMIR_CLEAR = (AM335x_INTC_BASE + 0x88 + (n * 0x20));
+        return (MIR_CLEAR_reg_t*&)sMIR_CLEAR;
     }
     
-    inline ITR_reg_t& get_ITR_reference(uint32_t int_id) 
+    inline MIR_SET_reg_t*& get_MIR_SET_reference(INTC::e_SYS_INTERRUPT int_id)
     {
-        uint32_t ITR = (AM335x_INTC_BASE + 0x80 + (int_id * 0x20));
-        return (ITR_reg_t&)ITR;
+        uint32_t n = ((uint32_t)int_id)/32;
+        uint32_t sMIR_SET = (AM335x_INTC_BASE + 0x8c + (n * 0x20));
+        return (MIR_SET_reg_t*&)sMIR_SET;
     }
+    
+    inline ISR_SET_reg_t*& get_ISR_SET_reference(INTC::e_SYS_INTERRUPT int_id) 
+    {
+        uint32_t n = ((uint32_t)int_id)/32;
+        uint32_t sISR_SET= (AM335x_INTC_BASE + 0x90 + (n * 0x20));
+        return (ISR_SET_reg_t*&)sISR_SET;
+    }
+    
+    inline ISR_CLEAR_reg_t*& get_ISR_CLEAR_reference(INTC::e_SYS_INTERRUPT int_id) 
+    {
+        uint32_t n = ((uint32_t)int_id)/32;
+        uint32_t sISR_CLEAR = (AM335x_INTC_BASE + 0x94 + (n * 0x20));
+        return (ISR_CLEAR_reg_t*&)sISR_CLEAR;
+    } 
       
-    inline PENDING_IRQ_reg_t& get_pending_IRQ_reference(uint32_t int_id) 
+    inline PENDING_IRQ_reg_t*& get_pending_IRQ_reference(INTC::e_SYS_INTERRUPT int_id) 
     {
-        uint32_t PENDING = (AM335x_INTC_BASE + 0x98 + (int_id * 0x20));
-        return (PENDING_IRQ_reg_t&)PENDING;
+        uint32_t n = ((uint32_t)int_id)/32;
+        uint32_t PENDING = (AM335x_INTC_BASE + 0x98 + (n * 0x20));
+        return (PENDING_IRQ_reg_t*&)PENDING;
     }
     
-    inline PENDING_FIQ_reg_t& get_pending_FIQ_reference(uint32_t int_id) 
+    inline PENDING_FIQ_reg_t*& get_pending_FIQ_reference(INTC::e_SYS_INTERRUPT int_id) 
     {
-        uint32_t PENDING = (AM335x_INTC_BASE + 0x9c + (int_id * 0x20));
-        return (PENDING_FIQ_reg_t&)PENDING;
+        uint32_t n = ((uint32_t)int_id)/32;
+        uint32_t PENDING = (AM335x_INTC_BASE + 0x9c + (n * 0x20));
+        return (PENDING_FIQ_reg_t*&)PENDING;
+    }
+    
+    inline INTC_ILR_reg_t*& get_ILR_reference(INTC::e_SYS_INTERRUPT int_id) 
+    {
+        uint32_t ILR = (AM335x_INTC_BASE + 0x100 + (((uint32_t)int_id) * 0x04));
+        return (INTC_ILR_reg_t*&)ILR;
     }
 }
 
@@ -663,9 +679,9 @@ public:
         void  init (void);
         void  OS_CPU_except_handler(uint32_t  src_id);
         void  BSP_int_handler(uint32_t  src_nbr);
-        void  BSP_int_clr (uint8_t  int_id);
-        void  register_handler(uint8_t  int_id,  INTC::Handler_ptr_t isr_fnct);
-        void  unregister_handler(uint32_t int_id);
+        void  BSP_int_clr (INTC::e_SYS_INTERRUPT  int_id);
+        void  register_handler(INTC::e_SYS_INTERRUPT  int_id,  INTC::Handler_ptr_t isr_fnct);
+        void  unregister_handler(INTC::e_SYS_INTERRUPT int_id);
         void  if_clk_free_run_set(void);
         void  if_clk_auto_gate_set(void);
         void  protection_enable(void);
@@ -675,8 +691,8 @@ public:
         void  func_clk_free_run_set(void);
         void  func_clk_auto_gate_set(void);
         void  priority_threshold_set(uint8_t threshold);
-        void  software_int_set(uint32_t int_id);
-        void  software_int_clear(uint32_t int_id);
+        void  software_int_set(INTC::e_SYS_INTERRUPT int_id);
+        void  software_int_clear(INTC::e_SYS_INTERRUPT int_id);
         void  master_IRQ_enable(void);
         void  master_IRQ_disable(void);
         void  master_FIQ_enable(void);
@@ -686,7 +702,7 @@ public:
 
         void  enable(uint8_t  status);
      uint8_t  disable(void);        
-        void  priority_set(uint32_t int_id, uint32_t priority, uint32_t host_int_route);
+        void  priority_set(INTC::e_SYS_INTERRUPT int_id, uint32_t priority, uint32_t host_int_route);
     uint32_t  master_status_get(void);
     uint32_t  active_IRQ_num_get(void);
     uint32_t  active_FIQ_num_get(void);
@@ -695,9 +711,9 @@ public:
     uint32_t  curr_IRQ_priorigty_get(void);
     uint32_t  curr_FIQ_priority_get(void);
      uint8_t  priority_threshold_get(void);
-        bool  raw_status_get(uint32_t int_id);
-        bool  pending_IRQ_masked_status_get(uint32_t int_id);
-        bool  pending_FIQ_masked_status_get(uint32_t int_id);
+        bool  raw_status_get(INTC::e_SYS_INTERRUPT int_id);
+        bool  pending_IRQ_masked_status_get(INTC::e_SYS_INTERRUPT int_id);
+        bool  pending_FIQ_masked_status_get(INTC::e_SYS_INTERRUPT int_id);
 
 private:
     INTC::AM335x_INTC_Type &m_sINTC;

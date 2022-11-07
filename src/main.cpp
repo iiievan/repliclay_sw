@@ -159,6 +159,6 @@ void DMTimer_irqhandler(void *p_obj)
 
     /* Enable the DMTimer interrupts */
     OS_TIMER.IRQ_enable(DMTIMER::IRQ_OVF);
-    IntSystemEnable(OS_TIMER_INTERRUPT);  
+    intc.system_enable(OS_TIMER_INTERRUPT);  
 }
 
