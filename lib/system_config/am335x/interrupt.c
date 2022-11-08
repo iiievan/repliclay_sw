@@ -139,7 +139,7 @@ void IntAINTCInit(void)
     
     REG_INTCPS_CONTROL = (INTC_CONTROL_NEWFIQAGR | INTC_CONTROL_NEWIRQAGR);
 }
-
+/*
 void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
 {
     switch (src_id) {
@@ -159,7 +159,7 @@ void  OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
              break;
     }
 }
-
+*/
 void  BSP_IntHandler (CPU_INT32U  src_nbr)
 {
     CPU_INT32U    int_nbr;

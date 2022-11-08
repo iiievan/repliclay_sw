@@ -187,7 +187,7 @@ extern "C" {
 **                     API FUNCTION PROTOTYPES
 *****************************************************************************/
 extern void IntAINTCInit (void);
-extern void OS_CPU_ExceptHndlr   (CPU_INT32U  src_id);
+//extern void OS_CPU_ExceptHndlr   (CPU_INT32U  src_id);
 extern void BSP_IntHandler       (CPU_INT32U     src_nbr);
 extern void BSP_IntClr (CPU_INT08U  int_id);
 extern void BSP_IntVectReg (CPU_INT08U  int_id, CPU_FNCT_PTR    isr_fnct);

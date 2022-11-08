@@ -1,11 +1,20 @@
 #include "INTC.h"
-#include  <cpu_core.h>
-#include  <os.h>
 #include "cpu.h"
-//#include "uC_cpu.h"
 
 Interrupt_controller intc;
 INTC::Handler_ptr_t interrupt_vector_table[INTC::INTERRUPTS_NUM_MAX];
+
+/**
+ * The Default Interrupt Handler.
+ *
+ * This is the default interrupt handler for all interrupts. It simply returns
+ * without performing any operation.
+ **/
+static void interrupt_default_handler(void)
+{
+    /* Go Back. Nothing to be done */
+    return;
+}
 
 static  void  OS_exept_handler (uint8_t  except_type)
 {
@@ -20,16 +29,60 @@ static  void  OS_exept_handler (uint8_t  except_type)
     }
 }
 
-/**
- * The Default Interrupt Handler.
- *
- * This is the default interrupt handler for all interrupts. It simply returns
- * without performing any operation.
- **/
-static void interrupt_default_handler(void)
+void OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
 {
-    /* Go Back. Nothing to be done */
-    return;
+    switch (src_id) 
+    {
+        case OS_CPU_ARM_EXCEPT_IRQ:
+        case OS_CPU_ARM_EXCEPT_FIQ:
+             interrupt_handler((uint32_t)src_id);
+             break;
+
+        case OS_CPU_ARM_EXCEPT_RESET:
+        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
+        case OS_CPU_ARM_EXCEPT_SWI:
+        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
+        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
+        case OS_CPU_ARM_EXCEPT_ADDR_ABORT:
+        default:
+             OS_exept_handler((uint8_t)src_id);
+             break;
+    }
+}
+
+void  interrupt_handler(uint32_t  src_nbr)
+{
+ INTC::e_SYS_INTERRUPT  int_nbr;
+    INTC::Handler_ptr_t  isr;
+
+    switch (src_nbr) 
+    {
+        case OS_CPU_ARM_EXCEPT_IRQ:
+             int_nbr = (INTC::e_SYS_INTERRUPT)INTC::AM335x_INTC->SIR_IRQ.b.ActiveIRQ;
+
+             isr = interrupt_vector_table[int_nbr];
+             if (isr != nullptr) 
+                 isr((void *)int_nbr);
+             
+			 intc.software_int_clear(int_nbr);              // Clear interrupt
+             INTC::AM335x_INTC->CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
+             break;
+
+        case OS_CPU_ARM_EXCEPT_FIQ:
+             int_nbr =  (INTC::e_SYS_INTERRUPT)INTC::AM335x_INTC->SIR_FIQ.b.ActiveFIQ;
+
+             isr = interrupt_vector_table[int_nbr];
+             if (isr != nullptr) 
+                 isr((void *)int_nbr);
+             
+			 intc.software_int_clear(int_nbr);              // Clear interrupt
+
+             INTC::AM335x_INTC->CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
+             break;
+
+        default:
+             break;
+    }
 }
 
 /**
@@ -44,22 +97,15 @@ static void interrupt_default_handler(void)
 void  Interrupt_controller::init (void)
 { 
     /* Reset the ARM interrupt controller */
-    //HWREG(SOC_AINTC_REGS + INTC_SYSCONFIG) = INTC_SYSCONFIG_SOFTRESET;
     m_sINTC.SYSCONFIG.b.SoftReset = HIGH;
  
-    /* Wait for the reset to complete */
-    //while((HWREG(SOC_AINTC_REGS + INTC_SYSSTATUS)& INTC_SYSSTATUS_RESETDONE) != INTC_SYSSTATUS_RESETDONE);    
+    /* Wait for the reset to complete */  
     while(m_sINTC.SYSSTATUS.b.ResetDone != HIGH);
     
     /* Enable any interrupt generation by setting priority threshold */ 
-    //HWREG(SOC_AINTC_REGS + INTC_THRESHOLD) = INTC_THRESHOLD_PRIORITYTHRESHOLD;
     m_sINTC.THRESHOLD.b.PriorityThreshold = INTC::PRIORITY_THRESHOLD;
     
     /* Disable all pending interrupts                       */
-    //REG_INTCPS_ISR_CLEAR(0) = DEF_BIT_FIELD(32u, 0u);
-    //REG_INTCPS_ISR_CLEAR(1) = DEF_BIT_FIELD(32u, 0u);
-    //REG_INTCPS_ISR_CLEAR(2) = DEF_BIT_FIELD(32u, 0u);
-    //REG_INTCPS_ISR_CLEAR(3) = DEF_BIT_FIELD(32u, 0u);
     m_sINTC.ISR_CLEAR0.reg = 0xFF;
     m_sINTC.ISR_CLEAR1.reg = 0xFF;
     m_sINTC.ISR_CLEAR2.reg = 0xFF;
@@ -70,86 +116,16 @@ void  Interrupt_controller::init (void)
         register_handler((INTC::e_SYS_INTERRUPT)int_id,(INTC::Handler_ptr_t)interrupt_default_handler);
     }
     
-    //REG_INTCPS_CONTROL = (INTC_CONTROL_NEWFIQAGR | INTC_CONTROL_NEWIRQAGR);
     m_sINTC.CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
     m_sINTC.CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
-    
-    return;
-}
-
-void  Interrupt_controller::OS_CPU_except_handler(uint32_t  src_id)
-{
-    switch (src_id) 
-    {
-        case OS_CPU_ARM_EXCEPT_IRQ:
-        case OS_CPU_ARM_EXCEPT_FIQ:
-             BSP_int_handler((uint32_t)src_id);
-             break;
-
-        case OS_CPU_ARM_EXCEPT_RESET:
-        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
-        case OS_CPU_ARM_EXCEPT_SWI:
-        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
-        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
-        case OS_CPU_ARM_EXCEPT_ADDR_ABORT:
-        default:
-             OS_exept_handler((uint8_t)src_id);
-             break;
-    }
 }
  
-void  Interrupt_controller::BSP_int_handler(uint32_t  src_nbr)
-{
-  INTC::e_SYS_INTERRUPT  int_nbr;
-    INTC::Handler_ptr_t  isr;
-
-    switch (src_nbr) 
-    {
-        case OS_CPU_ARM_EXCEPT_IRQ:
-             //int_nbr = REG_INTCPS_SIR_IRQ;
-             int_nbr = (INTC::e_SYS_INTERRUPT)m_sINTC.SIR_IRQ.b.ActiveIRQ;
-
-             isr = interrupt_vector_table[int_nbr];
-             if (isr != nullptr) 
-             {
-                 isr((void *)int_nbr);
-             }
-             
-			 BSP_int_clr(int_nbr);                               /* Clear interrupt									   	*/
-
-			 //REG_INTCPS_CONTROL = INTC_CONTROL_NEWIRQAGR;
-             m_sINTC.CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
-             break;
-
-        case OS_CPU_ARM_EXCEPT_FIQ:
-             //int_nbr = REG_INTCPS_SIR_FIQ;
-             int_nbr =  (INTC::e_SYS_INTERRUPT)m_sINTC.SIR_FIQ.b.ActiveFIQ;
-
-             isr = interrupt_vector_table[int_nbr];
-             if (isr != nullptr) 
-             {
-                 isr((void *)int_nbr);
-             }
-             
-			 BSP_int_clr(int_nbr);                       		/* Clear interrupt									   	*/
-
-			 //REG_INTCPS_CONTROL = INTC_CONTROL_NEWFIQAGR;
-             m_sINTC.CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
-             break;
-
-        default:
-             break;
-    }
-}
-
 void  Interrupt_controller::BSP_int_clr (INTC::e_SYS_INTERRUPT  int_id)
 {    
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
 
     INTC::ISR_CLEAR_reg_t *&s_isr_clear = INTC::get_ISR_CLEAR_reference(int_id);   
-        
-    //REG_INTCPS_ISR_CLEAR(reg_nbr) = BIT(int_id % 32);
     s_isr_clear->b.IsrClear = BIT(int_id % 32);
 }
 
@@ -380,12 +356,8 @@ void  Interrupt_controller::software_int_clear(INTC::e_SYS_INTERRUPT int_id)
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
     
-    /* Disable the software interrupt in the corresponding ISR_CLEAR register */
-    //HWREG(SOC_AINTC_REGS + INTC_ISR_CLEAR(intrNum >> REG_IDX_SHIFT)) = (0x01 << (intrNum & REG_BIT_MASK));   
-   
+    /* Disable the software interrupt in the corresponding ISR_CLEAR register */   
     INTC::ISR_CLEAR_reg_t *&s_isr_clear = INTC::get_ISR_CLEAR_reference(int_id);   
-        
-    //REG_INTCPS_ISR_CLEAR(reg_nbr) = BIT(int_id % 32);
     s_isr_clear->b.IsrClear = BIT(int_id % 32);
 }
 
@@ -470,17 +442,13 @@ void  Interrupt_controller::master_FIQ_disable(void)
  **/
 void  Interrupt_controller::system_enable(INTC::e_SYS_INTERRUPT int_id)
 {
-    volatile uint32_t mir_clear = BIT(int_id % 32);
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
     
     __asm(" dsb");
-    /* Disable the system interrupt in the corresponding MIR_CLEAR register */
-    //HWREG(SOC_AINTC_REGS + INTC_MIR_CLEAR(intrNum >> REG_IDX_SHIFT)) = (0x01 << (intrNum & REG_BIT_MASK));
-
+    /** Disable the system interrupt in the corresponding MIR_CLEAR register **/
     INTC::MIR_CLEAR_reg_t *&s_mir_clear = INTC::get_MIR_CLEAR_reference(int_id);          
-    //s_mir_clear->b.MirClear = BIT(int_id % 32);
-    s_mir_clear->b.MirClear = mir_clear;
+    s_mir_clear->b.MirClear = BIT(int_id % 32);
 }
 
 /**

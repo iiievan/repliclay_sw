@@ -149,16 +149,12 @@ int main()
 
 void DMTimer_irqhandler(void *p_obj)
 {  
-    /* Disable the DMTimer interrupts */
-    OS_TIMER.IRQ_disable(DMTIMER::IRQ_OVF);
-    
-    /* Clear the status of the interrupt flags */
-    OS_TIMER.IRQ_clear(DMTIMER::IRQ_OVF);
+    OS_TIMER.IRQ_disable(DMTIMER::IRQ_OVF); // Disable the DMTimer interrupts    
+    OS_TIMER.IRQ_clear(DMTIMER::IRQ_OVF);   // Clear the status of the interrupt flags 
 
     OSTimeTick();
-
-    /* Enable the DMTimer interrupts */
-    OS_TIMER.IRQ_enable(DMTIMER::IRQ_OVF);
+    
+    OS_TIMER.IRQ_enable(DMTIMER::IRQ_OVF);  // Enable the DM_Timer interrupts
     intc.system_enable(OS_TIMER_INTERRUPT);  
 }
 

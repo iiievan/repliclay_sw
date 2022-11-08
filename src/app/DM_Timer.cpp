@@ -14,8 +14,6 @@ void DM_Timer_setup(void)
     uint32_t dmtimer_mode =  DMTIMER::MODE_AUTORELOAD | (!DMTIMER::MODE_COMPARE); //  mode : autoreload and no compare
 
     OS_TIMER.init(); //This function will enable clocks and interrupt for the DM_Timer instance
-    /* Register DMTimer2 interrupts on to AINTC */
-    //DMTimerAintcConfigure();
     
     OS_TIMER.counter_set(DMTIMER2_INITIAL_COUNT); //Load the counter with the initial count value
     OS_TIMER.reload_set(DMTIMER2_RLD_COUNT);    //Load the load register with the reload count value
@@ -52,7 +50,7 @@ void DM_Timer::init(void)
     // run clock for timer instance
     m_sPRCM.run_clk_DMTIMER(m_sTIMER); 
 
-    // setup timer interrupt
+    // setup timer interrupt in INTC
     m_sINTC.register_handler(OS_TIMER_INTERRUPT,(INTC::Handler_ptr_t)DMTimer_irqhandler);            // Registering DMTimer_irqhandler
     m_sINTC.priority_set(OS_TIMER_INTERRUPT,(INTC::MAX_IRQ_PRIORITIES -1), INTC::HOSTINT_ROUTE_IRQ); // Set the lowest priority
     m_sINTC.system_enable(OS_TIMER_INTERRUPT);                                                       // Enable the system interrupt
