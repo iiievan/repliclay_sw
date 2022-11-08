@@ -68,7 +68,9 @@
 /*                                                  FUNCTION PROTOTYPES                                                   */
 /**************************************************************************************************************************/
 
-//static void DMTimerAintcConfigure(void);
+
+static void DMTimerAintcConfigure(void);
+static void DMTimerSetUp(void);
 static void GPIOModuleClkConfig(CPU_INT32U x);
 
 /**************************************************************************************************************************/
@@ -93,9 +95,9 @@ void configure_platform(void)
     /* Initiate MMU and ... Invoke Cache */
     InitMem(); 
     
-    //IntAINTCInit();    
+    IntAINTCInit();    
     //BSP_IntInit();
-    intc.init(); //Initializing the ARM Interrupt Controller.
+    //intc.init(); //Initializing the ARM Interrupt Controller.
     
     /* Enable Branch Prediction Shit */
     CP15BranchPredictionEnable();
@@ -106,7 +108,11 @@ void configure_platform(void)
     /* Select the console type based on compile time check */
     ConsoleUtilsSetType(CONSOLE_UART);
 
-    DM_Timer_setup(); // Perform the necessary configurations for DMTimer
+    //DM_Timer_setup(); // Perform the necessary configurations for DMTimer
+    /* This function will enable clocks for the DMTimer2 instance */
+    OS_TIMER.init();
+    DMTimerAintcConfigure();
+    DMTimerSetUp();
 }
 
 void halBspInit(void)   
@@ -120,6 +126,44 @@ void halBspInit(void)
 
 	/* Resetting the GPIO module. */
 	GPIOModuleReset(SOC_GPIO_1_REGS);
+}
+
+/*
+** Do the necessary DMTimer configurations on to AINTC.
+*/
+#define configMAX_IRQ_PRIORITIES                ((CPU_INT32U)(0x3Ful))
+
+static void DMTimerAintcConfigure(void)
+{
+    /* Registering DMTimerIsr */
+    //IntRegister(SYS_INT_TINT2, DMTimerIsr);
+    BSP_IntVectReg(OS_TIMER_INTERRUPT,(CPU_FNCT_PTR)DMTimer_irqhandler);
+    /* Set the priority */
+    IntPrioritySet(OS_TIMER_INTERRUPT,(configMAX_IRQ_PRIORITIES -1), AINTC_HOSTINT_ROUTE_IRQ); /* Lowest Priority */
+
+    /* Enable the system interrupt */
+    IntSystemEnable(OS_TIMER_INTERRUPT);
+}
+
+
+/*
+** Setup the timer for one-shot and compare mode.
+** Setup the timer 2 to generate the tick interrupts at the required frequency.
+ */
+
+#define DMTIMER2_INITIAL_COUNT             (0xffffa261) // 1ms approximate
+#define DMTIMER2_RLD_COUNT                 (0xffffa261) // 1ms approximate
+
+static void DMTimerSetUp(void)
+{
+    uint32_t dmtimer_mode =  DMTIMER::MODE_AUTORELOAD | (!DMTIMER::MODE_COMPARE); //  mode : autoreload and no compare
+    /* Load the counter with the initial count value */
+    OS_TIMER.counter_set(DMTIMER2_INITIAL_COUNT);
+    /* Load the load register with the reload count value */
+    OS_TIMER.reload_set(DMTIMER2_RLD_COUNT);
+    /* Configure the DMTimer for Auto-reload and compare mode */
+    OS_TIMER.mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode);
+    OS_TIMER.enable();
 }
 
 static void GPIOModuleClkConfig(CPU_INT32U x)
