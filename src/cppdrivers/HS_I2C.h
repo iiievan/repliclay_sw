@@ -92,6 +92,27 @@ namespace I2C
         } b;                                   // Structure used for bit access 
         uint32_t  reg;                         // Type used for register access 
     } I2C_IRQSTATUS_RAW_reg_t;
+
+    enum e_IRQSTATUS_RAW_flags: uint32_t
+    {
+        F_IRQSTATUS_RAW_NONE     = 0u,
+        F_IRQSTATUS_RAW_AL       = BIT(0),
+        F_IRQSTATUS_RAW_NACK     = BIT(1),
+        F_IRQSTATUS_RAW_ARDY     = BIT(2),
+        F_IRQSTATUS_RAW_RRDY     = BIT(3),
+        F_IRQSTATUS_RAW_XRDY     = BIT(4),
+        F_IRQSTATUS_RAW_GC       = BIT(5),
+        F_IRQSTATUS_RAW_STC      = BIT(6),
+        F_IRQSTATUS_RAW_AERR     = BIT(7),
+        F_IRQSTATUS_RAW_BF       = BIT(8),
+        F_IRQSTATUS_RAW_AAS      = BIT(9),
+        F_IRQSTATUS_RAW_XUDF     = BIT(10),
+        F_IRQSTATUS_RAW_ROVR     = BIT(11),
+        F_IRQSTATUS_RAW_BB       = BIT(12),
+        F_IRQSTATUS_RAW_RDR      = BIT(13),
+        F_IRQSTATUS_RAW_XDR      = BIT(14),
+        F_IRQSTATUS_RAW_ALL      = 0x1F
+    };
     
     /* [reset state = 0x0]*/
     typedef union 
@@ -122,6 +143,27 @@ namespace I2C
         } b;                                   // Structure used for bit access 
         uint32_t  reg;                         // Type used for register access 
     } I2C_IRQSTATUS_reg_t;
+
+    enum e_IRQSTATUS_flags: uint32_t
+    {
+        F_IRQSTATUS_NONE     = 0u,
+        F_IRQSTATUS_AL       = BIT(0),
+        F_IRQSTATUS_NACK     = BIT(1),
+        F_IRQSTATUS_ARDY     = BIT(2),
+        F_IRQSTATUS_RRDY     = BIT(3),
+        F_IRQSTATUS_XRDY     = BIT(4),
+        F_IRQSTATUS_GC       = BIT(5),
+        F_IRQSTATUS_STC      = BIT(6),
+        F_IRQSTATUS_AERR     = BIT(7),
+        F_IRQSTATUS_BF       = BIT(8),
+        F_IRQSTATUS_AAS      = BIT(9),
+        F_IRQSTATUS_XUDF     = BIT(10),
+        F_IRQSTATUS_ROVR     = BIT(11),
+        F_IRQSTATUS_BB       = BIT(12),
+        F_IRQSTATUS_RDR      = BIT(13),
+        F_IRQSTATUS_XDR      = BIT(14),
+        F_IRQSTATUS_ALL      = 0x1F
+    };
     
     /* [reset state = 0x0]*/
     typedef union 
@@ -150,6 +192,26 @@ namespace I2C
         } b;                                  // Structure used for bit access 
         uint32_t  reg;                        // Type used for register access 
     } I2C_IRQENABLE_SET_reg_t;
+
+    enum e_IRQENABLE_SET_flags: uint32_t
+    {
+        F_IRQENABLE_SET_NONE        = 0u,
+        F_IRQENABLE_SET_AL_IE       = BIT(0),
+        F_IRQENABLE_SET_NACK_IE     = BIT(1),
+        F_IRQENABLE_SET_ARDY_IE     = BIT(2),
+        F_IRQENABLE_SET_RRDY_IE     = BIT(3),
+        F_IRQENABLE_SET_XRDY_IE     = BIT(4),
+        F_IRQENABLE_SET_GC_IE       = BIT(5),
+        F_IRQENABLE_SET_STC_IE      = BIT(6),
+        F_IRQENABLE_SET_AERR_IE     = BIT(7),
+        F_IRQENABLE_SET_BF_IE       = BIT(8),
+        F_IRQENABLE_SET_AAS_IE      = BIT(9),
+        F_IRQENABLE_SET_XUDF_IE     = BIT(10),
+        F_IRQENABLE_SET_ROVR_IE     = BIT(11),
+        F_IRQENABLE_SET_RDR_IE      = BIT(13),
+        F_IRQENABLE_SET_XDR_IE      = BIT(14),
+        F_IRQENABLE_SET_ALL         = 0x1F
+    };
     
     /* [reset state = 0x0]*/
     typedef union 
@@ -178,6 +240,26 @@ namespace I2C
         } b;                                  // Structure used for bit access 
         uint32_t  reg;                        // Type used for register access 
     } I2C_IRQENABLE_CLR_reg_t;
+
+    enum e_IRQENABLE_CLR_flags: uint32_t
+    {
+        F_IRQENABLE_CLR_NONE        = 0u,
+        F_IRQENABLE_CLR_AL_IE       = BIT(0),
+        F_IRQENABLE_CLR_NACK_IE     = BIT(1),
+        F_IRQENABLE_CLR_ARDY_IE     = BIT(2),
+        F_IRQENABLE_CLR_RRDY_IE     = BIT(3),
+        F_IRQENABLE_CLR_XRDY_IE     = BIT(4),
+        F_IRQENABLE_CLR_GC_IE       = BIT(5),
+        F_IRQENABLE_CLR_STC_IE      = BIT(6),
+        F_IRQENABLE_CLR_AERR_IE     = BIT(7),
+        F_IRQENABLE_CLR_BF_IE       = BIT(8),
+        F_IRQENABLE_CLR_AAS_IE      = BIT(9),
+        F_IRQENABLE_CLR_XUDF_IE     = BIT(10),
+        F_IRQENABLE_CLR_ROVR_IE     = BIT(11),
+        F_IRQENABLE_CLR_RDR_IE      = BIT(13),
+        F_IRQENABLE_CLR_XDR_IE      = BIT(14),
+        F_IRQENABLE_CLR_ALL         = 0x1F
+    };
     
     /* [reset state = 0x0]*/
     typedef union 
@@ -209,6 +291,24 @@ namespace I2C
         uint32_t  reg;                        // Type used for register access 
     } I2C_WE_reg_t;
     
+    enum e_WE_flags: uint32_t
+    {
+        F_WE_NONE        = 0u,
+        F_WE_AL_WE       = BIT(0),
+        F_WE_NACK_WE     = BIT(1),
+        F_WE_ARDY_WE     = BIT(2),
+        F_WE_RRDY_WE     = BIT(3),
+        F_WE_GC_WE       = BIT(5),
+        F_WE_STC_WE      = BIT(6),
+        F_WE_BF_WE       = BIT(8),
+        F_WE_AAS_WE      = BIT(9),
+        F_WE_XUDF_WE     = BIT(10),
+        F_WE_ROVR_WE     = BIT(11),
+        F_WE_RDR_WE      = BIT(13),
+        F_WE_XDR_WE      = BIT(14),
+        F_WE_ALL         = 0x1F
+    };
+
     /* [reset state = 0x0]*/
     typedef union 
     { 
@@ -353,7 +453,7 @@ namespace I2C
         uint32_t  reg;                         // Type used for register access 
     } I2C_BUF_reg_t;
     
-    enum e_TXTRSH_VARIANTS : uint32_t
+    enum e_BUF_TRSH_flags : uint32_t
     {
         
     };
@@ -410,6 +510,27 @@ namespace I2C
         } b;                                // Structure used for bit access
         uint32_t  reg;                      // Type used for register access
     } I2C_CON_reg_t;
+
+    enum e_CON_flags: uint32_t
+    {
+        F_CON_NONE      =   0u,
+        F_CON_STT       =   BIT(0),
+        F_CON_STP       =   BIT(1),
+        F_CON_XOA3      =   BIT(4),
+        F_CON_XOA2      =   BIT(5),
+        F_CON_XOA1      =   BIT(6),
+        F_CON_XOA0      =   BIT(7),
+        F_CON_XSA       =   BIT(8),
+        F_CON_TRX       =   BIT(9),
+        F_CON_MST       =   BIT(10),
+        F_CON_STB       =   BIT(11), 
+        F_CON_OPMODE    =   BIT(12),         
+        F_CON_I2C_EN    =   BIT(15),
+        F_CON_ALL       =   0x1F
+
+    };
+
+   
     
     /* [reset state = 0x0]*/
     typedef union 
@@ -499,7 +620,7 @@ namespace I2C
             uint32_t    SDA_O_FUNC    :1;         // bit: 5      (R) SDA line output value (functional mode). [0h (R) = Driven 0 to SDA line. 1h (R) = Driven 1 to SDA line]
             uint32_t    SDA_I_FUNC    :1;         // bit: 6      (R) SDA line input value (functional mode). [0h (R) = Read 0 from SDA line. 1h (R) = Read 1 from SDA line]
             uint32_t    SCL_O_FUNC    :1;         // bit: 7      (R) SCL line output value (functional mode). [0h (R) = Driven 0 on SCL line. 1h (R) = Driven 1 on SCL line]
-            uint32_t    SCL_O_FUNC    :1;         // bit: 8      (R) SCL line input value (functional mode). [0h (R) = Driven 0 from SCL line. 1h (R) = Driven 1 from SCL line]
+            uint32_t    SCL_I_FUNC    :1;         // bit: 8      (R) SCL line input value (functional mode). [0h (R) = Driven 0 from SCL line. 1h (R) = Driven 1 from SCL line]
             uint32_t                  :2;         // bit: 9,10   Reserved
             uint32_t    SSB           :1;         // bit: 11     (RW) Set status bits. [0h = No action. 1h = Set all interrupt status bits to 1.]
             uint32_t    TMODE         :2;         // bit: 12,13  (RW) Test mode select. (lock enum e_I2C_TMODE)
@@ -586,7 +707,7 @@ namespace I2C
             uint32_t              :22;        // bit: 10..31      Reserved  
         } b;                                  // Structure used for bit access 
         uint32_t  reg;                        // Type used for register access 
-    } I2C_OA2_reg_t;
+    } I2C_OA3_reg_t;
     
     /* [reset state = 0x0]*/
     typedef union 
@@ -624,7 +745,7 @@ namespace I2C
     } I2C_SBLOCK_reg_t;
     
     
-     typedef struct 
+    typedef struct  
     {                                                                                      
         __R   I2C_REVNB_LO_reg_t                I2C_REVNB_LO;            // (0x00)  Module Revision Register (low bytes) 
         __R   I2C_REVNB_HI_reg_t                I2C_REVNB_HI;            // (0x04)  Module Revision Register (high bytes) 
@@ -667,7 +788,17 @@ namespace I2C
         constexpr AM335x_I2C_Type * AM335X_I2C_1 = ((AM335x_I2C_Type *) AM335x_I2C_1_BASE); 
         constexpr AM335x_I2C_Type * AM335X_I2C_2 = ((AM335x_I2C_Type *) AM335x_I2C_2_BASE);
         
-class I2C
+}
+
+#define     I2C_TX_MODE                  (0x1u)
+#define     I2C_RX_MODE                  (0x0u)
+
+#define     I2C_WAKE_UP_IRQ               (0x0u)
+#define     I2C_WAKE_UP_DMA_RECV          (0x1u)
+#define     I2C_WAKE_UP_DMA_TRANSMIT      (0x2u)
+
+        
+class HS_I2C
 {
 public:
                     typedef struct i2cContext 
@@ -678,10 +809,10 @@ public:
                          uint32_t ownaddr;
                      }I2CCONTEXT;
                     
-                    I2C(I2C::AM335x_I2C_Type * p_tmr);
-                   ~I2C() {}
+                    HS_I2C(I2C::AM335x_I2C_Type *p_i2c_regs);
+                   ~HS_I2C() {};
 
-		      void  soft_reset();
+              void  soft_reset();
               void  master_stop();
               void  master_start();
               void  master_enable();              
@@ -691,70 +822,56 @@ public:
               void  DMATx_event_enable();
               void  DMARx_event_enable();
               void  DMATx_event_disable();
-          uint32_t  master_err         
+ I2C::e_IRQSTATUS_RAW_flags  master_err();         
               void  DMARx_event_disable();
               void  global_wake_up_enable();             
               void  global_wake_up_disable();              
           uint32_t  data_count_get();
-          uint32_t  slave_data_get();
+          //uint32_t  slave_data_get();
           uint8_t   master_data_get();// char
           uint32_t  master_bus_busy();
           uint32_t  master_busy();
-          uint32_t  slave_int_status();
+          //uint32_t  slave_int_status();
           uint32_t  master_int_status();
           uint32_t  system_status_get();
-          uint32_t  slave_int_raw_status();
+          //uint32_t  slave_int_raw_status();
           uint32_t  master_int_raw_status();
           uint32_t  active_own_address_get();
-              void  FIFO_clear();
-              void  slave_data_put();  
-              void  master_control();
-              void  set_data_count();
-              void  idle_mode_select();
-              void  master_data_put();
-              void  wake_up_enable();
-              void  wake_up_disable();
-              void  master_init_exp_clk();
-              void  own_address_set();
-              void  slave_int_clear_ex();
-              void  clock_activity_select();
-              void  slave_int_enable_ex();
-              void  master_int_clear_ex();
-              void  slave_int_disable_ex();
-              void  master_int_enable_ex();
-          uint32_t  buffer_status();
-              void  master_int_disable_ex();
-              void  master_slave_addr_set();
-              void  slave_int_raw_status_clear_ex();
-              void  FIFO_threshold_config();
-          uint32_t  slave_int_status_ex();
-              void  master_int_raw_status_clear_ex();
-          uint32_t  master_int_status_ex();
-          uint32_t  slave_int_raw_status_ex();
-          uint32_t  master_slave_addr_get();
-          uint32_t  master_int_raw_status_ex();
-              void  context_save();
-              void  context_restore();
-private: 
-                //IRQn_Type   m_IRQn;         // irq module  
-                  void  m_wait_for_write(DMTIMER::e_TWPS_flags twps_mask)
-                  {
-                      /** Wait for previous write to complete if posted mode enabled**/
-                      if(m_pTIMER->TSICR.b.POSTED)
-                          while(m_pTIMER->TWPS.reg & twps_mask);
-                  }
+              void  FIFO_clear(uint32_t flag);
+              void  slave_data_put(uint32_t data);  
+              void  master_control(uint32_t cmd);
+              void  set_data_count(uint32_t count);
+              void  idle_mode_select(uint32_t flag);
+              void  master_data_put(uint8_t data);
+              void  wake_up_enable(I2C::e_WE_flags event_flag, uint32_t flag);
+              void  wake_up_disable(I2C::e_WE_flags event_flag, uint32_t flag);
+              void  master_init_exp_clk(uint32_t sys_clk, uint32_t internal_clk, uint32_t output_clk);
+              void  own_address_set(uint32_t slave_add, uint32_t flag);
+              void  slave_int_clear_ex(uint32_t int_flag);
+              void  clock_activity_select(uint32_t flag);
+              void  slave_int_enable_ex(uint32_t int_flag);
+              void  master_int_clear_ex(I2C::e_IRQSTATUS_flags int_flag);
+              void  slave_int_disable_ex(uint32_t int_flag);
+              void  master_int_enable_ex(I2C::e_IRQENABLE_SET_flags int_flag);
+          uint32_t  buffer_status(uint32_t flag);
+              void  master_int_disable_ex(I2C::e_IRQENABLE_CLR_flags int_flag);
+              void  master_slave_addr_set(uint32_t slave_add);
+              //void  slave_int_raw_status_clear_ex(uint32_t int_flag);
+              void  FIFO_threshold_config(I2C::e_BUF_TRSH_flags threshlod_val, uint32_t flag);
+          //uint32_t  slave_int_status_ex(uint32_t int_flag);
+              void  master_int_raw_status_clear_ex(I2C::e_IRQSTATUS_RAW_flags int_flag);
+          uint32_t  master_int_status_ex(I2C::e_IRQSTATUS_flags int_flag);
+          //uint32_t  slave_int_raw_status_ex(uint32_t int_flag);
+          uint32_t  master_slave_addr_get(uint32_t slave_add);
+          uint32_t  master_int_raw_status_ex(I2C::e_IRQSTATUS_RAW_flags int_flag);
+              void  clock_blocking_control(bool ownAdd0, bool ownAdd1, bool ownAdd2, bool ownAdd3);
+              void  context_save(I2CCONTEXT *contextPtr);
+              void  context_restore(I2CCONTEXT *contextPtr);
+private:             
               
-DMTIMER::AM335x_DMTIMER_Type *m_pTIMER; 
-    PRCM::AM335x_CM_PER_Type &m_sCM_PER;
-   PRCM::AM335x_CM_DPLL_Type &m_sCM_DPLL;
-    
-               void (*m_irq_handler)(void *p_obj) { nullptr };
-           uint64_t  m_time {0}; // the timer itself
-               bool  m_is_paused { true }; 
+I2C::AM335x_I2C_Type &m_I2C_regs; 
 }; 
  
-extern     void DMTimer_irqhandler(void *p_obj);
-extern DM_Timer dm_timer_2;
+
 #endif //__DM_TIMER_H
         
-#endif //_AM335X_MEM_MAP_H_
