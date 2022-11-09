@@ -26,14 +26,14 @@
 using namespace std;
 
 #ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
-     OS_Timer os_timer(*DMTIMER::AM335X_DMTIMER_1);
+     OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_1);
 #endif
-// OS_Timer os_timer(*DMTIMER::AM335X_DMTIMER_2);
-// OS_Timer os_timer(*DMTIMER::AM335X_DMTIMER_3);
-// OS_Timer os_timer*DMTIMER::AM335X_DMTIMER_4);
-OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_5);
-// OS_Timer os_timer(*DMTIMER::AM335X_DMTIMER_6);
-// OS_Timer os_timer(*DMTIMER::AM335X_DMTIMER_7);
+OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_2);
+// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_3);
+// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_4);
+// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_5);
+// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_6);
+// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_7);
 
 #ifdef __cplusplus
 extern "C" {
@@ -147,15 +147,3 @@ int main()
 
 
 }
-
-void DMTimer_irqhandler(void *p_obj)
-{  
-    os_timer.IRQ_disable(DMTIMER::IRQ_OVF); // Disable the DMTimer interrupts    
-    os_timer.IRQ_clear(DMTIMER::IRQ_OVF);   // Clear the status of the interrupt flags 
-
-    OSTimeTick();
-    
-    os_timer.IRQ_enable(DMTIMER::IRQ_OVF);  // Enable the DM_Timer interrupts
-    intc.system_enable(OS_TIMER_INTERRUPT);  
-}
-

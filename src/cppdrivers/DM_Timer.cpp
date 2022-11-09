@@ -140,6 +140,35 @@ DMTIMER::e_TIMER_NUM DM_Timer::get_DMTIMER_number()
     
     return DMTIMER::TIMER_NA;
 }
+
+INTC::e_SYS_INTERRUPT DM_Timer::get_DMTIMER_sys_interrupt()
+{
+    uint32_t timer_num = (uint32_t)&m_DMTIMER_regs;
+     
+    switch(timer_num)
+    {
+        case DMTIMER::AM335x_DMTIMER_0_BASE:     // only 32KHz RC Clock
+            return INTC::TINT0;
+        case DMTIMER::AM335x_DMTIMER_1_BASE:     // 1ms timer
+            return INTC::TINT1_1MS;
+        case DMTIMER::AM335x_DMTIMER_2_BASE:
+            return INTC::TINT2;
+        case DMTIMER::AM335x_DMTIMER_3_BASE: 
+            return INTC::TINT3;
+        case DMTIMER::AM335x_DMTIMER_4_BASE:
+            return INTC::TINT4;
+        case DMTIMER::AM335x_DMTIMER_5_BASE:
+            return INTC::TINT5;
+        case DMTIMER::AM335x_DMTIMER_6_BASE:
+            return INTC::TINT6;
+        case DMTIMER::AM335x_DMTIMER_7_BASE:
+            return INTC::TINT7;
+        default:
+            break;
+    } 
+    
+    return INTC::INTERRUPTS_NUM_MAX;
+}
  
 void  DM_Timer::IRQ_raw_set(DMTIMER::e_IRQ_flags int_flags)
 {

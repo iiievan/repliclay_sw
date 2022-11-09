@@ -103,7 +103,7 @@ void configure_platform(void)
     /* Select the console type based on compile time check */
     ConsoleUtilsSetType(CONSOLE_UART);
     
-    os_timer.setup();
+    os_timer.setup(OS_TIMER_RLD_COUNT);
 }
 
 void halBspInit(void)   

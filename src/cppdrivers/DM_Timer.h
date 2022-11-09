@@ -354,6 +354,7 @@ public:
                 void  compare_set(uint32_t compare_val);
             uint32_t  compare_get();
 DMTIMER::e_TIMER_NUM  get_DMTIMER_number();
+INTC::e_SYS_INTERRUPT get_DMTIMER_sys_interrupt();
               
                 void  IRQ_raw_set(DMTIMER::e_IRQ_flags int_flags);
             uint32_t  IRQ_raw_get();

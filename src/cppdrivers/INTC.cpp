@@ -2,7 +2,7 @@
 #include "cpu.h"
 
 Interrupt_controller intc;
-INTC::Handler_ptr_t interrupt_vector_table[INTC::INTERRUPTS_NUM_MAX];
+INTC::isr_handler_t interrupt_vector_table[INTC::INTERRUPTS_NUM_MAX];
 
 /**
  * The Default Interrupt Handler.
@@ -53,7 +53,7 @@ void OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
 void  interrupt_handler(uint32_t  src_nbr)
 {
  INTC::e_SYS_INTERRUPT  int_nbr;
-    INTC::Handler_ptr_t  isr;
+    INTC::isr_handler_t  isr;
 
     switch (src_nbr) 
     {
@@ -113,7 +113,7 @@ void  Interrupt_controller::init (void)
 
     for (uint32_t int_id = 0; int_id < INTC::INTERRUPTS_NUM_MAX; int_id++) 
     {
-        register_handler((INTC::e_SYS_INTERRUPT)int_id,(INTC::Handler_ptr_t)interrupt_default_handler);
+        register_handler((INTC::e_SYS_INTERRUPT)int_id,(INTC::isr_handler_t)interrupt_default_handler);
     }
     
     m_INTC_regs.CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
@@ -132,7 +132,7 @@ void  Interrupt_controller::init (void)
  * 
  * \return      None.
  **/
-void  Interrupt_controller::register_handler(INTC::e_SYS_INTERRUPT  int_id, INTC::Handler_ptr_t isr_fnct)
+void  Interrupt_controller::register_handler(INTC::e_SYS_INTERRUPT  int_id, INTC::isr_handler_t isr_fnct)
 {
     CPU_SR_ALLOC();
 
@@ -169,7 +169,7 @@ void  Interrupt_controller::unregister_handler(INTC::e_SYS_INTERRUPT int_id)
     {
         CPU_CRITICAL_ENTER();
         /* Assign default ISR */
-        interrupt_vector_table[int_id] = (INTC::Handler_ptr_t)interrupt_default_handler; 
+        interrupt_vector_table[int_id] = (INTC::isr_handler_t)interrupt_default_handler; 
         CPU_CRITICAL_EXIT();
     }
 }

@@ -578,7 +578,7 @@ namespace INTC
     constexpr uint32_t HOSTINT_ROUTE_IRQ = 0;  // To route an interrupt to IRQ    
     constexpr uint32_t HOSTINT_ROUTE_FIQ = 1;  // To route an interrupt to FIQ
       
-    typedef            void      (*Handler_ptr_t )(void *p_obj);
+    typedef            void      (*isr_handler_t )(void *p_obj);
     
             uint32_t debug_dump_INTC(AM335x_INTC_Type &sINTC = *AM335x_INTC);
  
@@ -679,7 +679,7 @@ public:
               ~Interrupt_controller() {}
 
         void  init (void);
-        void  register_handler(INTC::e_SYS_INTERRUPT  int_id,  INTC::Handler_ptr_t isr_fnct);
+        void  register_handler(INTC::e_SYS_INTERRUPT  int_id,  INTC::isr_handler_t isr_fnct);
         void  unregister_handler(INTC::e_SYS_INTERRUPT int_id);
         void  if_clk_free_run_set(void);
         void  if_clk_auto_gate_set(void);
