@@ -38,6 +38,7 @@
 
 #include "dmtimer.h"
 #include "DM_Timer.h"
+#include "OS_Timer.h"
 #include "error.h"
 #include "cp15.h"
 #include "hal_mmu.h"
@@ -101,8 +102,8 @@ void configure_platform(void)
 
     /* Select the console type based on compile time check */
     ConsoleUtilsSetType(CONSOLE_UART);
-
-    DM_Timer_setup(); // Perform the necessary configurations for DMTimer
+    
+    os_timer.setup();
 }
 
 void halBspInit(void)   

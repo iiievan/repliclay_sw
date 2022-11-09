@@ -369,6 +369,7 @@
                     <state>$PROJ_DIR$\vendor\uCOS-II\Source</state>
                     <state>$PROJ_DIR$\vendor\uC-CPU</state>
                     <state>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A</state>
+                    <state>$PROJ_DIR$\src\cppdrivers</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2679,34 +2680,40 @@
                 <name>$PROJ_DIR$\src\app\cpu_cfg.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\app\DM_Timer.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\DM_Timer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\HS_I2C.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\HS_I2C.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\INTC.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\INTC.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\src\app\lib_cfg.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\app\os_cfg.h</name>
             </file>
+        </group>
+        <group>
+            <name>cppdrivers</name>
             <file>
-                <name>$PROJ_DIR$\src\app\PRCM.cpp</name>
+                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\app\PRCM.h</name>
+                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\INTC.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\INTC.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\OS_Timer.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\PRCM.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\PRCM.h</name>
             </file>
         </group>
         <file>

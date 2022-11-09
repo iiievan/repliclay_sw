@@ -675,11 +675,10 @@ class Interrupt_controller
 {
 public:
               Interrupt_controller()
-              :m_sINTC(*INTC::AM335x_INTC) {}
+              :m_INTC_regs(*INTC::AM335x_INTC) {}
               ~Interrupt_controller() {}
 
         void  init (void);
-        void  BSP_int_clr (INTC::e_SYS_INTERRUPT  int_id);
         void  register_handler(INTC::e_SYS_INTERRUPT  int_id,  INTC::Handler_ptr_t isr_fnct);
         void  unregister_handler(INTC::e_SYS_INTERRUPT int_id);
         void  if_clk_free_run_set(void);
@@ -716,7 +715,7 @@ public:
         bool  pending_FIQ_masked_status_get(INTC::e_SYS_INTERRUPT int_id);
 
 private:
-    INTC::AM335x_INTC_Type &m_sINTC;
+    INTC::AM335x_INTC_Type &m_INTC_regs;
 };
 
 static void interrupt_default_handler(void);

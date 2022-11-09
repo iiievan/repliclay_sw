@@ -97,38 +97,29 @@ void  interrupt_handler(uint32_t  src_nbr)
 void  Interrupt_controller::init (void)
 { 
     /* Reset the ARM interrupt controller */
-    m_sINTC.SYSCONFIG.b.SoftReset = HIGH;
+    m_INTC_regs.SYSCONFIG.b.SoftReset = HIGH;
  
     /* Wait for the reset to complete */  
-    while(m_sINTC.SYSSTATUS.b.ResetDone != HIGH);
+    while(m_INTC_regs.SYSSTATUS.b.ResetDone != HIGH);
     
     /* Enable any interrupt generation by setting priority threshold */ 
-    m_sINTC.THRESHOLD.b.PriorityThreshold = INTC::PRIORITY_THRESHOLD;
+    m_INTC_regs.THRESHOLD.b.PriorityThreshold = INTC::PRIORITY_THRESHOLD;
     
     /* Disable all pending interrupts                       */
-    m_sINTC.ISR_CLEAR0.reg = 0xFF;
-    m_sINTC.ISR_CLEAR1.reg = 0xFF;
-    m_sINTC.ISR_CLEAR2.reg = 0xFF;
-    m_sINTC.ISR_CLEAR3.reg = 0xFF;
+    m_INTC_regs.ISR_CLEAR0.reg = 0xFF;
+    m_INTC_regs.ISR_CLEAR1.reg = 0xFF;
+    m_INTC_regs.ISR_CLEAR2.reg = 0xFF;
+    m_INTC_regs.ISR_CLEAR3.reg = 0xFF;
 
     for (uint32_t int_id = 0; int_id < INTC::INTERRUPTS_NUM_MAX; int_id++) 
     {
         register_handler((INTC::e_SYS_INTERRUPT)int_id,(INTC::Handler_ptr_t)interrupt_default_handler);
     }
     
-    m_sINTC.CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
-    m_sINTC.CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
+    m_INTC_regs.CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
+    m_INTC_regs.CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
 }
  
-void  Interrupt_controller::BSP_int_clr (INTC::e_SYS_INTERRUPT  int_id)
-{    
-    if (int_id > INTC::INTERRUPTS_NUM_MAX) 
-        return;
-
-    INTC::ISR_CLEAR_reg_t *&s_isr_clear = INTC::get_ISR_CLEAR_reference(int_id);   
-    s_isr_clear->b.IsrClear = BIT(int_id % 32);
-}
-
 /**
  * \brief    Registers an interrupt Handler in the interrupt vector table for
  *           system interrupts. 
@@ -194,7 +185,7 @@ void  Interrupt_controller::unregister_handler(INTC::e_SYS_INTERRUPT int_id)
 void  Interrupt_controller::if_clk_free_run_set(void)
 {
     //HWREG(SOC_AINTC_REGS + INTC_SYSCONFIG)&= ~INTC_SYSCONFIG_AUTOIDLE;
-    m_sINTC.SYSCONFIG.b.Autoidle = LOW; //Internal OCP clock gating strategy - clkfree.
+    m_INTC_regs.SYSCONFIG.b.Autoidle = LOW; //Internal OCP clock gating strategy - clkfree.
 }
 
 /**
@@ -209,7 +200,7 @@ void  Interrupt_controller::if_clk_free_run_set(void)
 void  Interrupt_controller::if_clk_auto_gate_set(void)
 {
     //HWREG(SOC_AINTC_REGS + INTC_SYSCONFIG)|= INTC_SYSCONFIG_AUTOIDLE; 
-    m_sINTC.SYSCONFIG.b.Autoidle = HIGH; //Internal OCP clock gating strategy - autoClkGate.
+    m_INTC_regs.SYSCONFIG.b.Autoidle = HIGH; //Internal OCP clock gating strategy - autoClkGate.
 }
 
 /**
@@ -225,7 +216,7 @@ void  Interrupt_controller::if_clk_auto_gate_set(void)
 void  Interrupt_controller::protection_enable(void)
 {
    // HWREG(SOC_AINTC_REGS + INTC_PROTECTION) = INTC_PROTECTION_PROTECTION;
-   m_sINTC.PROTECTION.b.Protection = HIGH;
+   m_INTC_regs.PROTECTION.b.Protection = HIGH;
 }
 
 /**
@@ -241,7 +232,7 @@ void  Interrupt_controller::protection_enable(void)
 void  Interrupt_controller::protection_disable(void)
 {
     // HWREG(SOC_AINTC_REGS + INTC_PROTECTION) &= ~INTC_PROTECTION_PROTECTION;
-    m_sINTC.PROTECTION.b.Protection = LOW;
+    m_INTC_regs.PROTECTION.b.Protection = LOW;
 }
 
 
@@ -256,7 +247,7 @@ void  Interrupt_controller::protection_disable(void)
 void  Interrupt_controller::sync_clk_free_run_set(void)
 {
     // HWREG(SOC_AINTC_REGS + INTC_IDLE) &= ~INTC_IDLE_TURBO;
-    m_sINTC.IDLE.b.Turbo = LOW;
+    m_INTC_regs.IDLE.b.Turbo = LOW;
 }
 
 /**
@@ -271,7 +262,7 @@ void  Interrupt_controller::sync_clk_free_run_set(void)
 void  Interrupt_controller::sync_clk_auto_gate_set(void)
 {
     // HWREG(SOC_AINTC_REGS + INTC_IDLE) |= INTC_IDLE_TURBO;
-    m_sINTC.IDLE.b.Turbo = HIGH;
+    m_INTC_regs.IDLE.b.Turbo = HIGH;
 }
 
 /**
@@ -285,7 +276,7 @@ void  Interrupt_controller::sync_clk_auto_gate_set(void)
 void  Interrupt_controller::func_clk_free_run_set(void)
 {
     // HWREG(SOC_AINTC_REGS + INTC_IDLE) |= INTC_IDLE_FUNCIDLE;
-    m_sINTC.IDLE.b.FuncIdle = HIGH;
+    m_INTC_regs.IDLE.b.FuncIdle = HIGH;
 }
 
 
@@ -301,7 +292,7 @@ void  Interrupt_controller::func_clk_free_run_set(void)
 void  Interrupt_controller::func_clk_auto_gate_set(void)
 {
     // HWREG(SOC_AINTC_REGS + INTC_IDLE) &= ~INTC_IDLE_FUNCIDLE;
-    m_sINTC.IDLE.b.FuncIdle = LOW;
+    m_INTC_regs.IDLE.b.FuncIdle = LOW;
 }
 
 /**
@@ -318,7 +309,7 @@ void  Interrupt_controller::func_clk_auto_gate_set(void)
 void  Interrupt_controller::priority_threshold_set(uint8_t threshold)
 {
     // HWREG(SOC_AINTC_REGS + INTC_THRESHOLD) = threshold & INTC_THRESHOLD_PRIORITYTHRESHOLD;
-    m_sINTC.THRESHOLD.b.PriorityThreshold = threshold;
+    m_INTC_regs.THRESHOLD.b.PriorityThreshold = threshold;
 }
 
 /**
@@ -564,13 +555,13 @@ uint32_t  Interrupt_controller::master_status_get(void)
 uint32_t  Interrupt_controller::active_IRQ_num_get(void)
 {
     //return (HWREG(SOC_AINTC_REGS + INTC_SIR_IRQ) &  INTC_SIR_IRQ_ACTIVEIRQ);
-    return   m_sINTC.SIR_IRQ.b.ActiveIRQ;
+    return   m_INTC_regs.SIR_IRQ.b.ActiveIRQ;
 }
 
 
 uint32_t  Interrupt_controller::active_FIQ_num_get(void)
 {
-    return   m_sINTC.SIR_FIQ.b.ActiveFIQ;
+    return   m_INTC_regs.SIR_FIQ.b.ActiveFIQ;
 }
 
 /**
@@ -585,12 +576,12 @@ uint32_t  Interrupt_controller::active_FIQ_num_get(void)
 uint32_t  Interrupt_controller::spur_IRQ_flag_get(void)
 {
     // return ((HWREG(SOC_AINTC_REGS + INTC_SIR_IRQ)& INTC_SIR_IRQ_SPURIOUSIRQ) >> INTC_SIR_IRQ_SPURIOUSIRQ_SHIFT);
-    return   m_sINTC.SIR_IRQ.b.SpuriousIRQ;
+    return   m_INTC_regs.SIR_IRQ.b.SpuriousIRQ;
 }
 
 uint32_t  Interrupt_controller::spur_FIQ_flag_get(void)
 {
-    return   m_sINTC.SIR_FIQ.b.SpuriousFIQ;
+    return   m_INTC_regs.SIR_FIQ.b.SpuriousFIQ;
 }
 
 /**
@@ -604,12 +595,12 @@ uint32_t  Interrupt_controller::spur_FIQ_flag_get(void)
 uint32_t  Interrupt_controller::curr_IRQ_priorigty_get(void)
 {
     //return (HWREG(SOC_AINTC_REGS + INTC_IRQ_PRIORITY) & INTC_IRQ_PRIORITY_IRQPRIORITY);
-    return m_sINTC.IRQ_PRIORITY.b.IRQPriority;
+    return m_INTC_regs.IRQ_PRIORITY.b.IRQPriority;
 }
 
 uint32_t  Interrupt_controller::curr_FIQ_priority_get(void)
 {
-    return m_sINTC.FIQ_PRIORITY.b.FIQPriority;
+    return m_INTC_regs.FIQ_PRIORITY.b.FIQPriority;
 }
 
 /**
@@ -623,7 +614,7 @@ uint32_t  Interrupt_controller::curr_FIQ_priority_get(void)
 uint8_t  Interrupt_controller::priority_threshold_get(void)
 {
     // return (HWREG(SOC_AINTC_REGS + INTC_THRESHOLD)& INTC_THRESHOLD_PRIORITYTHRESHOLD);
-    return m_sINTC.THRESHOLD.b.PriorityThreshold;
+    return m_INTC_regs.THRESHOLD.b.PriorityThreshold;
 }
 
 /**
