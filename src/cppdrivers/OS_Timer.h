@@ -27,8 +27,6 @@ public:
     **/
     void setup(uint32_t reload_value)
     {
-        uint32_t dmtimer_mode =  DMTIMER::MODE_AUTORELOAD | (!DMTIMER::MODE_COMPARE); //  mode : autoreload and no compare
-
         // run clock for timer instance
         m_prcm_module.run_clk_DMTIMER(m_DMTIMER_number); 
     
@@ -40,7 +38,7 @@ public:
         // setup timer itself
         DM_Timer::counter_set(reload_value); //Load the counter with the initial count value
         DM_Timer::reload_set(reload_value);    //Load the load register with the reload count value
-        DM_Timer::mode_configure((DMTIMER::e_DMTIMER_mode)dmtimer_mode); //Configure the DMTimer for Auto-reload and compare mode
+        DM_Timer::mode_configure(DMTIMER::MODE_AUTORELOAD); // mode : autoreload and no compare
         DM_Timer::enable();
     }
 
