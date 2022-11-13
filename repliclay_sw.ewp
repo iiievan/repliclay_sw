@@ -2701,6 +2701,9 @@
                 <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\cppdrivers\INTC.cpp</name>
             </file>
             <file>
@@ -2717,10 +2720,10 @@
             </file>
         </group>
         <file>
-            <name>$PROJ_DIR$\src\hal_bspInit.c</name>
+            <name>$PROJ_DIR$\src\hal_mmu.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\src\hal_mmu.c</name>
+            <name>$PROJ_DIR$\src\init.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\src\main.cpp</name>

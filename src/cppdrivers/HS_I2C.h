@@ -3,11 +3,7 @@
 
 #include <stdint.h>
 #include "app_utils.h"
-
-#define     __R     volatile const       // 'read only' register
-#define     __W     volatile             // 'write only' register 
-#define     __RW    volatile             // 'read / write' register
-
+#include "INTC.h"
 
 namespace I2C
 {
@@ -162,7 +158,7 @@ namespace I2C
         F_IRQSTATUS_BB       = BIT(12),
         F_IRQSTATUS_RDR      = BIT(13),
         F_IRQSTATUS_XDR      = BIT(14),
-        F_IRQSTATUS_ALL      = 0x1F
+        F_IRQSTATUS_ALL      = 0x3FFF
     };
     
     /* [reset state = 0x0]*/
@@ -210,7 +206,7 @@ namespace I2C
         F_IRQENABLE_SET_ROVR_IE     = BIT(11),
         F_IRQENABLE_SET_RDR_IE      = BIT(13),
         F_IRQENABLE_SET_XDR_IE      = BIT(14),
-        F_IRQENABLE_SET_ALL         = 0x1F
+        F_IRQENABLE_SET_ALL         = 0x3FFF
     };
     
     /* [reset state = 0x0]*/
@@ -258,7 +254,7 @@ namespace I2C
         F_IRQENABLE_CLR_ROVR_IE     = BIT(11),
         F_IRQENABLE_CLR_RDR_IE      = BIT(13),
         F_IRQENABLE_CLR_XDR_IE      = BIT(14),
-        F_IRQENABLE_CLR_ALL         = 0x1F
+        F_IRQENABLE_CLR_ALL         = 0x3FFF
     };
     
     /* [reset state = 0x0]*/
@@ -783,10 +779,18 @@ namespace I2C
         __R   I2C_ACTOA_reg_t                   I2C_ACTOA;               // (0xD0)  Active Own Address Register
         __RW  I2C_SBLOCK_reg_t                  I2C_SBLOCK;              // (0xD4)  I2C Clock Blocking Enable Register
      } AM335x_I2C_Type;
+
+     enum e_I2C_SER_NUM : uint8_t
+     {   
+         I2C_NUM_NA  = 0x0,
+         I2C_NUM_0   = 0x1,
+         I2C_NUM_1   = 0x2,
+         I2C_NUM_2   = 0x3                      
+     };
      
-        constexpr AM335x_I2C_Type * AM335X_I2C_0 = ((AM335x_I2C_Type *) AM335x_I2C_0_BASE); 
-        constexpr AM335x_I2C_Type * AM335X_I2C_1 = ((AM335x_I2C_Type *) AM335x_I2C_1_BASE); 
-        constexpr AM335x_I2C_Type * AM335X_I2C_2 = ((AM335x_I2C_Type *) AM335x_I2C_2_BASE);
+     constexpr AM335x_I2C_Type * AM335X_I2C_0 = ((AM335x_I2C_Type *) AM335x_I2C_0_BASE); 
+     constexpr AM335x_I2C_Type * AM335X_I2C_1 = ((AM335x_I2C_Type *) AM335x_I2C_1_BASE); 
+     constexpr AM335x_I2C_Type * AM335X_I2C_2 = ((AM335x_I2C_Type *) AM335x_I2C_2_BASE);
         
 }
 
@@ -801,72 +805,78 @@ namespace I2C
 class HS_I2C
 {
 public:
-                    typedef struct i2cContext 
-                    {
-                         uint32_t prescalar;
-                         uint32_t lowdivider;
-                         uint32_t highdivider;
-                         uint32_t ownaddr;
-                     }I2CCONTEXT;
+                       typedef struct i2cContext 
+                       {
+                            uint32_t prescalar;
+                            uint32_t lowdivider;
+                            uint32_t highdivider;
+                            uint32_t ownaddr;
+                       }I2CCONTEXT;
                     
-                    HS_I2C(I2C::AM335x_I2C_Type *p_i2c_regs);
-                   ~HS_I2C() {};
+                       HS_I2C(I2C::AM335x_I2C_Type *p_i2c_regs);
+                      ~HS_I2C() {};
 
-              void  soft_reset();
-              void  master_stop();
-              void  master_start();
-              void  master_enable();              
-              void  master_disable();
-              void  auto_idle_enable();
-              void  auto_idle_disable();
-              void  DMATx_event_enable();
-              void  DMARx_event_enable();
-              void  DMATx_event_disable();
+                 void  soft_reset();
+                 void  master_stop();
+                 void  master_start();
+                 void  master_enable();              
+                 void  master_disable();
+                 void  auto_idle_enable();
+                 void  auto_idle_disable();
+                 void  DMATx_event_enable();
+                 void  DMARx_event_enable();
+                 void  DMATx_event_disable();
  I2C::e_IRQSTATUS_RAW_flags  master_err();         
-              void  DMARx_event_disable();
-              void  global_wake_up_enable();             
-              void  global_wake_up_disable();              
-          uint32_t  data_count_get();
-          //uint32_t  slave_data_get();
-          uint8_t   master_data_get();// char
-          uint32_t  master_bus_busy();
-          uint32_t  master_busy();
-          //uint32_t  slave_int_status();
-          uint32_t  master_int_status();
-          uint32_t  system_status_get();
-          //uint32_t  slave_int_raw_status();
-          uint32_t  master_int_raw_status();
-          uint32_t  active_own_address_get();
-              void  FIFO_clear(uint32_t flag);
-              void  slave_data_put(uint32_t data);  
-              void  master_control(uint32_t cmd);
-              void  set_data_count(uint32_t count);
-              void  idle_mode_select(uint32_t flag);
-              void  master_data_put(uint8_t data);
-              void  wake_up_enable(I2C::e_WE_flags event_flag, uint32_t flag);
-              void  wake_up_disable(I2C::e_WE_flags event_flag, uint32_t flag);
-              void  master_init_exp_clk(uint32_t sys_clk, uint32_t internal_clk, uint32_t output_clk);
-              void  own_address_set(uint32_t slave_add, uint32_t flag);
-              void  slave_int_clear_ex(uint32_t int_flag);
-              void  clock_activity_select(uint32_t flag);
-              void  slave_int_enable_ex(uint32_t int_flag);
-              void  master_int_clear_ex(I2C::e_IRQSTATUS_flags int_flag);
-              void  slave_int_disable_ex(uint32_t int_flag);
-              void  master_int_enable_ex(I2C::e_IRQENABLE_SET_flags int_flag);
-          uint32_t  buffer_status(uint32_t flag);
-              void  master_int_disable_ex(I2C::e_IRQENABLE_CLR_flags int_flag);
-              void  master_slave_addr_set(uint32_t slave_add);
-              //void  slave_int_raw_status_clear_ex(uint32_t int_flag);
-              void  FIFO_threshold_config(I2C::e_BUF_TRSH_flags threshlod_val, uint32_t flag);
-          //uint32_t  slave_int_status_ex(uint32_t int_flag);
-              void  master_int_raw_status_clear_ex(I2C::e_IRQSTATUS_RAW_flags int_flag);
-          uint32_t  master_int_status_ex(I2C::e_IRQSTATUS_flags int_flag);
-          //uint32_t  slave_int_raw_status_ex(uint32_t int_flag);
-          uint32_t  master_slave_addr_get(uint32_t slave_add);
-          uint32_t  master_int_raw_status_ex(I2C::e_IRQSTATUS_RAW_flags int_flag);
-              void  clock_blocking_control(bool ownAdd0, bool ownAdd1, bool ownAdd2, bool ownAdd3);
-              void  context_save(I2CCONTEXT *contextPtr);
-              void  context_restore(I2CCONTEXT *contextPtr);
+                 void  DMARx_event_disable();
+                 void  global_wake_up_enable();             
+                 void  global_wake_up_disable();              
+             uint32_t  data_count_get();
+           //uint32_t  slave_data_get();
+              uint8_t  master_data_get();// char
+                 bool  master_bus_busy();
+             uint32_t  master_busy();
+           //uint32_t  slave_int_status();
+             uint32_t  master_int_status();
+             uint32_t  system_status_get();
+           //uint32_t  slave_int_raw_status();
+             uint32_t  master_int_raw_status();
+             uint32_t  active_own_address_get();
+                 void  FIFO_clear(uint32_t flag);
+                 void  slave_data_put(uint32_t data);  
+                 void  master_control(uint32_t cmd);
+                 void  set_data_count(uint32_t count);
+                 void  idle_mode_select(uint32_t flag);
+                 void  master_data_put(uint8_t data);
+                 void  wake_up_enable(I2C::e_WE_flags event_flag, uint32_t flag);
+                 void  wake_up_disable(I2C::e_WE_flags event_flag, uint32_t flag);
+                 void  master_init_exp_clk(uint32_t sys_clk, uint32_t internal_clk, uint32_t output_clk);
+                 void  own_address_set(uint32_t slave_add, uint32_t flag);
+                 void  clock_activity_select(uint32_t flag);
+
+                 void  slave_int_enable_ex(uint32_t int_flag);
+                 void  slave_int_clear_ex(uint32_t int_flag);
+                 void  slave_int_disable_ex(uint32_t int_flag);
+
+                 void  master_int_enable_ex(I2C::e_IRQENABLE_SET_flags int_flag);
+                 void  master_int_clear_ex(I2C::e_IRQSTATUS_flags int_flag);
+                 void  master_int_disable_ex(I2C::e_IRQENABLE_CLR_flags int_flag);                 
+
+             uint32_t  buffer_status(uint32_t flag);
+                 void  master_slave_addr_set(uint32_t slave_add);
+               //void  slave_int_raw_status_clear_ex(uint32_t int_flag);
+                 void  FIFO_threshold_config(I2C::e_BUF_TRSH_flags threshlod_val, uint32_t flag);
+           //uint32_t  slave_int_status_ex(uint32_t int_flag);
+                 void  master_int_raw_status_clear_ex(I2C::e_IRQSTATUS_RAW_flags int_flag);
+             uint32_t  master_int_status_ex(I2C::e_IRQSTATUS_flags int_flag);
+           //uint32_t  slave_int_raw_status_ex(uint32_t int_flag);
+             uint32_t  master_slave_addr_get(uint32_t slave_add);
+             uint32_t  master_int_raw_status_ex(I2C::e_IRQSTATUS_RAW_flags int_flag);
+                 void  clock_blocking_control(bool ownAdd0, bool ownAdd1, bool ownAdd2, bool ownAdd3);
+                 void  context_save(I2CCONTEXT *contextPtr);
+                 void  context_restore(I2CCONTEXT *contextPtr);
+              
+   I2C::e_I2C_SER_NUM  get_I2C_ser_number();
+INTC::e_SYS_INTERRUPT  get_I2C_sys_interrupt(); 
 private:             
               
 I2C::AM335x_I2C_Type &m_I2C_regs; 

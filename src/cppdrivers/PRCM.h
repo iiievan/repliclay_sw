@@ -3134,18 +3134,22 @@ namespace DMTIMER
 class power_reset_clock_control
 {
 public:  
-        power_reset_clock_control();
-       ~power_reset_clock_control(){}
-        
-    void run_clk_interconnects(); // run L3S,L3,L4,L4LS interconnects clock
-    
-    void run_clk_DMTIMER(DMTIMER::e_TIMER_NUM tmr_num);
-    void run_clk_DMTIMER_1ms(PRCM::e_TIMER1MS_CLKSEL clk_sel); // only for DMTIMER 1
-    void run_clk_DMTIMER_5(); 
-    void run_clk_DMTIMER_6(); 
-    
-    void run_clk_GPIO0(); 
-    void run_clk_GPIO1();
+                       power_reset_clock_control();
+                      ~power_reset_clock_control(){}
+                     
+                 void  run_clk_interconnects(); // run L3S,L3,L4,L4LS interconnects clock
+                 
+                 void  run_clk_DMTIMER(DMTIMER::e_TIMER_NUM tmr_num);
+                 void  run_clk_DMTIMER_1ms(PRCM::e_TIMER1MS_CLKSEL clk_sel); // only for DMTIMER 1
+                 void  run_clk_DMTIMER_5(); 
+                 void  run_clk_DMTIMER_6(); 
+                 
+                 void  run_clk_GPIO0(); 
+                 void  run_clk_GPIO1();                 
+   
+                 void  run_I2C0_clk();
+                 void  run_I2C1_clk();
+                 void  run_I2C2_clk();
     
 private:
     

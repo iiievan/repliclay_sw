@@ -8,7 +8,7 @@
 #include "error.h"
 
 
-#include "hal_bspInit.h"
+#include "init.h"
 #include "DM_Timer.h"
 #include "OS_Timer.h"
 #include "PRCM.h"
@@ -24,16 +24,6 @@
 #include <string>
 
 using namespace std;
-
-#ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
-     OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_1);
-#endif
-OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_2);
-// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_3);
-// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_4);
-// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_5);
-// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_6);
-// OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_7);
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,11 +53,6 @@ static  OS_STK        AppTaskStartStk[APP_CFG_TASK_START_STK_SIZE];
 static  void  AppTaskStart              (void *p_arg);
 //static  void  AppTaskCreate             (void);
 //static  void  AppEventCreate            (void);
-
-void init(void)
-{
-	halBspInit();
-}
 
 static  void  AppTaskStart (void *p_arg)
 {
@@ -120,7 +105,7 @@ int main()
 #if (CPU_CFG_NAME_EN == DEF_ENABLED)
     CPU_ERR  cpu_err;
 #endif
-    init();
+    init_board();
 	
     CPU_IntDis();
     ConsoleUtilsPrintf("Platform initialized.\r\n");

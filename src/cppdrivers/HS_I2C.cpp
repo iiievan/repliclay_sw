@@ -132,9 +132,10 @@ uint8_t   HS_I2C::master_data_get()// char
     rData = (uint8_t) m_I2C_regs.I2C_DATA.reg;
     return rData;
 }
-uint32_t  HS_I2C::master_bus_busy()
+
+bool  HS_I2C::master_bus_busy()
 {
-        /*if(HWREG(baseAdd + I2C_IRQSTATUS_RAW) & I2C_IRQSTATUS_RAW_BB)
+    /*if(HWREG(baseAdd + I2C_IRQSTATUS_RAW) & I2C_IRQSTATUS_RAW_BB)
     {
          status = 1;
     }
@@ -148,15 +149,13 @@ uint32_t  HS_I2C::master_bus_busy()
     bool status;
     
     if (m_I2C_regs.I2C_IRQSTATUS_RAW.b.BB)
-    {
         status = HIGH;
-    }
     else
-    {
         status = LOW;
-    }
+    
     return status;
 }
+
 uint32_t  HS_I2C::master_busy()
 {
     //(HWREG(baseAdd + I2C_CON) & I2C_CON_MST);
@@ -167,17 +166,20 @@ uint32_t  HS_I2C::master_int_status()
 {
     //return ((HWREG(baseAdd + I2C_IRQSTATUS)));
     return m_I2C_regs.I2C_IRQSTATUS.reg;
-}   
+}  
+
 uint32_t  HS_I2C::system_status_get()
 {
     //return(HWREG(baseAdd + I2C_SYSS) & I2C_SYSS_RDONE);
     return m_I2C_regs.I2C_SYSS.b.RDONE;
 }
+
 uint32_t  HS_I2C::master_int_raw_status()
 {
     //return ((HWREG(baseAdd + I2C_IRQSTATUS_RAW)));
     return m_I2C_regs.I2C_IRQSTATUS_RAW.reg;
 }
+
 uint32_t  HS_I2C::active_own_address_get()
 {
     /*if((HWREG(baseAdd + I2C_ACTOA) & (I2C_ACTOA_OA0_ACT)))
@@ -218,6 +220,7 @@ uint32_t  HS_I2C::active_own_address_get()
 
     return 0;
 }
+
 void  HS_I2C::FIFO_clear(uint32_t flag)
 {
     /*if(I2C_TX_MODE == flag)
@@ -238,20 +241,24 @@ void  HS_I2C::FIFO_clear(uint32_t flag)
         m_I2C_regs.I2C_BUF.b.RXFIFO_CLR = HIGH;
     }
 }
+
 void  HS_I2C::slave_data_put(uint32_t data)
 {
   return;
 } 
+
 void  HS_I2C::master_control(uint32_t cmd)
 {
     //HWREG(baseAdd + I2C_CON) = cmd | I2C_CON_I2C_EN;
     m_I2C_regs.I2C_CON.reg = cmd | m_I2C_regs.I2C_CON.b.I2C_EN;
 }
+
 void  HS_I2C::set_data_count(uint32_t count)
 {
     //HWREG(baseAdd + I2C_CNT) = count;
     m_I2C_regs.I2C_CNT.reg = count;
 }
+
 void  HS_I2C::idle_mode_select(uint32_t flag)
 {
     /*HWREG(baseAdd + I2C_SYSC) &= ~(I2C_SYSC_IDLEMODE);
@@ -262,12 +269,14 @@ void  HS_I2C::idle_mode_select(uint32_t flag)
     
     m_I2C_regs.I2C_SYSC.reg |= flag;
 }
+
 void  HS_I2C::master_data_put(uint8_t data)
 {
      /*write data to be transmited to Data transmit register */
     //HWREG(baseAdd + I2C_DATA) = data;
     m_I2C_regs.I2C_DATA.reg = data;
 }
+
 void  HS_I2C::wake_up_enable(I2C::e_WE_flags event_flag, uint32_t flag)
 {
     /*if(I2C_WAKE_UP_IRQ == flag)
@@ -296,6 +305,7 @@ void  HS_I2C::wake_up_enable(I2C::e_WE_flags event_flag, uint32_t flag)
          m_I2C_regs.I2C_DMATXWAKE_EN.reg |= event_flag;
     } 
 }
+
 void  HS_I2C::wake_up_disable(I2C::e_WE_flags event_flag, uint32_t flag)
 {
     /*if(I2C_WAKE_UP_IRQ == flag)
@@ -324,6 +334,7 @@ void  HS_I2C::wake_up_disable(I2C::e_WE_flags event_flag, uint32_t flag)
          m_I2C_regs.I2C_DMATXWAKE_EN.reg &= ~event_flag;
     }
 }
+
 void  HS_I2C::master_init_exp_clk(uint32_t sys_clk, uint32_t internal_clk, uint32_t output_clk)
 {
     uint8_t prescalar;
@@ -345,6 +356,7 @@ void  HS_I2C::master_init_exp_clk(uint32_t sys_clk, uint32_t internal_clk, uint3
     //HWREG(baseAdd + I2C_SCLH) = divider - 5;
     m_I2C_regs.I2C_SCLH.b.SCLH = divider - 5;
 }
+
 void  HS_I2C::own_address_set(uint32_t slave_add, uint32_t flag)
 {
     /*switch(flag)
@@ -377,10 +389,7 @@ void  HS_I2C::own_address_set(uint32_t slave_add, uint32_t flag)
      }
   
 }
-void  HS_I2C::slave_int_clear_ex(uint32_t int_flag)
-{
-  return;
-}
+
 void  HS_I2C::clock_activity_select(uint32_t flag)
 {
     /*HWREG(baseAdd + I2C_SYSC) &= ~(I2C_SYSC_CLKACTIVITY);
@@ -391,24 +400,40 @@ void  HS_I2C::clock_activity_select(uint32_t flag)
     m_I2C_regs.I2C_SYSC.reg |= flag;
   
 }
+
 void  HS_I2C::slave_int_enable_ex(uint32_t int_flag)
 {
-  return;
+    return;
 }
-void  HS_I2C::master_int_clear_ex(I2C::e_IRQSTATUS_flags int_flag)
+
+void  HS_I2C::slave_int_clear_ex(uint32_t int_flag)
 {
-    //HWREG(baseAdd + I2C_IRQSTATUS) = intFlag; 
-    m_I2C_regs.I2C_IRQSTATUS.reg |= int_flag;
+    return;
 }
+
 void  HS_I2C::slave_int_disable_ex(uint32_t int_flag)
 {
-  return;
+    return;
 }
+
 void  HS_I2C::master_int_enable_ex(I2C::e_IRQENABLE_SET_flags int_flag)
 {
     //HWREG(baseAdd + I2C_IRQENABLE_SET) |= intFlag;
     m_I2C_regs.I2C_IRQENABLE_SET.reg |= int_flag;
 }
+
+void  HS_I2C::master_int_clear_ex(I2C::e_IRQSTATUS_flags int_flag)
+{
+    //HWREG(baseAdd + I2C_IRQSTATUS) = intFlag; 
+    m_I2C_regs.I2C_IRQSTATUS.reg |= int_flag;
+}
+
+void  HS_I2C::master_int_disable_ex(I2C::e_IRQENABLE_CLR_flags int_flag)
+{
+    //HWREG(baseAdd + I2C_IRQENABLE_CLR) = intFlag;
+    m_I2C_regs.I2C_IRQENABLE_CLR.reg |= int_flag;
+}
+
 uint32_t  HS_I2C::buffer_status(uint32_t flag)
 {
     /*uint32_t status = 0;
@@ -457,17 +482,14 @@ uint32_t  HS_I2C::buffer_status(uint32_t flag)
 
     return status;
 }
-void  HS_I2C::master_int_disable_ex(I2C::e_IRQENABLE_CLR_flags int_flag)
-{
-    //HWREG(baseAdd + I2C_IRQENABLE_CLR) = intFlag;
-    m_I2C_regs.I2C_IRQENABLE_CLR.reg |= int_flag;
-}
+
 void  HS_I2C::master_slave_addr_set(uint32_t slave_add)
 {
     /*Set the address of the slave with which the master will communicate.*/
     //HWREG(baseAdd + I2C_SA) = slaveAdd;
     m_I2C_regs.I2C_SA.reg = slave_add;
 }
+
 void  HS_I2C::FIFO_threshold_config(I2C::e_BUF_TRSH_flags threshlod_val, uint32_t flag)
 {
     /*if(I2C_TX_MODE == flag)
@@ -496,27 +518,32 @@ void  HS_I2C::FIFO_threshold_config(I2C::e_BUF_TRSH_flags threshlod_val, uint32_
         m_I2C_regs.I2C_BUF.b.RXTRSH |= threshlod_val;  
     }
 }
+
 void  HS_I2C::master_int_raw_status_clear_ex(I2C::e_IRQSTATUS_RAW_flags int_flag)
 {
     //HWREG(baseAdd + I2C_IRQSTATUS_RAW) = intFlag;
   m_I2C_regs.I2C_IRQSTATUS_RAW.reg = int_flag; 
 }
+
 uint32_t  HS_I2C::master_int_status_ex(I2C::e_IRQSTATUS_flags int_flag)
 {
     //return ((HWREG(baseAdd + I2C_IRQSTATUS)) & (intFlag));
     return ((m_I2C_regs.I2C_IRQSTATUS.reg) & (int_flag));
 }
+
 uint32_t  HS_I2C::master_slave_addr_get(uint32_t slave_add)
 {
     /* Returns the address of the slave with which the master will communicate.*/
     //return (HWREG(baseAdd + I2C_SA) & I2C_SA_SA);
     return m_I2C_regs.I2C_SA.b.SA;
 }
+
 uint32_t  HS_I2C::master_int_raw_status_ex(I2C::e_IRQSTATUS_RAW_flags int_flag)
 {
     //return ((HWREG(baseAdd + I2C_IRQSTATUS_RAW)) & (intFlag));
     return ((m_I2C_regs.I2C_IRQSTATUS_RAW.reg) & (int_flag));
 }
+
 void  HS_I2C::clock_blocking_control(bool ownAdd0, bool ownAdd1, bool ownAdd2, bool ownAdd3)
 {
     /*HWREG(baseAdd + I2C_SBLOCK) &= ~(I2C_SBLOCK_OA0_EN);
@@ -543,6 +570,7 @@ void  HS_I2C::clock_blocking_control(bool ownAdd0, bool ownAdd1, bool ownAdd2, b
     m_I2C_regs.I2C_SBLOCK.b.OA3_EN = LOW;
     m_I2C_regs.I2C_SBLOCK.b.OA3_EN = ownAdd3;
 }
+
 void  HS_I2C::context_save(I2CCONTEXT *contextPtr)
 {
     //contextPtr->prescalar	= HWREG(i2cBase + I2C_PSC);
@@ -555,6 +583,7 @@ void  HS_I2C::context_save(I2CCONTEXT *contextPtr)
     contextPtr->highdivider     = m_I2C_regs.I2C_SCLH.reg;
     contextPtr->ownaddr 	    = m_I2C_regs.I2C_OA.reg;
 }
+
 void  HS_I2C::context_restore(I2CCONTEXT *contextPtr)
 {
     /*HWREG(i2cBase + I2C_CON) &= ~(I2C_CON_I2C_EN);	// Disable
@@ -580,4 +609,42 @@ void  HS_I2C::context_restore(I2CCONTEXT *contextPtr)
     
     m_I2C_regs.I2C_CON.b.I2C_EN = HIGH;                           // Enable 
     while (!m_I2C_regs.I2C_SYSS.b.RDONE); // Reset complete...?
+}
+
+I2C::e_I2C_SER_NUM  HS_I2C::get_I2C_ser_number()
+{
+    uint32_t i2c_num = (uint32_t)&m_I2C_regs;
+     
+    switch(i2c_num)
+    {
+        case I2C::AM335x_I2C_0_BASE:     
+            return I2C::I2C_NUM_0;
+        case I2C::AM335x_I2C_1_BASE:     
+            return I2C::I2C_NUM_1;
+        case I2C::AM335x_I2C_2_BASE:
+            return I2C::I2C_NUM_2;
+        default:
+            break;
+    } 
+    
+    return I2C::I2C_NUM_NA;  
+}
+
+INTC::e_SYS_INTERRUPT  HS_I2C::get_I2C_sys_interrupt()
+{  
+    uint32_t i2c_num = (uint32_t)&m_I2C_regs;
+     
+    switch(i2c_num)
+    {
+        case I2C::AM335x_I2C_0_BASE:     
+            return INTC::I2C0INT;
+        case I2C::AM335x_I2C_1_BASE:     
+            return INTC::I2C1INT;
+        case I2C::AM335x_I2C_2_BASE:
+            return INTC::I2C2INT;
+        default:
+            break;
+    } 
+    
+    return INTC::INTERRUPTS_NUM_MAX; 
 }
