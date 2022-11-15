@@ -149,7 +149,7 @@ namespace I2C
         F_IRQSTATUS_BB       = BIT(12),
         F_IRQSTATUS_RDR      = BIT(13),
         F_IRQSTATUS_XDR      = BIT(14),
-        F_IRQSTATUS_ALL      = 0x3FFF
+        F_IRQSTATUS_ALL      = 0x7FFF
     };
     
     /* [reset state = 0x0]*/
@@ -198,7 +198,7 @@ namespace I2C
         F_IRQENABLE_ROVR_IE     = BIT(11),
         F_IRQENABLE_RDR_IE      = BIT(13),
         F_IRQENABLE_XDR_IE      = BIT(14),
-        F_IRQENABLE_ALL         = 0x7FF
+        F_IRQENABLE_ALL         = 0x7FFF
     };
     
     /* [reset state = 0x0]*/
@@ -276,7 +276,7 @@ namespace I2C
         F_WE_ROVR_WE     = BIT(11),
         F_WE_RDR_WE      = BIT(13),
         F_WE_XDR_WE      = BIT(14),
-        F_WE_ALL         = 0x1F
+        F_WE_ALL         = 0x7FFF
     };
 
     /* [reset state = 0x0]*/

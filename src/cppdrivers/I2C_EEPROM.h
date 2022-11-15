@@ -67,7 +67,7 @@ public:
         master_slave_addr_set(I2C_SLAVE_ADDR);    // Set i2c slave address
         
         //I2CMasterEnable(SOC_I2C_0_REGS);
-        HS_I2C::master_disable();   // Bring I2C out of reset
+        HS_I2C::master_enable();   // Bring I2C out of reset
     }
 
     /** Receives data over I2C bus **/
@@ -97,7 +97,7 @@ public:
         HS_I2C::master_start();
     
         //while(I2CMasterBusBusy(SOC_I2C_0_REGS) == 0);
-        while(HS_I2C::master_bus_busy());
+        while(!HS_I2C::master_bus_busy());
         
         while(m_t_count != m_num_of_bytes);
     
@@ -121,11 +121,8 @@ public:
         HS_I2C::master_control((uint32_t)I2C::F_CON_MST);
     
         /* Receive and Stop Condition Interrupts are enabled */
-        //I2CMasterIntEnableEx(SOC_I2C_0_REGS,  I2C_INT_RECV_READY |
-        //                                      I2C_INT_STOP_CONDITION);
-        HS_I2C::master_int_enable_ex(I2C::F_IRQENABLE_RRDY_IE);
-        HS_I2C::master_int_enable_ex(I2C::F_IRQENABLE_BF_IE);
-    
+        HS_I2C::master_int_enable_ex(I2C::F_IRQENABLE_RRDY_IE);        
+            
         /* Generate Start Condition over I2C bus */
         //I2CMasterStart(SOC_I2C_0_REGS);
         HS_I2C::master_start();
@@ -139,11 +136,7 @@ public:
 
     /* Configures AINTC to generate interrupt */
     void AINTC_configure(void)
-    {
-        /* Intialize the ARM Interrupt Controller(AINTC) */
-        //IntAINTCInit();
-        //m_int_controller.init();
-        
+    {        
         /* Registering the Interrupt Service Routine(ISR). */
         //IntRegister(SYS_INT_I2C0INT, I2CIsr);
         m_int_controller.register_handler(m_I2C_sys_interrupt, m_isr_handler);            // Registering I2C_irqhandler         
@@ -231,6 +224,7 @@ inline void I2C_irqhandler(void *p_obj)
              /* Disable the receive ready interrupt */
              //I2CMasterIntDisableEx(SOC_I2C_0_REGS, I2C_INT_RECV_READY);
              s_I2C.HS_I2C::master_int_disable_ex(I2C::F_IRQENABLE_RRDY_IE);
+             s_I2C.HS_I2C::master_int_enable_ex(I2C::F_IRQENABLE_BF_IE);
              
              /* Generate a STOP */
              //I2CMasterStop(SOC_I2C_0_REGS);
@@ -238,24 +232,16 @@ inline void I2C_irqhandler(void *p_obj)
         }
     }
 
-    //if (status & I2C_INT_TRANSMIT_READY)
     if (status & (uint32_t)I2C::F_IRQSTATUS_XRDY)
-    {
-        /* Put data to data transmit register of i2c */
-        //I2CMasterDataPut(SOC_I2C_0_REGS, s_I2C.m_data_to_slave[m_t_count++]);
-        s_I2C.HS_I2C::master_data_put(s_I2C.m_data_to_slave[s_I2C.m_t_count++]);
-
-        /* Clear Transmit interrupt status */
-        //I2CMasterIntClearEx(SOC_I2C_0_REGS, I2C_INT_TRANSMIT_READY);
-        s_I2C.HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_XRDY);
+    {        
+        s_I2C.HS_I2C::master_data_put(s_I2C.m_data_to_slave[s_I2C.m_t_count++]); // Put data to data transmit register of i2c        
+        s_I2C.HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_XRDY);      // Clear Transmit interrupt status
                         
         if(s_I2C.m_t_count == s_I2C.m_num_of_bytes)
-        {
-             /* Disable the transmit ready interrupt */
-             //I2CMasterIntDisableEx(SOC_I2C_0_REGS, I2C_INT_TRANSMIT_READY);
-             s_I2C.HS_I2C::master_int_disable_ex(I2C::F_IRQENABLE_XRDY_IE);
+        {             
+             s_I2C.HS_I2C::master_int_disable_ex(I2C::F_IRQENABLE_XRDY_IE);      // Disable the transmit ready interrupt
+             s_I2C.HS_I2C::master_int_enable_ex(I2C::F_IRQENABLE_BF_IE);
         }
-
     }
         
     //if (status & I2C_INT_STOP_CONDITION)

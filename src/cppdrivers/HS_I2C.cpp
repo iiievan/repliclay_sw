@@ -20,7 +20,6 @@ void  HS_I2C::master_stop()
 
 void  HS_I2C::master_start()
 {
-    //HWREG(baseAdd + I2C_CON) |= I2C_CON_STT;
     m_I2C_regs.I2C_CON.b.STT = HIGH ;
 }
 
@@ -382,19 +381,16 @@ void  HS_I2C::clock_activity_select(I2C::e_SYSC_CLKACTIVITY flag)
 
 void  HS_I2C::master_int_enable_ex(I2C::e_IRQENABLE_flags int_flag)
 {
-    //HWREG(baseAdd + I2C_IRQENABLE_SET) |= intFlag;
     m_I2C_regs.I2C_IRQENABLE_SET.reg |= int_flag;
 }
 
 void  HS_I2C::master_int_clear_ex(uint32_t int_flag)
 {
-    //HWREG(baseAdd + I2C_IRQSTATUS) = intFlag; 
     m_I2C_regs.I2C_IRQSTATUS.reg = int_flag;
 }
 
 void  HS_I2C::master_int_disable_ex(I2C::e_IRQENABLE_flags int_flag)
 {
-    //HWREG(baseAdd + I2C_IRQENABLE_CLR) = intFlag;
     m_I2C_regs.I2C_IRQENABLE_CLR.reg |= int_flag;
 }
 
