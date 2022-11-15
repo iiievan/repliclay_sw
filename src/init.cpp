@@ -33,16 +33,18 @@ I2C_EEPROM CAT24C256WI(I2C::AM335X_I2C_0, I2C_SLAVE_ADDR);
 
 void init_board(void)   
 { 
-    InitMem();   // Initiate MMU and ... Invoke Cache
-    intc.init(); //Initializing the ARM Interrupt Controller.   
-    
-    CP15BranchPredictionEnable(); // Enable Branch Prediction Shit */
+    InitMem();                     // Initiate MMU and ... Invoke Cache  
+    CP15BranchPredictionEnable();  // Enable Branch Prediction Shit */
+ 
+    intc.master_IRQ_enable();      // Enable IRQ in CPSR
+    intc.init();                   // Initializing the ARM Interrupt Controller.
     
     /* Initialize the UART console */
     ConsoleUtilsInit();
     ConsoleUtilsSetType(CONSOLE_UART); // Select the console type based on compile time check
     
     os_timer.setup(OS_TIMER_RLD_COUNT);
+    CAT24C256WI.setup();
     
     GPIOModuleClkConfig(1);             // Enabling functional clocks for GPIO1 instance.
     GPIOModuleEnable(SOC_GPIO_1_REGS);  // Enabling the GPIO module.

@@ -997,7 +997,7 @@ namespace PRCM
             uint32_t    DPLL              :1;   // bit: 0       (RW)DPLL clock activity [0x0 = in bypass or in stop mode; 0x1= locked]              
             uint32_t                      :7;   // bit: 1..7    Reserved
             uint32_t    ST_MN_BYPASS      :8;   // bit: 8       (RW)DPLL MN_BYPASS status [0x0 = not bypass; 0x1= bypass]            
-            uint32_t                      :23;  // bit: 9..31   Reserved
+            uint32_t                      :16;  // bit: 9..31   Reserved
         } b;                                      
         uint32_t  reg;                           
     } IDLEST_DPLL_MPU_reg_t;
@@ -3103,6 +3103,7 @@ namespace PRCM
     constexpr AM335x_PRM_CEFUSE_Type    *AM335x_PRM_CEFUSE  = ((AM335x_PRM_CEFUSE_Type *) AM335x_PRM_CEFUSE_BASE);
     
     uint32_t debug_dump_CM_PER(AM335x_CM_PER_Type &sCM_PER = *AM335x_CM_PER);
+    uint32_t debug_dump_CM_WKUP(AM335x_CM_WKUP_Type &sCM_WKUP = *AM335x_CM_WKUP);
     /* for testing purpose */
     inline uint32_t debug_dump_CM_PER(AM335x_CM_PER_Type &sCM_PER)
     {
@@ -3122,6 +3123,28 @@ namespace PRCM
           }
           
           return SIZEOF_CM_PER;
+    }
+    
+    /* for testing purpose */
+    inline uint32_t debug_dump_CM_WKUP(AM335x_CM_WKUP_Type &sCM_WKUP)
+    {
+          constexpr uint32_t COUNTOF_CM_WKUP = sizeof(AM335x_CM_WKUP_Type)/sizeof(uint32_t);
+          volatile uint32_t TSTREG[COUNTOF_CM_WKUP] = {0};          
+          uint32_t *pAM335x_CM_WKUP = (uint32_t *)&sCM_WKUP;
+          
+          volatile uint32_t TSTREG1 = (uint32_t)sCM_WKUP.IDLEST_DPLL_MPU.reg;
+          volatile uint32_t TSTREG2 = (uint32_t)sCM_WKUP.SSC_DELTAMSTEP_DPLL_MPU.reg;
+          volatile uint32_t TSTREG3 = (uint32_t)sCM_WKUP.SSC_MODFREQDIV_DPLL_MPU.reg;
+          volatile uint32_t TSTREG4 = (uint32_t)sCM_WKUP.CLKSEL_DPLL_MPU.reg;
+          
+          volatile uint32_t SIZEOF_CM_WKUP = sizeof(AM335x_CM_WKUP_Type); 
+          
+          for(uint32_t i = 0 ; i < COUNTOF_CM_WKUP; i++)
+          {   
+                TSTREG[i] = pAM335x_CM_WKUP[i];
+          }
+          
+          return SIZEOF_CM_WKUP;
     }
 }
 

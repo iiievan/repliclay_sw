@@ -50,6 +50,9 @@ void OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
     }
 }
 
+class I2C_EEPROM;
+extern I2C_EEPROM CAT24C256WI;
+
 void  interrupt_handler(uint32_t  src_nbr)
 {
  INTC::e_SYS_INTERRUPT  int_nbr;
@@ -62,7 +65,12 @@ void  interrupt_handler(uint32_t  src_nbr)
 
              isr = interrupt_vector_table[int_nbr];
              if (isr != nullptr) 
-                 isr((void *)int_nbr);
+             {
+                if(int_nbr == INTC::I2C0INT)
+                    isr((void *)&CAT24C256WI);
+                else
+                    isr((void *)int_nbr);
+             }
              
 			 intc.software_int_clear(int_nbr);              // Clear interrupt
              INTC::AM335x_INTC->CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation

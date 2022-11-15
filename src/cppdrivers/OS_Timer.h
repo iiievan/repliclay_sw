@@ -28,18 +28,23 @@ public:
     void setup(uint32_t reload_value)
     {
         // run clock for timer instance
-        m_prcm_module.run_clk_DMTIMER(m_DMTIMER_number); 
-    
-        // setup timer interrupt in INTC
-        m_int_controller.register_handler(m_DMTIMER_sys_interrupt, m_isr_handler);            // Registering DMTimer_irqhandler
-        m_int_controller.priority_set(m_DMTIMER_sys_interrupt,(INTC::MAX_IRQ_PRIORITIES -1), INTC::HOSTINT_ROUTE_IRQ); // Set the lowest priority
-        sys_interrupt_enable(); 
-    
+        m_prcm_module.run_clk_DMTIMER(m_DMTIMER_number);
+        
+        AINTC_configure();
+
         // setup timer itself
         DM_Timer::counter_set(reload_value); //Load the counter with the initial count value
         DM_Timer::reload_set(reload_value);    //Load the load register with the reload count value
         DM_Timer::mode_configure(DMTIMER::MODE_AUTORELOAD); // mode : autoreload and no compare
         DM_Timer::enable();
+    }
+
+    void AINTC_configure(void)
+    {
+        // setup timer interrupt in INTC
+        m_int_controller.register_handler(m_DMTIMER_sys_interrupt, m_isr_handler);            // Registering DMTimer_irqhandler
+        m_int_controller.priority_set(m_DMTIMER_sys_interrupt,(INTC::MAX_IRQ_PRIORITIES -1), INTC::HOSTINT_ROUTE_IRQ); // Set the lowest priority
+        sys_interrupt_enable(); 
     }
 
     void sys_interrupt_enable()  { m_int_controller.system_enable(m_DMTIMER_sys_interrupt);  }

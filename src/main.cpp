@@ -13,6 +13,7 @@
 #include "OS_Timer.h"
 #include "PRCM.h"
 #include "INTC.h"
+#include "I2C_EEPROM.h"
 #include  <uC_cpu.h>
 #include  <app_cfg.h>
 #include  <cpu_cfg.h>
@@ -57,7 +58,9 @@ static  void  AppTaskStart              (void *p_arg);
 static  void  AppTaskStart (void *p_arg)
 {
     (void)p_arg;
-    CPU_INT32U i;
+    CPU_INT32U tm;
+uint8_t data_read[50];
+uint8_t temp;
 	
     ConsoleUtilsPrintf("Enabling timer interrupt!\r\n");
     
@@ -66,17 +69,41 @@ static  void  AppTaskStart (void *p_arg)
     Mem_Init();                                                 /* Initialize memory managment module                   */
     Math_Init();
     
- #if (OS_TASK_STAT_EN > 0)
+#if (OS_TASK_STAT_EN > 0)
     OSStatInit();                                               /* Determine CPU capacity                               */
 #endif
-      //ConsoleUtilsPrintf("\n\n\r");
-      //ConsoleUtilsPrintf("Creating Application Objects...\n\r");
-      //AppEventCreate();                                           /* Create Application Events                            */
-      //ConsoleUtilsPrintf("Creating Application Tasks...\n\r");
-      //AppTaskCreate();                                            /* Create Application Tasks                             */
+    //ConsoleUtilsPrintf("\n\n\r");
+    //ConsoleUtilsPrintf("Creating Application Objects...\n\r");
+    //AppEventCreate();                                           /* Create Application Events                            */
+    //ConsoleUtilsPrintf("Creating Application Tasks...\n\r");
+    //AppTaskCreate();                                            /* Create Application Tasks                             */
     
-      while (DEF_TRUE) {
-        ConsoleUtilsPrintf("Task 1 message %d!\r\n", i++);
+    CAT24C256WI.EEPROM_Read(data_read);
+      
+    for(uint32_t i = 0; i < 50; i++)
+    {
+        /* Collecting the Most Significant Nibble of the data byte. */
+        temp = ((data_read[i] & 0xF0) >> 4);
+    
+        if(temp < 10)
+            ConsoleUtilsPrintf("%c", (temp + 0x30));
+        else
+            ConsoleUtilsPrintf("%c", (temp + 0x37));
+    
+        /* Collecting the Least Significant Nibble of the data byte. */
+        temp = (data_read[i] & 0x0F);
+    
+        if(temp < 10)
+            ConsoleUtilsPrintf("%c", (temp + 0x30));
+        else
+            ConsoleUtilsPrintf("%c", (temp + 0x37));
+    
+        ConsoleUtilsPrintf("%c", ',');
+    }
+      
+    while (DEF_TRUE) 
+    {
+        ConsoleUtilsPrintf("Task 1 message %d!\r\n", tm++);
         OSTimeDlyHMSM(0, 0, 5,0);
     }
 }
@@ -101,7 +128,7 @@ static  void  AppTaskStart (void *p_arg)
 
 int main() 
 {
-     CPU_INT08U	os_err;
+    CPU_INT08U	os_err;
 #if (CPU_CFG_NAME_EN == DEF_ENABLED)
     CPU_ERR  cpu_err;
 #endif

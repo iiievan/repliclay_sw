@@ -25,9 +25,9 @@ public:
 
         m_slave_address = address;
 
-        m_t_count = 0;
-        m_r_count = 0;
-        m_flag   = 1;
+        m_t_count      = 0;
+        m_r_count      = 0;
+        m_flag         = 1;
         m_num_of_bytes = 0;
     }
 
@@ -44,11 +44,13 @@ public:
         
     }
 
-    void setup_to_transmit()
+    void setup()
     {
         /* Enable the clock for I2C0 */
         //I2C0ModuleClkConfig();
         m_prcm_module.run_I2C0_clk();
+        
+        AINTC_configure();
     
         I2CPinMuxSetup(0);    
         
@@ -140,13 +142,11 @@ public:
     {
         /* Intialize the ARM Interrupt Controller(AINTC) */
         //IntAINTCInit();
-        m_int_controller.init();
+        //m_int_controller.init();
         
         /* Registering the Interrupt Service Routine(ISR). */
         //IntRegister(SYS_INT_I2C0INT, I2CIsr);
-        m_int_controller.register_handler(m_I2C_sys_interrupt, m_isr_handler);            // Registering DMTimer_irqhandler
-
-         
+        m_int_controller.register_handler(m_I2C_sys_interrupt, m_isr_handler);            // Registering I2C_irqhandler         
     
         /* Setting the priority for the system interrupt in AINTC. */
         //IntPrioritySet(SYS_INT_I2C0INT, 0, AINTC_HOSTINT_ROUTE_IRQ );
