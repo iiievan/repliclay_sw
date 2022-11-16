@@ -14,7 +14,6 @@ void  HS_I2C::soft_reset()
 
 void  HS_I2C::master_stop()
 {
-    //HWREG(baseAdd + I2C_CON) |= I2C_CON_STP;
     m_I2C_regs.I2C_CON.b.STP = HIGH;
 }
 
@@ -25,27 +24,23 @@ void  HS_I2C::master_start()
 
 void  HS_I2C::master_enable()
 {
-    /* Bring the I2C module out of reset */
-    //HWREG(baseAdd + I2C_CON) |= I2C_CON_I2C_EN;
+    /** Bring the I2C module out of reset **/
     m_I2C_regs.I2C_CON.b.I2C_EN = HIGH;
 }
 
 void  HS_I2C::master_disable()
 {
-    /* Put I2C module in reset */
-    //HWREG(baseAdd + I2C_CON) &= ~(I2C_CON_I2C_EN);
+    /** Put I2C module in reset **/
     m_I2C_regs.I2C_CON.b.I2C_EN = LOW;
 }
 
 void  HS_I2C::auto_idle_enable()
 {
-    //HWREG(baseAdd + I2C_SYSC) |= I2C_SYSC_AUTOIDLE;
     m_I2C_regs.I2C_SYSC.b.AUTOIDLE = HIGH;
 }
 
 void  HS_I2C::auto_idle_disable()
 {
-    //HWREG(baseAdd + I2C_SYSC) &= ~I2C_SYSC_AUTOIDLE;
     m_I2C_regs.I2C_SYSC.b.AUTOIDLE = LOW;
 }
 
@@ -71,8 +66,8 @@ void  HS_I2C::DMATx_event_disable()
 {
     /*HWREG(baseAdd + I2C_BUF) &= ~(I2C_BUF_XDMA_EN);
     HWREG(baseAdd + I2C_DMATXENABLE_CLR) = (I2C_DMATXENABLE_CLR_DMATX_ENABLE_CLEAR);*/
-    m_I2C_regs.I2C_BUF.b.XDMA_EN = LOW;
-    
+  
+    m_I2C_regs.I2C_BUF.b.XDMA_EN = LOW;    
     m_I2C_regs.I2C_DMATXENABLE_CLR.b.DMATX_ENABLE_CLEAR = HIGH;
   
 }
@@ -103,7 +98,7 @@ uint32_t  HS_I2C::master_err()
                                                         I2C::F_IRQSTATUS_AERR    |  //      1000 0000 b
                                                         I2C::F_IRQSTATUS_NACK    |  //           0010 b
                                                         I2C::F_IRQSTATUS_ROVR)   ;  // 1000 0000 0000 b
-    return err;                                                                 // 1000 0000 1011 mask result
+    return err;                                                                     // 1000 0000 1011 mask result
 } 
 
 void  HS_I2C::global_wake_up_enable()
@@ -245,7 +240,6 @@ void  HS_I2C::master_control(uint32_t cmd)
 
 void  HS_I2C::set_data_count(uint16_t count)
 {
-    //HWREG(baseAdd + I2C_CNT) = count;
     m_I2C_regs.I2C_CNT.b.DCOUNT = count;
 }
 
@@ -320,19 +314,14 @@ void  HS_I2C::master_init_exp_clk(uint32_t sys_clk, uint32_t internal_clk, uint3
     uint32_t prescaler;
     uint32_t divider;
 
-    /* Calculate prescaler value */
+    // Calculate and set prescaler value
     prescaler = (uint8_t)(sys_clk / internal_clk) - 1;
-
-    //HWREG(baseAdd + I2C_PSC) = prescaler;
     m_I2C_regs.I2C_PSC.b.PSC = (uint8_t)prescaler;
     
     divider = internal_clk/output_clk;
     divider = divider / 2;
 
-    //HWREG(baseAdd + I2C_SCLL) = divider - 7;
     m_I2C_regs.I2C_SCLL.b.SCLL = (uint8_t)(divider - 7);
-    
-    //HWREG(baseAdd + I2C_SCLH) = divider - 5;
     m_I2C_regs.I2C_SCLH.b.SCLH = (uint8_t)(divider - 5);
 }
 
@@ -379,19 +368,22 @@ void  HS_I2C::clock_activity_select(I2C::e_SYSC_CLKACTIVITY flag)
   
 }
 
-void  HS_I2C::master_int_enable_ex(I2C::e_IRQENABLE_flags int_flag)
+void  HS_I2C::master_int_enable_ex(uint32_t int_flag)
 {
-    m_I2C_regs.I2C_IRQENABLE_SET.reg |= int_flag;
+    volatile uint32_t reg = int_flag;
+    m_I2C_regs.I2C_IRQENABLE_SET.reg = reg;
 }
 
 void  HS_I2C::master_int_clear_ex(uint32_t int_flag)
 {
-    m_I2C_regs.I2C_IRQSTATUS.reg = int_flag;
+    volatile uint32_t reg = int_flag;
+    m_I2C_regs.I2C_IRQSTATUS.reg = reg;
 }
 
-void  HS_I2C::master_int_disable_ex(I2C::e_IRQENABLE_flags int_flag)
+void  HS_I2C::master_int_disable_ex(uint32_t int_flag)
 {
-    m_I2C_regs.I2C_IRQENABLE_CLR.reg |= int_flag;
+    volatile uint32_t reg = int_flag;
+    m_I2C_regs.I2C_IRQENABLE_CLR.reg = reg;
 }
 
 uint32_t  HS_I2C::buffer_status(I2C::e_I2C_buffer_status flag)
@@ -442,8 +434,6 @@ uint32_t  HS_I2C::buffer_status(I2C::e_I2C_buffer_status flag)
 
 void  HS_I2C::master_slave_addr_set(uint16_t slave_add)
 {
-    /*Set the address of the slave with which the master will communicate.*/
-    //HWREG(baseAdd + I2C_SA) = slaveAdd;
     m_I2C_regs.I2C_SA.b.SA = slave_add;
 }
 

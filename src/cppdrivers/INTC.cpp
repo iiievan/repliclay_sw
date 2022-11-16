@@ -51,7 +51,7 @@ void OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
 }
 
 class I2C_EEPROM;
-extern I2C_EEPROM CAT24C256WI;
+extern I2C_EEPROM BRDINFO_24LC32A;
 
 void  interrupt_handler(uint32_t  src_nbr)
 {
@@ -67,7 +67,7 @@ void  interrupt_handler(uint32_t  src_nbr)
              if (isr != nullptr) 
              {
                 if(int_nbr == INTC::I2C0INT)
-                    isr((void *)&CAT24C256WI);
+                    isr((void *)&BRDINFO_24LC32A);
                 else
                     isr((void *)int_nbr);
              }

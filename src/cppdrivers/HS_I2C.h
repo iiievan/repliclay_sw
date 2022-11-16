@@ -912,9 +912,9 @@ public:
                 //void  slave_int_clear_ex(uint32_t int_flag);
                 //void  slave_int_disable_ex(uint32_t int_flag);
 
-                  void  master_int_enable_ex(I2C::e_IRQENABLE_flags int_flag);
-                  void  master_int_clear_ex(uint32_t int_flag);
-                  void  master_int_disable_ex(I2C::e_IRQENABLE_flags int_flag);                 
+                  void  master_int_enable_ex(uint32_t int_flag);  // e_IRQENABLE_flags
+                  void  master_int_clear_ex(uint32_t int_flag);   // 
+                  void  master_int_disable_ex(uint32_t int_flag); // e_IRQENABLE_flags                 
  
               uint32_t  buffer_status(I2C::e_I2C_buffer_status flag);
                   void  master_slave_addr_set(uint16_t slave_add);
