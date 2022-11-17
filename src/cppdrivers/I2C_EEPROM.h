@@ -14,14 +14,16 @@ class I2C_EEPROM : public HS_I2C
     
 public:
           I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t address);
-          ~I2C_EEPROM() {}
-    
-    void  clean_interrupts(void); // Clear status of all interrupts
+          ~I2C_EEPROM() {}   
+
     void  setup(uint32_t output_freq = 100000);   //100kHz by default
     void  AINTC_configure(void);
+    void  clean_interrupts(void);                 // Clear status of all interrupts
     
-    void  setup_to_receive(uint16_t d_count);    // Receives data over I2C bus
-    void  EEPROM_Read(uint8_t *data);            // Reads data from a specific address of e2prom
+    void  transmit(uint16_t d_count);             // Transmit data over I2C bus
+    void  receive(uint16_t d_count);              // Receives data over I2C bus
+    void  setup_to_receive(uint16_t d_count);     // 
+    void  EEPROM_Read(uint8_t *data);             // Reads data from a specific address of e2prom
     
     void  sys_interrupt_enable()  { m_int_controller.system_enable(m_I2C_sys_interrupt);  }
     void  sys_interrupt_disable() { m_int_controller.system_disable(m_I2C_sys_interrupt); }

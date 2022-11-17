@@ -869,69 +869,70 @@ public:
                         HS_I2C(I2C::AM335x_I2C_Type *p_i2c_regs);
                        ~HS_I2C() {};
 
-                  void  soft_reset();
-                  void  master_stop();
-                  void  master_start();
+                  /** i2c initial setup methods **/
                   void  master_enable();              
                   void  master_disable();
                   void  auto_idle_enable();
                   void  auto_idle_disable();
+                  void  master_init_exp_clk(uint32_t sys_clk, uint32_t internal_clk, uint32_t output_clk);
+                  void  master_slave_addr_set(uint16_t slave_add);
+    I2C::e_I2C_SER_NUM  get_I2C_ser_number();
+ INTC::e_SYS_INTERRUPT  get_I2C_sys_interrupt();                  
+                  
+                  /** i2c transaction management methods **/
+                  void  master_control(uint32_t cmd);   // see I2C::e_CON_flags
+                  void  set_data_count(uint16_t count);
+              uint16_t  data_count_get();
+                  void  master_data_put(uint8_t data);
+               uint8_t  master_data_get();
+                  bool  master_bus_busy();
+              uint32_t  master_int_raw_status();
+                  void  master_stop();
+                  void  master_start();
+                  void  master_int_enable_ex(uint32_t int_flag);  // see e_IRQENABLE_flags
+                  void  master_int_clear_ex(uint32_t int_flag);   // see e_IRQSTATUS_flags
+                  void  master_int_disable_ex(uint32_t int_flag); // see e_IRQENABLE_flags
+
+                  /** not frequently used methods! **/
+                  void  soft_reset();
                   void  DMATx_event_enable();
                   void  DMARx_event_enable();
                   void  DMATx_event_disable();
-                  void  DMARx_event_disable();
-                 
-              uint32_t  master_err();   // check by I2C::e_IRQSTATUS_flags       
-
+                  void  DMARx_event_disable();                 
+              uint32_t  master_err();           // check by I2C::e_IRQSTATUS_flags
                   void  global_wake_up_enable();             
-                  void  global_wake_up_disable();              
-              uint16_t  data_count_get();
-            //uint32_t  slave_data_get();
-               uint8_t  master_data_get();
-                  bool  master_bus_busy();
+                  void  global_wake_up_disable(); 
               uint32_t  master_busy();
-            //uint32_t  slave_int_status();
-              uint32_t  master_int_status(); //check by I2C::e_IRQSTATUS_flags  
+              uint32_t  master_int_status();    //check by I2C::e_IRQSTATUS_flags  
                   bool  system_status_get();
-            //uint32_t  slave_int_raw_status();
-              uint32_t  master_int_raw_status();
               uint32_t  active_own_address_get();
                   void  FIFO_clear(I2C::e_I2C_MODE flag);
-                  void  slave_data_put(uint32_t data);  
-                  void  master_control(uint32_t cmd); // see I2C::e_CON_flags
-                  void  set_data_count(uint16_t count);
+                  void  slave_data_put(uint32_t data); 
                   void  idle_mode_select(I2C::e_SYSC_IDLEMODE flag);
-                  void  master_data_put(uint8_t data);
                   void  wake_up_enable(I2C::e_WE_flags event_flag, I2C::e_I2C_WAKE_UP flag);
                   void  wake_up_disable(I2C::e_WE_flags event_flag, I2C::e_I2C_WAKE_UP flag);
-                  void  master_init_exp_clk(uint32_t sys_clk, uint32_t internal_clk, uint32_t output_clk);
                   void  own_address_set(uint32_t slave_add, I2C::e_OWN_ADDRESS_flags flag);
                   void  clock_activity_select(I2C::e_SYSC_CLKACTIVITY flag);
-
-                //void  slave_int_enable_ex(uint32_t int_flag);
-                //void  slave_int_clear_ex(uint32_t int_flag);
-                //void  slave_int_disable_ex(uint32_t int_flag);
-
-                  void  master_int_enable_ex(uint32_t int_flag);  // e_IRQENABLE_flags
-                  void  master_int_clear_ex(uint32_t int_flag);   // 
-                  void  master_int_disable_ex(uint32_t int_flag); // e_IRQENABLE_flags                 
- 
               uint32_t  buffer_status(I2C::e_I2C_buffer_status flag);
-                  void  master_slave_addr_set(uint16_t slave_add);
-                //void  slave_int_raw_status_clear_ex(uint32_t int_flag);
                   void  FIFO_threshold_config(I2C::e_BUF_TRSH_flags threshlod_val, I2C::e_I2C_MODE flag);
-            //uint32_t  slave_int_status_ex(uint32_t int_flag);
                   void  master_int_raw_status_clear_ex(I2C::e_IRQSTATUS_flags int_flag);
               uint32_t  master_int_status_ex(I2C::e_IRQSTATUS_flags int_flag);
-            //uint32_t  slave_int_raw_status_ex(uint32_t int_flag);
               uint16_t  master_slave_addr_get(uint32_t slave_add);
               uint32_t  master_int_raw_status_ex(I2C::e_IRQSTATUS_flags int_flag);
                   void  clock_blocking_control(bool ownAdd0, bool ownAdd1, bool ownAdd2, bool ownAdd3);
                   void  context_save(I2CCONTEXT *contextPtr);
                   void  context_restore(I2CCONTEXT *contextPtr);
-              
-    I2C::e_I2C_SER_NUM  get_I2C_ser_number();
- INTC::e_SYS_INTERRUPT  get_I2C_sys_interrupt(); 
+
+            /** not existing methods, but desired! **/
+            //uint32_t  slave_data_get();
+            //uint32_t  slave_int_status();
+            //uint32_t  slave_int_raw_status();
+                //void  slave_int_enable_ex(uint32_t int_flag);
+                //void  slave_int_clear_ex(uint32_t int_flag);
+                //void  slave_int_disable_ex(uint32_t int_flag);
+                //void  slave_int_raw_status_clear_ex(uint32_t int_flag);
+            //uint32_t  slave_int_status_ex(uint32_t int_flag);
+            //uint32_t  slave_int_raw_status_ex(uint32_t int_flag); 
 
 private:
 

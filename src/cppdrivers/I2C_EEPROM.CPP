@@ -20,6 +20,29 @@ I2C_EEPROM::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t address)
     m_E2PROM_ADDR_LSB = 0x00;   // Lower byte address (i.e A0-A7)
 }
 
+void  I2C_EEPROM::setup(uint32_t output_freq)
+{        
+    m_prcm_module.run_I2C0_clk(); // Enable the clock for I2C0        
+    AINTC_configure();
+
+    I2CPinMuxSetup(0);    
+    
+    HS_I2C::master_disable();                                        // Put i2c in reset/disabled state 
+    
+    HS_I2C::auto_idle_disable();                                     // Disable auto Idle functionality         
+    HS_I2C::master_init_exp_clk(48000000, 12000000, output_freq);    // Configure i2c bus speed to 100khz         
+    HS_I2C::master_slave_addr_set(m_slave_address);                  // Set i2c slave address
+    
+    HS_I2C::master_enable();                                         // Bring I2C out of reset
+}
+
+void  I2C_EEPROM::AINTC_configure(void)
+{        
+    m_int_controller.register_handler(m_I2C_sys_interrupt, m_isr_handler);            // Registering I2C_irqhandler         
+    m_int_controller.priority_set(m_I2C_sys_interrupt,0, INTC::HOSTINT_ROUTE_IRQ);    // Set the highest priority
+    sys_interrupt_enable();                                                           // Enabling the system interrupt in AINTC. 
+}
+
 /** Clear status of all interrupts **/
 void  I2C_EEPROM::clean_interrupts(void)
 {      
@@ -28,21 +51,46 @@ void  I2C_EEPROM::clean_interrupts(void)
     HS_I2C::master_int_disable_ex((uint32_t)I2C::F_IRQENABLE_ALL);        
 }
 
-void  I2C_EEPROM::setup(uint32_t output_freq)
-{        
-    m_prcm_module.run_I2C0_clk(); // Enable the clock for I2C0        
-    AINTC_configure();
+// Transmit data over I2C bus
+void  I2C_EEPROM::transmit(uint16_t d_count)
+{
+    HS_I2C::set_data_count(d_count);            // Data Count specifies the number of bytes to be transmitted 
+    m_num_of_bytes = HS_I2C::data_count_get();
+    clean_interrupts();                         // Clear status of all interrupts
 
-    I2CPinMuxSetup(0);    
+    /** Configure I2C controller in Master Transmitter mode **/
+    uint32_t cmd = (uint32_t)(I2C::F_CON_MST|I2C::F_CON_TRX);
+    HS_I2C::master_control(cmd);    
+    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_XRDY_IE); // Transmit interrupt is enabled
     
-    HS_I2C::master_disable();                                   // Put i2c in reset/disabled state 
+    HS_I2C::master_start();                                           // Generate Start Condition over I2C bus and start to transmit
+
+    while(!HS_I2C::master_bus_busy());        
+    while(m_t_count != m_num_of_bytes);    
+    m_Wait_flag = true;
+}  
+
+// Receives data over I2C bus          
+void  I2C_EEPROM::receive(uint16_t d_count)
+{
+    /** Wait untill I2C registers are ready to access **/
+    while(!(HS_I2C::master_int_raw_status() &
+           ((uint32_t)I2C::F_IRQSTATUS_ARDY)));  
     
-    HS_I2C::auto_idle_disable();                                // Disable auto Idle functionality         
-    HS_I2C::master_init_exp_clk(48000000, 12000000, output_freq);    // Configure i2c bus speed to 100khz         
-    HS_I2C::master_slave_addr_set(m_slave_address);             // Set i2c slave address
+    HS_I2C::set_data_count(d_count);                                  // Data Count specifies the number of bytes to be received      
+    m_num_of_bytes = HS_I2C::data_count_get();       
+    clean_interrupts();                                               // Clear status of all interrupts
     
-    HS_I2C::master_enable();                                    // Bring I2C out of reset
-}
+    HS_I2C::master_control((uint32_t)I2C::F_CON_MST);                 // Configure I2C controller in Master Receiver mode  
+    HS_I2C::master_int_enable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE |
+                                            I2C::F_IRQENABLE_BF_IE | 
+                                            I2C::F_IRQENABLE_NACK_IE)); // Receive and Stop Condition Interrupts are enabled          
+    HS_I2C::master_start();                                             // Generate Start Condition over I2C bus and start to Receive
+    
+    while(!HS_I2C::master_bus_busy());    
+    while(m_Wait_flag);                                                 // wait transaction end flag  
+    m_Wait_flag = true;
+}              
 
 /** Receives data over I2C bus **/
 void  I2C_EEPROM::setup_to_receive(uint16_t d_count)
@@ -81,13 +129,6 @@ void  I2C_EEPROM::setup_to_receive(uint16_t d_count)
     m_Wait_flag = true;
 }
 
-void  I2C_EEPROM::AINTC_configure(void)
-{        
-    m_int_controller.register_handler(m_I2C_sys_interrupt, m_isr_handler);            // Registering I2C_irqhandler         
-    m_int_controller.priority_set(m_I2C_sys_interrupt,0, INTC::HOSTINT_ROUTE_IRQ);    // Set the highest priority
-    sys_interrupt_enable();                                                           // Enabling the system interrupt in AINTC. 
-}
-
 // Reads data from a specific address of e2prom
 void  I2C_EEPROM::EEPROM_Read(uint8_t *data)
 {   
@@ -97,7 +138,8 @@ void  I2C_EEPROM::EEPROM_Read(uint8_t *data)
     m_t_count = 0;
     m_r_count = 0;
     
-    setup_to_receive(50);
+    transmit(2);
+    receive(50);
 
     for (uint32_t i = 0; i < 50; i++ )
         data[i] = m_data_from_slave[i];
