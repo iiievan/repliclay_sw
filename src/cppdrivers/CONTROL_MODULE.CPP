@@ -38,11 +38,11 @@ void  x_CONTROL_MODULE::I2C2_pin_mux_setup()
     m_CTRL_MODULE_regs.conf_uart1_rtsn.b.putypesel = CONTROL_MODULE::PULL_UP;
     m_CTRL_MODULE_regs.conf_uart1_rtsn.b.rxactive  = CONTROL_MODULE::INPUT_ENABLE;
     m_CTRL_MODULE_regs.conf_uart1_rtsn.b.slewctrl  = CONTROL_MODULE::SLOW;
-    m_CTRL_MODULE_regs.conf_uart1_rtsn.b.mode      = CONTROL_MODULE::PINMODE_2;
+    m_CTRL_MODULE_regs.conf_uart1_rtsn.b.mode      = CONTROL_MODULE::PINMODE_3;
    
     /** I2C_SDA **/ 
     m_CTRL_MODULE_regs.conf_uart1_ctsn.b.putypesel = CONTROL_MODULE::PULL_UP;
     m_CTRL_MODULE_regs.conf_uart1_ctsn.b.rxactive  = CONTROL_MODULE::INPUT_ENABLE;
     m_CTRL_MODULE_regs.conf_uart1_ctsn.b.slewctrl  = CONTROL_MODULE::SLOW; 
-    m_CTRL_MODULE_regs.conf_uart1_ctsn.b.mode      = CONTROL_MODULE::PINMODE_2;
+    m_CTRL_MODULE_regs.conf_uart1_ctsn.b.mode      = CONTROL_MODULE::PINMODE_3;
 }

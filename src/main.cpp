@@ -78,7 +78,8 @@ uint8_t temp;
     //ConsoleUtilsPrintf("Creating Application Tasks...\n\r");
     //AppTaskCreate();                                            /* Create Application Tasks                             */
     
-    BRDINFO_24LC32A.EEPROM_Read(data_read);
+    //BRDINFO_24LC32A.EEPROM_Read(data_read);
+    CAT24C256WI.EEPROM_Read(data_read);
       
     for(uint32_t i = 0; i < 50; i++)
     {

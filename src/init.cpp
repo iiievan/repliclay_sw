@@ -29,7 +29,8 @@ OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_2);
 // OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_6);
 // OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_7);
 
-I2C_EEPROM BRDINFO_24LC32A(I2C::AM335X_I2C_0, I2C_SLAVE_ADDR);
+I2C_EEPROM BRDINFO_24LC32A(I2C::AM335X_I2C_0, SLAVE_ADDR_24LC32A);
+I2C_EEPROM CAT24C256WI(I2C::AM335X_I2C_2, SLAVE_ADDR_CAT24C256);
 
 void init_board(void)   
 { 
@@ -44,7 +45,8 @@ void init_board(void)
     ConsoleUtilsSetType(CONSOLE_UART); // Select the console type based on compile time check
     
     os_timer.setup(OS_TIMER_RLD_COUNT);
-    BRDINFO_24LC32A.setup(I2C::F_400KHz);
+    //BRDINFO_24LC32A.setup(I2C::F_400KHz);
+    CAT24C256WI.setup(I2C::F_400KHz);
     
     GPIOModuleClkConfig(1);             // Enabling functional clocks for GPIO1 instance.
     GPIOModuleEnable(SOC_GPIO_1_REGS);  // Enabling the GPIO module.

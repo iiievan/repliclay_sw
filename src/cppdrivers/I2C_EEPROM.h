@@ -5,7 +5,8 @@
 #include "PRCM.h"
 #include "CONTROL_MODULE.h"
 
-#define  I2C_SLAVE_ADDR   (0x50) // I2C address of CAT24C256 e2prom
+#define  SLAVE_ADDR_24LC32A     (0x50) // I2C address of 24LC32A eeprom
+#define  SLAVE_ADDR_CAT24C256   (0x54) // I2C address of CAT24C256 eeprom
 
 void I2C_irqhandler(void *p_obj);
 
@@ -50,6 +51,7 @@ private:
                       uint8_t  m_E2PROM_ADDR_LSB;   // Lower byte address (i.e A0-A7)
 };
 
-extern I2C_EEPROM BRDINFO_24LC32A;
+//extern I2C_EEPROM BRDINFO_24LC32A;
+extern I2C_EEPROM CAT24C256WI;
 
 #endif //__I2C_EEPROM_H
