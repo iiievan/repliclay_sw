@@ -4,7 +4,8 @@
 I2C_EEPROM::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t address) 
 : HS_I2C(p_i2c_regs), 
   m_prcm_module(prcm_module),
-  m_int_controller(intc)
+  m_int_controller(intc),
+  m_pinmux_ctrl(ctrl_module)
 { 
     m_I2C_number        = HS_I2C::get_I2C_ser_number();
     m_I2C_sys_interrupt = HS_I2C::get_I2C_sys_interrupt();
@@ -20,19 +21,47 @@ I2C_EEPROM::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t address)
     m_E2PROM_ADDR_LSB = 0x00;   // Lower byte address (i.e A0-A7)
 }
 
-void  I2C_EEPROM::setup(uint32_t output_freq)
-{        
-    m_prcm_module.run_I2C0_clk(); // Enable the clock for I2C0        
+void  I2C_EEPROM::setup(I2C::e_CLK_FREQUENCY output_freq)  // output_freq 100kHz by default
+{ 
+    switch(m_I2C_number)
+    {
+        case I2C::I2C_NUM_0:
+            m_prcm_module.run_I2C0_clk(); // Enable the clock for I2C0        
+            m_pinmux_ctrl.I2C0_pin_mux_setup(); 
+            break;
+        case I2C::I2C_NUM_1:
+            m_prcm_module.run_I2C1_clk(); // Enable the clock for I2C1        
+            m_pinmux_ctrl.I2C1_pin_mux_setup();
+            break;
+        case I2C::I2C_NUM_2:
+            m_prcm_module.run_I2C2_clk(); // Enable the clock for I2C2        
+            m_pinmux_ctrl.I2C2_pin_mux_setup();
+            break;
+        default:
+            return;
+    }  
+    
     AINTC_configure();
-
-    I2CPinMuxSetup(0);    
+ 
+    HS_I2C::master_disable();                                        // Put i2c in reset/disabled state     
+    HS_I2C::auto_idle_disable();                                     // Disable auto Idle functionality  
     
-    HS_I2C::master_disable();                                        // Put i2c in reset/disabled state 
-    
-    HS_I2C::auto_idle_disable();                                     // Disable auto Idle functionality         
-    HS_I2C::master_init_exp_clk(48000000, 12000000, output_freq);    // Configure i2c bus speed to 100khz         
-    HS_I2C::master_slave_addr_set(m_slave_address);                  // Set i2c slave address
-    
+    switch(output_freq)
+    {
+        case I2C::F_100KHz:
+            HS_I2C::master_init_exp_clk(48000000, 12000000, 100000); 
+            break;
+        case I2C::F_250KHz:
+            HS_I2C::master_init_exp_clk(48000000, 12000000, 250000);
+            break;
+        case I2C::F_400KHz:
+            HS_I2C::master_init_exp_clk(48000000, 12000000, 400000);
+            break;
+        default:
+            return;
+    }    
+                
+    HS_I2C::master_slave_addr_set(m_slave_address);                  // Set i2c slave address   
     HS_I2C::master_enable();                                         // Bring I2C out of reset
 }
 

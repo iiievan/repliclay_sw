@@ -3,6 +3,7 @@
 
 #include "HS_I2C.h"
 #include "PRCM.h"
+#include "CONTROL_MODULE.h"
 
 #define  I2C_SLAVE_ADDR   (0x50) // I2C address of CAT24C256 e2prom
 
@@ -16,7 +17,7 @@ public:
           I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t address);
           ~I2C_EEPROM() {}   
 
-    void  setup(uint32_t output_freq = 100000);   //100kHz by default
+          void  setup(I2C::e_CLK_FREQUENCY output_freq = I2C::F_400KHz);   //100kHz by default
     void  AINTC_configure(void);
     void  clean_interrupts(void);                 // Clear status of all interrupts
     
@@ -34,7 +35,8 @@ private:
         INTC::e_SYS_INTERRUPT  m_I2C_sys_interrupt;
 
     power_reset_clock_control &m_prcm_module;      // for clock contrlol setup and management
-    Interrupt_controller      &m_int_controller;   // for interrupt setup and management
+         Interrupt_controller &m_int_controller;   // for interrupt setup and management
+             x_CONTROL_MODULE &m_pinmux_ctrl;      // for PINMUX
 
                      uint32_t  m_t_count;
                      uint32_t  m_r_count;

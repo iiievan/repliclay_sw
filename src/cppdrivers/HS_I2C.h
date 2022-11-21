@@ -844,6 +844,13 @@ namespace I2C
         I2C_NUM_1   = 0x2,
         I2C_NUM_2   = 0x3                      
     };
+    
+    enum e_CLK_FREQUENCY : uint32_t
+    {
+        F_100KHz = 100000,
+        F_250KHz = 250000,
+        F_400KHz = 400000
+    };
 
     constexpr uint32_t AM335x_I2C_0_BASE     = 0x44E0B000;    
     constexpr uint32_t AM335x_I2C_1_BASE     = 0x4802A000;    

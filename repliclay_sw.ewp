@@ -2689,6 +2689,12 @@
         <group>
             <name>cppdrivers</name>
             <file>
+                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.CPP</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.cpp</name>
             </file>
             <file>

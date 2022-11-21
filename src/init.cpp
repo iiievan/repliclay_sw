@@ -44,7 +44,7 @@ void init_board(void)
     ConsoleUtilsSetType(CONSOLE_UART); // Select the console type based on compile time check
     
     os_timer.setup(OS_TIMER_RLD_COUNT);
-    BRDINFO_24LC32A.setup();
+    BRDINFO_24LC32A.setup(I2C::F_400KHz);
     
     GPIOModuleClkConfig(1);             // Enabling functional clocks for GPIO1 instance.
     GPIOModuleEnable(SOC_GPIO_1_REGS);  // Enabling the GPIO module.
