@@ -2674,6 +2674,9 @@
                 <name>$PROJ_DIR$\src\app\app_hooks.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\app\app_utils.cpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\app\app_utils.h</name>
             </file>
             <file>

@@ -1,7 +1,7 @@
 #include "I2C_EEPROM.h" 
 #include "beaglebone.h"
 
-I2C_EEPROM::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t address) 
+I2C_EEPROM::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t slave_address) 
 : HS_I2C(p_i2c_regs), 
   m_prcm_module(prcm_module),
   m_int_controller(intc),
@@ -16,7 +16,7 @@ I2C_EEPROM::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t address)
     m_Wait_flag    = true;
     m_num_of_bytes = 0;
 
-    m_slave_address   = address;
+    m_slave_address   = slave_address;
     m_E2PROM_ADDR_MSB = 0x00;   // Higher byte address (i.e A8-A15)
     m_E2PROM_ADDR_LSB = 0x00;   // Lower byte address (i.e A0-A7)
 }
@@ -80,98 +80,153 @@ void  I2C_EEPROM::clean_interrupts(void)
     HS_I2C::master_int_disable_ex((uint32_t)I2C::F_IRQENABLE_ALL);        
 }
 
-// Transmit data over I2C bus
-void  I2C_EEPROM::transmit(uint16_t d_count)
+// write one byte
+void  I2C_EEPROM::write_byte(EEPROM_byte_address_t byte_addr, uint8_t data)
 {
-    HS_I2C::set_data_count(d_count);            // Data Count specifies the number of bytes to be transmitted 
+    m_data_to_slave[0] = byte_addr.msb;
+    m_data_to_slave[1] = byte_addr.lsb;
+    
+    m_data_to_slave[2] = data;
+    m_t_count = 0;
+        
+    HS_I2C::set_data_count(3);                  // Data Count specifies the number of bytes to be transmitted 
     m_num_of_bytes = HS_I2C::data_count_get();
     clean_interrupts();                         // Clear status of all interrupts
 
     /** Configure I2C controller in Master Transmitter mode **/
     uint32_t cmd = (uint32_t)(I2C::F_CON_MST|I2C::F_CON_TRX);
     HS_I2C::master_control(cmd);    
-    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_XRDY_IE); // Transmit interrupt is enabled
-    
+    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_XRDY_IE); // Transmit interrupt is enabled    
     HS_I2C::master_start();                                           // Generate Start Condition over I2C bus and start to transmit
 
     while(!HS_I2C::master_bus_busy());        
     while(m_t_count != m_num_of_bytes);    
-    m_Wait_flag = true;
-}  
-
-// Receives data over I2C bus          
-void  I2C_EEPROM::receive(uint16_t d_count)
-{
-    /** Wait untill I2C registers are ready to access **/
-    while(!(HS_I2C::master_int_raw_status() &
-           ((uint32_t)I2C::F_IRQSTATUS_ARDY)));  
-    
-    HS_I2C::set_data_count(d_count);                                  // Data Count specifies the number of bytes to be received      
-    m_num_of_bytes = HS_I2C::data_count_get();       
-    clean_interrupts();                                               // Clear status of all interrupts
-    
-    HS_I2C::master_control((uint32_t)I2C::F_CON_MST);                 // Configure I2C controller in Master Receiver mode  
-    HS_I2C::master_int_enable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE |
-                                            I2C::F_IRQENABLE_BF_IE | 
-                                            I2C::F_IRQENABLE_NACK_IE)); // Receive and Stop Condition Interrupts are enabled          
-    HS_I2C::master_start();                                             // Generate Start Condition over I2C bus and start to Receive
-    
-    while(!HS_I2C::master_bus_busy());    
-    while(m_Wait_flag);                                                 // wait transaction end flag  
-    m_Wait_flag = true;
-}              
-
-/** Receives data over I2C bus **/
-void  I2C_EEPROM::setup_to_receive(uint16_t d_count)
-{        
-    HS_I2C::set_data_count(0x02);               // Data Count specifies the number of bytes to be transmitted 
-    m_num_of_bytes = HS_I2C::data_count_get();
-    clean_interrupts();                         // Clear status of all interrupts
-
-    /** Configure I2C controller in Master Transmitter mode **/
-    uint32_t cmd = (uint32_t)(I2C::F_CON_MST|I2C::F_CON_TRX);
-    HS_I2C::master_control(cmd);    
-    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_XRDY_IE); // Transmit interrupt is enabled
-    
-    HS_I2C::master_start();                                           // Generate Start Condition over I2C bus and start to transmit
-
-    while(!HS_I2C::master_bus_busy());        
-    while(m_t_count != m_num_of_bytes);    
-    m_Wait_flag = true;
-
-    /** Wait untill I2C registers are ready to access **/
-    while(!(HS_I2C::master_int_raw_status() &
-           ((uint32_t)I2C::F_IRQSTATUS_ARDY)));  
-    
-    HS_I2C::set_data_count(d_count);                                  // Data Count specifies the number of bytes to be received      
-    m_num_of_bytes = HS_I2C::data_count_get();       
-    clean_interrupts();                                               // Clear status of all interrupts
-    
-    HS_I2C::master_control((uint32_t)I2C::F_CON_MST);                 // Configure I2C controller in Master Receiver mode  
-    HS_I2C::master_int_enable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE |
-                                            I2C::F_IRQENABLE_BF_IE | 
-                                            I2C::F_IRQENABLE_NACK_IE)); // Receive and Stop Condition Interrupts are enabled          
-    HS_I2C::master_start();                                             // Generate Start Condition over I2C bus and start to Receive
-    
-    while(!HS_I2C::master_bus_busy());    
-    while(m_Wait_flag);                                                 // wait transaction end flag  
-    m_Wait_flag = true;
+    HS_I2C::master_stop();
 }
 
-// Reads data from a specific address of e2prom
-void  I2C_EEPROM::EEPROM_Read(uint8_t *data)
-{   
-    m_data_to_slave[0] = m_E2PROM_ADDR_MSB;
-    m_data_to_slave[1] = m_E2PROM_ADDR_LSB;
+// write multiple bytes until page end
+void  I2C_EEPROM::write(EEPROM_byte_address_t byte_addr, uint8_t *data, size_t d_count)
+{
+    m_data_to_slave[0] = byte_addr.msb;
+    m_data_to_slave[1] = byte_addr.lsb;
+    
+    std::memcpy(&m_data_to_slave[2],data, d_count);
+    m_t_count = 0;
+        
+    HS_I2C::set_data_count(d_count + 1);        // Data Count specifies the number of bytes to be transmitted + msb and lsb byte addr
+    m_num_of_bytes = HS_I2C::data_count_get();
+    clean_interrupts();                         // Clear status of all interrupts
+
+    /** Configure I2C controller in Master Transmitter mode **/
+    uint32_t cmd = (uint32_t)(I2C::F_CON_MST|I2C::F_CON_TRX);
+    HS_I2C::master_control(cmd);    
+    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_XRDY_IE); // Transmit interrupt is enabled    
+    HS_I2C::master_start();                                           // Generate Start Condition over I2C bus and start to transmit
+
+    while(!HS_I2C::master_bus_busy());        
+    while(m_t_count != m_num_of_bytes);    
+    HS_I2C::master_stop();
+}
+
+// write page to the end
+void  I2C_EEPROM::write_page(EEPROM_byte_address_t byte_addr, uint8_t *page_data)
+{
+    
+    return;
+}
+
+// immediate read byte accessed by prevous operation
+uint8_t  I2C_EEPROM::immediate_read()
+{
+    /** Wait untill I2C registers are ready to access **/
+    while(!(HS_I2C::master_int_raw_status() &
+           ((uint32_t)I2C::F_IRQSTATUS_ARDY)));  
+    
+    HS_I2C::set_data_count(1);                                        // Data Count specifies the number of bytes to be received      
+    m_num_of_bytes = HS_I2C::data_count_get();       
+    clean_interrupts();                                               // Clear status of all interrupts
+    
+    HS_I2C::master_control((uint32_t)I2C::F_CON_MST);                 // Configure I2C controller in Master Receiver mode  
+    HS_I2C::master_int_enable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE |
+                                            I2C::F_IRQENABLE_BF_IE)); // Receive and Stop Condition Interrupts are enabled          
+    
+    m_Wait_flag = true;
+    HS_I2C::master_start();                                           // Generate Start Condition over I2C bus and start to Receive
+    
+    while(!HS_I2C::master_bus_busy());    
+    while(m_Wait_flag);                                               // wait read transaction end flag  
+    
+    return m_data_from_slave[0];
+}
+
+// selective read byte by address
+uint8_t  I2C_EEPROM::read_byte(EEPROM_byte_address_t byte_addr)
+{  
+    //--------------------------------- set byte address to read from ----------------->
+    m_data_to_slave[0] = byte_addr.msb;
+    m_data_to_slave[1] = byte_addr.lsb;  
 
     m_t_count = 0;
-    m_r_count = 0;
-    
-    transmit(2);
-    receive(50);
+        
+    HS_I2C::set_data_count(2);                  // Data Count specifies the number of bytes to be transmitted 
+    m_num_of_bytes = HS_I2C::data_count_get();
+    clean_interrupts();                         // Clear status of all interrupts
 
-    for (uint32_t i = 0; i < 50; i++ )
-        data[i] = m_data_from_slave[i];
+    /** Configure I2C controller in Master Transmitter mode **/
+    uint32_t cmd = (uint32_t)(I2C::F_CON_MST|I2C::F_CON_TRX);
+    HS_I2C::master_control(cmd);    
+    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_XRDY_IE); // Transmit interrupt is enabled    
+    HS_I2C::master_start();                                           // Generate Start Condition over I2C bus and start to transmit
+       
+    while(m_t_count != m_num_of_bytes);    
+    //<-------------------------------- set byte address to read from -----------------
+    
+    return immediate_read();
+}
+
+// sequential read multiple bytes
+uint8_t*  I2C_EEPROM::read(EEPROM_byte_address_t byte_addr, size_t d_count)
+{
+    if(d_count > RW_BUFF_SIZE)
+        return nullptr;
+    //--------------------------------- set byte address to start read from ----------------->
+    m_data_to_slave[0] = byte_addr.msb;
+    m_data_to_slave[1] = byte_addr.lsb;  
+
+    m_t_count = 0;
+        
+    HS_I2C::set_data_count(2);                  // Data Count specifies the number of bytes to be transmitted 
+    m_num_of_bytes = HS_I2C::data_count_get();
+    clean_interrupts();                         // Clear status of all interrupts
+
+    /** Configure I2C controller in Master Transmitter mode **/
+    uint32_t cmd = (uint32_t)(I2C::F_CON_MST|I2C::F_CON_TRX);
+    HS_I2C::master_control(cmd);    
+    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_XRDY_IE); // Transmit interrupt is enabled    
+    HS_I2C::master_start();                                           // Generate Start Condition over I2C bus and start to transmit
+       
+    while(m_t_count != m_num_of_bytes);    
+    //<-------------------------------- set byte address to start read from -----------------
+    
+      /** Wait untill I2C registers are ready to access **/
+    while(!(HS_I2C::master_int_raw_status() &
+           ((uint32_t)I2C::F_IRQSTATUS_ARDY)));  
+    
+    HS_I2C::set_data_count(d_count);                                  // Data Count specifies the number of bytes to be received      
+    m_num_of_bytes = HS_I2C::data_count_get();       
+    clean_interrupts();                                               // Clear status of all interrupts
+    
+    HS_I2C::master_control((uint32_t)I2C::F_CON_MST);                 // Configure I2C controller in Master Receiver mode  
+    HS_I2C::master_int_enable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE |
+                                            I2C::F_IRQENABLE_BF_IE | 
+                                            I2C::F_IRQENABLE_NACK_IE)); // Receive and Stop Condition Interrupts are enabled 
+    m_Wait_flag = true;
+    HS_I2C::master_start();                                             // Generate Start Condition over I2C bus and start to Receive
+    
+    while(!HS_I2C::master_bus_busy());    
+    while(m_Wait_flag);                                                 // wait transaction end flag  
+    
+    return &m_data_from_slave[0];
 }
 
 /** I2C Interrupt Service Routine. This function will read and write data through I2C bus. 
@@ -199,8 +254,8 @@ void  I2C_irqhandler(void *p_obj)
     }
 
     if (status & (uint32_t)I2C::F_IRQSTATUS_XRDY)
-    {        
-        s_I2C.HS_I2C::master_data_put(s_I2C.m_data_to_slave[s_I2C.m_t_count++]); // Put data to data transmit register of i2c        
+    {   
+        s_I2C.HS_I2C::master_data_put(s_I2C.m_data_to_slave[s_I2C.m_t_count++]); // Put data to data transmit register of i2c         
         s_I2C.HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_XRDY);      // Clear Transmit interrupt status
                         
         if(s_I2C.m_t_count == s_I2C.m_num_of_bytes)            

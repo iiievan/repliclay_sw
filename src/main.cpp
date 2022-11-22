@@ -14,6 +14,7 @@
 #include "PRCM.h"
 #include "INTC.h"
 #include "I2C_EEPROM.h"
+#include "app_utils.h"
 #include  <uC_cpu.h>
 #include  <app_cfg.h>
 #include  <cpu_cfg.h>
@@ -23,6 +24,7 @@
 #include  <lib_math.h>
 
 #include <string>
+#include <cstring>
 
 using namespace std;
 
@@ -59,8 +61,9 @@ static  void  AppTaskStart (void *p_arg)
 {
     (void)p_arg;
     CPU_INT32U tm;
-uint8_t data_read[50];
-uint8_t temp;
+uint8_t data_read[64];
+
+char str2[] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456123456";
 	
     ConsoleUtilsPrintf("Enabling timer interrupt!\r\n");
     
@@ -78,30 +81,16 @@ uint8_t temp;
     //ConsoleUtilsPrintf("Creating Application Tasks...\n\r");
     //AppTaskCreate();                                            /* Create Application Tasks                             */
     
-    //BRDINFO_24LC32A.EEPROM_Read(data_read);
-    CAT24C256WI.EEPROM_Read(data_read);
-      
-    for(uint32_t i = 0; i < 50; i++)
-    {
-        /* Collecting the Most Significant Nibble of the data byte. */
-        temp = ((data_read[i] & 0xF0) >> 4);
+    //BRDINFO_24LC32A.EEPROM_Read(data_read);  
+   
+    CAT24C256WI.write({.addr = 0x0000},(uint8_t *)str2, sizeof(str2));
     
-        if(temp < 10)
-            ConsoleUtilsPrintf("%c", (temp + 0x30));
-        else
-            ConsoleUtilsPrintf("%c", (temp + 0x37));
+    delay_100us(50);
     
-        /* Collecting the Least Significant Nibble of the data byte. */
-        temp = (data_read[i] & 0x0F);
+    uint8_t * p_Read = CAT24C256WI.read({.addr = 0x0002},64);
     
-        if(temp < 10)
-            ConsoleUtilsPrintf("%c", (temp + 0x30));
-        else
-            ConsoleUtilsPrintf("%c", (temp + 0x37));
+    std::memcpy(&data_read[0],p_Read, sizeof(data_read));
     
-        ConsoleUtilsPrintf("%c", ',');
-    }
-      
     while (DEF_TRUE) 
     {
         ConsoleUtilsPrintf("Task 1 message %d!\r\n", tm++);
