@@ -1,7 +1,8 @@
 #include "I2C_EEPROM.h" 
 #include "beaglebone.h"
 
-I2C_EEPROM::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t slave_address) 
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t slave_address, INTC::isr_handler_t isr_hndlr) 
 : HS_I2C(p_i2c_regs), 
   m_prcm_module(prcm_module),
   m_int_controller(intc),
@@ -9,19 +10,19 @@ I2C_EEPROM::I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t slave_address)
 { 
     m_I2C_number        = HS_I2C::get_I2C_ser_number();
     m_I2C_sys_interrupt = HS_I2C::get_I2C_sys_interrupt();
-    m_isr_handler       = (INTC::isr_handler_t)I2C_irqhandler;
+    m_isr_handler       = isr_hndlr;
 
-    m_t_count      = 0;
-    m_r_count      = 0;
-    m_Wait_flag    = true;
-    m_num_of_bytes = 0;
+    m_t_count         = 0;
+    m_r_count         = 0;
+    m_Wait_flag       = true;
+    m_num_of_bytes    = 0;
 
-    m_slave_address   = slave_address;
-    m_E2PROM_ADDR_MSB = 0x00;   // Higher byte address (i.e A8-A15)
-    m_E2PROM_ADDR_LSB = 0x00;   // Lower byte address (i.e A0-A7)
+    m_slave_address   = slave_address;    
+    m_Pages_max       = EEPROM_SIZE/PAGE_SIZE;
 }
 
-void  I2C_EEPROM::setup(I2C::e_CLK_FREQUENCY output_freq)  // output_freq 100kHz by default
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::setup(I2C::e_CLK_FREQUENCY output_freq)  // output_freq 100kHz by default
 { 
     switch(m_I2C_number)
     {
@@ -65,7 +66,8 @@ void  I2C_EEPROM::setup(I2C::e_CLK_FREQUENCY output_freq)  // output_freq 100kHz
     HS_I2C::master_enable();                                         // Bring I2C out of reset
 }
 
-void  I2C_EEPROM::AINTC_configure(void)
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::AINTC_configure(void)
 {        
     m_int_controller.register_handler(m_I2C_sys_interrupt, m_isr_handler);            // Registering I2C_irqhandler         
     m_int_controller.priority_set(m_I2C_sys_interrupt,0, INTC::HOSTINT_ROUTE_IRQ);    // Set the highest priority
@@ -73,7 +75,8 @@ void  I2C_EEPROM::AINTC_configure(void)
 }
 
 /** Clear status of all interrupts **/
-void  I2C_EEPROM::clean_interrupts(void)
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::clean_interrupts(void)
 {      
     HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_ALL);
     HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_ALL);
@@ -81,7 +84,8 @@ void  I2C_EEPROM::clean_interrupts(void)
 }
 
 // write one byte
-void  I2C_EEPROM::write_byte(EEPROM_byte_address_t byte_addr, uint8_t data)
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::write_byte(EEPROM_byte_address_t byte_addr, uint8_t data)
 {
     m_data_to_slave[0] = byte_addr.msb;
     m_data_to_slave[1] = byte_addr.lsb;
@@ -105,7 +109,8 @@ void  I2C_EEPROM::write_byte(EEPROM_byte_address_t byte_addr, uint8_t data)
 }
 
 // write multiple bytes until page end
-void  I2C_EEPROM::write(EEPROM_byte_address_t byte_addr, uint8_t *data, size_t d_count)
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::write(EEPROM_byte_address_t byte_addr, uint8_t *data, size_t d_count)
 {
     m_data_to_slave[0] = byte_addr.msb;
     m_data_to_slave[1] = byte_addr.lsb;
@@ -129,14 +134,15 @@ void  I2C_EEPROM::write(EEPROM_byte_address_t byte_addr, uint8_t *data, size_t d
 }
 
 // write page to the end
-void  I2C_EEPROM::write_page(EEPROM_byte_address_t byte_addr, uint8_t *page_data)
-{
-    
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::write_page(EEPROM_byte_address_t byte_addr, uint8_t *page_data)
+{    
     return;
 }
 
 // immediate read byte accessed by prevous operation
-uint8_t  I2C_EEPROM::immediate_read()
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+uint8_t  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::immediate_read()
 {
     /** Wait untill I2C registers are ready to access **/
     while(!(HS_I2C::master_int_raw_status() &
@@ -160,7 +166,8 @@ uint8_t  I2C_EEPROM::immediate_read()
 }
 
 // selective read byte by address
-uint8_t  I2C_EEPROM::read_byte(EEPROM_byte_address_t byte_addr)
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+uint8_t  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::read_byte(EEPROM_byte_address_t byte_addr)
 {  
     //--------------------------------- set byte address to read from ----------------->
     m_data_to_slave[0] = byte_addr.msb;
@@ -185,9 +192,10 @@ uint8_t  I2C_EEPROM::read_byte(EEPROM_byte_address_t byte_addr)
 }
 
 // sequential read multiple bytes
-uint8_t*  I2C_EEPROM::read(EEPROM_byte_address_t byte_addr, size_t d_count)
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+uint8_t*  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE> ::read(EEPROM_byte_address_t byte_addr, size_t d_count)
 {
-    if(d_count > RW_BUFF_SIZE)
+    if(d_count > PAGE_SIZE)
         return nullptr;
     //--------------------------------- set byte address to start read from ----------------->
     m_data_to_slave[0] = byte_addr.msb;
@@ -229,59 +237,76 @@ uint8_t*  I2C_EEPROM::read(EEPROM_byte_address_t byte_addr, size_t d_count)
     return &m_data_from_slave[0];
 }
 
-/** I2C Interrupt Service Routine. This function will read and write data through I2C bus. 
-This function is a friend of class I2C_EEPROM **/
-void  I2C_irqhandler(void *p_obj)
-{ 
-    uint32_t status = 0; 
-    I2C_EEPROM &s_I2C = *((I2C_EEPROM*)p_obj);
-    
-    status = s_I2C.HS_I2C::master_int_status(); // Get only Enabled interrupt status 
+template <auto EEPROM_SIZE, auto PAGE_SIZE>
+void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::irq_handler()
+{
+    uint32_t status = HS_I2C::master_int_status(); // Get only Enabled interrupt status 
 
     /** Clear all enabled interrupt status except receive ready and transmit ready interrupt status **/
-    s_I2C.HS_I2C::master_int_clear_ex((status & ~(I2C::F_IRQSTATUS_RRDY | I2C::F_IRQSTATUS_XRDY)));
+    HS_I2C::master_int_clear_ex((status & ~(I2C::F_IRQSTATUS_RRDY | I2C::F_IRQSTATUS_XRDY)));
                         
     if (status & (uint32_t)I2C::F_IRQSTATUS_RRDY)
     {        
-        s_I2C.m_data_from_slave[s_I2C.m_r_count++] = s_I2C.HS_I2C::master_data_get(); // Receive data from data receive register
-        s_I2C.HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_RRDY);           // Clear receive ready interrupt status 
+        m_data_from_slave[m_r_count++] = HS_I2C::master_data_get(); // Receive data from data receive register
+        HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_RRDY);           // Clear receive ready interrupt status 
         
-        if(s_I2C.m_r_count == s_I2C.m_num_of_bytes)
+        if(m_r_count == m_num_of_bytes)
         {             
-             s_I2C.HS_I2C::master_int_disable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE)); // Disable the receive ready interrupt            
-             s_I2C.HS_I2C::master_stop();                                               // Generate a STOP            
+             HS_I2C::master_int_disable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE)); // Disable the receive ready interrupt            
+             HS_I2C::master_stop();                                               // Generate a STOP            
         }
     }
 
     if (status & (uint32_t)I2C::F_IRQSTATUS_XRDY)
     {   
-        s_I2C.HS_I2C::master_data_put(s_I2C.m_data_to_slave[s_I2C.m_t_count++]); // Put data to data transmit register of i2c         
-        s_I2C.HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_XRDY);      // Clear Transmit interrupt status
+        HS_I2C::master_data_put(m_data_to_slave[m_t_count++]); // Put data to data transmit register of i2c         
+        HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_XRDY);      // Clear Transmit interrupt status
                         
-        if(s_I2C.m_t_count == s_I2C.m_num_of_bytes)            
-             s_I2C.HS_I2C::master_int_disable_ex(I2C::F_IRQENABLE_XRDY_IE);      // Disable the transmit ready interrupt
+        if(m_t_count == m_num_of_bytes)            
+             HS_I2C::master_int_disable_ex(I2C::F_IRQENABLE_XRDY_IE);      // Disable the transmit ready interrupt
     }
         
     if (status & (uint32_t)I2C::F_IRQSTATUS_BF)
     {
         /** Disable transmit data ready, receive data read and STOP event interupts **/
-        s_I2C.HS_I2C::master_int_disable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE | 
-                                                       I2C::F_IRQENABLE_XRDY_IE | 
-                                                       I2C::F_IRQENABLE_BF_IE));        
-        s_I2C.m_Wait_flag = false;   // set transaction flag
+        HS_I2C::master_int_disable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE | 
+                                                 I2C::F_IRQENABLE_XRDY_IE | 
+                                                 I2C::F_IRQENABLE_BF_IE));        
+        m_Wait_flag = false;   // set transaction flag
     }
    
     if (status & (uint32_t)I2C::F_IRQSTATUS_NACK)
     {    
         /** Disable transmit data ready, receive data read, STOP event and NACK event interrupts **/
-        s_I2C.HS_I2C::master_int_disable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE | 
-                                                       I2C::F_IRQENABLE_XRDY_IE |
-                                                       I2C::F_IRQENABLE_NACK_IE |
-                                                       I2C::F_IRQENABLE_BF_IE));
+        HS_I2C::master_int_disable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE | 
+                                                 I2C::F_IRQENABLE_XRDY_IE |
+                                                 I2C::F_IRQENABLE_NACK_IE |
+                                                 I2C::F_IRQENABLE_BF_IE));
 
-        s_I2C.HS_I2C::master_stop();    // Generate a STOP 
-        s_I2C.m_Wait_flag = false;      // set transaction end flag
+        HS_I2C::master_stop();    // Generate a STOP 
+        m_Wait_flag = false;      // set transaction end flag
     }
-}   
+}
+
+/** I2C Interrupt Service Routine. This function will read and write data through I2C bus. 
+This function is a friend of class I2C_EEPROM **/
+void  BRDINFO_24LC32A_irqhandler(void *p_obj)
+{  
+    I2C_EEPROM<(32*1024),32> &s_I2C = *((I2C_EEPROM<(32*1024),32> *)p_obj);
+  
+    // go to interrupt handler
+    s_I2C.irq_handler();
+} 
+
+void  CAT24C256WI_irqhandler(void *p_obj)
+{  
+    I2C_EEPROM<(32*1024),64> &s_I2C = *((I2C_EEPROM<(32*1024),64> *)p_obj);
+  
+    // go to interrupt handler
+    s_I2C.irq_handler();
+}
+
+template class I2C_EEPROM <(32*1024), 32>;
+template class I2C_EEPROM <(32*1024), 64>;
 
 
