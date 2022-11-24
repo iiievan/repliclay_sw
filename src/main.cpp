@@ -80,17 +80,16 @@ char str2[] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456123456"
     //AppEventCreate();                                           /* Create Application Events                            */
     //ConsoleUtilsPrintf("Creating Application Tasks...\n\r");
     //AppTaskCreate();                                            /* Create Application Tasks                             */
-    
-    //BRDINFO_24LC32A.EEPROM_Read(data_read);  
-   
+      
+/*
     CAT24C256WI.write({.addr = 0x0000},(uint8_t *)str2, sizeof(str2));
     
     delay_100us(50);
     
     uint8_t * p_Read = CAT24C256WI.read({.addr = 0x0002},64);
     
-    std::memcpy(&data_read[0],p_Read, sizeof(data_read));
-    
+    std::memcpy(&data_read[0],p_Read, sizeof(data_read));    
+*/    
     while (DEF_TRUE) 
     {
         ConsoleUtilsPrintf("Task 1 message %d!\r\n", tm++);

@@ -78,9 +78,8 @@ void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::AINTC_configure(void)
 template <auto EEPROM_SIZE, auto PAGE_SIZE>
 void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::clean_interrupts(void)
 {      
-    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_ALL);
-    HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_ALL);
-    HS_I2C::master_int_disable_ex((uint32_t)I2C::F_IRQENABLE_ALL);        
+    HS_I2C::master_int_disable_ex((uint32_t)I2C::F_IRQENABLE_ALL);
+    HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_ALL);        
 }
 
 // write one byte

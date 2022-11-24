@@ -49,7 +49,7 @@ void init_board(void)
     
     os_timer.setup(OS_TIMER_RLD_COUNT);
     BRDINFO_24LC32A.setup(I2C::F_400KHz);
-    CAT24C256WI.setup(I2C::F_400KHz);
+    //CAT24C256WI.setup(I2C::F_400KHz);
     
     GPIOModuleClkConfig(1);             // Enabling functional clocks for GPIO1 instance.
     GPIOModuleEnable(SOC_GPIO_1_REGS);  // Enabling the GPIO module.
@@ -74,7 +74,7 @@ void GPIOModuleClkConfig(CPU_INT32U x)
 uint32_t board_info_check(uint8_t *board_ver)
 {
     uint8_t  board_id[30];
-    uint8_t *p_Read = CAT24C256WI.read({.addr = 0x0000},30);
+    uint8_t *p_Read = BRDINFO_24LC32A.read({.addr = 0x0000},30);
     
     std::memcpy(&board_id[0],p_Read, sizeof(board_id));
     
