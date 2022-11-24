@@ -893,6 +893,7 @@ public:
                   void  master_data_put(uint8_t data);
                uint8_t  master_data_get();
                   bool  master_bus_busy();
+                  bool  master_nack_status();
               uint32_t  master_int_raw_status();
                   void  master_stop();
                   void  master_start();

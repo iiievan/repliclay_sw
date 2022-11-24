@@ -273,6 +273,23 @@ bool  HS_I2C::master_bus_busy()
 }
 
 /**
+ * \brief   This API determines nack status.
+ *
+ * \param   baseAdd   It is the Memory address of the I2C instance used.
+ *
+ * \return  returns 1 if nack detetcted.
+ *          returns 0 if nack event not found.
+ *
+ **/
+bool  HS_I2C::master_nack_status()
+{ 
+    if (m_I2C_regs.I2C_IRQSTATUS_RAW.b.NACK)
+        return true;    
+    else
+        return false;
+}
+
+/**
  * \brief  This API returns the raw status of interrupts in
  *         master mode.
  *

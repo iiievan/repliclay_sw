@@ -48,14 +48,14 @@ void init_board(void)
     ConsoleUtilsSetType(CONSOLE_UART); // Select the console type based on compile time check
     
     os_timer.setup(OS_TIMER_RLD_COUNT);
-    BRDINFO_24LC32A.setup(I2C::F_400KHz);
-    //CAT24C256WI.setup(I2C::F_400KHz);
+    //BRDINFO_24LC32A.setup(I2C::F_400KHz); //bus i2c0 presumably burned out on this board
+    CAT24C256WI.setup(I2C::F_400KHz);
     
     GPIOModuleClkConfig(1);             // Enabling functional clocks for GPIO1 instance.
     GPIOModuleEnable(SOC_GPIO_1_REGS);  // Enabling the GPIO module.
     GPIOModuleReset(SOC_GPIO_1_REGS);   // Resetting the GPIO module. */
     
-    board_info_check((uint8_t *)BBB_A3_VERSION);
+    //board_info_check((uint8_t *)BBB_A3_VERSION);
 }
 
 void GPIOModuleClkConfig(CPU_INT32U x)

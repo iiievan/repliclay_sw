@@ -194,39 +194,61 @@ uint8_t  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::read_byte(EEPROM_byte_address_t by
 template <auto EEPROM_SIZE, auto PAGE_SIZE>
 uint8_t*  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE> ::read(EEPROM_byte_address_t byte_addr, size_t d_count)
 {
+    uint8_t strt_sequence_tryes = 20;
     if(d_count > PAGE_SIZE)
         return nullptr;
+    
     //--------------------------------- set byte address to start read from ----------------->
-    m_data_to_slave[0] = byte_addr.msb;
-    m_data_to_slave[1] = byte_addr.lsb;  
-
-    m_t_count = 0;
+    do
+    {
+        if(m_TX_fsm == NACK_DURING_START)
+        {
+            delay_100us(2);
+            strt_sequence_tryes--;
+        }
         
-    HS_I2C::set_data_count(2);                  // Data Count specifies the number of bytes to be transmitted 
-    m_num_of_bytes = HS_I2C::data_count_get();
-    clean_interrupts();                         // Clear status of all interrupts
-
-    /** Configure I2C controller in Master Transmitter mode **/
-    uint32_t cmd = (uint32_t)(I2C::F_CON_MST|I2C::F_CON_TRX);
-    HS_I2C::master_control(cmd);    
-    HS_I2C::master_int_enable_ex((uint32_t)I2C::F_IRQENABLE_XRDY_IE); // Transmit interrupt is enabled    
-    HS_I2C::master_start();                                           // Generate Start Condition over I2C bus and start to transmit
-       
-    while(m_t_count != m_num_of_bytes);    
-    //<-------------------------------- set byte address to start read from -----------------
+        m_data_to_slave[0] = byte_addr.msb;
+        m_data_to_slave[1] = byte_addr.lsb;  
     
-      /** Wait untill I2C registers are ready to access **/
-    while(!(HS_I2C::master_int_raw_status() &
-           ((uint32_t)I2C::F_IRQSTATUS_ARDY)));  
+        m_t_count = 0;
+            
+        HS_I2C::set_data_count(2);                  // Data Count specifies the number of bytes to be transmitted 
+        m_num_of_bytes = HS_I2C::data_count_get();
+        clean_interrupts();                         // Clear status of all interrupts
     
-    HS_I2C::set_data_count(d_count);                                  // Data Count specifies the number of bytes to be received      
+        /** Configure I2C controller in Master Transmitter mode **/
+        uint32_t cmd = (uint32_t)(I2C::F_CON_MST|I2C::F_CON_TRX);
+        HS_I2C::master_control(cmd);    
+        HS_I2C::master_int_enable_ex((uint32_t)(I2C::F_IRQENABLE_XRDY_IE |
+                                                I2C::F_IRQENABLE_ARDY_IE |
+                                                I2C::F_IRQENABLE_NACK_IE)); // Transmit interrupt is enabled   
+        m_TX_fsm = TX_STARTED;
+        HS_I2C::master_start();                                             // Generate Start Condition over I2C bus and start to transmit
+        while(m_TX_fsm == TX_STARTED);
+    }
+    while(m_TX_fsm == NACK_DURING_START &&
+          (strt_sequence_tryes > 0)); // repeat transaction if EEPROM  is busy after the previous operation
+    
+    if(strt_sequence_tryes == 0)
+    {
+        // unsuccsesfully start sequence =(
+        m_TX_fsm = TX_IDLE;
+        return nullptr;  
+    }
+    
+    /** Wait untill I2C registers are ready to access **/
+    while(m_TX_fsm != TX_ARDY); 
+    m_TX_fsm = TX_IDLE;     // start sequence successfully finished
+        
+  //<-------------------------------- set byte address to start read from -----------------
+    
+    HS_I2C::set_data_count(d_count);                                    // Data Count specifies the number of bytes to be received      
     m_num_of_bytes = HS_I2C::data_count_get();       
-    clean_interrupts();                                               // Clear status of all interrupts
+    clean_interrupts();                                                 // Clear status of all interrupts
     
-    HS_I2C::master_control((uint32_t)I2C::F_CON_MST);                 // Configure I2C controller in Master Receiver mode  
+    HS_I2C::master_control((uint32_t)I2C::F_CON_MST);                   // Configure I2C controller in Master Receiver mode  
     HS_I2C::master_int_enable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE |
-                                            I2C::F_IRQENABLE_BF_IE | 
-                                            I2C::F_IRQENABLE_NACK_IE)); // Receive and Stop Condition Interrupts are enabled 
+                                            I2C::F_IRQENABLE_BF_IE));   // Receive and Stop Condition Interrupts are enabled 
     m_Wait_flag = true;
     HS_I2C::master_start();                                             // Generate Start Condition over I2C bus and start to Receive
     
@@ -261,8 +283,11 @@ void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::irq_handler()
         HS_I2C::master_data_put(m_data_to_slave[m_t_count++]); // Put data to data transmit register of i2c         
         HS_I2C::master_int_clear_ex((uint32_t)I2C::F_IRQSTATUS_XRDY);      // Clear Transmit interrupt status
                         
-        if(m_t_count == m_num_of_bytes)            
+        if(m_t_count == m_num_of_bytes)
+        {             
              HS_I2C::master_int_disable_ex(I2C::F_IRQENABLE_XRDY_IE);      // Disable the transmit ready interrupt
+             m_TX_fsm = TX_COMPLETED;
+        }
     }
         
     if (status & (uint32_t)I2C::F_IRQSTATUS_BF)
@@ -273,17 +298,20 @@ void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::irq_handler()
                                                  I2C::F_IRQENABLE_BF_IE));        
         m_Wait_flag = false;   // set transaction flag
     }
+    
+    if (status & (uint32_t)I2C::F_IRQSTATUS_ARDY)
+    { 
+        HS_I2C::master_int_disable_ex((uint32_t)(I2C::F_IRQENABLE_ARDY_IE));
+        m_TX_fsm = TX_ARDY;
+    }
    
     if (status & (uint32_t)I2C::F_IRQSTATUS_NACK)
-    {    
+    {           
         /** Disable transmit data ready, receive data read, STOP event and NACK event interrupts **/
-        HS_I2C::master_int_disable_ex((uint32_t)(I2C::F_IRQENABLE_RRDY_IE | 
-                                                 I2C::F_IRQENABLE_XRDY_IE |
-                                                 I2C::F_IRQENABLE_NACK_IE |
-                                                 I2C::F_IRQENABLE_BF_IE));
-
+        HS_I2C::master_int_disable_ex((uint32_t)I2C::F_IRQENABLE_NACK_IE);  
+        m_TX_fsm = NACK_DURING_START;
+        nack_cnt++;
         HS_I2C::master_stop();    // Generate a STOP 
-        m_Wait_flag = false;      // set transaction end flag
     }
 }
 

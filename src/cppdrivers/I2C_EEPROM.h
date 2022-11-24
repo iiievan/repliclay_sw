@@ -29,6 +29,15 @@ class I2C_EEPROM : public HS_I2C
 {
    
 public:
+  
+            enum e_TX_sts
+            {
+                TX_IDLE             = 0x0,
+                TX_STARTED          = 0x1,
+                NACK_DURING_START   = 0x2,
+                TX_COMPLETED        = 0x3,
+                TX_ARDY             = 0x4                
+            };
           I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t slave_address, INTC::isr_handler_t isr_hndlr);
          ~I2C_EEPROM() {}   
 
@@ -59,6 +68,8 @@ private:
                      uint32_t  m_t_count;
                      uint32_t  m_r_count;
                          bool  m_Wait_flag;
+                     e_TX_sts  m_TX_fsm {TX_IDLE};
+                     uint32_t  nack_cnt {0};
                      uint16_t  m_num_of_bytes;
                       uint8_t  m_data_to_slave[PAGE_SIZE + 2];     // 2 for msb and lsb address values
                       uint8_t  m_data_from_slave[PAGE_SIZE];   
