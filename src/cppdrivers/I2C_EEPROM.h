@@ -9,6 +9,7 @@
 #define  SLAVE_ADDR_24LC32A     (0x50) // I2C address of 24LC32A eeprom
 #define  SLAVE_ADDR_CAT24C256   (0x54) // I2C address of CAT24C256 eeprom
 
+#define   STRT_SEQ_TRYES_NUM    (20)
 typedef union 
 {
     struct 
@@ -30,20 +31,22 @@ class I2C_EEPROM : public HS_I2C
    
 public:
   
-            enum e_TX_sts
-            {
-                TX_IDLE             = 0x0,
-                TX_STARTED          = 0x1,
-                NACK_DURING_START   = 0x2,
-                TX_COMPLETED        = 0x3,
-                TX_ARDY             = 0x4                
-            };
+          enum e_Transaction_fsm_sts : uint32_t
+          {
+              IDLE                = 0x0,  // nothing to happen, readi to operation
+              STARTED             = 0x1,  // transaction started, start condition has occured
+              NACK_DURING_START   = 0x2,  // EEPROM write busy after prevous operation
+              ARDY                = 0x3,  // tx finished, and all registers ready to next operation
+              STOPPED             = 0x4   // transaction finished, stop condition has occured 
+          };
+          
           I2C_EEPROM(I2C::AM335x_I2C_Type *p_i2c_regs, uint8_t slave_address, INTC::isr_handler_t isr_hndlr);
          ~I2C_EEPROM() {}   
 
     void  setup(I2C::e_CLK_FREQUENCY output_freq = I2C::F_400KHz);                //100kHz by default
     void  AINTC_configure(void);
-    void  clean_interrupts(void);                                                 // Clear status of all interrupts    
+    void  clean_interrupts(void);                                                 // Clear status of all interrupts 
+    void  generate_STOP_with_IRQ();
   
     void  write_byte(EEPROM_byte_address_t byte_addr, uint8_t data);              // write one byte
     void  write(EEPROM_byte_address_t byte_addr, uint8_t *data, size_t d_count);  // write multiple bytes until page end
@@ -67,9 +70,7 @@ private:
 
                      uint32_t  m_t_count;
                      uint32_t  m_r_count;
-                         bool  m_Wait_flag;
-                     e_TX_sts  m_TX_fsm {TX_IDLE};
-                     uint32_t  nack_cnt {0};
+        e_Transaction_fsm_sts  m_transaction_fsm { IDLE };
                      uint16_t  m_num_of_bytes;
                       uint8_t  m_data_to_slave[PAGE_SIZE + 2];     // 2 for msb and lsb address values
                       uint8_t  m_data_from_slave[PAGE_SIZE];   

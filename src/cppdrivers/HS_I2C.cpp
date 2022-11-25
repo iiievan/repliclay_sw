@@ -669,16 +669,7 @@ uint32_t  HS_I2C::active_own_address_get()
  * \return None.
  **/
 void  HS_I2C::FIFO_clear(I2C::e_I2C_MODE flag)
-{
-    /*if(I2C_TX_MODE == flag)
-    {
-         HWREG(baseAdd + I2C_BUF) |= (I2C_BUF_TXFIFO_CLR);
-    }
-    else
-    {
-         HWREG(baseAdd + I2C_BUF) |= (I2C_BUF_RXFIFO_CLR);
-    }*/
-  
+{  
     if(flag == I2C::I2C_TX_MODE)
         m_I2C_regs.I2C_BUF.b.TXFIFO_CLR = HIGH;
     else

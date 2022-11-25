@@ -62,6 +62,9 @@ static  void  AppTaskStart (void *p_arg)
     (void)p_arg;
     CPU_INT32U tm;
 uint8_t data_read[64];
+EEPROM_byte_address_t addr1 = {.addr = 0x0002};
+EEPROM_byte_address_t addr2 = {.addr = 0x0050};
+EEPROM_byte_address_t addr3 = {.addr = 0x0030};
 
 char str2[] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456123456";
 	
@@ -82,11 +85,20 @@ char str2[] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456123456"
     //AppTaskCreate();                                            /* Create Application Tasks                             */
       
 
-    CAT24C256WI.write({.addr = 0x0000},(uint8_t *)str2, sizeof(str2));
+    //CAT24C256WI.write({.addr = 0x0000},(uint8_t *)str2, (sizeof(str2) - 1));    // get rid of /0 symbol
+      CAT24C256WI.write_byte(addr1, 0xEE);
+      CAT24C256WI.write_byte(addr2, 0xAA);
+      CAT24C256WI.write_byte(addr3, 0x55);
+
+
         
-    uint8_t * p_Read = CAT24C256WI.read({.addr = 0x0002},64);
-    
-    std::memcpy(&data_read[0],p_Read, sizeof(data_read));    
+    //uint8_t * p_Read = CAT24C256WI.read({.addr = 0x0002},64);
+    uint8_t p_Read = CAT24C256WI.read_byte(addr1);
+            p_Read = CAT24C256WI.read_byte(addr2);
+            p_Read = CAT24C256WI.read_byte(addr3);
+
+       
+    //std::memcpy(&data_read[0],p_Read, sizeof(data_read));    
     
     while (DEF_TRUE) 
     {
