@@ -2674,6 +2674,9 @@
                 <name>$PROJ_DIR$\src\app\app_hooks.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\app\app_utils.cpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\app\app_utils.h</name>
             </file>
             <file>
@@ -2689,6 +2692,12 @@
         <group>
             <name>cppdrivers</name>
             <file>
+                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.CPP</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.cpp</name>
             </file>
             <file>
@@ -2699,6 +2708,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.CPP</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\cppdrivers\INTC.cpp</name>
@@ -2717,10 +2732,10 @@
             </file>
         </group>
         <file>
-            <name>$PROJ_DIR$\src\hal_bspInit.c</name>
+            <name>$PROJ_DIR$\src\hal_mmu.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\src\hal_mmu.c</name>
+            <name>$PROJ_DIR$\src\init.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\src\main.cpp</name>
