@@ -219,23 +219,23 @@ extern void I2CAutoIdleDisable(unsigned int baseAdd);
 extern void I2CDMATxEventEnable(unsigned int baseAdd);
 extern void I2CDMARxEventEnable(unsigned int baseAdd);
 extern void I2CDMATxEventDisable(unsigned int baseAdd);
-extern unsigned int I2CMasterErr(unsigned int baseAdd);
 extern void I2CDMARxEventDisable(unsigned int baseAdd);
+extern unsigned int I2CMasterErr(unsigned int baseAdd);
 extern void I2CGlobalWakeUpEnable(unsigned int baseAdd);
 extern void I2CGlobalWakeUpDisable(unsigned int baseAdd);
 extern unsigned int I2CDataCountGet(unsigned int baseAdd);
-extern unsigned int I2CSlaveDataGet(unsigned int baseAdd);
+//extern unsigned int I2CSlaveDataGet(unsigned int baseAdd);   // no func
 extern unsigned char I2CMasterDataGet(unsigned int baseAdd);
 extern unsigned int I2CMasterBusBusy(unsigned int baseAdd);
 extern unsigned int I2CMasterBusy(unsigned int baseAdd);
-extern unsigned int I2CSlaveIntStatus(unsigned int baseAdd);
+//extern unsigned int I2CSlaveIntStatus(unsigned int baseAdd);    // no func
 extern unsigned int I2CMasterIntStatus(unsigned int baseAdd);
 extern unsigned int I2CSystemStatusGet(unsigned int baseAdd);
-extern unsigned int I2CSlaveIntRawStatus(unsigned int baseAdd);
+//extern unsigned int I2CSlaveIntRawStatus(unsigned int baseAdd);     // no func
 extern unsigned int I2CMasterIntRawStatus(unsigned int baseAdd);
 extern unsigned int I2CActiveOwnAddressGet(unsigned int baseAdd);
 extern void I2CFIFOClear(unsigned int baseAdd, unsigned int flag);
-extern void I2CSlaveDataPut(unsigned int baseAdd,unsigned int data);
+//extern void I2CSlaveDataPut(unsigned int baseAdd,unsigned int data); // no func
 extern void I2CMasterControl(unsigned int baseAdd, unsigned int cmd);
 extern void I2CSetDataCount(unsigned int baseAdd, unsigned int count);
 extern void I2CIdleModeSelect(unsigned int baseAdd, unsigned int flag);
@@ -248,23 +248,23 @@ extern void I2CMasterInitExpClk(unsigned int baseAdd, unsigned int SysClk,
                                 unsigned int IClk, unsigned int outputClk);
 extern void I2COwnAddressSet(unsigned int baseAdd, unsigned int slaveAdd,
                              unsigned int flag);
-extern void I2CSlaveIntClearEx(unsigned int baseAdd, unsigned int intFlag);
+//extern void I2CSlaveIntClearEx(unsigned int baseAdd, unsigned int intFlag); // no func
 extern void I2CClockActivitySelect(unsigned int baseAdd, unsigned int flag);
-extern void I2CSlaveIntEnableEx(unsigned int baseAdd, unsigned int intFlag);
+//extern void I2CSlaveIntEnableEx(unsigned int baseAdd, unsigned int intFlag); // no func
 extern void I2CMasterIntClearEx(unsigned int baseAdd, unsigned int intFlag);
-extern void I2CSlaveIntDisableEx(unsigned int baseAdd, unsigned int intFlag);
+//extern void I2CSlaveIntDisableEx(unsigned int baseAdd, unsigned int intFlag); // no func
 extern void I2CMasterIntEnableEx(unsigned int baseAdd, unsigned int intFlag);
 extern unsigned int I2CBufferStatus(unsigned int baseAdd, unsigned int flag);
 extern void I2CMasterIntDisableEx(unsigned int baseAdd, unsigned int intFlag);
 
 extern void I2CMasterSlaveAddrSet(unsigned int baseAdd, unsigned int slaveAdd);
-extern void I2CSlaveIntRawStatusClearEx(unsigned int baseAdd, unsigned int intFlag);
+//extern void I2CSlaveIntRawStatusClearEx(unsigned int baseAdd, unsigned int intFlag); // no func
 extern void I2CFIFOThresholdConfig(unsigned int baseAdd, unsigned int threshlodVal,
                                    unsigned int flag);
-extern unsigned int I2CSlaveIntStatusEx(unsigned int baseAdd, unsigned int intFlag);
+//extern unsigned int I2CSlaveIntStatusEx(unsigned int baseAdd, unsigned int intFlag); // no func
 extern void I2CMasterIntRawStatusClearEx(unsigned int baseAdd, unsigned int intFlag);
-extern unsigned int I2CMasterIntStatusEx(unsigned int baseAdd, unsigned int intFlag);
-extern unsigned int I2CSlaveIntRawStatusEx(unsigned int baseAdd, unsigned int intFlag);
+extern unsigned int I2CMasterIntStatusEx(unsigned int baseAdd, unsigned int intFlag); // no func
+//extern unsigned int I2CSlaveIntRawStatusEx(unsigned int baseAdd, unsigned int intFlag); // no func
 extern unsigned int I2CMasterSlaveAddrGet(unsigned int baseAdd, unsigned int slaveAdd);
 extern unsigned int I2CMasterIntRawStatusEx(unsigned int baseAdd, unsigned int intFlag);
 

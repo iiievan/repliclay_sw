@@ -225,6 +225,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>am335x</state>
+                    <state>beaglebone_black</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -368,6 +369,7 @@
                     <state>$PROJ_DIR$\vendor\uCOS-II\Source</state>
                     <state>$PROJ_DIR$\vendor\uC-CPU</state>
                     <state>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A</state>
+                    <state>$PROJ_DIR$\src\cppdrivers</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2672,13 +2674,13 @@
                 <name>$PROJ_DIR$\src\app\app_hooks.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\app\app_utils.cpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\app\app_utils.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\app\cpu_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\DM_Timer.cpp</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\app\lib_cfg.h</name>
@@ -2687,11 +2689,53 @@
                 <name>$PROJ_DIR$\src\app\os_cfg.h</name>
             </file>
         </group>
-        <file>
-            <name>$PROJ_DIR$\src\hal_bspInit.c</name>
-        </file>
+        <group>
+            <name>cppdrivers</name>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.CPP</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.CPP</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\INTC.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\INTC.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\OS_Timer.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\PRCM.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\PRCM.h</name>
+            </file>
+        </group>
         <file>
             <name>$PROJ_DIR$\src\hal_mmu.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\init.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\src\main.cpp</name>

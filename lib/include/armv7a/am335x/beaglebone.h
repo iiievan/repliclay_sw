@@ -63,6 +63,9 @@ extern "C" {
 #define BOARD_ID_BBB_A3                     (0x3)
 #define BOARD_ID_BBB_A5                     (0x4)
 #define BOARD_ID_BBB_A6                     (0x5)
+  
+#define BOARD_UNKNOWN              (0xFF)
+#define BOARD_VER_UNKNOWN          (0xFE)
 
 /*
 ** Structure to map selection of IO Pad for power down configuration
