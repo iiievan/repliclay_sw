@@ -997,7 +997,7 @@ namespace PRCM
             uint32_t    DPLL              :1;   // bit: 0       (RW)DPLL clock activity [0x0 = in bypass or in stop mode; 0x1= locked]              
             uint32_t                      :7;   // bit: 1..7    Reserved
             uint32_t    ST_MN_BYPASS      :8;   // bit: 8       (RW)DPLL MN_BYPASS status [0x0 = not bypass; 0x1= bypass]            
-            uint32_t                      :23;  // bit: 9..31   Reserved
+            uint32_t                      :16;  // bit: 9..31   Reserved
         } b;                                      
         uint32_t  reg;                           
     } IDLEST_DPLL_MPU_reg_t;
@@ -3103,6 +3103,7 @@ namespace PRCM
     constexpr AM335x_PRM_CEFUSE_Type    *AM335x_PRM_CEFUSE  = ((AM335x_PRM_CEFUSE_Type *) AM335x_PRM_CEFUSE_BASE);
     
     uint32_t debug_dump_CM_PER(AM335x_CM_PER_Type &sCM_PER = *AM335x_CM_PER);
+    uint32_t debug_dump_CM_WKUP(AM335x_CM_WKUP_Type &sCM_WKUP = *AM335x_CM_WKUP);
     /* for testing purpose */
     inline uint32_t debug_dump_CM_PER(AM335x_CM_PER_Type &sCM_PER)
     {
@@ -3123,63 +3124,75 @@ namespace PRCM
           
           return SIZEOF_CM_PER;
     }
+    
+    /* for testing purpose */
+    inline uint32_t debug_dump_CM_WKUP(AM335x_CM_WKUP_Type &sCM_WKUP)
+    {
+          constexpr uint32_t COUNTOF_CM_WKUP = sizeof(AM335x_CM_WKUP_Type)/sizeof(uint32_t);
+          volatile uint32_t TSTREG[COUNTOF_CM_WKUP] = {0};          
+          uint32_t *pAM335x_CM_WKUP = (uint32_t *)&sCM_WKUP;
+          
+          volatile uint32_t TSTREG1 = (uint32_t)sCM_WKUP.IDLEST_DPLL_MPU.reg;
+          volatile uint32_t TSTREG2 = (uint32_t)sCM_WKUP.SSC_DELTAMSTEP_DPLL_MPU.reg;
+          volatile uint32_t TSTREG3 = (uint32_t)sCM_WKUP.SSC_MODFREQDIV_DPLL_MPU.reg;
+          volatile uint32_t TSTREG4 = (uint32_t)sCM_WKUP.CLKSEL_DPLL_MPU.reg;
+          
+          volatile uint32_t SIZEOF_CM_WKUP = sizeof(AM335x_CM_WKUP_Type); 
+          
+          for(uint32_t i = 0 ; i < COUNTOF_CM_WKUP; i++)
+          {   
+                TSTREG[i] = pAM335x_CM_WKUP[i];
+          }
+          
+          return SIZEOF_CM_WKUP;
+    }
 }
 
 namespace DMTIMER
 {
     struct AM335x_DMTIMER_Type;
+    enum e_TIMER_NUM : uint8_t;
 }
 
 class power_reset_clock_control
 {
-public:
-        enum e_TIMER_NUM : uint8_t
-        {   
-            TIMER_NA  = 0x0,
-            TIMER_0   = 0x1,
-            TIMER_1ms = 0x2,
-            TIMER_2   = 0x3,
-            TIMER_3   = 0x4,
-            TIMER_4   = 0x5,
-            TIMER_5   = 0x6,
-            TIMER_6   = 0x7,
-            TIMER_7   = 0x8                      
-        };
-  
-        power_reset_clock_control();
-       ~power_reset_clock_control(){}
-        
-    void run_clk_interconnects(); // run L3S,L3,L4,L4LS interconnects clock
-    
-    void define_DMTIMER_number(DMTIMER::AM335x_DMTIMER_Type &p_tmr);
-    void run_clk_DMTIMER(DMTIMER::AM335x_DMTIMER_Type &p_tmr);
-    void run_clk_DMTIMER_1ms(PRCM::e_TIMER1MS_CLKSEL clk_sel); // only for DMTIMER 1
-    void run_clk_DMTIMER_5(); 
-    void run_clk_DMTIMER_6(); 
-    
-    void run_clk_GPIO0(); 
-    void run_clk_GPIO1();
+public:  
+                       power_reset_clock_control();
+                      ~power_reset_clock_control(){}
+                     
+                 void  run_clk_interconnects(); // run L3S,L3,L4,L4LS interconnects clock
+                 
+                 void  run_clk_DMTIMER(DMTIMER::e_TIMER_NUM tmr_num);
+                 void  run_clk_DMTIMER_1ms(PRCM::e_TIMER1MS_CLKSEL clk_sel); // only for DMTIMER 1
+                 void  run_clk_DMTIMER_5(); 
+                 void  run_clk_DMTIMER_6(); 
+                 
+                 void  run_clk_GPIO0(); 
+                 void  run_clk_GPIO1();                 
+   
+                 void  run_I2C0_clk();
+                 void  run_I2C1_clk();
+                 void  run_I2C2_clk();
     
 private:
-    e_TIMER_NUM  m_timer_num     { TIMER_NA };
     
-    PRCM::AM335x_CM_PER_Type     &m_sCM_PER;
-    PRCM::AM335x_CM_DPLL_Type    &m_sCM_DPLL;  
-    PRCM::AM335x_CM_WKUP_Type    &m_sCM_WKUP;   
-    PRCM::AM335x_CM_MPU_Type     &m_sCM_MPU;
-    PRCM::AM335x_CM_DEVICE_Type  &m_sCM_DEVICE;
-    PRCM::AM335x_CM_RTC_Type     &m_sCM_RTC;
-    PRCM::AM335x_CM_GFX_Type     &m_sCM_GFX;
-    PRCM::AM335x_CM_CEFUSE_Type  &m_sCM_CEFUSE;
+    PRCM::AM335x_CM_PER_Type     &m_CM_PER_regs;
+    PRCM::AM335x_CM_DPLL_Type    &m_CM_DPLL_regs;  
+    PRCM::AM335x_CM_WKUP_Type    &m_CM_WKUP_regs;   
+    PRCM::AM335x_CM_MPU_Type     &m_CM_MPU_regs;
+    PRCM::AM335x_CM_DEVICE_Type  &m_CM_DEVICE_regs;
+    PRCM::AM335x_CM_RTC_Type     &m_CM_RTC_regs;
+    PRCM::AM335x_CM_GFX_Type     &m_CM_GFX_regs;
+    PRCM::AM335x_CM_CEFUSE_Type  &m_CM_CEFUSE_regs;
     
-    PRCM::AM335x_PRM_IRQ_Type    &m_sPRM_IRQ;
-    PRCM::AM335x_PRM_PER_Type    &m_sPRM_PER;
-    PRCM::AM335x_PRM_WKUP_Type   &m_sPRM_WKUP;   
-    PRCM::AM335x_PRM_MPU_Type    &m_sPRM_MPU;
-    PRCM::AM335x_PRM_DEVICE_Type &m_sPRM_DEVICE;
-    PRCM::AM335x_PRM_RTC_Type    &m_sPRM_RTC;
-    PRCM::AM335x_PRM_GFX_Type    &m_sPRM_GFX;
-    PRCM::AM335x_PRM_CEFUSE_Type &m_sPRM_CEFUSE;
+    PRCM::AM335x_PRM_IRQ_Type    &m_PRM_IRQ_regs;
+    PRCM::AM335x_PRM_PER_Type    &m_PRM_PER_regs;
+    PRCM::AM335x_PRM_WKUP_Type   &m_PRM_WKUP_regs;   
+    PRCM::AM335x_PRM_MPU_Type    &m_PRM_MPU_regs;
+    PRCM::AM335x_PRM_DEVICE_Type &m_PRM_DEVICE_regs;
+    PRCM::AM335x_PRM_RTC_Type    &m_PRM_RTC_regs;
+    PRCM::AM335x_PRM_GFX_Type    &m_PRM_GFX_regs;
+    PRCM::AM335x_PRM_CEFUSE_Type &m_PRM_CEFUSE_regs;
 };
 
 extern power_reset_clock_control prcm_module;
