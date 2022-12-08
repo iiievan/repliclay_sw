@@ -227,6 +227,57 @@ namespace UART
         CTS_RTS_DSR_IT      = 0x10  // Priority = 6.
     };
 
+    /*! @brief      The following interrupt identification register (IIR) description is for CIR mode.  
+    *   @details    Refer to Section 19.3.7.1 to
+    *               determine the mode(s) in which this register can be accessed. The CIR interrupt identification register
+    *               (IIR) is a read-only register that provides the source of the interrupt. An interrupt source can be flagged
+    *               only if enabled in the IER register.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    RHRIT       :1;        // bit: 0       (RW) RHR interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    THRIT       :1;        // bit: 1       (RW) THR interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    RXSTOPIT    :1;        // bit: 2       (RW) Receive stop interrupt  [0x0 = inactive; 0x1 = active ]
+            uint32_t    RXOEIT      :1;        // bit: 3       (RW) RX overrun interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t                :1;        // bit: 4       Reserved
+            uint32_t    TXSTATUSIT  :1;        // bit: 5       (RW) TX status interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t                :26;       // bit: 6..32   Reserved  
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } IIR_CIR_reg_t;
+    // to mask this register please see --> e_CIR_IRQSTATUS_flags <--
+
+    enum e_CIR_IRQSTATUS_flags
+    {
+        CIR_RHR      = BIT(0),
+        CIR_THR      = BIT(1),
+        CIR_RXSTOP   = BIT(2),
+        CIR_RXOE     = BIT(3),
+        CIR_TXSTATUS = BIT(5)
+    };
+
+
+    /*! @brief      FIFO Control Register. 
+    *   @details    Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed. FCR[5:4] can
+    *               only be written when EFR[4] = 1.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    FIFO_EN         :1;    // bit: 0       (RW) Can be changed only when the baud clock is not running (DLL and DLH cleared to 0). [0x0 = Disables rcv FIFO; 0x1 = Enables rcv FIFO ]
+            uint32_t    RX_FIFO_CLEAR   :1;    // bit: 1       (RW) THR interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    TX_FIFO_CLEAR   :1;    // bit: 2       (RW) Receive stop interrupt  [0x0 = inactive; 0x1 = active ]
+            uint32_t    DMA_MODE        :1;    // bit: 3       (RW) RX overrun interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    TX_FIFO_TRIG    :1;    // bit: 4,5     Reserved
+            uint32_t    RX_FIFO_TRIG    :1;    // bit: 6,7     (RW) TX status interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t                    :24;   // bit: 8..32   Reserved  
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } FCR_reg_t;
+
     struct AM335x_UART_Type
     {     
         union
@@ -246,8 +297,8 @@ namespace UART
         {      
             __RW   EFR_reg_t              EFR;                  // (0x08) - Enhanced Feature Register 
             __R    IIR_UART_reg_t         IIR_UART;             // (0x08) - Interrupt Identification Register (UART)
-            __   IIR_CIR_reg_t            IIR_CIR;              // (0x08) - Interrupt Identification Register (CIR)
-            __   FCR_reg_t                FCR;                  // (0x08) - FIFO Control Register
+            __R    IIR_CIR_reg_t          IIR_CIR;              // (0x08) - Interrupt Identification Register (CIR)
+            __W    FCR_reg_t              FCR;                  // (0x08) - FIFO Control Register
             __   IIR_IRDA_reg_t           IIR_IRDA;             // (0x08) - Interrupt Identification Register (IrDA)
         };                  
             __   LCR_reg_t                LCR;                  // (0x0C) - Line Control Register 
