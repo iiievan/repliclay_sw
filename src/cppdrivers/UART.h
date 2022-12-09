@@ -278,6 +278,38 @@ namespace UART
         uint32_t  reg;                         // Type used for register access 
     } FCR_reg_t;
 
+    /*! @brief        
+    *   @details    
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    RHRIT                   :1;        // bit: 0       (R) RHR interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    THRIT                   :1;        // bit: 1       (R) THR interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    RX_FIFO_LAST_BYTE_IT    :1;        // bit: 2       (R) Last byte of frame in RX FIFO interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    RXOEIT                  :1;        // bit: 3       (R) RX overrun interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    STS_FIFO_IT             :1;        // bit: 4       (R) Status FIFO trigger level interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    TX_STATUS_IT            :1;        // bit: 5       (R) TX status interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    LINE_STS_IT             :1;        // bit: 6       (R) Receiver line status interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    EOF_IT                  :1;        // bit: 7       (R) Received EOF [0x0 = inactive; 0x1 = active ]
+            uint32_t                            :24;       // bit: 8..32   Reserved  
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } IIR_IRDA_reg_t;
+
+    enum e_IRDA_IRQSTATUS_flags
+    {
+        IRDA_RHR                 = BIT(0),
+        IRDA_THR                 = BIT(1),
+        IRDA_RX_FIFO_LAST_BYTE   = BIT(2),
+        IRDA_RXOE                = BIT(3),
+        IRDA_STS_FIFO            = BIT(4)
+        IRDA_TX_STATUS           = BIT(5),
+        IRDA_LINE_STS            = BIT(6),
+        IRDA_EOF                 = BIT(7)
+    };
+
     struct AM335x_UART_Type
     {     
         union
@@ -299,7 +331,7 @@ namespace UART
             __R    IIR_UART_reg_t         IIR_UART;             // (0x08) - Interrupt Identification Register (UART)
             __R    IIR_CIR_reg_t          IIR_CIR;              // (0x08) - Interrupt Identification Register (CIR)
             __W    FCR_reg_t              FCR;                  // (0x08) - FIFO Control Register
-            __   IIR_IRDA_reg_t           IIR_IRDA;             // (0x08) - Interrupt Identification Register (IrDA)
+            __R    IIR_IRDA_reg_t         IIR_IRDA;             // (0x08) - Interrupt Identification Register (IrDA)
         };                  
             __   LCR_reg_t                LCR;                  // (0x0C) - Line Control Register 
         union               
