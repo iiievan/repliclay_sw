@@ -1,0 +1,74 @@
+/* buildroot manual */
+1. отформатировать флешку
+
+$ sudo apt install gparted
+
+/** сделать необходимые операции в gparted **/
+$ sudo mkdir -p /mnt/sdcard
+$ lsblk
+$ sudo mount /dev/mmcblk0p1 /mnt/sdcard
+
+/** 2. ставим buildroot **/
+$ git clone git://git.buildroot.net/buildroot -b 2021.08.1
+$ cd buildroot
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt install sed make binutils build-essential diffutils gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc findutils wget python3 python-is-python3
+
+/** ѕроверить что в переменной PATH нет лишних пробелов и двоеточий: **/
+$ echo $PATH
+$ sudo sublime /etc/environment
+$ sudo sublime ~/.bashrc
+$ sudo sublime ~/.profile
+
+/** выбираем конфигурацию beaglebone_defconfig **/
+$ make list-defconfigs
+$ make beaglebone_defconfig
+$ make
+
+/** ѕосле того как компил€ци€ завершитс€, разворачиваем образ на SD-карту: **/
+$ cd buildroot/output/images/
+$ lsblk
+$ sudo dd if=sdcard.img of=/dev/mmcblk0 bs=1M
+
+/** на карточке после этого по€в€твс€ два раздела. **/
+/** ¬ переменную uEnv.txt в разделе boot вписать:  **/
+---->
+bootpart=0:1
+devtype=mmc
+bootdir=
+bootfile=zImage
+dtfile=am335x-boneblack.dtb
+bootpartition=mmcblk0p2
+console=ttyS0,115200n8
+loadaddr=0x82000000
+fdtaddr=0x88000000
+loadimage=fatload ${devtype} ${bootpart} ${loadaddr} ${bootfile}
+loadfdt=fatload ${devtype} ${bootpart} ${fdtaddr} ${dtfile}
+set_mmc1=if test $board_name = A33515BB; then setenv bootpartition mmcblk1p2; fi
+set_bootargs=setenv bootargs console=${console} init=/sbin/init root=/dev/${bootpartition} rw rootfstype=ext4 rootwait
+uenvcmd=run set_mmc1; run set_bootargs;run loadimage;run loadfdt;printenv bootargs;bootz ${loadaddr} - ${fdtaddr}
+<----
+
+/** ¬ таблицу /etc/inittab дописать дл€ инциализации(находитс€ в rootfs): **/
+/** после **/
+
+::sysinit:/etc/init.d/rcS
+
+/** дописать монтирование proc и sysfs, и создание узлов драйверов: **/
+::sysinit:/etc/init.d/rcS
+::sysinit:/bin/mount -t proc proc /proc
+::sysinit:/bin/mount -t sysfs sysfs /sys
+::sysinit:/bin/mount -t devtmpfs devtmpfs /dev
+
+/** в качестве консоли добавл€ем /bin/sh **/
+# Put a getty on the serial port
+# console::respawn:/sbin/getty -L  console 0 vt100 # GENERIC_SERIAL
+console::respawn:/bin/sh
+
+/** «атем подключаем терминал. **/ 
+// чтобы посмотреть какие устройства ttyUSB* подключены
+$ dmesg | grep tty
+$ sudo gtkterm -p /dev/ttyUSB0 -s 115200
+
+/** «атем вставл€ем карточку в плату, зажимаем ресет, подаем питание через п€ть секунд отжимаем резет. **/
