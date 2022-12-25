@@ -249,7 +249,7 @@ namespace UART
     } IIR_CIR_reg_t;
     // to mask this register please see --> e_CIR_IRQSTATUS_flags <--
 
-    enum e_CIR_IRQSTATUS_flags
+    enum e_CIR_IRQSTATUS_flags : uint32_t
     {
         CIR_RHR      = BIT(0),
         CIR_THR      = BIT(1),
@@ -298,7 +298,7 @@ namespace UART
         uint32_t  reg;                         // Type used for register access 
     } IIR_IRDA_reg_t;
 
-    enum e_IRDA_IRQSTATUS_flags
+    enum e_IRDA_IRQSTATUS_flags : uint32_t
     {
         IRDA_RHR                 = BIT(0),
         IRDA_THR                 = BIT(1),
@@ -308,6 +308,42 @@ namespace UART
         IRDA_TX_STATUS           = BIT(5),
         IRDA_LINE_STS            = BIT(6),
         IRDA_EOF                 = BIT(7)
+    };
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.       
+    *   @details    As soon as LCR[6] is set to 1, the TX line is forced to 0 and remains in this state as long as LCR[6] = 1.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    CHAR_LENGTH     :2;        // bit: 0,1     (RW) Specifies the word length to be transmitted or received. [ see e_CHAR_LENGHT ]
+            uint32_t    NB_STOP         :1;        // bit: 2       (RW) Specifies the number of stop bits. [0x0 = 1 stop bit (word length = 5, 6, 7, 8).;
+                                                   //                                                       0x1 = 1.5 stop bits (word length = 5) or 2 stop bits (word length = 6, 7, 8). ]
+            uint32_t    PARITY_EN       :1;        // bit: 3       (RW) Parity bit. [0x0 = No parity; 
+                                                   //                                0x1 = A parity bit is generated during transmission, and the receiver checks for received parity. ]
+            uint32_t    PARITY_TYPE1    :1;        // bit: 4       (RW) If LCR[3] = 1, then: [0x0 = Odd parity is generated.; 0x1 = Even parity is generated. ]
+            uint32_t    PARITY_TYPE2    :1;        // bit: 5       (RW) If LCR[3] = 1, then: [0x0 = If LCR[5] = 0, LCR[4] selects the forced parity format.; 
+                                                   //                                         0x1 = If LCR[5] = 1 and LCR[4] = 0, the parity bit is forced to 1 in the
+                                                   //                                         transmitted and received data. If LCR[5] = 1 and LCR[4] = 1, the
+                                                   //                                         parity bit is forced to 0 in the transmitted and received data. ]
+            uint32_t    BREAK_EN        :1;        // bit: 6       (RW) Break control bit. Note: When LCR[6] is set to 1, the TX line is forced to 0 and remains
+                                                   //                   in this state as long as LCR[6] = 1.
+                                                   //                   [0x0 = Normal operating condition.; 
+                                                   //                    0x1 = Forces the transmitter output to go low to alert the communication terminal ]
+            uint32_t    DIV_EN          :1;        // bit: 7       (RW) Divisor latch enable. [0x0 = Normal operating condition.; 
+                                                   //                                          0x1 = Divisor latch enable. Allows access to DLL and DLH. ]
+            uint32_t                    :24;       // bit: 8..32   Reserved  
+        } b;                                       // Structure used for bit access 
+        uint32_t  reg;                             // Type used for register access 
+    } LCR_reg_t;
+
+    enum e_CHAR_LENGHT : uint32_t
+    {
+        CHL_5_BITS = 0x00,
+        CHL_6_BITS = 0x01,
+        CHL_7_BITS = 0x02,
+        CHL_8_BITS = 0x03
     };
 
     struct AM335x_UART_Type
@@ -333,7 +369,7 @@ namespace UART
             __W    FCR_reg_t              FCR;                  // (0x08) - FIFO Control Register
             __R    IIR_IRDA_reg_t         IIR_IRDA;             // (0x08) - Interrupt Identification Register (IrDA)
         };                  
-            __   LCR_reg_t                LCR;                  // (0x0C) - Line Control Register 
+            __RW   LCR_reg_t              LCR;                  // (0x0C) - Line Control Register 
         union               
         {                   
             __   MCR_reg_t                MCR;                  // (0x10) - Modem Control Register
