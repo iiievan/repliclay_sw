@@ -621,6 +621,483 @@ namespace UART
         uint32_t  reg;                                      // Type used for register access 
     } XOFF2_reg_t;
 
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details    The mode of operation is programmed by writing to MDR1[2:0]; therefore, the mode definition register 1 (MDR1) must
+    *               be programmed on startup after configuration of the configuration registers (DLL, DLH, and LCR). The
+    *               value of MDR1[2:0] must not be changed again during normal operation. If the module is disabled by
+    *               setting the MODESELECT field to 7h, interrupt requests can still be generated unless disabled through the
+    *               interrupt enable register (IER). In this case, UART mode interrupts are visible. Reading the interrupt
+    *               identification register (IIR) shows the UART mode interrupt flags.  
+    [reset state = 0x7] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    MODESELECT              :3;             // bit: 0..2    (RW) UART/IrDA/CIR mode selection. [ see e_MODESELECT ]
+            uint32_t    IRSLEEP                 :1;             // bit: 3       (RW) IrDA/CIR sleep mode. [0x0 = disabled; 0x1 = enabled ]
+            uint32_t    SETTXIR                 :1;             // bit: 4       (RW) Used to configure the infrared transceiver. [0x0 = If MDR2[7] = 0, no action; if MDR2[7] = 1, TXIR pin output is forced low.; 
+                                                                //                                                                0x1 = TXIR pin output is forced high (not dependant of MDR2[7] value). ]
+            uint32_t    SCT                     :1;             // bit: 5       (RW) Store and control the transmission. [0x0 = Starts the infrared transmission when a value is written to the THR register.; 
+                                                                //                                                        0x1 = Starts the infrared transmission with the control of ACREG[2]. ]
+                                                                //                   !! Note: Before starting any transmission, there must be no reception ongoing !!
+            uint32_t    SIPMODE                 :1;             // bit: 6       (RW) MIR/FIR modes only. [0x0 = Manual SIP mode: SIP is generated with the control of ACREG[3].; 
+                                                                //                                        0x1 = Automatic SIP mode: SIP is generated after each transmission. ]
+            uint32_t    FRAMEENDMODE            :1;             // bit: 7       (RW) IrDA mode only. [0x0 = Frame-length method.; 0x1 = Set EOT bit method. ]
+            uint32_t                            :24;            // bit: 8..32   Reserved  
+        } b;                                                    // Structure used for bit access 
+        uint32_t  reg;                                          // Type used for register access 
+    } MDR1_reg_t;
+
+    enum e_MODESELECT : uint32_t
+    {
+        MODE_UART_16x           = 0x0,
+        MODE_SIR                = 0x1,
+        MODE_UART_16x_AUTOBAUD  = 0x2,
+        MODE_UART_13x           = 0x3,
+        MODE_MIR                = 0x4,
+        MODE_FIR                = 0x5,
+        MODE_CIR                = 0x6,
+        MODE_DISABLE            = 0x7,  // default state
+    };
+
+    /*! @brief    Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed    
+    *   @details  The MDR2[0] bit describes the status of the TX status interrupt in IIR[5]. The IRTXUNDERRUN bit must be read after a
+    *             TX status interrupt occurs. The MDR2[2:1] bits set the trigger level for the frame status FIFO (8 entries)
+    *             and must be programmed before the mode is programmed in MDR1[2:0]. The MDR2[6] bit gives the
+    *             flexibility to invert the RX pin inside the UART module to ensure that the protocol at the input of the
+    *             transceiver module has the same polarity at module level. By default, the RX pin is inverted because most
+    *             of transceiver invert the IR receive pin.  
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    IRTXUNDERRUN            :1;         // bit: 0       (R)  IrDA transmission status interrupt. [0x0 = frame was transmitted successfully without error.; 
+                                                            //                                                        0x1 = An underrun occurred. The last bit of the frame was transmitted
+                                                            //                                                        but with an underrun error. The bit is reset to 0 when the RESUME register is read. ]
+            uint32_t    STSFIFOTRIG             :2;         // bit: 1,2     (RW) Only for IrDA mode.Frame status FIFO threshold select: [see e_IRDA_FIFO_TIRGLVL ]
+            uint32_t    UARTPULSE               :1;         // bit: 3       (RW) UART mode only.Used to allow pulse shaping in UART mode.[0x0 = Normal UART mode.; 0x1 = UART mode with pulse shaping. ]
+            uint32_t    CIRPULSEMODE            :2;         // bit: 4,5     (RW) CIR pulse modulation definition. Defines high level of the pulse width associated with a digit:[ see e_CIRPULSE_MODULATION ]
+            uint32_t    IRRXINVERT              :1;         // bit: 6       (RW) Only for IR mode (IrDA and CIR).
+                                                            //                   Invert RX pin in the module before the voting or sampling system
+                                                            //                   logic of the infrared block.
+                                                            //                   This does not affect the RX path in UART modem modes.[0x0 = Inversion is performed.; 0x1 = No inversion is performed. ]
+            uint32_t    SETTXIRALT              :1;         // bit: 7       (RW) Provides alternate functionality for MDR1[4]. [0x0 = Normal mode; 0x1 = Alternate mode for SETTXIR ]
+            uint32_t                            :24;        // bit: 8..32   Reserved  
+        } b;                                                // Structure used for bit access 
+        uint32_t  reg;                                      // Type used for register access 
+    } MDR2_reg_t;
+
+    enum e_IRDA_FIFO_TIRGLVL : uint32_t
+    {
+        TRIGLVL_1_ENTRY = 0x0,
+        TRIGLVL_4_ENTRY = 0x1,
+        TRIGLVL_7_ENTRY = 0x2,
+        TRIGLVL_8_ENTRY = 0x3,
+    };
+
+    enum e_CIRPULSE_MODULATION : uint32_t
+    {
+        PULSE_WIDTH_3_12_CYCLES = 0x0,
+        PULSE_WIDTH_4_12_CYCLES = 0x1,
+        PULSE_WIDTH_5_12_CYCLES = 0x2,
+        PULSE_WIDTH_6_12_CYCLES = 0x3,
+    };
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    The transmit frame length low register (TXFLL) and the TXFLH register hold the 13-bit transmit frame length
+    *               (expressed in bytes). TXFLL holds the LSBs and TXFLH holds the MSBs. The frame length value is used
+    *               if the frame length method of frame closing is used.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    TXFLL               :8;         // bit: 0..7    (W) LSB register used to specify the frame length.
+            uint32_t                        :24;        // bit: 8..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } TXFLL_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    Reading the status FIFO line status register (SFLSR) effectively reads frame status information from the status FIFO.
+    *               This register does not physically exist. Reading this register increments the status FIFO read pointer
+    *               (SFREGL and SFREGH must be read first). Top of RX FIFO = Next frame to be read from RX FIFO.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t                            :1;         // bit: 0       Reserved
+            uint32_t    CRC_ERROR               :1;         // bit: 1       (R) [0x0 = No error; 0x1 = CRC error in frame at top of RX FIFO. ]
+            uint32_t    ABORT_DETECT            :1;         // bit: 2       (R) [0x0 = No error; 0x1 = Abort pattern detected in frame at top of RX FIFO. ]
+            uint32_t    FRAME_TOO_LONG_ERROR    :1;         // bit: 3       (R) [0x0 = No error; 0x1 = Frame-length too long error in frame at top of RX FIFO. ]
+            uint32_t    OE_ERROR                :1;         // bit: 4       (R) [0x0 = No error; 0x1 = Overrun error in RX FIFO when frame at top of RX FIFO was received. ]
+            uint32_t                            :27;        // bit: 5..32   Reserved  
+        } b;                                                // Structure used for bit access 
+        uint32_t  reg;                                      // Type used for register access 
+    } SFLSR_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed      
+    *   @details    The RESUME register is used to clear internal flags, which halt transmission/reception when an underrun/overrun error
+    *               occurs. Reading this register resumes the halted operation. This register does not physically exist and
+    *               always reads as 00.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    RESUME              :8;         // bit: 0..7    (R) Dummy read to restart the TX or RX, value 0 to FFh.
+            uint32_t                        :24;        // bit: 8..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } RESUME_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    The transmit frame length high register (TXFLH) and the TXFLL register hold the 13-bit transmit frame length
+    *               (expressed in bytes). TXFLL holds the LSBs and TXFLH holds the MSBs. The frame length value is used
+    *               if the frame length method of frame closing is used.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    TXFLH               :5;         // bit: 0..4    (R) MSB register used to specify the frame length, value 0 to 1Fh.
+            uint32_t                        :27;        // bit: 5..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } TXFLH_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    The received frame length low register (RXFLL) and the RXFLH register hold the 12-bit receive maximum frame length.
+    *               RXFLL holds the LSBs and RXFLH holds the MSBs. If the intended maximum receive frame length is n
+    *               bytes, program RXFLL and RXFLH to be n + 3 in SIR or MIR modes and n + 6 in FIR mode (+3 and +6
+    *               are the result of frame format with CRC and stop flag; two bytes are associated with the FIR stop flag).
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    RXFLL               :8;         // bit: 0..7    (W) LSB register used to specify the frame length in reception, value 0 to FFh.
+            uint32_t                        :24;        // bit: 8..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } RXFLL_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    The frame lengths of received frames are written into the status FIFO. This information can be read by reading the
+    *               status FIFO register low (SFREGL) and the status FIFO register high (SFREGH). These registers do not
+    *               physically exist. The LSBs are read from SFREGL and the MSBs are read from SFREGH. Reading these
+    *               registers does not alter the status FIFO read pointer. These registers must be read before the pointer is
+    *               incremented by reading the SFLSR.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    SFREGL              :8;         // bit: 0..7    (R) LSB register used to specify the frame length in reception, value 0 to FFh.
+            uint32_t                        :24;        // bit: 8..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } SFREGL_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    The frame lengths of received frames are written into the status FIFO. This information can be read by reading the
+    *               status FIFO register low (SFREGL) and the status FIFO register high (SFREGH). These registers do not
+    *               physically exist. The LSBs are read from SFREGL and the MSBs are read from SFREGH. Reading these
+    *               registers does not alter the status FIFO read pointer. These registers must be read before the pointer is
+    *               incremented by reading the SFLSR.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    SFREGH              :4;         // bit: 0..3    (R) MSB part of the frame length, value 0 to Fh.
+            uint32_t                        :28;        // bit: 4..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } SFREGH_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    The received frame length high register (RXFLH) and the RXFLL register hold the 12-bit receive maximum frame length.
+    *               RXFLL holds the LSBs and RXFLH holds the MSBs. If the intended maximum receive frame length is n
+    *               bytes, program RXFLL and RXFLH to be n + 3 in SIR or MIR modes and n + 6 in FIR mode (+3 and +6
+    *               are the result of frame format with CRC and stop flag; two bytes are associated with the FIR stop flag).
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    RXFLH               :4;         // bit: 0..3    (W) MSB register used to specify the frame length in reception, value 0 to Fh.
+            uint32_t                        :28;        // bit: 4..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } RXFLH_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    The BLR[6] bit is used to select whether C0h or FFh start patterns are to be used, when multiple start flags are required
+    *               in SIR mode. If only one start flag is required, this is always C0h. If n start flags are required, either (n - 1)
+    *               C0h or (n -1) FFh flags are sent, followed by a single C0h flag (immediately preceding the first data byte).
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t                            :6;         // bit: 0..5    Reserved
+            uint32_t    XBOFTYPE                :1;         // bit: 6       (RW) SIR xBOF select.[0x0 = FFh start pattern is used.; 0x1 = C0h start pattern is used. ]
+            uint32_t    STSFIFORESET            :1;         // bit: 7       (RW) Status FIFO reset.This bit is self-clearing.
+            uint32_t                            :24;        // bit: 8..32   Reserved  
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } BLR_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details    The UART autobauding status register (UASR) returns the speed, the number of bits by characters, and the type of
+    *               parity in UART autobauding mode. In autobauding mode, the input frequency of the UART modem must
+    *               be fixed to 48 MHz. Any other module clock frequency results in incorrect baud rate recognition. This
+    *               register is used to set up transmission according to characteristics of previous reception, instead of LCR,
+    *               DLL, and DLH registers when UART is in autobauding mode. To reset the autobauding hardware (to start
+    *               a new AT detection) or to set the UART in standard mode (no autobaud), MDR1[2:0] must be set to 7h
+    *               (reset state), then set to 2h (UART in autobaud mode) or cleared to 0 (UART in standard mode). Usage
+    *               limitation: Only 7 and 8 bits character (5 and 6 bits not supported). 7 bits character with space parity not
+    *               supported. Baud rate between 1200 and 115 200 bp/s (10 possibilities).
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    SPEED                   :5;         // bit: 0..4    (R) Speed. [ see e_AUTOBAUD_SPEED ]
+            uint32_t    BITBYCHAR               :1;         // bit: 5       (R) Number of bits by characters. [ 0x0 = 7-bit character identified.; 
+                                                            //                                                  0x1 = 8-bit character identified. ]
+            uint32_t    PARITYTYPE              :6;         // bit: 6,7     (R) Type of the parity in UART autobauding mode. [ see e_PARITY_TYPE ]
+            uint32_t                            :24;        // bit: 8..32   Reserved  
+        } b;                                                // Structure used for bit access 
+        uint32_t  reg;                                      // Type used for register access 
+    } UASR_reg_t;
+
+    enum e_AUTOBAUD_SPEED : uint32_t
+    {
+        ABAUD_NOSPEED = 0x0,
+        ABAUD_115200  = 0x1,
+        ABAUD_57600   = 0x2,
+        ABAUD_38400   = 0x3,
+        ABAUD_28800   = 0x4,
+        ABAUD_19200   = 0x5,
+        ABAUD_14400   = 0x6,
+        ABAUD_9600    = 0x7,
+        ABAUD_4800    = 0x8,
+        ABAUD_2400    = 0x9,
+        ABAUD_1200    = 0xA,
+    };
+
+    enum e_PARITY_TYPE : uint32_t
+    {
+        PARITY_NO    = 0x0,
+        PARITY_SPACE = 0x1,
+        PARITY_EVEN  = 0x2,
+        PARITY_ODD   = 0x3
+    };
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.    
+    *   @details    If transmit FIFO is not empty and MDR1[5] = 1, IrDA starts a new transfer with data of previous frame as soon as
+    *               abort frame has been sent. Therefore, TX FIFO must be reset before sending an abort frame. It is
+    *               recommended to disable TX FIFO underrun capability by masking corresponding underrun interrupt. When
+    *               disabling underrun by setting ACREG[4] = 1, unknown data is sent over TX line.  
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    EOTEN             :1;           // bit: 0       (RW) EOT (end-of-transmission) bit. The LH writes 1 to this bit just before it writes the last byte to the TX
+                                                        //                   FIFO in the set-EOT bit frame-closing method. This bit is automatically cleared when the LH writes to the THR (TXFIFO).
+            uint32_t    ABORTEN           :1;           // bit: 1       (RW) Frame abort. The LH can intentionally abort transmission of a frame by writing 1 to
+                                                        //                   this bit.Neither the end flag nor the CRC bits are appended to the frame.
+            uint32_t    SCTXEN            :1;           // bit: 2       (RW) Store and control TX start. When MDR1[5] = 1 and the LH writes 1 to this bit, the TX statemachine
+                                                        //                   starts frame transmission. This bit is self-clearing.
+            uint32_t    SENDSIP           :1;           // bit: 3       (RW) MIR/FIR modes only. Send serial infrared interaction pulse (SIP).
+                                                        //                   If this bit is set during an MIR/FIR transmission, the SIP is sent at the end of it.
+                                                        //                   This bit is automatically cleared at the end of the SIP transmission.[0x0 = No action.; 0x1 = Send SIP pulse. ]
+            uint32_t    DISTXUNDERRUN     :1;           // bit: 4       (RW) Disable TX underrun. [ 0x0 = Long stop bits cannot be transmitted. TX underrun is enabled.; 
+                                                        //                                          0x1 = Long stop bits can be transmitted. ]
+            uint32_t    DISIRRX           :1;           // bit: 5       (RW) Disable RX input. [0x0 = Normal operation (RX input automatically disabled during
+                                                        //                                      transmit, but enabled outside of transmit operation).; 
+                                                        //                                      0x1 = Disables RX input (permanent state; independent of transmit). ]
+            uint32_t    SDMOD             :1;           // bit: 6       (RW) Primary output used to configure transceivers.Connected to the SD/MODE input pin of IrDA transceivers.[0x0 = SD pin is set to high.;
+                                                        //                                                                                                                          0x1 = SD pin is set to low. ]
+            uint32_t    PULSETYPE         :1;           // bit: 7       (RW) SIR pulse-width select: [0x0 = 3/16 of baud-rate pulse width; 0x1 = 1.6 microseconds ]
+            uint32_t                      :24;          // bit: 8..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } ACREG_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details    Bit 4 enables the wake-up interrupt, but this interrupt is not mapped into the IIR register. Therefore, when an interrupt
+    *               occurs and there is no interrupt pending in the IIR register, the SSR[1] bit must be checked. To clear the
+    *               wake-up interrupt, bit SCR[4] must be reset to 0.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    DMAMODECTL              :1;         // bit: 0       (RW) [0x0 = The DMAMODE is set with FCR[3].; 0x1 = The DMAMODE is set with SCR[2:1]. ]
+            uint32_t    DMAMODE2                :2;         // bit: 1,2     (RW) Specifies the DMA mode valid if SCR[0] = 1, then:[ see e_SCR_DMA_MODE ]
+            uint32_t    TXEMPTYCTLIT            :1;         // bit: 3       (RW) [0x0 = Normal mode for THR interrupt.; 0x1 = THR interrupt is generated when TX FIFO and TX shift register are empty. ]
+            uint32_t    RXCTSDSRWAKEUPENABLE    :1;         // bit: 4       (RW) [0x0 = Disables the WAKE UP interrupt and clears SSR[1].; 
+                                                            //                    0x1 = Waits for a falling edge of RX, CTS (active-low), or DSR (active-low) pins to generate an interrupt. ]
+            uint32_t    DSRIT                   :1;         // bit: 5       (RW) [0x0 = Disables DSR (active-low) interrupt.; 0x1 = Enables DSR (active-low) interrupt. ]
+            uint32_t    TXTRIGGRANU1            :1;         // bit: 6       (RW) [0x0 = Disables the granularity of 1 for trigger TX level.; 0x1 = Enables the granularity of 1 for trigger TX level. ]
+            uint32_t    RXTRIGGRANU1            :1;         // bit: 7       (RW) [0x0 = Disables the granularity of 1 for trigger RX level.; 0x1 = Enables the granularity of 1 for trigger RX level. ]
+            uint32_t                            :24;        // bit: 8..32   Reserved  
+        } b;                                                // Structure used for bit access 
+        uint32_t  reg;                                      // Type used for register access 
+    } SCR_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details    Bit 1 is reset only when SCR[4] is reset to 0.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    TXFIFOFULL              :1;         // bit: 0       (R)  [ 0x0 = TX FIFO is not full.; 0x1 = TX FIFO is full. ]
+            uint32_t    RXCTSDSRWAKEUPSTS       :1;         // bit: 1       (R)  Pin falling edge detection: Reset only when SCR[4] is reset to 0. [0x0 = No falling-edge event on RX, CTS (active-low), and DSR
+                                                            //                                                                                      (active-low).;
+                                                            //                                                                                      0x1 = A falling edge occurred on RX, CTS (active-low), or DSR
+                                                            //                                                                                      (active-low). ]
+            uint32_t    DMACOUNTERRST           :1;         // bit: 2       (RW) [  0x0 = The DMA counter will not be reset, if the corresponding FIFO is reset (via FCR[1] or FCR[2]).; 
+                                                            //                      0x1 = The DMA counter will be reset, if the corresponding FIFO is reset (via FCR[1] or FCR[2]). ]
+            uint32_t                            :29;        // bit: 3..32   Reserved  
+        } b;                                                // Structure used for bit access 
+        uint32_t  reg;                                      // Type used for register access 
+    } SSR_reg_t;
+
+    enum  e_SCR_DMA_MODE : uint32_t
+    {
+        SCR_DMA_MODE_0 = 0x0,   //  no DMA.
+        SCR_DMA_MODE_1 = 0x1,   //  UARTnDMAREQ[0] in TX, UARTnDMAREQ[1] in RX
+        SCR_DMA_MODE_2 = 0x2,   //  UARTnDMAREQ[0] in RX
+        SCR_DMA_MODE_3 = 0x3,   //  UARTnDMAREQ[0] in TX
+    };
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
+    *   @details    In IrDA SIR operation, the BOF length register (EBLR) specifies the number of BOF + xBOFs to transmit. The value
+    *               set into this register must consider the BOF character; therefore, to send only one BOF with no XBOF, this
+    *               register must be set to 1. To send one BOF with n XBOFs, this register must be set to n + 1. Furthermore,
+    *               the value 0 sends 1 BOF plus 255 XBOFs. In IrDA MIR mode, the BOF length register (EBLR) specifies
+    *               the number of additional start flags (MIR protocol mandates a minimum of 2 start flags). In CIR mode, the
+    *               BOF length register (EBLR) specifies the number of consecutive zeros to be received before generating
+    *               the RXSTOP interrupt (IIR[2]). All the received zeros are stored in the RX FIFO. When the register is
+    *               cleared to 0, this feature is deactivated and always in reception state, which is disabled by setting the
+    *               ACREG[5] bit to 1. If the RX_STOP interrupt occurs before a byte boundary, the remaining bits of the last
+    *               byte are filled with zeros and then passed into the RX FIFO.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    EBLR                :8;         // bit: 0..7    (RW) IrDA mode: This register allows definition of up to 176 xBOFs, the
+                                                        //                   maximum required by IrDA specification.
+                                                        //                   CIR mode: This register specifies the number of consecutive zeros
+                                                        //                   to be received before generating the RXSTOP interrupt (IIR[2]).
+                                                        //                   0h = Feature disabled.
+                                                        //                   1h = Generate RXSTOP interrupt after receiving 1 zero bit.
+                                                        //                   FFh = Generate RXSTOP interrupt after receiving 255 zero bits.
+            uint32_t                        :24;        // bit: 8..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } EBLR_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details    The reset value is fixed by hardware and corresponds to the RTL revision of this module. A reset has no effect on
+    *               the value returned.
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    MINORREV_               :6;         // bit: 0..5    (R)  Minor revision number of the module.
+            uint32_t                            :2;         // bit: 6,7     Reserved
+            uint32_t    MAJORREV                :3;         // bit: 8..9    (R)  Major revision number of the module. 
+            uint32_t                            :21;        // bit: 3..32   Reserved  
+        } b;                                                // Structure used for bit access 
+        uint32_t  reg;                                      // Type used for register access 
+    } MVR_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details    The AUTOIDLE bit controls a power-saving technique to reduce the logic power consumption of the module
+    *               interface; that is, when the feature is enabled, the interface clock is gated off until the module interface is
+    *               accessed. When the SOFTRESET bit is set high, it causes a full device reset.   
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    AUTOIDLE        :1;         // bit: 0       (RW) Internal interface clock-gating strategy. [0x0 = Clock is running.; 0x1 = Reserved. ]
+            uint32_t    SOFTRESET       :1;         // bit: 1       (RW)  Software reset. Set this bit to 1 to trigger a module reset.
+                                                    //                    This bit is automatically reset by the hardware. Read returns 0.[0x0 = Normal mode.; 0x1 = Module is reset. ]
+            uint32_t    ENAWAKEUP       :1;         // bit: 2       (RW) Wakeup control. [0x0 = Wakeup is disabled.; 0x1 = Wakeup capability is enabled. ]
+            uint32_t    IDLEMODE        :2;         // bit: 3,4     (RW) Power management req/ack control. [ see e_IDLEMODE]
+            uint32_t                    :27;        // bit: 5..32   Reserved  
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access 
+    } SYSC_reg_t;
+
+    enum e_IDLEMODE : uint32_t
+    {
+        FORCE_IDLE       = 0x0,     // Idle request is acknowledged unconditionally.
+        NO_IDLE          = 0x1,     // Idle request is never acknowledged.
+        SMART_IDLE       = 0x2,     // Acknowledgement to an idle request is given based
+                                    // in the internal activity of the module.
+        SMART_IDLE_WKUP  = 0x3      // Acknowledgement to an idle request is
+                                    // given based in the internal activity of the module. The module is
+                                    // allowed to generate wakeup request. Only available on UART0
+    };
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details       
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    RESETDONE       :1;         // bit: 0       (RW) Internal reset monitoring. [0x0 = Internal module reset is ongoing.; 0x1 = Reset complete. ]
+            uint32_t                    :31;        // bit: 1..32   Reserved  
+        } b;                                        // Structure used for bit access 
+        uint32_t  reg;                              // Type used for register access 
+    } SYSS_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.   
+    *   @details    The wake-up enable register (WER) is used to mask and unmask a UART event that subsequently notifies the system.
+    *               An event is any activity in the logic that can cause an interrupt and/or an activity that requires the system
+    *               to wake up. Even if wakeup is disabled for certain events, if these events are also an interrupt to the
+    *               UART, the UART still registers the interrupt as such.   
+    [reset state = 0xFF] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    CTS__ACTIVITY       :1;         // bit: 0       (RW) [0x0 = Event is not allowed to wake up the system.; 
+                                                        //                    0x1 = Event can wake up the system. ]
+            uint32_t    DSR_ACTIVITY        :1;         // bit: 1       (RW) [0x0 = Event is not allowed to wake up the system.; 
+                                                        //                    0x1 = Event can wake up the system. ]
+            uint32_t    RI__ACTIVITY        :1;         // bit: 2       (RW) [0x0 = Event is not allowed to wake up the system.; 
+                                                        //                    0x1 = Event can wake up the system. ]
+            uint32_t    DCD_ACTIVITY        :1;         // bit: 3       (RW) [0x0 = Event is not allowed to wake up the system.; 
+                                                        //                    0x1 = Event can wake up the system. ]
+            uint32_t    RX__ACTIVITY        :1;         // bit: 4       (RW) [0x0 = Event is not allowed to wake up the system.; 
+                                                        //                    0x1 = Event can wake up the system. ]
+            uint32_t    RHR__INTERRUPT      :1;         // bit: 5       (RW) [0x0 = Event is not allowed to wake up the system.; 
+                                                        //                    0x1 = Event can wake up the system. ]
+            uint32_t    RLS__INTERRUPT      :1;         // bit: 6       (RW) Receiver line status interrupt. [0x0 = Event is not allowed to wake up the system.; 
+                                                        //                                                    0x1 = Event can wake up the system. ]
+            uint32_t    TXWAKEUPEN          :1;         // bit: 7       (RW) Wake-up interrupt. [0x0 = Event is not allowed to wake up the system.; 
+                                                        //                                       0x1 = Event can wake up the system: Event can be: THRIT or
+                                                        //                                             TXDMA request and/or TXSATUSIT. ]
+            uint32_t                        :24;        // bit: 8..32   Reserved  
+        } b;                                            // Structure used for bit access 
+        uint32_t  reg;                                  // Type used for register access 
+    } WER_reg_t;
+
     struct AM335x_UART_Type
     {     
         union
@@ -669,69 +1146,69 @@ namespace UART
             __RW   TLR_reg_t               TLR;                 // (0x1C) - Trigger Level Register
             __RW   XOFF2_reg_t             XOFF2;               // (0x1C) - XOFF2 Register 
         };              
-            __  MDR1_reg_t                MDR1;                 // (0x20) - Mode Definition Register 1 
-            __  MDR2_reg_t                MDR2;                 // (0x24) - Mode Definition Register 2
+            __RW   MDR1_reg_t              MDR1;                // (0x20) - Mode Definition Register 1 
+            __RW   MDR2_reg_t              MDR2;                // (0x24) - Mode Definition Register 2
         union           
         {           
-            __  TXFLL_reg_t               TXFLL;                // (0x28) - Transmit Frame Length Low Register
-            __  SFLSR_reg_t               SFLSR;                // (0x28) - Status FIFO Line Status Register 
+            __W    TXFLL_reg_t             TXFLL;               // (0x28) - Transmit Frame Length Low Register
+            __R    SFLSR_reg_t             SFLSR;               // (0x28) - Status FIFO Line Status Register 
         };                  
         union               
         {                   
-            __  RESUME_reg_t              RESUME;               // (0x2C) - RESUME Register
-            __  TXFLH_reg_t               TXFLH;                // (0x2C) - Transmit Frame Length High Register 
+            __R    RESUME_reg_t            RESUME;              // (0x2C) - RESUME Register
+            __W    TXFLH_reg_t             TXFLH;               // (0x2C) - Transmit Frame Length High Register 
         };                  
         union               
         {                   
-            __  RXFLL_reg_t               RXFLL;                // (0x30) - Received Frame Length Low Register
-            __  SFREGL_reg_t              SFREGL;               // (0x30) - Status FIFO Register Low 
+            __W    RXFLL_reg_t             RXFLL;                // (0x30) - Received Frame Length Low Register
+            __R    SFREGL_reg_t            SFREGL;               // (0x30) - Status FIFO Register Low 
         };                  
         union               
         {                   
-            __  SFREGH_reg_t              SFREGH;               // (0x34) - Status FIFO Register High
-            __  RXFLH_reg_t               RXFLH;                // (0x34) - Received Frame Length High Register 
+            __R    SFREGH_reg_t            SFREGH;               // (0x34) - Status FIFO Register High
+            __W    RXFLH_reg_t             RXFLH;                // (0x34) - Received Frame Length High Register 
         };      
         union      
         {        
-            __  BLR_reg_t                 BLR;                  // (0x38) - BOF Control Register
-            __  UASR_reg_t                UASR;                 // (0x38) - UART Autobauding Status Register 
+            __RW   BLR_reg_t               BLR;                  // (0x38) - BOF Control Register
+            __R    UASR_reg_t              UASR;                 // (0x38) - UART Autobauding Status Register 
         };              
-            __  ACREG_reg_t               ACREG;                // (0x3C) - Auxiliary Control Register  
-            __   SCR_reg_t                SCR;                  // (0x40) - Supplementary Control Register 
-            __   SSR_reg_t                SSR;                  // (0x44) - Supplementary Status Register   
-            __   EBLR_reg_t               EBLR;                 // (0x48) - BOF Length Register
-            __   uint32_t                 RESERVED[1];
-            __   MVR_reg_t                MVR;                  // (0x50) - Module Version Register 
-            __   SYSC_reg_t               SYSC;                 // (0x54) - System Configuration Register   
-            __   SYSS_reg_t               SYSS;                 // (0x58) - System Status Register
-            __   WER_reg_t                WER;                  // (0x5C) - Wake-Up Enable Register  
+            __RW   ACREG_reg_t             ACREG;                // (0x3C) - Auxiliary Control Register  
+            __RW   SCR_reg_t               SCR;                  // (0x40) - Supplementary Control Register 
+            __RW   SSR_reg_t               SSR;                  // (0x44) - Supplementary Status Register   
+            __RW   EBLR_reg_t              EBLR;                 // (0x48) - BOF Length Register
+            __R    uint32_t                RESERVED[1];
+            __R    MVR_reg_t               MVR;                  // (0x50) - Module Version Register 
+            __RW   SYSC_reg_t              SYSC;                 // (0x54) - System Configuration Register   
+            __R    SYSS_reg_t              SYSS;                 // (0x58) - System Status Register
+            __RW   WER_reg_t               WER;                  // (0x5C) - Wake-Up Enable Register  
             __   CFPS_reg_t               CFPS;                 // (0x60) - Carrier Frequency Prescaler Register  
             __   RXFIFO_LVL_reg_t         RXFIFO_LVL;           // (0x64) - Received FIFO Level Register 
             __   TXFIFO_LVL_reg_t         TXFIFO_LVL;           // (0x68) - Transmit FIFO Level Register   
             __   IER2_reg_t               IER2;                 // (0x6C) - IER2 Register
             __   ISR2_reg_t               ISR2;                 // (0x70) - ISR2 Register 
             __   FREQ_SEL_reg_t           FREQ_SEL;             // (0x74) - FREQ_SEL Register 
-            __   uint32_t                 RESERVED1[2];  
+            __R  uint32_t                 RESERVED1[2];  
             __   MDR3_reg_t               MDR3;                 // (0x80) - Mode Definition Register 3
             __   TX_DMA_THRESHOLD_reg_t   TX_DMA_THRESHOLD;     // (0x84) - TX DMA Threshold Register
     };
 
 
-        /*! @brief        
+    /*! @brief        
     *   @details    
     [reset state = 0x0] */ 
     typedef union 
     { 
         struct 
         {             
-            uint32_t    RHRIT                   :1;         // bit: 0       (R) RHR interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    THRIT                   :1;         // bit: 1       (R) THR interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    RX_FIFO_LAST_BYTE_IT    :1;         // bit: 2       (R) Last byte of frame in RX FIFO interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    RXOEIT                  :1;         // bit: 3       (R) RX overrun interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    STS_FIFO_IT             :1;         // bit: 4       (R) Status FIFO trigger level interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    TX_STATUS_IT            :1;         // bit: 5       (R) TX status interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    LINE_STS_IT             :1;         // bit: 6       (R) Receiver line status interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    EOF_IT                  :1;         // bit: 7       (R) Received EOF [0x0 = inactive; 0x1 = active ]
+            uint32_t    RHRIT                   :1;         // bit: 0       (R) [0x0 = inactive; 0x1 = active ]
+            uint32_t    THRIT                   :1;         // bit: 1       (R) [0x0 = inactive; 0x1 = active ]
+            uint32_t    RX_FIFO_LAST_BYTE_IT    :1;         // bit: 2       (R) [0x0 = inactive; 0x1 = active ]
+            uint32_t    RXOEIT                  :1;         // bit: 3       (R) [0x0 = inactive; 0x1 = active ]
+            uint32_t    STS_FIFO_IT             :1;         // bit: 4       (R) [0x0 = inactive; 0x1 = active ]
+            uint32_t    TX_STATUS_IT            :1;         // bit: 5       (R) [0x0 = inactive; 0x1 = active ]
+            uint32_t    LINE_STS_IT             :1;         // bit: 6       (R) [0x0 = inactive; 0x1 = active ]
+            uint32_t    EOF_IT                  :1;         // bit: 7       (R) [0x0 = inactive; 0x1 = active ]
             uint32_t                            :24;        // bit: 8..32   Reserved  
         } b;                                   // Structure used for bit access 
         uint32_t  reg;                         // Type used for register access 
