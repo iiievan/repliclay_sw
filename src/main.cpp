@@ -9,6 +9,7 @@
 
 
 #include "init.h"
+#include "n_UART.h"
 #include "DM_Timer.h"
 #include "OS_Timer.h"
 #include "PRCM.h"

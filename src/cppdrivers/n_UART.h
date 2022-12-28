@@ -1,12 +1,12 @@
-#ifndef _UART_H_
-#define _UART_H_
+#ifndef _N_UART_H_
+#define _N_UART_H_
 
 #include <stdint.h>
 #include "app_utils.h"
 #include "INTC.h"
 
 //This is UART class and his namespace
-namespace UART
+namespace n_UART
 { 
 /*******************************************************************************************************************************************************************************/  
 
@@ -25,7 +25,7 @@ namespace UART
         struct 
         {
              
-            uint32_t    THR        :8;         // bit: 0..7    (RW) Transmit holding register.[Value 0 to FFh.]
+            uint32_t    THR        :8;         // bit: 0..7    (W) Transmit holding register.[Value 0 to FFh.]
             uint32_t               :24;        // bit: 8..32   Reserved  
         } b;                                   // Structure used for bit access 
         uint32_t  reg;                         // Type used for register access 
@@ -40,7 +40,7 @@ namespace UART
     { 
         struct 
         {             
-            uint32_t    RHR        :8;         // bit: 0..7    (RW) Transmit holding register.[Value 0 to FFh.]
+            uint32_t    RHR        :8;         // bit: 0..7    (R) Receive holding register..[Value 0 to FFh.]
             uint32_t               :24;        // bit: 8..32   Reserved  
         } b;                                   // Structure used for bit access 
         uint32_t  reg;                         // Type used for register access 
@@ -271,8 +271,8 @@ namespace UART
             uint32_t    RX_FIFO_CLEAR   :1;    // bit: 1       (RW) THR interrupt [0x0 = inactive; 0x1 = active ]
             uint32_t    TX_FIFO_CLEAR   :1;    // bit: 2       (RW) Receive stop interrupt  [0x0 = inactive; 0x1 = active ]
             uint32_t    DMA_MODE        :1;    // bit: 3       (RW) RX overrun interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    TX_FIFO_TRIG    :1;    // bit: 4,5     Reserved
-            uint32_t    RX_FIFO_TRIG    :1;    // bit: 6,7     (RW) TX status interrupt [0x0 = inactive; 0x1 = active ]
+            uint32_t    TX_FIFO_TRIG    :2;    // bit: 4,5     Reserved
+            uint32_t    RX_FIFO_TRIG    :2;    // bit: 6,7     (RW) TX status interrupt [0x0 = inactive; 0x1 = active ]
             uint32_t                    :24;   // bit: 8..32   Reserved  
         } b;                                   // Structure used for bit access 
         uint32_t  reg;                         // Type used for register access 
@@ -304,7 +304,7 @@ namespace UART
         IRDA_THR                 = BIT(1),
         IRDA_RX_FIFO_LAST_BYTE   = BIT(2),
         IRDA_RXOE                = BIT(3),
-        IRDA_STS_FIFO            = BIT(4)
+        IRDA_STS_FIFO            = BIT(4),
         IRDA_TX_STATUS           = BIT(5),
         IRDA_LINE_STS            = BIT(6),
         IRDA_EOF                 = BIT(7)
@@ -501,8 +501,8 @@ namespace UART
     { 
         struct 
         {             
-            uint32_t    RXFIFOTRIGHALT          :1;         // bit: 0..3       (RW) RX FIFO trigger level to HALT transmission (0 to 60).
-            uint32_t    RXFIFOTRIGSTART         :1;         // bit: 4..7       (RW) RX FIFO trigger level to RESTORE transmission (0 to 60).
+            uint32_t    RXFIFOTRIGHALT          :4;         // bit: 0..3       (RW) RX FIFO trigger level to HALT transmission (0 to 60).
+            uint32_t    RXFIFOTRIGSTART         :4;         // bit: 4..7       (RW) RX FIFO trigger level to RESTORE transmission (0 to 60).
             uint32_t                            :24;        // bit: 8..32       Reserved  
         } b;                                                // Structure used for bit access 
         uint32_t  reg;                                      // Type used for register access 
@@ -762,7 +762,7 @@ namespace UART
     { 
         struct 
         {             
-            uint32_t    TXFLH               :5;         // bit: 0..4    (R) MSB register used to specify the frame length, value 0 to 1Fh.
+            uint32_t    TXFLH               :5;         // bit: 0..4    (W) MSB register used to specify the frame length, value 0 to 1Fh.
             uint32_t                        :27;        // bit: 5..32   Reserved  
         } b;                                            // Structure used for bit access 
         uint32_t  reg;                                  // Type used for register access 
@@ -869,7 +869,7 @@ namespace UART
             uint32_t    SPEED                   :5;         // bit: 0..4    (R) Speed. [ see e_AUTOBAUD_SPEED ]
             uint32_t    BITBYCHAR               :1;         // bit: 5       (R) Number of bits by characters. [ 0x0 = 7-bit character identified.; 
                                                             //                                                  0x1 = 8-bit character identified. ]
-            uint32_t    PARITYTYPE              :6;         // bit: 6,7     (R) Type of the parity in UART autobauding mode. [ see e_PARITY_TYPE ]
+            uint32_t    PARITYTYPE              :2;         // bit: 6,7     (R) Type of the parity in UART autobauding mode. [ see e_PARITY_TYPE ]
             uint32_t                            :24;        // bit: 8..32   Reserved  
         } b;                                                // Structure used for bit access 
         uint32_t  reg;                                      // Type used for register access 
@@ -1098,12 +1098,167 @@ namespace UART
         uint32_t  reg;                                  // Type used for register access 
     } WER_reg_t;
 
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.       
+    *   @details    Since the consumer IR (CIR) works at modulation rates of 30-56.8 kHz, the 48 MHz clock must be prescaled before
+    *               the clock can drive the IR logic. The carrier frequency prescaler register (CFPS) sets the divisor rate to
+    *               give a range to accommodate the remote control requirements in BAUD multiples of 12x. The value of the
+    *               CFPS at reset is 105 decimal (69h), which equates to a 38.1 kHz output from starting conditions. The 48
+    *               MHz carrier is prescaled by the CFPS that is then divided by the 12x BAUD multiple.    
+    [reset state = 0x69] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    CFPS                   :8;          // bit: 0       System clock frequency prescaler at (12x multiple).CFPS = 0 is not supported. [ see e_TARGET_CIR_FREQ]
+                                                            //              Examples for CFPS values follow.
+                                                            //              Target Frequency (kHz) = 30, CFPS (decimal) = 133, Actual
+                                                            //              Frequency (kHz) = 30.08.
+                                                            //              Target Frequency (kHz) = 32.75, CFPS (decimal) = 122, Actual
+                                                            //              Frequency (kHz) = 32.79.
+                                                            //              Target Frequency (kHz) = 36, CFPS (decimal) = 111, Actual
+                                                            //              Frequency (kHz) = 36.04.
+                                                            //              Target Frequency (kHz) = 36.7, CFPS (decimal) = 109, Actual
+                                                            //              Frequency (kHz) = 36.69.
+                                                            //              Target Frequency (kHz) = 38, CFPS (decimal) = 105, Actual
+                                                            //              Frequency (kHz) = 38.1.
+                                                            //              Target Frequency (kHz) = 40, CFPS (decimal) = 100, Actual
+                                                            //              Frequency (kHz) = 40.
+                                                            //              Target Frequency (kHz) = 56.8, CFPS (decimal) = 70, Actual
+                                                            //              Frequency (kHz) = 57.14.
+            uint32_t                           :24;         // bit: 8..32   Reserved  
+        } b;                                                // Structure used for bit access 
+        uint32_t  reg;                                      // Type used for register access 
+    } CFPS_reg_t;   
+
+    //  for example CIR modualtion frequiencies
+    enum e_TARGET_CIR_FREQ : uint32_t
+    {
+        TARGET_CIR_56_800 = 70,     // Actual Frequency (kHz) = 57.14.
+        TARGET_CIR_40_000 = 100,    // Actual Frequency (kHz) = 40.00.
+        TARGET_CIR_38_000 = 105,    // Actual Frequency (kHz) = 38.10.
+        TARGET_CIR_36_700 = 109,    // Actual Frequency (kHz) = 36.69.
+        TARGET_CIR_36_000 = 111,    // Actual Frequency (kHz) = 36.04.
+        TARGET_CIR_32_750 = 122,    // Actual Frequency (kHz) = 32.79.
+        TARGET_CIR_30_000 = 133     // Actual Frequency (kHz) = 30.08.
+    };
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details       
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    RXFIFO_LVL      :8;         // bit: 0..7    (R) Level of the RX FIFO.
+            uint32_t                    :24;        // bit: 8..32   Reserved  
+        } b;                                        // Structure used for bit access 
+        uint32_t  reg;                              // Type used for register access 
+    } RXFIFO_LVL_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details       
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    TXFIFO_LVL      :8;         // bit: 0..7    (R) Level of the TX FIFO
+            uint32_t                    :24;        // bit: 8..32   Reserved  
+        } b;                                        // Structure used for bit access 
+        uint32_t  reg;                              // Type used for register access 
+    } TXFIFO_LVL_reg_t;
+
+
+    /*! @brief      The IER2 enables RX/TX FIFOs empty corresponding interrupts. Refer to Section 19.3.7.1 to determine
+    *               the mode(s) in which this register can be accessed.     
+    *   @details       
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    EN_RXFIFO_EMPTY      :1;         // bit: 0    (R) [0x0 = Disables EN_RXFIFO_EMPTY interrupt.; 0x1 = Enables EN_RXFIFO_EMPTY interrupt. ]
+            uint32_t    EN_TXFIFO_EMPTY      :1;         // bit: 1    (R) [0x0 = Disables EN_TXFIFO_EMPTY interrupt.; 0x1 = Enables EN_TXFIFO_EMPTY interrupt. ]
+            uint32_t                         :30;        // bit: 2..32   Reserved  
+        } b;                                        // Structure used for bit access 
+        uint32_t  reg;                              // Type used for register access 
+    } IER2_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed. The ISR2
+    *               displays the status of RX/TX FIFOs empty corresponding interrupts.     
+    *   @details       
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    TXFIFO_EMPTY_STS     :1;         // bit: 0    (R) [0x0 = TXFIFO_EMPTY interrupt not pending.; 0x1 = TXFIFO_EMPTY interrupt pending. ]
+            uint32_t    RXFIFO_EMPTY_STS     :1;         // bit: 1    (R) [0x0 = RXFIFO_EMPTY interrupt not pending.; 0x1 = RXFIFO_EMPTY interrupt pending. ]
+            uint32_t                         :30;        // bit: 2..32   Reserved  
+        } b;                                             // Structure used for bit access 
+        uint32_t  reg;                                   // Type used for register access 
+    } ISR2_reg_t;
+
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
+    *   @details       
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    FREQ_SEL       :8;          // bit: 0..7       (RW) Sets the sample per bit if non default frequency is used.
+                                                    //                      MDR3[1] must be set to 1 after this value is set. Must be equal or higher then 6.
+            uint32_t                   :24;         // bit: 8..32      Reserved  
+        } b;                                        // Structure used for bit access 
+        uint32_t  reg;                              // Type used for register access 
+    } FREQ_SEL_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.    
+    *   @details    The DISABLE_CIR_RX_DEMOD register bit will force the CIR receiver to bypass demodulation of received
+    *               data if set. See the CIR Mode Block Components. The NONDEFAULT_FREQ register bit allows the user
+    *               to set sample per bit by writing it into FREQ_SEL register. Set it if non-default (48 MHz) fclk frequency is
+    *               used to achieve a less than 2% error rate. Changing this bit (to any value) will automatically disable the
+    *               device by setting MDR[2:0] to 111 .     
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    DISABLE_CIR_RX_DEMOD       :1;          // bit: 0         (RW) [ 0x0 = Enables CIR RX demodulation.; 
+                                                                //                       0x1 = Disables CIR RX demodulation. ]
+            uint32_t    NONDEFAULT_FREQ            :1;          // bit: 1         (RW) [ 0x0 = Disables using NONDEFAULT fclk frequencies.; 
+                                                                //                       0x1 = Enables using NONDEFAULT fclk frequencies (set FREQ_SEL and DLH/DLL). ]
+            uint32_t    SET_DMA_TX_THRESHOLD       :1;          // bit: 2         (RW) [ 0x0 = Disable use of TX DMA Threshold register. Use 64-TX trigger  as DMA threshold.;
+                                                                //                       0x1 = Enable to set different TX DMA threshold in the TX DMA Threshold register. ]
+            uint32_t                               :29;         // bit: 3..32      Reserved  
+        } b;                                        // Structure used for bit access 
+        uint32_t  reg;                              // Type used for register access 
+    } MDR3_reg_t;
+
+    /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.    
+    *   @details       
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {             
+            uint32_t    TX_DMA_THRESHOLD    :6;     // bit: 0..5       (RW) Used to manually set the TX DMA threshold level.
+                                                    //                      UART_MDR3[2] SET_TX_DMA_THRESHOLD must be 1 and must
+                                                    //                      be value + tx_trigger_level = 64 (TX FIFO size).
+                                                    //                      If not, 64_tx_trigger_level will be used without modifying the value of
+                                                    //                      this register.
+            uint32_t                        :26;    // bit: 6..32      Reserved  
+        } b;                                        // Structure used for bit access 
+        uint32_t  reg;                              // Type used for register access 
+    } TX_DMA_THRESHOLD_reg_t;
+
     struct AM335x_UART_Type
     {     
         union
         { 
-            __RW   THR_reg_t               THR;                 // (0x00) - Transmit Holding Register
-            __RW   RHR_reg_t               RHR;                 // (0x00) - Receiver Holding Register
+            __W    THR_reg_t               THR;                 // (0x00) - Transmit Holding Register
+            __R    RHR_reg_t               RHR;                 // (0x00) - Receiver Holding Register
             __RW   DLL_reg_t               DLL;                 // (0x00) - Divisor Latches Low Register
         };   
         union
@@ -1182,37 +1337,134 @@ namespace UART
             __RW   SYSC_reg_t              SYSC;                 // (0x54) - System Configuration Register   
             __R    SYSS_reg_t              SYSS;                 // (0x58) - System Status Register
             __RW   WER_reg_t               WER;                  // (0x5C) - Wake-Up Enable Register  
-            __   CFPS_reg_t               CFPS;                 // (0x60) - Carrier Frequency Prescaler Register  
-            __   RXFIFO_LVL_reg_t         RXFIFO_LVL;           // (0x64) - Received FIFO Level Register 
-            __   TXFIFO_LVL_reg_t         TXFIFO_LVL;           // (0x68) - Transmit FIFO Level Register   
-            __   IER2_reg_t               IER2;                 // (0x6C) - IER2 Register
-            __   ISR2_reg_t               ISR2;                 // (0x70) - ISR2 Register 
-            __   FREQ_SEL_reg_t           FREQ_SEL;             // (0x74) - FREQ_SEL Register 
-            __R  uint32_t                 RESERVED1[2];  
-            __   MDR3_reg_t               MDR3;                 // (0x80) - Mode Definition Register 3
-            __   TX_DMA_THRESHOLD_reg_t   TX_DMA_THRESHOLD;     // (0x84) - TX DMA Threshold Register
+            __RW   CFPS_reg_t              CFPS;                 // (0x60) - Carrier Frequency Prescaler Register  
+            __R    RXFIFO_LVL_reg_t        RXFIFO_LVL;           // (0x64) - Received FIFO Level Register 
+            __R    TXFIFO_LVL_reg_t        TXFIFO_LVL;           // (0x68) - Transmit FIFO Level Register   
+            __RW   IER2_reg_t              IER2;                 // (0x6C) - IER2 Register
+            __RW   ISR2_reg_t              ISR2;                 // (0x70) - ISR2 Register 
+            __RW   FREQ_SEL_reg_t          FREQ_SEL;             // (0x74) - FREQ_SEL Register 
+            __R    uint32_t                RESERVED1[2];  
+            __RW   MDR3_reg_t              MDR3;                 // (0x80) - Mode Definition Register 3
+            __RW   TX_DMA_THRESHOLD_reg_t  TX_DMA_THRESHOLD;     // (0x84) - TX DMA Threshold Register
     };
 
+    constexpr uint32_t AM335x_UART_0_BASE     = 0x44E09000;    
+    constexpr uint32_t AM335x_UART_1_BASE     = 0x48022000;    
+    constexpr uint32_t AM335x_UART_2_BASE     = 0x48024000;
+    constexpr uint32_t AM335x_UART_3_BASE     = 0x481A6000;    
+    constexpr uint32_t AM335x_UART_4_BASE     = 0x481A8000;    
+    constexpr uint32_t AM335x_UART_5_BASE     = 0x481AA000;   
+     
+    constexpr AM335x_UART_Type * AM335X_UART_0_regs = reinterpret_cast<AM335x_UART_Type *>(AM335x_UART_0_BASE);
+    constexpr AM335x_UART_Type * AM335X_UART_1_regs = reinterpret_cast<AM335x_UART_Type *>(AM335x_UART_1_BASE);
+    constexpr AM335x_UART_Type * AM335X_UART_2_regs = reinterpret_cast<AM335x_UART_Type *>(AM335x_UART_2_BASE);
+    constexpr AM335x_UART_Type * AM335X_UART_3_regs = reinterpret_cast<AM335x_UART_Type *>(AM335x_UART_3_BASE);
+    constexpr AM335x_UART_Type * AM335X_UART_4_regs = reinterpret_cast<AM335x_UART_Type *>(AM335x_UART_4_BASE);
+    constexpr AM335x_UART_Type * AM335X_UART_5_regs = reinterpret_cast<AM335x_UART_Type *>(AM335x_UART_5_BASE); 
 
-    /*! @brief        
-    *   @details    
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {             
-            uint32_t    RHRIT                   :1;         // bit: 0       (R) [0x0 = inactive; 0x1 = active ]
-            uint32_t    THRIT                   :1;         // bit: 1       (R) [0x0 = inactive; 0x1 = active ]
-            uint32_t    RX_FIFO_LAST_BYTE_IT    :1;         // bit: 2       (R) [0x0 = inactive; 0x1 = active ]
-            uint32_t    RXOEIT                  :1;         // bit: 3       (R) [0x0 = inactive; 0x1 = active ]
-            uint32_t    STS_FIFO_IT             :1;         // bit: 4       (R) [0x0 = inactive; 0x1 = active ]
-            uint32_t    TX_STATUS_IT            :1;         // bit: 5       (R) [0x0 = inactive; 0x1 = active ]
-            uint32_t    LINE_STS_IT             :1;         // bit: 6       (R) [0x0 = inactive; 0x1 = active ]
-            uint32_t    EOF_IT                  :1;         // bit: 7       (R) [0x0 = inactive; 0x1 = active ]
-            uint32_t                            :24;        // bit: 8..32   Reserved  
-        } b;                                   // Structure used for bit access 
-        uint32_t  reg;                         // Type used for register access 
-    } IIR_IRDA_reg_t;
+    //-> Values used to choose the trigger level granularity. <-//
+    enum e_UART_MODULE_TRIG_GRNAULARITY  : uint32_t
+    {
+        TRIG_LVL_GRANULARITY_4 = 0x0,      
+        TRIG_LVL_GRANULARITY_1 = 0x1       
+    };
+
+    //-> Values to be used while switching between register configuration modes. <-//
+    enum e_UART_CONFIG_MODE  : uint32_t
+    {
+        CONFIG_MODE_A      = 0x0080,
+        CONFIG_MODE_B      = 0x00BF,
+        OPERATIONAL_MODE   = 0x007F,
+    };
+
 }
 
-#endif // _UART_H_
+class AM335x_UART
+{
+public:
+            AM335x_UART(n_UART::AM335x_UART_Type *p_uart_regs);
+            ~AM335x_UART() {}
+            
+  n_UART::e_MODESELECT  operating_mode_select(n_UART::e_MODESELECT mode_flag);
+  uint32_t  divisor_val_compute(uint32_t  module_clk,
+                                uint32_t  baud_rate,
+                    n_UART::e_MODESELECT  mode_flag,
+                                uint32_t  mir_over_samp_rate);
+  uint32_t  divisor_latch_write(uint32_t divisor_value);
+      void  divisor_latch_enable();
+      void  divisor_latch_disable();
+  uint32_t  reg_config_mode_enable(n_UART::e_UART_CONFIG_MODE mode_flag);
+      void  reg_conf_mode_restore(uint32_t lcr_reg_value);
+      void  break_ctl(uint32_t break_state);
+      void  line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag);
+      void  parity_mode_set(uint32_t parity_flag);
+  uint32_t  parity_mode_get();
+  uint32_t  FIFO_config(uint32_t fifo_config);
+      void  DMA_enable(uint32_t dma_mode_flag);
+      void  DMA_disable();
+      void  FIFO_register_write(uint32_t fcr_value);
+  uint32_t  enhan_func_enable();
+      void  enhan_func_bit_val_restore(uint32_t enhan_fn_bit_val);
+  uint32_t  sub_config_MSRSPR_mode_en();
+  uint32_t  sub_config_TCRTLR_mode_en();
+  uint32_t  sub_config_XOFF_mode_en();
+      void  TCRTLR_bit_val_restore(uint32_t tcr_tlr_bit_val);
+      void  int_enable(uint32_t int_flag);
+      void  int_disable(uint32_t int_flag);
+  uint32_t  space_avail();
+  uint32_t  chars_avail();
+  uint32_t  char_put_non_blocking(uint8_t byte_write);
+      char  char_get_non_blocking();
+      char  char_get();
+       int  char_get_timeout(uint32_t time_out_val);
+      void  char_put(uint8_t byte_tx);
+      void  FIFO_char_put(uint8_t byte_tx);
+      char  FIFO_char_get();
+  uint32_t  FIFO_write(uint8_t *p_Buf, uint32_t num_tx_bytes);
+  uint32_t  RX_error_get();
+  uint32_t  int_identity_get();
+  uint32_t  int_pending_status_get();
+  uint32_t  FIFO_enable_status_get();
+      void  auto_RTS_auto_CTS_control(uint32_t auto_cts_control, uint32_t auto_rts_control);
+      void  special_char_detect_control(uint32_t control_flag);
+      void  software_flow_ctrl_opt_set(uint32_t sw_flow_ctrl);
+      void  pulse_shaping_control(uint32_t shape_control);
+      void  module_reset();
+      void  idle_mode_configure(uint32_t mode_flag);
+      void  wakeup_control(uint32_t control_flag);
+      void  auto_idle_mode_control(uint32_t mode_flag);
+      void  flow_ctrl_trig_lvl_config(uint32_t rts_halt_flag, uint32_t rts_start_flag);
+      void  XON1XOFF1_val_program(uint8_t xon1_value, uint8_t xoff1_value);
+      void  XON2XOFF2_val_program(uint8_t xon2_value, uint8_t xoff2_value);
+      void  XON_any_feature_control(uint32_t control_flag);
+      void  loopback_mode_control(uint32_t control_flag);
+      void  modem_control_set(uint32_t mode_flag);
+      void  modem_control_clear(uint32_t mode_flag);
+  uint32_t  modem_ctatus_get();
+  uint32_t  modem_ctatus_change_check();
+      void  resume_operation();
+      void  wakeup_events_enable(uint32_t wakeup_flag);
+      void  wakeup_events_disable(uint32_t wakeup_flag);
+      void  FIFO_trig_lvl_gran_control(uint32_t rx_FIFO_gran_ctrl, uint32_t tx_FIFO_gran_ctrl);
+      void  DSR_interrupt_control(uint32_t control_flag);
+      void  TX_empty_int_control(uint32_t control_flag);
+      void  RXCTSDSR_wakeup_configure(uint32_t wake_up_flag);
+  uint32_t  RXCTSDSR_transition_status_get();
+      void  DMA_counter_reset_control(uint32_t control_flag);
+  uint32_t  TX_FIFO_full_status_get();
+  uint32_t  TX_FIFO_level_get();
+  uint32_t  RX_FIFO_level_get();
+  uint32_t  autobaud_parity_get();
+  uint32_t  autobaud_word_len_get();
+  uint32_t  autobaud_speed_get();
+      void  scratchpad_reg_write(uint32_t scratch_value);
+  uint32_t  scratchpad_reg_read();
+  uint32_t  module_version_number_get();
+      void  TX_DMA_threshold_control(uint32_t thrs_ctrl_flag);
+      void  TX_DMA_threshold_val_config(uint32_t thrs_value);
+
+private:
+    n_UART::AM335x_UART_Type &m_UART_regs;
+};
+
+#endif // _N_UART_H_

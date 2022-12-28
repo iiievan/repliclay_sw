@@ -2720,6 +2720,12 @@
                 <name>$PROJ_DIR$\src\cppdrivers\INTC.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\cppdrivers\n_UART.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\cppdrivers\n_UART.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\cppdrivers\OS_Timer.h</name>
             </file>
             <file>
