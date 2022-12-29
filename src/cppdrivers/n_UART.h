@@ -267,16 +267,65 @@ namespace n_UART
     { 
         struct 
         {             
-            uint32_t    FIFO_EN         :1;    // bit: 0       (RW) Can be changed only when the baud clock is not running (DLL and DLH cleared to 0). [0x0 = Disables rcv FIFO; 0x1 = Enables rcv FIFO ]
-            uint32_t    RX_FIFO_CLEAR   :1;    // bit: 1       (RW) THR interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    TX_FIFO_CLEAR   :1;    // bit: 2       (RW) Receive stop interrupt  [0x0 = inactive; 0x1 = active ]
-            uint32_t    DMA_MODE        :1;    // bit: 3       (RW) RX overrun interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t    TX_FIFO_TRIG    :2;    // bit: 4,5     Reserved
-            uint32_t    RX_FIFO_TRIG    :2;    // bit: 6,7     (RW) TX status interrupt [0x0 = inactive; 0x1 = active ]
-            uint32_t                    :24;   // bit: 8..32   Reserved  
-        } b;                                   // Structure used for bit access 
-        uint32_t  reg;                         // Type used for register access 
+            uint32_t    FIFO_EN         :1;     // bit: 0       (W) Can be changed only when the baud clock is not running (DLL and DLH cleared to 0). [0x0 = Disables rcv FIFO; 0x1 = Enables rcv FIFO ]
+            uint32_t    RX_FIFO_CLEAR   :1;     // bit: 1       (W) [ 0x0 = No change.; 
+                                                //                    0x1 = Clears the receive FIFO and resets its counter logic to 0. Returns to 0 after clearing FIFO. ]
+            uint32_t    TX_FIFO_CLEAR   :1;     // bit: 2       (W)  [ 0x0 = No change.; 
+                                                //                     0x1 = Clears the transmit FIFO and resets its counter logic to 0. Returns to 0 after clearing FIFO. ]
+            uint32_t    DMA_MODE        :1;     // bit: 3       (W) Can be changed only when the baud clock is not running (DLL and DLH cleared to 0).
+                                                //                    If SCR[0] = 0, this register is considered. [0x0 = DMA_MODE 0 (No DMA).; 
+                                                //                                                                 0x1 = DMA_MODE 1 (UART_NDMA_REQ[0] in TX, UART_NDMA_REQ[1] in RX). ]
+            uint32_t    TX_FIFO_TRIG    :2;     // bit: 4,5     (W) Can be written only if EFR[4] = 1. Sets the trigger level for the TX FIFO: If SCR[6] = 0 and TLR[3] to
+                                                //                  TLR[0] not equal to 0000, TX_FIFO_TRIG is not considered.
+                                                //                  If SCR[6] = 1, TX_FIFO_TRIG is 2 LSB of the trigger level (1 to 63
+                                                //                  on 6 bits) with a granularity of 1.
+                                                //                  If SCR[6] = 0 and TLR[3] to TLR[0] = 0000, then: [ see e_FCR_TX_FIFO_TRIG ]
+            uint32_t    RX_FIFO_TRIG    :2;     // bit: 6,7     (RW) Sets the trigger level for the RX FIFO: If SCR[7] = 0 and TLR[7] to
+                                                //                   TLR[4] not equal to 0000, RX_FIFO_TRIG is not considered.
+                                                //                   If SCR[7] = 1, RX_FIFO_TRIG is 2 LSB of the trigger level (1 to 63
+                                                //                   on 6 bits) with the granularity 1.
+                                                //                   If SCR[7] = 0 and TLR[7] to TLR[4] = 0000, then: [ see e_FCR_RX_FIFO_TRIG ]
+            uint32_t                    :24;    // bit: 8..32   Reserved  
+        } b;                                    // Structure used for bit access 
+        uint32_t  reg;                          // Type used for register access 
     } FCR_reg_t;
+
+    enum e_FCR_BITMASK : uint32_t
+    {
+        FCR_FIFO_EN         = BIT(0),
+        FCR_RX_FIFO_CLEAR   = BIT(1),
+        FCR_TX_FIFO_CLEAR   = BIT(2),
+        FCR_DMA_MODE        = BIT(3),
+        FCR_TX_FIFO_TRIG    = (BIT(4) | BIT(5)),
+        FCR_RX_FIFO_TRIG    = (BIT(6) | BIT(7))
+    };
+
+    constexpr uint32_t FCR_RX_FIFO_CLEAR_SHIFT     = 0x00000001;
+    constexpr uint32_t FCR_TX_FIFO_CLEAR_SHIFT     = 0x00000002;
+    constexpr uint32_t FCR_DMA_MODE_SHIFT          = 0x00000003;
+    constexpr uint32_t FCR_TX_FIFO_TRIG_SHIFT      = 0x00000004;
+    constexpr uint32_t FCR_RX_FIFO_TRIG_SHIFT      = 0x00000006;
+
+    // Values used to choose the path for configuring the DMA Mode.
+    // DMA Mode could be configured either through FCR or SCR.
+    constexpr uint32_t DMA_EN_PATH_FCR = 0x0;             
+    constexpr uint32_t DMA_EN_PATH_SCR = 0x1;             
+
+    enum e_FCR_TX_FIFO_TRIG : uint32_t
+    {
+        FCR_TX_FIFO_TRIG_8CHARS    = 0x0,
+        FCR_TX_FIFO_TRIG_16CHARS   = 0x1,
+        FCR_TX_FIFO_TRIG_32CHARS   = 0x2,
+        FCR_TX_FIFO_TRIG_56CHARS   = 0x3,
+    };
+
+    enum e_FCR_RX_FIFO_TRIG : uint32_t
+    {
+        FCR_RX_FIFO_TRIG_8CHARS    = 0x0,
+        FCR_RX_FIFO_TRIG_16CHARS   = 0x1,
+        FCR_RX_FIFO_TRIG_56CHARS   = 0x2,
+        FCR_RX_FIFO_TRIG_60CHARS   = 0x3,
+    };
 
     /*! @brief        
     *   @details    
@@ -344,6 +393,17 @@ namespace n_UART
         CHL_6_BITS = 0x01,
         CHL_7_BITS = 0x02,
         CHL_8_BITS = 0x03
+    };
+
+    enum e_LCR_BITMASK : uint32_t
+    {
+        LCR_CHAR_LENGTH  = 0x03,
+        LCR_NB_STOP      = BIT(2),
+        LCR_PARITY_EN    = BIT(3),
+        LCR_PARITY_TYPE1 = BIT(4),
+        LCR_PARITY_TYPE2 = BIT(5),
+        LCR_BREAK_EN     = BIT(6),
+        LCR_DIV_EN       = BIT(7)
     };
 
     /*! @brief    Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.    
@@ -952,6 +1012,14 @@ namespace n_UART
         uint32_t  reg;                                      // Type used for register access 
     } SCR_reg_t;
 
+    enum  e_SCR_DMA_MODE : uint32_t
+    {
+        SCR_DMA_MODE_0 = 0x0,   //  no DMA.
+        SCR_DMA_MODE_1 = 0x1,   //  UARTnDMAREQ[0] in TX, UARTnDMAREQ[1] in RX
+        SCR_DMA_MODE_2 = 0x2,   //  UARTnDMAREQ[0] in RX
+        SCR_DMA_MODE_3 = 0x3,   //  UARTnDMAREQ[0] in TX
+    };
+
     /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
     *   @details    Bit 1 is reset only when SCR[4] is reset to 0.
     [reset state = 0x0] */ 
@@ -971,13 +1039,7 @@ namespace n_UART
         uint32_t  reg;                                      // Type used for register access 
     } SSR_reg_t;
 
-    enum  e_SCR_DMA_MODE : uint32_t
-    {
-        SCR_DMA_MODE_0 = 0x0,   //  no DMA.
-        SCR_DMA_MODE_1 = 0x1,   //  UARTnDMAREQ[0] in TX, UARTnDMAREQ[1] in RX
-        SCR_DMA_MODE_2 = 0x2,   //  UARTnDMAREQ[0] in RX
-        SCR_DMA_MODE_3 = 0x3,   //  UARTnDMAREQ[0] in TX
-    };
+
 
     /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.      
     *   @details    In IrDA SIR operation, the BOF length register (EBLR) specifies the number of BOF + xBOFs to transmit. The value
@@ -1232,8 +1294,8 @@ namespace n_UART
             uint32_t    SET_DMA_TX_THRESHOLD       :1;          // bit: 2         (RW) [ 0x0 = Disable use of TX DMA Threshold register. Use 64-TX trigger  as DMA threshold.;
                                                                 //                       0x1 = Enable to set different TX DMA threshold in the TX DMA Threshold register. ]
             uint32_t                               :29;         // bit: 3..32      Reserved  
-        } b;                                        // Structure used for bit access 
-        uint32_t  reg;                              // Type used for register access 
+        } b;                                                    // Structure used for bit access 
+        uint32_t  reg;                                          // Type used for register access 
     } MDR3_reg_t;
 
     /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.    
@@ -1395,7 +1457,7 @@ public:
       void  divisor_latch_disable();
   uint32_t  reg_config_mode_enable(n_UART::e_UART_CONFIG_MODE mode_flag);
       void  reg_conf_mode_restore(uint32_t lcr_reg_value);
-      void  break_ctl(uint32_t break_state);
+      void  break_ctl(bool break_state);
       void  line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag);
       void  parity_mode_set(uint32_t parity_flag);
   uint32_t  parity_mode_get();
@@ -1404,7 +1466,7 @@ public:
       void  DMA_disable();
       void  FIFO_register_write(uint32_t fcr_value);
   uint32_t  enhan_func_enable();
-      void  enhan_func_bit_val_restore(uint32_t enhan_fn_bit_val);
+      void  enhan_func_bit_val_restore(bool enhan_fn_bit_val);
   uint32_t  sub_config_MSRSPR_mode_en();
   uint32_t  sub_config_TCRTLR_mode_en();
   uint32_t  sub_config_XOFF_mode_en();
