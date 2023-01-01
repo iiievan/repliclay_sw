@@ -1373,7 +1373,8 @@ char  AM335x_UART::char_get_non_blocking()
     uint32_t  LCR_reg_value = 0;
         char  ret_val = -1;
 
-    LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);   // Switching to Register Operational Mode of operation.
+    // Switching to Register Operational Mode of operation.
+    LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);
 
     // Checking if the RX FIFO(or RHR) has atleast one byte of data.
     //if(HWREG(baseAdd + UART_LSR) & UART_LSR_RX_FIFO_E)
@@ -1403,7 +1404,8 @@ char  AM335x_UART::char_get()
     uint32_t  LCR_reg_value = 0;
         char  ret_val = 0;
     
-    LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE); // Switching to Register Operational Mode of operation.
+    // Switching to Register Operational Mode of operation.
+    LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);
 
     // Waits indefinitely until a byte arrives in the RX FIFO(or RHR).
     //while(0 == (HWREG(baseAdd + UART_LSR) & UART_LSR_RX_FIFO_E));
@@ -1439,7 +1441,8 @@ int  AM335x_UART::char_get_timeout(uint32_t time_out_val)
     uint32_t LCR_reg_value = 0;
     int ret_val = -1;
     
-    LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);   // Switching to Register Operational Mode of operation.
+    // Switching to Register Operational Mode of operation.
+    LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);
 
     // Wait until either data is not received or the time out value is greater 
     //while((0 == (HWREG(baseAdd + UART_LSR) & UART_LSR_RX_FIFO_E)) && time_out_val)
@@ -1475,17 +1478,19 @@ void  AM335x_UART::char_put(uint8_t byte_tx)
 {
     uint32_t LCR_reg_value = 0;
 
-    /* Switching to Register Operational Mode of operation. */
+    // Switching to Register Operational Mode of operation. 
     LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);
 
-    /*
-    ** Waits indefinitely until the THR and Transmitter Shift Registers are
-    ** empty.
-    */
-    while((UART_LSR_TX_SR_E | UART_LSR_TX_FIFO_E) !=
-          (HWREG(baseAdd + UART_LSR) & (UART_LSR_TX_SR_E | UART_LSR_TX_FIFO_E)));
+    // Waits indefinitely until the THR and Transmitter Shift Registers are empty.
+    //while((UART_LSR_TX_SR_E | UART_LSR_TX_FIFO_E) !=
+    //      (HWREG(baseAdd + UART_LSR) & (UART_LSR_TX_SR_E | UART_LSR_TX_FIFO_E)));
 
-    HWREG(baseAdd + UART_THR) = byte_tx;
+    //HWREG(baseAdd + UART_THR) = byte_tx;
+    
+    while(!m_UART_regs.LSR_UART.b.TXSRE  ||
+          !m_UART_regs.LSR_UART.b.TXFIFOE);
+    
+    m_UART_regs.THR.b.THR = byte_tx;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -1510,8 +1515,8 @@ void  AM335x_UART::char_put(uint8_t byte_tx)
  */
 void  AM335x_UART::FIFO_char_put(uint8_t byte_tx)
 {
-    /* Write the byte to the Transmit Holding Register(or TX FIFO). */
-    HWREG(baseAdd + UART_THR) = byte_tx;
+    //HWREG(baseAdd + UART_THR) = byte_tx;  // Write the byte to the Transmit Holding Register(or TX FIFO).
+    m_UART_regs.THR.b.THR = byte_tx;        // Write the byte to the Transmit Holding Register(or TX FIFO).
 }
 
 /**
@@ -1534,7 +1539,8 @@ void  AM335x_UART::FIFO_char_put(uint8_t byte_tx)
  */
 char  AM335x_UART::FIFO_char_get()
 {
-    return(HWREG(baseAdd + UART_RHR));
+    //return (HWREG(baseAdd + UART_RHR));
+  return  (char)m_UART_regs.RHR.b.RHR;
 }
 
 /**
@@ -1554,15 +1560,16 @@ char  AM335x_UART::FIFO_char_get()
  */
 uint32_t  AM335x_UART::FIFO_write(uint8_t *p_Buf, uint32_t num_tx_bytes)
 {
-    uint32_t lIndex = 0;
+    uint32_t l_index = 0;
 
-    for(lIndex = 0; lIndex < num_tx_bytes; lIndex++)
-    {
-        /* Writing data to the TX FIFO. */
-        HWREG(baseAdd + UART_THR) = *pBuffer++;
+    // Writing data to the TX FIFO.
+    for(l_index = 0; l_index < num_tx_bytes; l_index++)
+    {        
+        //HWREG(baseAdd + UART_THR) = *p_Buf++;
+        m_UART_regs.THR.b.THR = *p_Buf++;
     }
 
-    return lIndex;
+    return l_index;
 }
 
 /**
@@ -1585,15 +1592,21 @@ uint32_t  AM335x_UART::RX_error_get()
 {
     uint32_t LCR_reg_value = 0;
     uint32_t ret_val = 0;
-
-    /* Switching to Register Operational Mode of operation. */
+    
+    // Switching to Register Operational Mode of operation.
     LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);
 
-    ret_val = (HWREG(baseAdd + UART_LSR) & (UART_LSR_RX_FIFO_STS |
-                                           UART_LSR_RX_BI |
-                                           UART_LSR_RX_FE |
-                                           UART_LSR_RX_PE |
-                                           UART_LSR_RX_OE));
+    //ret_val = (HWREG(baseAdd + UART_LSR) & (UART_LSR_RX_FIFO_STS |
+    //                                        UART_LSR_RX_BI |
+    //                                        UART_LSR_RX_FE |
+    //                                        UART_LSR_RX_PE |
+    //                                        UART_LSR_RX_OE));
+    ret_val = (m_UART_regs.LSR_UART.reg & (n_UART::ERR_RX_OVERRUN |
+                                          n_UART::ERR_RX_PARITY |
+                                          n_UART::ERR_RX_FRAMING |
+                                          n_UART::ERR_RX_BRAK_COND |
+                                          n_UART::ERR_RX_FIFO));
+ 
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -1627,11 +1640,12 @@ uint32_t  AM335x_UART::int_identity_get()
 {
     uint32_t LCR_reg_value = 0;
     uint32_t ret_val = 0;
-
-    /* Switching to Register Operational Mode of operation. */
+    
+    // Switching to Register Operational Mode of operation.
     LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);
 
-    ret_val = (HWREG(baseAdd + UART_IIR) & UART_IIR_IT_TYPE);
+    //ret_val = (HWREG(baseAdd + UART_IIR) & UART_IIR_IT_TYPE);
+    ret_val = m_UART_regs.IIR_UART.b.IT_TYPE;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -1648,19 +1662,18 @@ uint32_t  AM335x_UART::int_identity_get()
  * \return UART_INT_PENDING - if servicing an interrupt is still pending\n
  *         UART_N0_INT_PENDING - if there are no interrupts to be serviced\n
  */
-uint32_t  AM335x_UART::int_pending_status_get()
+bool  AM335x_UART::int_pending_status_get()
 {
-    uint32_t ret_val = UART_N0_INT_PENDING;
+    bool ret_val = true;
     uint32_t LCR_reg_value = 0;
 
-    /* Switching to Register Operational Mode of operation. */
+    // Switching to Register Operational Mode of operation.
     LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);
 
-    /* Checking if an Interrupt is pending. */
-    if(!(HWREG(baseAdd + UART_IIR) & UART_IIR_IT_PENDING))
-    {
-        ret_val = UART_INT_PENDING;
-    }
+    // Checking if an Interrupt is pending.
+    //if(!(HWREG(baseAdd + UART_IIR) & UART_IIR_IT_PENDING))
+    if(!m_UART_regs.IIR_UART.b.IT_PENDING)
+        ret_val = false;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -1677,18 +1690,17 @@ uint32_t  AM335x_UART::int_pending_status_get()
  * \return HIGH - if FIFO mode of operation is enabled\n
  *         LOW - if FIFO mode of operation is disabled\n
  */
-uint32_t  AM335x_UART::FIFO_enable_status_get()
+bool  AM335x_UART::FIFO_enable_status_get()
 {
     uint32_t LCR_reg_value = 0;
-    uint32_t ret_val = LOW;
+        bool ret_val = false;
 
-    /* Switching to Register Operational Mode of operation. */
+    // Switching to Register Operational Mode of operation.
     LCR_reg_value = reg_config_mode_enable(n_UART::OPERATIONAL_MODE);
 
-    if(HWREG(baseAdd + UART_IIR) & UART_IIR_FCR_MIRROR)
-    {
-        ret_val = HIGH;
-    }
+    //if(HWREG(baseAdd + UART_IIR) & UART_IIR_FCR_MIRROR)
+    if(m_UART_regs.IIR_UART.b.FCR_MIRROR)
+        ret_val = true;
     
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -1728,13 +1740,17 @@ void  AM335x_UART::auto_RTS_auto_CTS_control(uint32_t auto_cts_control, uint32_t
  
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
     
-    /* Clearing AUTOCTSEN and AUTORTSEN bits in EFR. */
-    HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_AUTO_CTS_EN |
-                                   UART_EFR_AUTO_RTS_EN);
-
-    /* Programming AUTOCTSEN and AUTORTSEN bits in EFR. */
-    HWREG(baseAdd + UART_EFR) |= (auto_cts_control & UART_EFR_AUTO_CTS_EN);
-    HWREG(baseAdd + UART_EFR) |= (auto_rts_control & UART_EFR_AUTO_RTS_EN);
+    // Clearing AUTOCTSEN and AUTORTSEN bits in EFR
+    //HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_AUTO_CTS_EN |
+    //                               UART_EFR_AUTO_RTS_EN);
+    m_UART_regs.EFR.b.AUTOCTSEN = 0;
+    m_UART_regs.EFR.b.AUTORTSEN = 0;
+    
+    // Programming AUTOCTSEN and AUTORTSEN bits in EFR.
+    //HWREG(baseAdd + UART_EFR) |= (auto_cts_control & UART_EFR_AUTO_CTS_EN);
+    //HWREG(baseAdd + UART_EFR) |= (auto_rts_control & UART_EFR_AUTO_RTS_EN);
+    m_UART_regs.EFR.b.AUTOCTSEN = auto_cts_control;
+    m_UART_regs.EFR.b.AUTORTSEN = auto_rts_control;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -1767,10 +1783,12 @@ void  AM335x_UART::special_char_detect_control(uint32_t control_flag)
  
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
 
-    HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_SPECIAL_CHAR_DETECT);
+    //HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_SPECIAL_CHAR_DETECT);
+    m_UART_regs.EFR.b.SPECIALCHARDETECT = 0;
 
-    /* Programming the SPECIALCHARDETECT bit in EFR. */
-    HWREG(baseAdd + UART_EFR) |= (control_flag & UART_EFR_SPECIAL_CHAR_DETECT);
+    // Programming the SPECIALCHARDETECT bit in EFR. 
+    //HWREG(baseAdd + UART_EFR) |= (control_flag & UART_EFR_SPECIAL_CHAR_DETECT);
+    m_UART_regs.EFR.b.SPECIALCHARDETECT = control_flag;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -1805,11 +1823,13 @@ void  AM335x_UART::software_flow_ctrl_opt_set(uint32_t sw_flow_ctrl)
  
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
 
-    /* Clearing the SWFLOWCONTROL field in EFR. */
-    HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_SW_FLOW_CONTROL);
+    // Clearing the SWFLOWCONTROL field in EFR.
+    //HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_SW_FLOW_CONTROL);
+    m_UART_regs.EFR.b.SWFLOWCONTROL = 0;
 
-    /* Configuring the SWFLOWCONTROL field in EFR. */
-    HWREG(baseAdd + UART_EFR) |= (sw_flow_ctrl & UART_EFR_SW_FLOW_CONTROL);
+    // Configuring the SWFLOWCONTROL field in EFR.
+    //HWREG(baseAdd + UART_EFR) |= (sw_flow_ctrl & UART_EFR_SW_FLOW_CONTROL);
+    m_UART_regs.EFR.b.SWFLOWCONTROL = sw_flow_ctrl;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -1834,11 +1854,13 @@ void  AM335x_UART::software_flow_ctrl_opt_set(uint32_t sw_flow_ctrl)
  */
 void  AM335x_UART::pulse_shaping_control(uint32_t shape_control)
 {
-    /* Clearing the UARTPULSE bit in MDR2. */
-    HWREG(baseAdd + UART_MDR2) &= ~(UART_MDR2_UART_PULSE);
+    // Clearing the UARTPULSE bit in MDR2.
+    //HWREG(baseAdd + UART_MDR2) &= ~(UART_MDR2_UART_PULSE);
+    m_UART_regs.MDR2.b.UARTPULSE = 0;
 
-    /* Programming the UARTPULSE bit in MDR2. */
-    HWREG(baseAdd + UART_MDR2) |= (shape_control & UART_MDR2_UART_PULSE);
+    // Programming the UARTPULSE bit in MDR2.
+    //HWREG(baseAdd + UART_MDR2) |= (shape_control & UART_MDR2_UART_PULSE);
+    m_UART_regs.MDR2.b.UARTPULSE = shape_control;
 }
 
 /**
@@ -1855,11 +1877,13 @@ void  AM335x_UART::pulse_shaping_control(uint32_t shape_control)
  */
 void  AM335x_UART::module_reset()
 {
-    /* Performing Software Reset of the module. */
-    HWREG(baseAdd + UART_SYSC) |= (UART_SYSC_SOFTRESET);
+    // Performing Software Reset of the module.
+    //HWREG(baseAdd + UART_SYSC) |= (UART_SYSC_SOFTRESET);
+    m_UART_regs.SYSC.b.SOFTRESET = HIGH;
 
-    /* Wait until the process of Module Reset is complete. */
-    while(!(HWREG(baseAdd + UART_SYSS) & UART_SYSS_RESETDONE));
+    // Wait until the process of Module Reset is complete.
+    //while(!(HWREG(baseAdd + UART_SYSS) & UART_SYSS_RESETDONE));
+    while(!m_UART_regs.SYSS.b.RESETDONE);
 }
 
 /**
@@ -1878,13 +1902,15 @@ void  AM335x_UART::module_reset()
  *
  * \return None
  */
-void  AM335x_UART::idle_mode_configure(uint32_t mode_flag)
+void  AM335x_UART::idle_mode_configure(n_UART::e_IDLEMODE mode_flag)
 {
-    /* Clearing the IDLEMODE field in SYSC. */
-    HWREG(baseAdd + UART_SYSC) &= ~(UART_SYSC_IDLEMODE);
+    // Clearing the IDLEMODE field in SYSC.
+    //HWREG(baseAdd + UART_SYSC) &= ~(UART_SYSC_IDLEMODE);
+    m_UART_regs.SYSC.b.IDLEMODE = 0x0;
 
-    /* Programming the IDLEMODE field in SYSC. */
-    HWREG(baseAdd + UART_SYSC) |= (mode_flag & UART_SYSC_IDLEMODE);
+    // Programming the IDLEMODE field in SYSC.
+    //HWREG(baseAdd + UART_SYSC) |= (mode_flag & UART_SYSC_IDLEMODE);
+    m_UART_regs.SYSC.b.IDLEMODE = mode_flag;
 }
 
 /**
@@ -1903,11 +1929,13 @@ void  AM335x_UART::idle_mode_configure(uint32_t mode_flag)
  */
 void  AM335x_UART::wakeup_control(uint32_t control_flag)
 {
-    /* Clearing the ENAWAKEUP bit in SYSC register. */
-    HWREG(baseAdd + UART_SYSC) &= ~(UART_SYSC_ENAWAKEUP);
+    // Clearing the ENAWAKEUP bit in SYSC register.
+    //HWREG(baseAdd + UART_SYSC) &= ~(UART_SYSC_ENAWAKEUP);
+    m_UART_regs.SYSC.b.ENAWAKEUP = 0;
 
-    /* Programming the ENAWAKEUP feature in SYSC register. */
-    HWREG(baseAdd + UART_SYSC) |= (control_flag & UART_SYSC_ENAWAKEUP);
+    // Programming the ENAWAKEUP feature in SYSC register.
+    //HWREG(baseAdd + UART_SYSC) |= (control_flag & UART_SYSC_ENAWAKEUP);
+    m_UART_regs.SYSC.b.ENAWAKEUP = 0;
 }
 
 /**
@@ -1926,11 +1954,13 @@ void  AM335x_UART::wakeup_control(uint32_t control_flag)
  */
 void  AM335x_UART::auto_idle_mode_control(uint32_t mode_flag)
 {
-    /* Clearing the AUTOIDLE bit in SYSC register. */
-    HWREG(baseAdd + UART_SYSC) &= ~(UART_SYSC_AUTOIDLE);
+    // Clearing the AUTOIDLE bit in SYSC register.
+    //HWREG(baseAdd + UART_SYSC) &= ~(UART_SYSC_AUTOIDLE);
+    m_UART_regs.SYSC.b.AUTOIDLE = 0;
 
-    /* Programming the AUTOIDLE bit in SYSC register. */
-    HWREG(baseAdd + UART_SYSC) |= (mode_flag & UART_SYSC_AUTOIDLE);
+    // Programming the AUTOIDLE bit in SYSC register.
+    //HWREG(baseAdd + UART_SYSC) |= (mode_flag & UART_SYSC_AUTOIDLE);
+    m_UART_regs.SYSC.b.AUTOIDLE = mode_flag;
 }
 
 
@@ -1968,15 +1998,17 @@ void  AM335x_UART::auto_idle_mode_control(uint32_t mode_flag)
  */
 void  AM335x_UART::flow_ctrl_trig_lvl_config(uint32_t rts_halt_flag, uint32_t rts_start_flag)
 {
-    unsigned tcrValue = 0;
+    //uint32_t tcr_value = 0;
 
-    tcrValue = rts_halt_flag & UART_TCR_RX_FIFO_TRIG_HALT;
-    tcrValue |= (rts_start_flag <<
-                 UART_TCR_RX_FIFO_TRIG_START_SHIFT) &
-                 UART_TCR_RX_FIFO_TRIG_START;
+    //tcr_value = rts_halt_flag & n_UART::TCR_RX_FIFO_TRIG_HALT;
+    //tcr_value |= (rts_start_flag <<
+    //              n_UART::TCR_RX_FIFO_TRIG_START_SHIFT) &
+    //              n_UART::TCR_RX_FIFO_TRIG_START;
 
-    /* Writing to TCR register. */
-    HWREG(baseAdd + UART_TCR) = tcrValue;
+    // Writing to TCR register.
+    //HWREG(baseAdd + UART_TCR) = tcr_value;
+    m_UART_regs.TCR.b.RXFIFOTRIGHALT = rts_halt_flag;
+    m_UART_regs.TCR.b.RXFIFOTRIGSTART = rts_start_flag;
 }
 
 /**
@@ -1993,11 +2025,13 @@ void  AM335x_UART::flow_ctrl_trig_lvl_config(uint32_t rts_halt_flag, uint32_t rt
  */
 void  AM335x_UART::XON1XOFF1_val_program(uint8_t xon1_value, uint8_t xoff1_value)
 {
-    /* Programming the XON1 register. */
-    HWREG(baseAdd + UART_XON1_ADDR1) = xon1_value;
+    // Programming the XON1 register
+    //HWREG(baseAdd + UART_XON1_ADDR1) = xon1_value;
+    m_UART_regs.XON1_ADDR1.b.XONWORD1 = xon1_value;
         
-    /* Programming the XOFF1 register. */
-    HWREG(baseAdd + UART_XOFF1) = xoff1_value;
+    // Programming the XOFF1 register. 
+    //HWREG(baseAdd + UART_XOFF1) = xoff1_value;
+    m_UART_regs.XOFF1.b.XOFFWORD1 = xoff1_value;
 }
 
 /**
@@ -2015,11 +2049,13 @@ void  AM335x_UART::XON1XOFF1_val_program(uint8_t xon1_value, uint8_t xoff1_value
  */
 void  AM335x_UART::XON2XOFF2_val_program(uint8_t xon2_value, uint8_t xoff2_value)
 {
-    /* Programming the XON2 register. */
-    HWREG(baseAdd + UART_XON2_ADDR2) = xon2_value;
+    // Programming the XON2 register.
+    //HWREG(baseAdd + UART_XON2_ADDR2) = xon2_value;
+    m_UART_regs.XON2_ADDR2.b.XONWORD2 = xon2_value;
 
-    /* Programming the XOFF2 register. */
-    HWREG(baseAdd + UART_XOFF2) = xoff2_value;
+    // Programming the XOFF2 register. */
+    //HWREG(baseAdd + UART_XOFF2) = xoff2_value;
+    m_UART_regs.XOFF2.b.XOFFWORD2 = xoff2_value;
 }
 
 
@@ -2049,15 +2085,19 @@ void  AM335x_UART::XON_any_feature_control(uint32_t control_flag)
 
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
 
-    /* Collecting the value of EFR[4] and later setting the same to 1. */
-    enhan_fn_bit_val = (HWREG(baseAdd + UART_EFR) & UART_EFR_ENHANCED_EN);
-    HWREG(baseAdd + UART_EFR) |= UART_EFR_ENHANCED_EN;
+    // Collecting the value of EFR[4] and later setting the same to 1.
+    //enhan_fn_bit_val = (HWREG(baseAdd + UART_EFR) & UART_EFR_ENHANCED_EN);
+    //HWREG(baseAdd + UART_EFR) |= UART_EFR_ENHANCED_EN;
+    enhan_fn_bit_val = m_UART_regs.EFR.b.ENHANCEDEN;
+    m_UART_regs.EFR.b.ENHANCEDEN = HIGH;
 
-    /* Clearing the XONEN bit in MCR. */
-    HWREG(baseAdd + UART_MCR) &= ~(UART_MCR_XON_EN);
+    // Clearing the XONEN bit in MCR.
+    //HWREG(baseAdd + UART_MCR) &= ~(UART_MCR_XON_EN);
+    m_UART_regs.MCR.b.XONEN = 0;
 
-    /* Programming the XONEN bit in MCR. */
-    HWREG(baseAdd + UART_MCR) |= (control_flag & UART_MCR_XON_EN);
+    // Programming the XONEN bit in MCR.
+    //HWREG(baseAdd + UART_MCR) |= (control_flag & UART_MCR_XON_EN);
+    m_UART_regs.MCR.b.XONEN = control_flag;
 
     // Restoring the value of EFR[4] to its original value.
     //HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_ENHANCED_EN);
@@ -2086,11 +2126,13 @@ void  AM335x_UART::XON_any_feature_control(uint32_t control_flag)
  */
 void  AM335x_UART::loopback_mode_control(uint32_t control_flag)
 {
-    /* Clearing the LOOPBACKEN bit in MCR. */
-    HWREG(baseAdd + UART_MCR) &= ~(UART_MCR_LOOPBACK_EN);
+    // Clearing the LOOPBACKEN bit in MCR.
+    //HWREG(baseAdd + UART_MCR) &= ~(UART_MCR_LOOPBACK_EN);
+    m_UART_regs.MCR.b.LOOPBACKEN = 0;
 
-    /* Programming the LOOPBACKEN bit in MCR. */
-    HWREG(baseAdd + UART_MCR) |= (control_flag & UART_MCR_LOOPBACK_EN);
+    // Programming the LOOPBACKEN bit in MCR.
+    //HWREG(baseAdd + UART_MCR) |= (control_flag & UART_MCR_LOOPBACK_EN);
+    m_UART_regs.MCR.b.LOOPBACKEN = control_flag;
 }
 
 /**
@@ -2114,11 +2156,16 @@ void  AM335x_UART::loopback_mode_control(uint32_t control_flag)
  */
 void  AM335x_UART::modem_control_set(uint32_t mode_flag)
 {
-    /* Programming the specified bits of MCR. */
-    HWREG(baseAdd + UART_MCR) |= (mode_flag & (UART_MCR_CD_STS_CH |
-                                              UART_MCR_RI_STS_CH |
-                                              UART_MCR_RTS |
-                                              UART_MCR_DTR));
+    // Programming the specified bits of MCR.
+    //HWREG(baseAdd + UART_MCR) |= (mode_flag & (UART_MCR_CD_STS_CH |
+    //                                         UART_MCR_RI_STS_CH |
+    //                                         UART_MCR_RTS |
+    //                                         UART_MCR_DTR));
+  
+    m_UART_regs.MCR.reg |= (mode_flag & (n_UART::MODEM_DTR |
+                                         n_UART::MODEM_RTS |
+                                         n_UART::MODEM_RISTSCH |
+                                         n_UART::MODEM_CDSTSCH));    
  
 }
 
@@ -2144,11 +2191,15 @@ void  AM335x_UART::modem_control_set(uint32_t mode_flag)
  */
 void  AM335x_UART::modem_control_clear(uint32_t mode_flag)
 {
-    /* Clearing the specified bits in MCR. */
-    HWREG(baseAdd + UART_MCR) &= ~(mode_flag & (UART_MCR_CD_STS_CH |
-                                               UART_MCR_RI_STS_CH |
-                                               UART_MCR_RTS |
-                                               UART_MCR_DTR));
+    // Clearing the specified bits in MCR.
+    //HWREG(baseAdd + UART_MCR) &= ~(mode_flag & (UART_MCR_CD_STS_CH |
+    //                                           UART_MCR_RI_STS_CH |
+    //                                           UART_MCR_RTS |
+    //                                           UART_MCR_DTR));
+    m_UART_regs.MCR.reg &= ~(mode_flag & (n_UART::MODEM_DTR |
+                                          n_UART::MODEM_RTS |
+                                          n_UART::MODEM_RISTSCH |
+                                          n_UART::MODEM_CDSTSCH));
 }
 
 /**
@@ -2169,16 +2220,17 @@ void  AM335x_UART::modem_control_clear(uint32_t mode_flag)
  *         - UART_CTS_VALUE - indicating CTSn line is active(low)\n
  */
 uint32_t  AM335x_UART::modem_ctatus_get()
-{
-    /*
-    ** Reading MSR[7:4] bits. These values indicate the complement of the
-    ** signal levels on the Modem input lines.
-    */
-
-    return(HWREG(baseAdd + UART_MSR) & (UART_MSR_NCD_STS |
-                                        UART_MSR_NRI_STS |
-                                        UART_MSR_NDSR_STS |
-                                        UART_MSR_NCTS_STS));
+{    
+    // Reading MSR[7:4] bits. These values indicate the complement of the
+    // signal levels on the Modem input lines.
+    //return(HWREG(baseAdd + UART_MSR) & (UART_MSR_NCD_STS |
+    //                                    UART_MSR_NRI_STS |
+    //                                    UART_MSR_NDSR_STS |
+    //                                    UART_MSR_NCTS_STS));
+    return(m_UART_regs.MSR.reg & (n_UART::BIT_NCD_STS |
+                                  n_UART::BIT_NRI_STS |
+                                  n_UART::BIT_NDSR_STS |
+                                  n_UART::BIT_NCTS_STS));
 }
 
 /**
@@ -2201,14 +2253,17 @@ uint32_t  AM335x_UART::modem_ctatus_get()
  */
 uint32_t  AM335x_UART::modem_ctatus_change_check()
 {
-    /*
-    ** Reading MSR[3:0] bits that indicate the change of state of Modem signal
-    ** lines.
-    */
-    return(HWREG(baseAdd + UART_MSR) & (UART_MSR_DCD_STS |
-                                        UART_MSR_RI_STS |
-                                        UART_MSR_DSR_STS |
-                                        UART_MSR_CTS_STS));
+
+    // Reading MSR[3:0] bits that indicate the change of state of Modem signal
+    // lines.
+    //return(HWREG(baseAdd + UART_MSR) & (UART_MSR_DCD_STS |
+    //                                    UART_MSR_RI_STS |
+    //                                    UART_MSR_DSR_STS |
+    //                                    UART_MSR_CTS_STS));
+    return(m_UART_regs.MSR.reg & (n_UART::BIT_DCD_STS |
+                                  n_UART::BIT_RI_STS |
+                                  n_UART::BIT_DSR_STS |
+                                  n_UART::BIT_CTS_STS));
 }
 
 /**
@@ -2223,9 +2278,10 @@ uint32_t  AM335x_UART::modem_ctatus_change_check()
  *         Clearing these flags would resume the halted operation.
  */
 void  AM335x_UART::resume_operation()
-{
-    /* Dummy read of RESUME register. */
-    HWREG(baseAdd + UART_RESUME);
+{   
+    // Dummy read of RESUME register.
+    //HWREG(baseAdd + UART_RESUME);
+    uint8_t resume_read = m_UART_regs.RESUME.b.RESUME;
 }
 
 
@@ -2260,16 +2316,26 @@ void  AM335x_UART::resume_operation()
  */
 void  AM335x_UART::wakeup_events_enable(uint32_t wakeup_flag)
 {
-    /* Programming the Wake-Up configuration fields in WER. */
-    HWREG(baseAdd + UART_WER) |= (wakeup_flag &
-                                  (UART_WER_EVENT_7_TX_WAKEUP_EN |
-                                   UART_WER_EVENT_6_RECEIVER_LINE_STATUS_INTERRUPT |
-                                   UART_WER_EVENT_5_RHR_INTERRUPT |
-                                   UART_WER_EVENT_4_RX_ACTIVITY |
-                                   UART_WER_EVENT_3_DCD_CD_ACTIVITY |
-                                   UART_WER_EVENT_2_RI_ACTIVITY |
-                                   UART_WER_EVENT_1_DSR_ACTIVITY |
-                                   UART_WER_EVENT_0_CTS_ACTIVITY));
+    // Programming the Wake-Up configuration fields in WER.
+    //HWREG(baseAdd + UART_WER) |= (wakeup_flag &
+    //                              (UART_WER_EVENT_7_TX_WAKEUP_EN |
+    //                               UART_WER_EVENT_6_RECEIVER_LINE_STATUS_INTERRUPT |
+    //                               UART_WER_EVENT_5_RHR_INTERRUPT |
+    //                               UART_WER_EVENT_4_RX_ACTIVITY |
+    //                               UART_WER_EVENT_3_DCD_CD_ACTIVITY |
+    //                               UART_WER_EVENT_2_RI_ACTIVITY |
+    //                               UART_WER_EVENT_1_DSR_ACTIVITY |
+    //                               UART_WER_EVENT_0_CTS_ACTIVITY));
+    m_UART_regs.WER.reg |= (wakeup_flag &
+                            (n_UART::EVENT_7_TX_WAKEUP_EN |
+                             n_UART::EVENT_6_RECEIVER_LINE_STATUS_INTERRUPT |
+                             n_UART::EVENT_5_RHR_INTERRUPT |
+                             n_UART::EVENT_4_RX_ACTIVITY |
+                             n_UART::EVENT_3_DCD_CD_ACTIVITY |
+                             n_UART::EVENT_2_RI_ACTIVITY |
+                             n_UART::EVENT_1_DSR_ACTIVITY |
+                             n_UART::EVENT_0_CTS_ACTIVITY));
+  
 }
 
 /**
@@ -2303,16 +2369,25 @@ void  AM335x_UART::wakeup_events_enable(uint32_t wakeup_flag)
  */
 void  AM335x_UART::wakeup_events_disable(uint32_t wakeup_flag)
 {
-    /* Programming the Wake-Up configuration fields in WER. */
-    HWREG(baseAdd + UART_WER) &= ~(wakeup_flag &
-                                   (UART_WER_EVENT_7_TX_WAKEUP_EN |
-                                    UART_WER_EVENT_6_RECEIVER_LINE_STATUS_INTERRUPT |
-                                    UART_WER_EVENT_5_RHR_INTERRUPT |
-                                    UART_WER_EVENT_4_RX_ACTIVITY |
-                                    UART_WER_EVENT_3_DCD_CD_ACTIVITY |
-                                    UART_WER_EVENT_2_RI_ACTIVITY |
-                                    UART_WER_EVENT_1_DSR_ACTIVITY |
-                                    UART_WER_EVENT_0_CTS_ACTIVITY));
+    // Programming the Wake-Up configuration fields in WER.
+    //HWREG(baseAdd + UART_WER) &= ~(wakeup_flag &
+    //                               (UART_WER_EVENT_7_TX_WAKEUP_EN |
+    //                                UART_WER_EVENT_6_RECEIVER_LINE_STATUS_INTERRUPT |
+    //                                UART_WER_EVENT_5_RHR_INTERRUPT |
+    //                                UART_WER_EVENT_4_RX_ACTIVITY |
+    //                                UART_WER_EVENT_3_DCD_CD_ACTIVITY |
+    //                                UART_WER_EVENT_2_RI_ACTIVITY |
+    //                                UART_WER_EVENT_1_DSR_ACTIVITY |
+    //                                UART_WER_EVENT_0_CTS_ACTIVITY));
+     m_UART_regs.WER.reg &= ~(wakeup_flag &
+                              (n_UART::EVENT_7_TX_WAKEUP_EN |
+                               n_UART::EVENT_6_RECEIVER_LINE_STATUS_INTERRUPT |
+                               n_UART::EVENT_5_RHR_INTERRUPT |
+                               n_UART::EVENT_4_RX_ACTIVITY |
+                               n_UART::EVENT_3_DCD_CD_ACTIVITY |
+                               n_UART::EVENT_2_RI_ACTIVITY |
+                               n_UART::EVENT_1_DSR_ACTIVITY |
+                               n_UART::EVENT_0_CTS_ACTIVITY));
 }
 
 
@@ -2342,15 +2417,19 @@ void  AM335x_UART::wakeup_events_disable(uint32_t wakeup_flag)
  */
  void  AM335x_UART::FIFO_trig_lvl_gran_control(uint32_t rx_FIFO_gran_ctrl, uint32_t tx_FIFO_gran_ctrl)
 {
-    /* Clearing the RXTRIGGRANU1 and TXTRIGGRANU1 bits in SCR. */
-    HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_RX_TRIG_GRANU1 |
-                                   UART_SCR_TX_TRIG_GRANU1);
+    // Clearing the RXTRIGGRANU1 and TXTRIGGRANU1 bits in SCR.
+    //HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_RX_TRIG_GRANU1 |
+    //                               UART_SCR_TX_TRIG_GRANU1);
+    m_UART_regs.SCR.b.RXTRIGGRANU1 = 0;
+    m_UART_regs.SCR.b.TXTRIGGRANU1 = 0;
+    
+    // Programming the RXTRIGGRANU1 bit in SCR.
+    //HWREG(baseAdd + UART_SCR) |= (rx_FIFO_gran_ctrl & UART_SCR_RX_TRIG_GRANU1);
+    m_UART_regs.SCR.b.RXTRIGGRANU1 = rx_FIFO_gran_ctrl;
 
-    /* Programming the RXTRIGGRANU1 bit in SCR. */
-    HWREG(baseAdd + UART_SCR) |= (rx_FIFO_gran_ctrl & UART_SCR_RX_TRIG_GRANU1);
-
-    /* Programming the TXTRIGGRANU1 bit in SCR. */
-    HWREG(baseAdd + UART_SCR) |= (tx_FIFO_gran_ctrl & UART_SCR_TX_TRIG_GRANU1);
+    // Programming the TXTRIGGRANU1 bit in SCR.
+    //HWREG(baseAdd + UART_SCR) |= (tx_FIFO_gran_ctrl & UART_SCR_TX_TRIG_GRANU1);
+    m_UART_regs.SCR.b.TXTRIGGRANU1 = tx_FIFO_gran_ctrl;
 }
 
 /**
@@ -2369,9 +2448,12 @@ void  AM335x_UART::wakeup_events_disable(uint32_t wakeup_flag)
  */
 void  AM335x_UART::DSR_interrupt_control(uint32_t control_flag)
 {
-    HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_DSR_IT);
-    /* Programming the DSRIT bit in SCR. */
-    HWREG(baseAdd + UART_SCR) |= (control_flag & UART_SCR_DSR_IT);
+    //HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_DSR_IT);
+    m_UART_regs.SCR.b.DSRIT = 0;
+    
+    // Programming the DSRIT bit in SCR.
+    //HWREG(baseAdd + UART_SCR) |= (control_flag & UART_SCR_DSR_IT);
+    m_UART_regs.SCR.b.DSRIT = control_flag;
 }
 
 /**
@@ -2395,11 +2477,13 @@ void  AM335x_UART::DSR_interrupt_control(uint32_t control_flag)
  */
 void  AM335x_UART::TX_empty_int_control(uint32_t control_flag)
 {
-    /* Clearing the TXEMPTYCTLIT bit in SCR. */
-    HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_TX_EMPTY_CTL_IT);
+    // Clearing the TXEMPTYCTLIT bit in SCR.
+    //HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_TX_EMPTY_CTL_IT);
+    m_UART_regs.SCR.b.TXEMPTYCTLIT = 0;
 
-    /* Programming the TXEMPTYCTLIT bit in SCR. */
-    HWREG(baseAdd + UART_SCR) |= (control_flag & UART_SCR_TX_EMPTY_CTL_IT);
+    // Programming the TXEMPTYCTLIT bit in SCR.
+    //HWREG(baseAdd + UART_SCR) |= (control_flag & UART_SCR_TX_EMPTY_CTL_IT);
+    m_UART_regs.SCR.b.TXEMPTYCTLIT = control_flag;
 }
 
 
@@ -2423,11 +2507,13 @@ void  AM335x_UART::TX_empty_int_control(uint32_t control_flag)
  */
 void  AM335x_UART::RXCTSDSR_wakeup_configure(uint32_t wake_up_flag)
 {
-    /* Clearing the RXCTSDSRWAKEUPENABLE bit in SCR. */
-    HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_RX_CTS_DSR_WAKE_UP_ENABLE);
+    // Clearing the RXCTSDSRWAKEUPENABLE bit in SCR.
+    //HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_RX_CTS_DSR_WAKE_UP_ENABLE);
+    m_UART_regs.SCR.b.RXCTSDSRWAKEUPENABLE = 0;
 
-    /* Programming the RXCTSDSRWAKEUPENABLE bit in SCR. */
-    HWREG(baseAdd + UART_SCR) |= (wake_up_flag & UART_SCR_RX_CTS_DSR_WAKE_UP_ENABLE);
+    // Programming the RXCTSDSRWAKEUPENABLE bit in SCR.
+    //HWREG(baseAdd + UART_SCR) |= (wake_up_flag & UART_SCR_RX_CTS_DSR_WAKE_UP_ENABLE);
+    m_UART_regs.SCR.b.RXCTSDSRWAKEUPENABLE = wake_up_flag;
 }
 
 /**
@@ -2444,7 +2530,8 @@ void  AM335x_UART::RXCTSDSR_wakeup_configure(uint32_t wake_up_flag)
  */
 uint32_t  AM335x_UART::RXCTSDSR_transition_status_get()
 {
-    return(HWREG(baseAdd + UART_SSR) & UART_SSR_RX_CTS_DSR_WAKE_UP_STS);
+    //return(HWREG(baseAdd + UART_SSR) & UART_SSR_RX_CTS_DSR_WAKE_UP_STS);
+    return (uint32_t)m_UART_regs.SSR.b.RXCTSDSRWAKEUPSTS;
 }
 
 /**
@@ -2463,11 +2550,13 @@ uint32_t  AM335x_UART::RXCTSDSR_transition_status_get()
  */
 void  AM335x_UART::DMA_counter_reset_control(uint32_t control_flag)
 {
-    /* Clearing the DMACOUNTERRST bit in SSR. */
-    HWREG(baseAdd + UART_SSR) &= ~(UART_SSR_DMA_COUNTER_RST);
+    // Clearing the DMACOUNTERRST bit in SSR.
+    //HWREG(baseAdd + UART_SSR) &= ~(UART_SSR_DMA_COUNTER_RST);
+    m_UART_regs.SSR.b.DMACOUNTERRST = 0;
 
-    /* Programming the DMACOUNTERRST bit in SSR. */
-    HWREG(baseAdd + UART_SSR) |= (control_flag &  UART_SSR_DMA_COUNTER_RST);
+    // Programming the DMACOUNTERRST bit in SSR.
+    //HWREG(baseAdd + UART_SSR) |= (control_flag &  UART_SSR_DMA_COUNTER_RST);
+    m_UART_regs.SSR.b.DMACOUNTERRST = control_flag;
 }
 
 /**
@@ -2481,7 +2570,8 @@ void  AM335x_UART::DMA_counter_reset_control(uint32_t control_flag)
  */
 uint32_t  AM335x_UART::TX_FIFO_full_status_get()
 {
-    return (HWREG(baseAdd + UART_SSR) & UART_SSR_TX_FIFO_FULL);
+    //return (HWREG(baseAdd + UART_SSR) & UART_SSR_TX_FIFO_FULL);
+    return (uint32_t)m_UART_regs.SSR.b.TXFIFOFULL;
 }
 
 /**
@@ -2493,7 +2583,8 @@ uint32_t  AM335x_UART::TX_FIFO_full_status_get()
  */
 uint32_t  AM335x_UART::TX_FIFO_level_get()
 {
-    return(HWREG(baseAdd + UART_TXFIFO_LVL));
+    //return(HWREG(baseAdd + UART_TXFIFO_LVL));
+    return (uint32_t)m_UART_regs.TXFIFO_LVL.reg;
 }
 
 /**
@@ -2505,7 +2596,8 @@ uint32_t  AM335x_UART::TX_FIFO_level_get()
  */
 uint32_t  AM335x_UART::RX_FIFO_level_get()
 {
-    return(HWREG(baseAdd + UART_RXFIFO_LVL));
+    //return(HWREG(baseAdd + UART_RXFIFO_LVL));
+    return (uint32_t)m_UART_regs.RXFIFO_LVL.reg;
 }
 
 /**
@@ -2534,7 +2626,8 @@ uint32_t  AM335x_UART::autobaud_parity_get()
 
     reg_config_mode_enable(n_UART::CONFIG_MODE_A);  // Switching to Configuration Mode A of operation.
 
-    ret_val = (HWREG(baseAdd + UART_UASR) & UART_UASR_PARITY_TYPE);
+    //ret_val = (HWREG(baseAdd + UART_UASR) & UART_UASR_PARITY_TYPE);
+      ret_val = m_UART_regs.UASR.b.PARITYTYPE;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -2562,10 +2655,11 @@ uint32_t  AM335x_UART::autobaud_word_len_get()
 
     reg_config_mode_enable(n_UART::CONFIG_MODE_A);  // Switching to Configuration Mode A of operation.
 
-    ret_val = (HWREG(baseAdd + UART_UASR) & UART_UASR_BIT_BY_CHAR);
+    //ret_val = (HWREG(baseAdd + UART_UASR) & UART_UASR_BIT_BY_CHAR);
+      ret_val = m_UART_regs.UASR.b.BITBYCHAR;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
-     m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
+      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
 
     return ret_val;
 }
@@ -2599,7 +2693,8 @@ uint32_t  AM335x_UART::autobaud_speed_get()
 
     reg_config_mode_enable(n_UART::CONFIG_MODE_A);  // Switching to Configuration Mode A of operation.
 
-    ret_val = (HWREG(baseAdd + UART_UASR) & UART_UASR_SPEED);
+    //ret_val = (HWREG(baseAdd + UART_UASR) & UART_UASR_SPEED);
+      ret_val = m_UART_regs.UASR.b.SPEED;
 
     //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
      m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
@@ -2619,9 +2714,11 @@ uint32_t  AM335x_UART::autobaud_speed_get()
  */
 void  AM335x_UART::scratchpad_reg_write(uint32_t scratch_value)
 {
-    HWREG(baseAdd + UART_SPR) &= ~(UART_SPR_SPR_WORD);
-    /* Programming the SPR_WORD field of SPR. */
-    HWREG(baseAdd + UART_SPR) |= (scratch_value & UART_SPR_SPR_WORD);
+    //HWREG(baseAdd + UART_SPR) &= ~(UART_SPR_SPR_WORD);
+    m_UART_regs.SPR.b.SPR_WORD = 0;
+    
+    // Programming the SPR_WORD field of SPR
+    m_UART_regs.SPR.b.SPR_WORD = scratch_value;
 }
 
 /**
@@ -2633,7 +2730,8 @@ void  AM335x_UART::scratchpad_reg_write(uint32_t scratch_value)
  */
 uint32_t  AM335x_UART::scratchpad_reg_read()
 {
-    return (HWREG(baseAdd + UART_SPR) & UART_SPR_SPR_WORD);
+    //return (HWREG(baseAdd + UART_SPR) & UART_SPR_SPR_WORD);
+    return (uint32_t)m_UART_regs.SPR.b.SPR_WORD;
 }
 
 /**
@@ -2647,7 +2745,8 @@ uint32_t  AM335x_UART::scratchpad_reg_read()
  */
 uint32_t  AM335x_UART::module_version_number_get()
 {
-    return (HWREG(baseAdd + UART_MVR) & 0x00FF);
+    //return (HWREG(baseAdd + UART_MVR) & 0x00FF);
+    return (m_UART_regs.MVR.reg & 0x00FF);
 }
 
 
@@ -2671,11 +2770,13 @@ uint32_t  AM335x_UART::module_version_number_get()
  */
 void  AM335x_UART::TX_DMA_threshold_control(uint32_t thrs_ctrl_flag)
 {
-    /* Clearing the SET_TX_DMA_THRESHOLD bit in MDR3 register. */
-    HWREG(baseAdd + UART_MDR3) &= ~(UART_MDR3_SET_DMA_TX_THRESHOLD);
+    // Clearing the SET_TX_DMA_THRESHOLD bit in MDR3 register.
+    //HWREG(baseAdd + UART_MDR3) &= ~(UART_MDR3_SET_DMA_TX_THRESHOLD);
+    m_UART_regs.MDR3.b.SET_DMA_TX_THRESHOLD = 0;
 
-    /* Programming the SET_TX_DMA_THRESHOLD bit in MDR3 register. */
-    HWREG(baseAdd + UART_MDR3) |= (thrs_ctrl_flag & UART_MDR3_SET_DMA_TX_THRESHOLD );
+    // Programming the SET_TX_DMA_THRESHOLD bit in MDR3 register. */
+    //HWREG(baseAdd + UART_MDR3) |= (thrs_ctrl_flag & UART_MDR3_SET_DMA_TX_THRESHOLD );
+    m_UART_regs.MDR3.b.SET_DMA_TX_THRESHOLD = thrs_ctrl_flag;
 }
 
 
@@ -2695,10 +2796,11 @@ void  AM335x_UART::TX_DMA_threshold_control(uint32_t thrs_ctrl_flag)
  */
 void  AM335x_UART::TX_DMA_threshold_val_config(uint32_t thrs_value)
 {
-    /* Clearing the TX_DMA_THRESHOLD field of TX DMA Threshold register. */
-    HWREG(baseAdd + UART_TX_DMA_THRESHOLD) &=
-        ~(UART_TX_DMA_THRESHOLD_TX_DMA_THRESHOLD);
+    // Clearing the TX_DMA_THRESHOLD field of TX DMA Threshold register.
+    //HWREG(baseAdd + UART_TX_DMA_THRESHOLD) &= ~(UART_TX_DMA_THRESHOLD_TX_DMA_THRESHOLD);
+    m_UART_regs.TX_DMA_THRESHOLD.b.TX_DMA_THRESHOLD = 0;
 
-    /* Programming the TX_DMA_THRESHOLD field of TX DMA Threshold register. */
-    HWREG(baseAdd + UART_TX_DMA_THRESHOLD) |=  (thrs_value & UART_TX_DMA_THRESHOLD_TX_DMA_THRESHOLD);
+    // Programming the TX_DMA_THRESHOLD field of TX DMA Threshold register.
+    //HWREG(baseAdd + UART_TX_DMA_THRESHOLD) |=  (thrs_value & UART_TX_DMA_THRESHOLD_TX_DMA_THRESHOLD);
+     m_UART_regs.TX_DMA_THRESHOLD.b.TX_DMA_THRESHOLD = thrs_value;
 }

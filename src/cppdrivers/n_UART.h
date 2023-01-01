@@ -415,7 +415,7 @@ namespace n_UART
         struct 
         {             
             uint32_t    DTR                     :1;         // bit: 0       (RW)  DTR. [0x0 = Force DTR (active-low) output (used in loopback mode) to inactive (high).;
-                                                            //                     0x1 = Force DTR (active-low) output (used in loopback mode) to active (low). ]
+                                                            //                          0x1 = Force DTR (active-low) output (used in loopback mode) to active (low). ]
             uint32_t    RTS                     :1;         // bit: 1       (RW)  In loopback mode, controls MSR[4]. If auto-RTS is enabled, the RTS (active-low) output is controlled by
                                                             //                     hardware flow control.[0x0 = Force RTS (active-low) output to inactive (high).; 
                                                             //                                            0x1 = Force RTS (active-low) output to active (low). ]
@@ -432,6 +432,14 @@ namespace n_UART
         } b;                                                // Structure used for bit access 
         uint32_t  reg;                                      // Type used for register access 
     } MCR_reg_t;
+
+    enum e_MODEM_CTRL_SET : uint32_t
+    {
+        MODEM_DTR     = BIT(0),
+        MODEM_RTS     = BIT(1),
+        MODEM_RISTSCH = BIT(2),
+        MODEM_CDSTSCH = BIT(3)
+    };
 
     /*! @brief    Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.     
     *   @details  In UART mode, XON1 character; in IrDA mode, ADDR1 address 1.  
@@ -547,6 +555,15 @@ namespace n_UART
         uint32_t  reg;                              // Type used for register access 
     } LSR_UART_reg_t;
 
+    enum e_RX_ERRORS : uint32_t
+    {
+        ERR_RX_OVERRUN      = BIT(1),
+        ERR_RX_PARITY       = BIT(2),
+        ERR_RX_FRAMING      = BIT(3),
+        ERR_RX_BRAK_COND    = BIT(4),
+        ERR_RX_FIFO         = BIT(7)
+    };
+
     /*! @brief        Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.
     *   @details      The TCR is accessible only when EFR[4] = 1 and MCR[6] = 1. The transmission control register (TCR) stores the
     *                 receive FIFO threshold levels to start/stop transmission during hardware flow control. Trigger levels from
@@ -567,6 +584,11 @@ namespace n_UART
         } b;                                                // Structure used for bit access 
         uint32_t  reg;                                      // Type used for register access 
     } TCR_reg_t;
+
+constexpr uint32_t TCR_RX_FIFO_TRIG_HALT        = 0x0000000F;
+constexpr uint32_t TCR_RX_FIFO_TRIG_HALT_SHIFT  = 0x00000000;
+constexpr uint32_t TCR_RX_FIFO_TRIG_START       = 0x000000F0;
+constexpr uint32_t TCR_RX_FIFO_TRIG_START_SHIFT = 0x00000004;
 
 
     /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.       
@@ -599,6 +621,18 @@ namespace n_UART
         } b;                                                // Structure used for bit access 
         uint32_t  reg;                                      // Type used for register access 
     } MSR_reg_t;
+
+    enum e_MSR_BITMASK : uint32_t
+    {
+        BIT_CTS_STS  = BIT(0),
+        BIT_DSR_STS  = BIT(1),
+        BIT_RI_STS   = BIT(2),
+        BIT_DCD_STS  = BIT(3),
+        BIT_NCTS_STS = BIT(4),
+        BIT_NDSR_STS = BIT(5),
+        BIT_NRI_STS  = BIT(6),
+        BIT_NCD_STS  = BIT(7)
+    };
 
     /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed      
     *   @details    In UART mode, XOFF1 character.
@@ -1160,6 +1194,18 @@ namespace n_UART
         uint32_t  reg;                                  // Type used for register access 
     } WER_reg_t;
 
+    enum e_WER_EVENTS : uint32_t
+    {
+        EVENT_0_CTS_ACTIVITY    = BIT(0),
+        EVENT_1_DSR_ACTIVITY    = BIT(1),
+        EVENT_2_RI_ACTIVITY     = BIT(2),
+        EVENT_3_DCD_CD_ACTIVITY = BIT(3),
+        EVENT_4_RX_ACTIVITY     = BIT(4),
+        EVENT_5_RHR_INTERRUPT   = BIT(5),
+        EVENT_6_RECEIVER_LINE_STATUS_INTERRUPT = BIT(6),
+        EVENT_7_TX_WAKEUP_EN    = BIT(7)
+    };       
+
     /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.       
     *   @details    Since the consumer IR (CIR) works at modulation rates of 30-56.8 kHz, the 48 MHz clock must be prescaled before
     *               the clock can drive the IR logic. The carrier frequency prescaler register (CFPS) sets the divisor rate to
@@ -1485,14 +1531,14 @@ public:
   uint32_t  FIFO_write(uint8_t *p_Buf, uint32_t num_tx_bytes);
   uint32_t  RX_error_get();
   uint32_t  int_identity_get();
-  uint32_t  int_pending_status_get();
-  uint32_t  FIFO_enable_status_get();
+      bool  int_pending_status_get();
+      bool  FIFO_enable_status_get();
       void  auto_RTS_auto_CTS_control(uint32_t auto_cts_control, uint32_t auto_rts_control);
       void  special_char_detect_control(uint32_t control_flag);
       void  software_flow_ctrl_opt_set(uint32_t sw_flow_ctrl);
       void  pulse_shaping_control(uint32_t shape_control);
       void  module_reset();
-      void  idle_mode_configure(uint32_t mode_flag);
+      void  idle_mode_configure(n_UART::e_IDLEMODE mode_flag);
       void  wakeup_control(uint32_t control_flag);
       void  auto_idle_mode_control(uint32_t mode_flag);
       void  flow_ctrl_trig_lvl_config(uint32_t rts_halt_flag, uint32_t rts_start_flag);
