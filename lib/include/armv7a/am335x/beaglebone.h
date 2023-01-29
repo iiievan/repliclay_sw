@@ -104,6 +104,7 @@ extern void GPIO1PinMuxSetup(unsigned int pinNo);
 extern void GpioPinMuxSetup(unsigned int offsetAddr, unsigned int padConfValue);
 extern void UARTPinMuxSetup(unsigned int instanceNum);
 extern void UART0ModuleClkConfig(void);
+extern void UARTStdioInitExpClk(unsigned int baudRate, unsigned int rxTrigLevel, unsigned int txTrigLevel);
 
 extern void UARTConsolePutc(unsigned char data);
 extern unsigned char UARTConsoleGetc(void);

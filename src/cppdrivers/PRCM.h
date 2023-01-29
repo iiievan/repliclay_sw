@@ -3173,6 +3173,8 @@ public:
                  void  run_I2C0_clk();
                  void  run_I2C1_clk();
                  void  run_I2C2_clk();
+                 
+                 void  run_clk_UART0();
     
 private:
     

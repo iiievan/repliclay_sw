@@ -44,7 +44,11 @@ void init_board(void)
     intc.init();                   // Initializing the ARM Interrupt Controller.
     
     /* Initialize the UART console */
-    ConsoleUtilsInit();
+    //ConsoleUtilsInit();    
+    //UART0ModuleClkConfig();   // Configuring the system clocks for UART0 instance.
+    prcm_module.run_clk_UART0();    
+    UARTPinMuxSetup(0); // Performing the Pin Multiplexing for UART0 instance.
+    UARTStdioInitExpClk(115200, 1, 1);
     ConsoleUtilsSetType(CONSOLE_UART); // Select the console type based on compile time check
     
     os_timer.setup(OS_TIMER_RLD_COUNT);
