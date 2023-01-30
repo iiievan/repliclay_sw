@@ -15,9 +15,11 @@
 #include "OS_Timer.h"
 #include "HS_I2C.h"
 #include "I2C_EEPROM.h"
+#include "n_UART.h"
 #include "error.h"
 #include "cp15.h"
 #include "hal_mmu.h"
+#include "uart_irda_cir.h"
 
 #ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
      OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_1);
@@ -37,24 +39,33 @@ I2C_EEPROM<(32*1024),64> CAT24C256WI(I2C::AM335X_I2C_2, SLAVE_ADDR_CAT24C256, CA
 
 void init_board(void)   
 { 
+    /// Initialize MMU,Cache,Branch prediction etc... ///
     InitMem();                     // Initiate MMU and ... Invoke Cache  
     CP15BranchPredictionEnable();  // Enable Branch Prediction Shit */
  
+    /// Initialize Interrupt controller /// 
     intc.master_IRQ_enable();      // Enable IRQ in CPSR
     intc.init();                   // Initializing the ARM Interrupt Controller.
     
-    /* Initialize the UART console */
-    //ConsoleUtilsInit();    
-    //UART0ModuleClkConfig();   // Configuring the system clocks for UART0 instance.
-    prcm_module.run_clk_UART0();    
-    UARTPinMuxSetup(0); // Performing the Pin Multiplexing for UART0 instance.
-    UARTStdioInitExpClk(115200, 1, 1);
-    ConsoleUtilsSetType(CONSOLE_UART); // Select the console type based on compile time check
+    /// Initialize the UART console /// 
+    prcm_module.run_clk_UART0();                            // Configuring the system clocks for UART0 instance.
+    ctrl_module.UART0_pin_mux_setup();                      // Performing the Pin Multiplexing for UART0 instance.                            
+    uart_0.module_reset();                                  // Performing a module reset.        
+    uart_0.FIFO_configure_no_DMA(1, 1);                     // Performing FIFO configurations.
     
+    uart_0.BAUD_set(115200);                                // Performing Baud Rate settings.
+    uart_0.reg_config_mode_enable(n_UART::CONFIG_MODE_B);   // Switching to Configuration Mode B.
+    uart_0.line_char_config((UART_FRAME_WORD_LENGTH_8 | UART_FRAME_NUM_STB_1), UART_PARITY_NONE);   // Programming the Line Characteristics.        
+    uart_0.divisor_latch_disable();                         // Disabling write access to Divisor Latches.        
+    uart_0.break_ctl(false);                                // Disabling Break Control.
+    uart_0.operating_mode_select(n_UART::MODE_UART_16x);    // Switching to UART16x operating mode.    
+    
+    ConsoleUtilsSetType(CONSOLE_UART);                      // Select the console type based on compile time check
+    
+    /// Initialize the OS-tick timer console /// 
     os_timer.setup(OS_TIMER_RLD_COUNT);
-    //BRDINFO_24LC32A.setup(I2C::F_400KHz); //bus i2c0 presumably burned out on this board
-    CAT24C256WI.setup(I2C::F_400KHz);
     
+    /// Initialize GPIO's ///
     GPIOModuleClkConfig(1);             // Enabling functional clocks for GPIO1 instance.
     GPIOModuleEnable(SOC_GPIO_1_REGS);  // Enabling the GPIO module.
     GPIOModuleReset(SOC_GPIO_1_REGS);   // Resetting the GPIO module. */
@@ -114,3 +125,4 @@ uint32_t board_info_check(uint8_t *board_ver)
         return BOARD_UNKNOWN;
     }
 }
+

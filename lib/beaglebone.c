@@ -76,8 +76,7 @@
 **              INTERNAL FUNCTION DECLARATIONS
 ******************************************************************************/
 
-static void UartFIFOConfigure(unsigned int txTrigLevel, unsigned int rxTrigLevel);
-static void UartBaudRateSet(unsigned int baudRate);
+
 
 /*****************************************************************************
 **                    FUNCTION DEFINITIONS
@@ -500,7 +499,7 @@ void UARTStdioInitExpClk(unsigned int baudRate,
 ** A wrapper function performing FIFO configurations.
 */
 
-static void UartFIFOConfigure(unsigned int txTrigLevel,
+void UartFIFOConfigure(unsigned int txTrigLevel,
                               unsigned int rxTrigLevel)
 {
     unsigned int fifoConfig = 0;
@@ -523,7 +522,7 @@ static void UartFIFOConfigure(unsigned int txTrigLevel,
 ** A wrapper function performing Baud Rate settings.
 */
 
-static void UartBaudRateSet(unsigned int baudRate)
+void UartBaudRateSet(unsigned int baudRate)
 {
     unsigned int divisorValue = 0;
 

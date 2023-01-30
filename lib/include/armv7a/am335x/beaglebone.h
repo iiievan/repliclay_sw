@@ -131,6 +131,8 @@ extern void I2CPinMuxSetup(unsigned int instance);
 extern void I2C1ModuleClkConfig(void);
 extern void I2C0ModuleClkConfig(void);
 
+extern void UartFIFOConfigure(unsigned int txTrigLevel, unsigned int rxTrigLevel);
+extern void UartBaudRateSet(unsigned int baudRate);
 
 #ifdef __cplusplus
 }

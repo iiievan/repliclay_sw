@@ -1847,6 +1847,7 @@ public:
     void  I2C0_pin_mux_setup();
     void  I2C1_pin_mux_setup();
     void  I2C2_pin_mux_setup();
+    void  UART0_pin_mux_setup();
     
 private:
     

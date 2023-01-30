@@ -7,497 +7,51 @@ AM335x_UART::AM335x_UART(n_UART::AM335x_UART_Type *p_uart_regs)
 
 }
 
-/**
- * \brief  This API configures the operating mode for the UART instance.
- *         The different operating modes are:
- *         - UART(16x, 13x, 16x Auto-Baud)\n
- *         - IrDA(SIR, MIR, FIR)\n
- *         - CIR\n
- *         - Disabled state(default state)\n
- *
- * \param   baseAdd   Memory address of the UART instance being used.
- * \param   mode_flag  A value which holds the mode number. This mode  
- *                    number is referred from the MODESELECT field in MDR1.
- *
- * 'mode_flag' can take one of the following values:
- * - UART16x_OPER_MODE - to switch to UART 16x operating mode\n
- * - UART_SIR_OPER_MODE - to swith to IrDA SIR operating mode\n
- * - UART16x_AUTO_BAUD_OPER_MODE - to switch to UART 16x Auto Baud operating
- *   mode\n
- * - UART13x_OPER_MODE - to switch to UART 13x operating mode\n
- * - UART_MIR_OPER_MODE - to switch to IrDA MIR operating mode\n 
- * - UART_FIR_OPER_MODE - to switch to IrDA FIR operating mode\n
- * - UART_CIR_OPER_MODE - to switch to CIR operating mode\n
- * - UART_DISABLED_MODE - to switch to Disabled state\n
- *
- * \return  The mode number in the MODESELECT field of MDR1 before it
- *          was  modified.
- */
-n_UART::e_MODESELECT  AM335x_UART::operating_mode_select(n_UART::e_MODESELECT mode_flag)
-{
-    n_UART::e_MODESELECT op_mode = (n_UART::e_MODESELECT)0;
-
-    /*
-    op_mode = (HWREG(baseAdd + UART_MDR1) & UART_MDR1_MODE_SELECT);
-
-    // Clearing the MODESELECT field in MDR1. 
-    HWREG(baseAdd + UART_MDR1) &= ~(UART_MDR1_MODE_SELECT);
-
-    // Programming the MODESELECT field in MDR1. 
-    HWREG(baseAdd + UART_MDR1) |= (mode_flag & UART_MDR1_MODE_SELECT);
-    */
-    
-    op_mode = (n_UART::e_MODESELECT)m_UART_regs.MDR1.b.MODESELECT;
-    m_UART_regs.MDR1.b.MODESELECT = 0; // Clearing the MODESELECT field in MDR1.
-    m_UART_regs.MDR1.b.MODESELECT = mode_flag; // Programming the MODESELECT field in MDR1.
-    
-    return op_mode;
-}
 
 /**
- * \brief   This API computes the divisor value for the specified operating
- *          mode. Not part of this API, the divisor value returned is written
- *          to the Divisor Latches to configure the Baud Rate.
+ * \brief  This API performs a module reset of the UART module. It also
+ *         waits until the reset process is complete.
  *
- * \param   module_clk        The frequency of the input clock to the UART module
- * \param   mode_flag         A value which represents the current operating mode
- * \param   baud_rate         The required baud rate of communication in bits
- *                           per second(bps)
- * \param   mirOverSampRate  Over-sampling rate for MIR mode.This is applicable
- *                           only when MIR mode of operation is chosen.
- *                           Otherwise, this value is not considered.
- *
- * 'mode_flag' can take one of the following values:\n
- * - UART16x_OPER_MODE - indicating 16x operating mode\n
- * - UART13x_OPER_MODE - indicating 13x operating mode\n 
- * - UART_SIR_OPER_MODE - indicating SIR operating mode\n
- * - UART_MIR_OPER_MODE - indicating MIR operating mode\n
- * - UART_FIR_OPER_MODE - indicating FIR operating mode\n
- *
- * 'mirOverSampRate' can take one of the following values:
- * - UART_MIR_OVERSAMPLING_RATE_41 - for an over-sampling rate of 41\n
- * - UART_MIR_OVERSAMPLING_RATE_42 - for an over-smapling rate of 42\n
- *
- * \return The divisor value computed for the specified mode.
- *
- * \note   Refer to the section in the user guide that specifies the baud rate
- *         computation method to find the supported values of baud rates.
- */
-uint32_t  AM335x_UART::divisor_val_compute(uint32_t module_clk,
-                                           uint32_t baud_rate,
-                                           n_UART::e_MODESELECT  mode_flag,
-                                           uint32_t mir_over_samp_rate)
-{
-    uint32_t divisor_value = 0;
-    
-    /*
-    mode_flag &= UART_MDR1_MODE_SELECT;
-
-    switch(mode_flag)
-    {
-        case UART16x_OPER_MODE:
-        case UART_SIR_OPER_MODE:
-            divisor_value = (module_clk)/(16 * baud_rate);
-            break;
-        case UART13x_OPER_MODE:
-            divisor_value = (module_clk)/(13 * baud_rate);
-            break;        
-        case UART_MIR_OPER_MODE:
-            divisor_value = (module_clk)/(mir_over_samp_rate * baud_rate);
-            break;
-        case UART_FIR_OPER_MODE:
-            divisor_value = 0;
-            break;
-        default:
-            break;
-    }
-    */
-    
-    switch(mode_flag)
-    {
-        case n_UART::MODE_UART_16x:
-        case n_UART::MODE_SIR:
-            divisor_value = (module_clk)/(16 * baud_rate);
-            break;
-        case n_UART::MODE_UART_13x:
-            divisor_value = (module_clk)/(13 * baud_rate);
-            break;        
-        case n_UART::MODE_MIR:
-            divisor_value = (module_clk)/(mir_over_samp_rate * baud_rate);
-            break;
-        case n_UART::MODE_FIR:
-            divisor_value = 0;
-            break;
-        default:
-            break;
-    }
-  
-    return divisor_value;
-}
-
-/**
- * \brief  This API is used to write the specified divisor value to Divisor
- *         Latch registers DLL and DLH.
- *
- * \param  baseAdd       Memory address of the UART instance being used.
- * \param  divisorValue  The 14-bit value whose least 8 bits go to DLL
- *                       and highest 6 bits go to DLH.
- * 
- * \return A concatenated value of DLH and DLL registers(DLH:DLL, a 14-bit 
- *         value) before they are modified in the current API.
- */
-uint32_t  AM335x_UART::divisor_latch_write(uint32_t divisor_value)
-{
-    volatile             uint32_t  enhan_fn_bit_val = 0;
-    volatile             uint32_t  sleep_md_bit_val = 0;
-    volatile             uint32_t  LCR_reg_value    = 0;
-    volatile n_UART::e_MODESELECT  op_mode          = (n_UART::e_MODESELECT)0;
-                         uint32_t  div_reg_val      = 0;
-
- /*   
-    LCR_reg_value = reg_config_mode_enable(UART_REG_CONFIG_MODE_B);   // Switching to Register Configuration Mode B.    
-    enhan_fn_bit_val = HWREG(baseAdd + UART_EFR) & UART_EFR_ENHANCED_EN;   // Collecting the current value of EFR[4] and later setting it.
-    HWREG(baseAdd + UART_EFR) |= UART_EFR_ENHANCED_EN;
-    
-    reg_config_mode_enable(UART_REG_OPERATIONAL_MODE);  // Switching to Register Operational Mode.
-
-    /// Collecting the current value of IER[4](SLEEPMODE bit) and later clearing it.///
-    sleep_md_bit_val = HWREG(baseAdd + UART_IER) & UART_IER_SLEEP_MODE_IT;
-    HWREG(baseAdd + UART_IER) &= ~(UART_IER_SLEEP_MODE_IT);
-    
-    reg_config_mode_enable(UART_REG_CONFIG_MODE_B);     // Switching to Register Configuration Mode B.
-
-    /// Collecting the current value of Divisor Latch Registers. ///
-    div_reg_val = HWREG(baseAdd + UART_DLL) & 0xFF;
-    div_reg_val |= ((HWREG(baseAdd + UART_DLH) & 0x3F) << 8);
-    
-    op_mode = operating_mode_select(UART_MDR1_MODE_SELECT_DISABLED);   // Switch the UART instance to Disabled state.
-    
-    HWREG(baseAdd + UART_DLL) = (divisor_value & 0x00FF);   // Writing to Divisor Latch Low(DLL) register.    
-    HWREG(baseAdd + UART_DLH) = ((divisor_value & 0x3F00) >> 8);    // Writing to Divisor Latch High(DLH) register.    
-    
-    operating_mode_select(op_mode);    // Restoring the Operating Mode of UART.    
-    reg_config_mode_enable(UART_REG_OPERATIONAL_MODE);  // Switching to Register Operational Mode.    
-    HWREG(baseAdd + UART_IER) |= sleep_md_bit_val;     // Restoring the value of IER[4] to its original value.    
-    reg_config_mode_enable(UART_REG_CONFIG_MODE_B); // Switching to Register Configuration Mode B.
-
-    /// Restoring the value of EFR[4] to its original value. ///
-    HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_ENHANCED_EN);
-    HWREG(baseAdd + UART_EFR) |= enhan_fn_bit_val;    
-    HWREG(baseAdd + UART_LCR) = LCR_reg_value;    // Restoring the value of LCR Register.
-*/
-    
-    LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);      // Switching to Register Configuration Mode B.    
-    enhan_fn_bit_val = m_UART_regs.EFR.b.ENHANCEDEN;                    // Collecting the current value of EFR[4] and later setting it.    
-    m_UART_regs.EFR.b.ENHANCEDEN = HIGH;    
-    reg_config_mode_enable(n_UART::OPERATIONAL_MODE);                   // Switching to Register Operational Mode.
-
-    /// Collecting the current value of IER[4](SLEEPMODE bit) and later clearing it.///
-    sleep_md_bit_val = m_UART_regs.IER_UART.b.SLEEPMODE;
-    m_UART_regs.IER_UART.b.SLEEPMODE = 0;        
-    
-    reg_config_mode_enable(n_UART::CONFIG_MODE_B);                      // Switching to Register Configuration Mode B.
-
-    /// Collecting the current value of Divisor Latch Registers. ///
-    div_reg_val = m_UART_regs.DLL.reg & 0xFF;
-    div_reg_val |= ((m_UART_regs.DLH.reg & 0x3F) << 8);
-    
-    op_mode = operating_mode_select(n_UART::MODE_DISABLE);     // Switch the UART instance to Disabled state.
-    
-    m_UART_regs.DLL.reg = (divisor_value & 0x00FF);           // Writing to Divisor Latch Low(DLL) register.    
-    m_UART_regs.DLH.reg = ((divisor_value & 0x3F00) >> 8);    // Writing to Divisor Latch High(DLH) register.    
-    
-    operating_mode_select(op_mode);    // Restoring the Operating Mode of UART.
-    
-    reg_config_mode_enable(n_UART::OPERATIONAL_MODE);         // Switching to Register Operational Mode.    
-    m_UART_regs.IER_UART.b.SLEEPMODE = sleep_md_bit_val;      // Restoring the value of IER[4] to its original value.    
-    reg_config_mode_enable(n_UART::CONFIG_MODE_B);            // Switching to Register Configuration Mode B.
-
-    /// Restoring the value of EFR[4] to its original value. ///
-    m_UART_regs.EFR.b.ENHANCEDEN = LOW;
-    m_UART_regs.EFR.b.ENHANCEDEN = enhan_fn_bit_val;
-    m_UART_regs.LCR.reg = LCR_reg_value;                     // Restoring the value of LCR Register.  
-    
-    return div_reg_val;
-}
-
-/**
- * \brief  This API enables write access to Divisor Latch registers DLL and
- *         DLH.
- *
- * \param  baseAdd   Memory address of the UART instance being used.
- *
- * \return None.
- */
-void  AM335x_UART::divisor_latch_enable()
-{
-    /* Enable access to Divisor Latch registers by setting LCR[7] bit. */
-    // HWREG(baseAdd + UART_LCR) |= (UART_LCR_DIV_EN);
-    m_UART_regs.LCR.b.DIV_EN = HIGH;
-}
-
-/**
- * \brief  This API disables write access to Divisor Latch registers DLL and
- *         DLH.
- *
- * \param  baseAdd   Memory address of the UART instance being used.
+ * \param  baseAdd  Memory address of the UART instance being used.
  *
  * \return None.
  *
- * \note   Disabling write access to Divisor Latch Registers enables access to
- *         MCR, FCR, IER, BLR, EBLR, RHR registers.
+ * \note   This API accesses the System Configuration Register(SYSC) and 
+ *         System Status Register(SYSS) to perform module reset and to 
+ *         wait until the same is complete.
  */
-void  AM335x_UART::divisor_latch_disable()
+void  AM335x_UART::module_reset()
 {
-    /* Disabling access to Divisor Latch registers by clearing LCR[7] bit. */
-    //HWREG(baseAdd + UART_LCR) &= ~(UART_LCR_DIV_EN);
-    m_UART_regs.LCR.b.DIV_EN = LOW;
+    // Performing Software Reset of the module.
+    m_UART_regs.SYSC.b.SOFTRESET = HIGH;
+
+    // Wait until the process of Module Reset is complete.
+    while(!m_UART_regs.SYSS.b.RESETDONE);
 }
-
-
-/**
- * \brief  This API configures the specified Register Configuration mode for
- *         the UART.
- *
- * \param  baseAdd   Memory address of the UART instance being used.
- * \param  mode_flag  This specifies the register configuration mode to be
- *                   enabled.
- *
- * 'mode_flag' can take one of the following values:
- * - UART_REG_CONFIG_MODE_A - to enable Register Configuration Mode A\n
- * - UART_REG_CONFIG_MODE_B - to enable Register Configuration Mode B\n
- * - UART_REG_OPERATIONAL_MODE - to enable Register Operational Mode\n
- *
- * \return The contents of the Line Control Register(LCR) before it was
- *         modified.
- *
- * \note   Since the UART module registers that can be accessed at any time
- *         depends on the value in the Line Control Register(LCR), three
- *         register configuration modes have been defined, each corresponding
- *         to a specific state of the LCR. The three register configuration
- *         modes are:\n
- *         - Configuration Mode A: LCR[7] = 1 and LCR[7:0] != 0xBF.\n
- *         - Configuration Mode B: LCR[7:0] = 0xBF.\n
- *         - Operational Mode    : LCR[7] = 0.\n
- *
- *         Refer to the Register Listing in the UART/IrDA/CIR peripheral
- *         document for more information.\n
- *
- */
-uint32_t  AM335x_UART::reg_config_mode_enable(n_UART::e_UART_CONFIG_MODE mode_flag)
-{
-    volatile uint32_t LCR_reg_value = 0;
+                          
+void AM335x_UART::FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl)
+{    
+    n_UART::SCR_reg_t  cfg_scr = {.reg = 0x0 };
+    n_UART::TLR_reg_t  trigger_lvl_cfg = {.reg = 0x0 };
+    n_UART::FCR_reg_t  cfg_fcr = {.reg = 0x0 }; 
     
-    //LCR_reg_value = HWREG(baseAdd + UART_LCR);    // Preserving the current value of LCR.
-    LCR_reg_value = m_UART_regs.LCR.reg;        // Preserving the current value of LCR.
+    cfg_scr.b.TXTRIGGRANU1 = 0x1;
+    cfg_scr.b.RXTRIGGRANU1 = 0x1;
+    cfg_scr.b.DMAMODECTL   = 0x1;
+    cfg_scr.b.DMAMODE2     = 0x0;
+
+    tx_trig_lvl &= 0x003F;                                             // 'tx_trig_lvl' now has the 6-bit TX Trigger level value.
+    trigger_lvl_cfg.b.TX_FIFO_TRIG_DMA  = (tx_trig_lvl & 0x003C) >> 2; // Collecting the bits tx_trig_lvl[5:2].        
+    cfg_fcr.b.TX_FIFO_TRIG |= (tx_trig_lvl & 0x0003);                  // Collecting the bits tx_trig_lvl[1:0] and writing to 'fcr_value'.
     
-    switch(mode_flag)
-    {
-        case n_UART::CONFIG_MODE_A:
-        case n_UART::CONFIG_MODE_B:
-            //HWREG(baseAdd + UART_LCR) = (mode_flag & 0xFF);
-             m_UART_regs.LCR.reg = (mode_flag & 0xFF);
-        break;
-        case n_UART::OPERATIONAL_MODE:
-            //HWREG(baseAdd + UART_LCR) &= 0x7F;
-            m_UART_regs.LCR.reg &= 0x7F;
-        break;
-
-        default:
-        break;
-    }
-
-    return LCR_reg_value;
-}
-
-
-/**
- * \brief  This API is used to restore the UART to the specified Register
- *         Configuration Mode. 
- *
- * \param  baseAdd      Memory address of the UART instance being used.
- * \param  lcr_reg_value  The value to be loaded to the Line Control Register(LCR).
- *
- * \return None
- *
- * \note   The API UARTRegConfigModeEnable() and the current API are used
- *         hand-in-hand. While UARTRegConfigModeEnable() switches the UART to
- *         the requested operating mode, the current API restores the UART to
- *         that register configuration mode prevalent before
- *         UARTRegConfigModeEnable() was called.
- */
-void  AM335x_UART::reg_conf_mode_restore(uint32_t lcr_reg_value)
-{
-    /* Programming the Line Control Register(LCR). */
-    //HWREG(baseAdd + UART_LCR) = lcr_reg_value;
-    m_UART_regs.LCR.reg = lcr_reg_value;
-}
-
-/**
- * \brief  This API is used to introduce or to remove a Break condition.
- * 
- * \param  baseAdd     Memory address of the UART instance being used.
- * \param  break_state  This specifies whether the break condition should be
- *                     introduced or removed.
- *
- * 'break_state' can take one of the following two values:
- * - UART_BREAK_COND_DISABLE - to disable the Break condition if it has
- *   already been enabled\n
- * - UART_BREAK_COND_ENABLE - to enable the Break condition\n
- *
- * \return None
- *
- * \note  When the Break Condition is imposed, the Transmitter output line TX
- *        goes low to alert the communication terminal.
- */
-void  AM335x_UART::break_ctl(bool break_state)
-{
-    /* Clearing the BREAK_EN bit in LCR. */
-    //HWREG(baseAdd + UART_LCR) &= ~(UART_LCR_BREAK_EN);
-    m_UART_regs.LCR.b.BREAK_EN = 0;
-
-    /* Programming the BREAK_EN bit in LCR. */
-    //HWREG(baseAdd + UART_LCR) |= (break_state & UART_LCR_BREAK_EN);
-    m_UART_regs.LCR.b.BREAK_EN = break_state;
-}
-
-/**
- * \brief  This API configures the Line Characteristics for the
- *         UART instance. The Line Characteristics include:
- *         - Word length per frame\n
- *         - Number of Stop Bits per frame\n
- *         - Parity feature configuration\n
- *
- * \param   baseAdd     Memory address of the UART instance being used.
- * \param   wlen_stb_flag Bit mask value of the bits pertaining to word
- *                      length selection and stop bits selection in LCR.
- * \param   parity_flag  Bit mask value of the bits pertaining to parity
- *                      feature selection in LCR.
- *
- * 'wlen_stb_flag' can take one of the following macros:
- *  - (UART_FRAME_WORD_LENGTH_n | UART_FRAME_NUM_STB_1), where
- *    n = 5,6,7 or 8. -- This signifies that 1 stop bit and
- *    one among 5,6,7 and 8 bits are chosen as the word length
- *    per frame.
- *  - (UART_FRAME_WORD_LENGTH_n | UART_FRAME_NUM_STB_1_5_2), where
- *    n = 5,6,7 or 8. -- This signifies that the word length and
- *    number of stop bits per frame could be one among the below
- *    four choices:
- *    --- WL = 5          NUM_STB = 1.5
- *    --- WL = 6,7 or 8   NUM_STB = 2
- *
- * 'parity_flag' can take one of the following macros:
- *  - (UART_ODD_PARITY) - signifying that odd parity be enabled and the
- *     parity bit be represented in a default manner.\n
- *  - (UART_EVEN_PARITY) - signifying that even parity be enabled and the
- *     parity bit be represented in a default manner.\n
- *  - (UART_PARITY_REPR_1) - signifying that the parity bit be represented
- *     by a logic 1 in the transmitted and received data.\n
- *  - (UART_PARITY_REPR_0) - signifying that the parity bit be represented
- *     by a logic 0 in the transmitted and received data.\n
- *  - (UART_PARITY_NONE) - signifying that no parity be enabled.\n
- *
- * \return  None.
- */ 
-void  AM335x_UART::line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag)
-{
+    rx_trig_lvl &= 0x003F;                                             // 'rx_trig_lvl' now has the 6-bit RX Trigger level value.
+    trigger_lvl_cfg.b.RX_FIFO_TRIG_DMA = (rx_trig_lvl & 0x003C) >> 2;  // Collecting the bits rx_trig_lvl[5:2]. 
+    cfg_fcr.b.RX_FIFO_TRIG = (rx_trig_lvl & 0x0003);                   // Collecting the bits rx_trig_lvl[1:0] and writing to 'fcr_value'.   
     
-    //HWREG(baseAdd + UART_LCR) &= ~(UART_LCR_NB_STOP | UART_LCR_CHAR_LENGTH);                    // Clearing the CHAR_LENGTH and NB_STOP fields in LCR.    
-    //HWREG(baseAdd + UART_LCR) |= (wlen_stb_flag & (UART_LCR_NB_STOP | UART_LCR_CHAR_LENGTH));   // Programming the CHAR_LENGTH and NB_STOP fields in LCR.  
+    cfg_fcr.b.TX_FIFO_CLEAR = 1;
+    cfg_fcr.b.RX_FIFO_CLEAR = 1;
     
-    // Clearing the CHAR_LENGTH and NB_STOP fields in LCR.
-    m_UART_regs.LCR.b.CHAR_LENGTH = 0;
-    m_UART_regs.LCR.b.NB_STOP = 0;
-    // Programming the CHAR_LENGTH and NB_STOP fields in LCR.
-    m_UART_regs.LCR.reg |= (wlen_stb_flag & 
-                            (n_UART::LCR_CHAR_LENGTH | 
-                             n_UART::LCR_NB_STOP));
-      
-    // Clearing the PARITY_EN, PARITY_TYPE1 and PARITY_TYPE2 fields in LCR.
-    //HWREG(baseAdd + UART_LCR) &= ~(UART_LCR_PARITY_TYPE2 |
-    //                               UART_LCR_PARITY_TYPE1 |
-    //                               UART_LCR_PARITY_EN);
-    // Programming the PARITY_EN, PARITY_TYPE1 and PARITY_TYPE2 fields in LCR.
-    //HWREG(baseAdd + UART_LCR) |= (parity_flag & (UART_LCR_PARITY_TYPE2 |
-    //                                             UART_LCR_PARITY_TYPE1 |
-    //                                             UART_LCR_PARITY_EN));
-    
-    // Clearing the PARITY_EN, PARITY_TYPE1 and PARITY_TYPE2 fields in LCR.
-    m_UART_regs.LCR.b.PARITY_EN = 0;
-    m_UART_regs.LCR.b.PARITY_TYPE1 = 0;
-    m_UART_regs.LCR.b.PARITY_TYPE2 = 0;
-    
-    // Programming the PARITY_EN, PARITY_TYPE1 and PARITY_TYPE2 fields in LCR.
-    m_UART_regs.LCR.reg = (parity_flag & 
-                           (n_UART::LCR_PARITY_EN | 
-                            n_UART::LCR_PARITY_TYPE1 |
-                            n_UART::LCR_PARITY_TYPE2));
-}
-
-/**
- * \brief  This API configures the Parity feature for the UART.
- *
- * \param  baseAdd     Memory address of the UART instance being used
- * \param  parity_flag  This specifies the parity configuration to be
- *                     programmed to the Line Control Register(LCR)
- *
- * 'parity_flag' can take one of the following values:
- *  - (UART_ODD_PARITY) - signifying that odd parity be enabled and the parity
- *     bit be represented in a default manner\n
- *  - (UART_EVEN_PARITY) - signifying that even parity be enabled and the
- *     parity bit be represented in a default manner\n
- *  - (UART_ODD_PARITY_REPR_1) - signifying that odd parity be enabled and the
- *     parity bit be represented by a logic 1\n
- *  - (UART_EVEN_PARITY_REPR_0)- signifying that even parity be enabled and the
- *     parity bit be represented by a logic 0\n
- *  - (UART_PARITY_NONE) - signifying that no parity be enabled\n
- *
- * \return None
- */
-void  AM335x_UART::parity_mode_set(uint32_t parity_flag)
-{
-    //HWREG(baseAdd + UART_LCR) &= ~((UART_LCR_PARITY_TYPE2 |
-    //                                UART_LCR_PARITY_TYPE1 |
-    //                                UART_LCR_PARITY_EN));
-    m_UART_regs.LCR.b.PARITY_EN = 0;
-    m_UART_regs.LCR.b.PARITY_TYPE1 = 0;
-    m_UART_regs.LCR.b.PARITY_TYPE2 = 0;
-
-    // Programming the PARITY_TYPE2, PARITY_TYPE1 and PARITY_EN fields of LCR.
-    //HWREG(baseAdd + UART_LCR) |= (parity_flag & (UART_LCR_PARITY_TYPE2 |
-    //                                            UART_LCR_PARITY_TYPE1 |
-    //                                            UART_LCR_PARITY_EN));
-    m_UART_regs.LCR.reg = (parity_flag & 
-                           (n_UART::LCR_PARITY_EN | 
-                            n_UART::LCR_PARITY_TYPE1 |
-                            n_UART::LCR_PARITY_TYPE2));
-}
-
-/**
- * \brief  This API reads the Parity configuration being set in the UART.
- *
- * \param  baseAdd     Memory address of the UART instance being used
- *
- * \return This returs one of the following values:
- *  - (UART_ODD_PARITY) - signifying that odd parity is enabled and the parity
- *     bit is represented in a default manner\n
- *  - (UART_EVEN_PARITY) - signifying that even parity is enabled and the
- *     parity bit is represented in a default manner\n
- *  - (UART_ODD_PARITY_REPR_1) - signifying that odd parity is enabled and the
- *     parity bit is represented by a logic 1\n
- *  - (UART_EVEN_PARITY_REPR_0)- signifying that even parity is enabled and the
- *     parity bit is represented by a logic 0\n
- *  - (UART_PARITY_NONE) - signifying that no parity is enabled\n
- *
- */
-uint32_t  AM335x_UART::parity_mode_get()
-{
-    //return (HWREG(baseAdd + UART_LCR) & (UART_LCR_PARITY_TYPE2 |
-    //                                     UART_LCR_PARITY_TYPE1 |
-    //                                     UART_LCR_PARITY_EN));
-    return (m_UART_regs.LCR.reg & (n_UART::LCR_PARITY_EN | 
-                                   n_UART::LCR_PARITY_TYPE1 |
-                                   n_UART::LCR_PARITY_TYPE2));
+    FIFO_config(cfg_scr, trigger_lvl_cfg, cfg_fcr);
 }
 
 /**
@@ -579,164 +133,519 @@ uint32_t  AM335x_UART::parity_mode_get()
  *             FIFO related settings to take effect.
  */
 
-#define UART_FIFO_CONFIG_TXGRA     (0xF << 26)
-#define UART_FIFO_CONFIG_RXGRA     (0xF << 22)
-#define UART_FIFO_CONFIG_TXTRIG    (0xFF << 14)
-#define UART_FIFO_CONFIG_RXTRIG    (0xFF << 6)
-#define UART_FIFO_CONFIG_TXCLR     (0x1 << 5)
-#define UART_FIFO_CONFIG_RXCLR     (0x1 << 4)
-#define UART_FIFO_CONFIG_DMAENPATH (0x1 << 3)
-#define UART_FIFO_CONFIG_DMAMODE   (0x7 << 0)
 
-uint32_t  AM335x_UART::FIFO_config(uint32_t fifo_config)
+n_UART::FCR_reg_t AM335x_UART::FIFO_config(n_UART::SCR_reg_t  cfg_scr, 
+                                   n_UART::TLR_reg_t  fifo_trigger_lvl, 
+                                   n_UART::FCR_reg_t  cfg_fcr)
 {
-    uint32_t tx_gra = (fifo_config & UART_FIFO_CONFIG_TXGRA) >> 26;
-    uint32_t rx_gra = (fifo_config & UART_FIFO_CONFIG_RXGRA) >> 22;
-
-    uint32_t tx_trig = (fifo_config & UART_FIFO_CONFIG_TXTRIG) >> 14;
-    uint32_t rx_trig = (fifo_config & UART_FIFO_CONFIG_RXTRIG) >> 6;
-
-    uint32_t tx_clr = (fifo_config & UART_FIFO_CONFIG_TXCLR) >> 5;
-    uint32_t rx_clr = (fifo_config & UART_FIFO_CONFIG_RXCLR) >> 4;
-
-    uint32_t dma_en_path = (fifo_config & UART_FIFO_CONFIG_DMAENPATH) >> 3;
-    uint32_t dma_mode = (fifo_config & UART_FIFO_CONFIG_DMAMODE);
-
-    uint32_t enhan_fn_bit_val = 0;
-    uint32_t tcr_tlr_bit_val = 0;
-    uint32_t tlr_value = 0;
-    uint32_t fcr_value = 0;
-
+    uint32_t  enhan_fn_bit_val = 0;
+    uint32_t  tcr_tlr_bit_val = 0;
+        
     // Setting the EFR[4] bit to 1. 
     enhan_fn_bit_val = enhan_func_enable();
-    tcr_tlr_bit_val  = sub_config_TCRTLR_mode_en();
-    
-    //fcr_value |= UART_FCR_FIFO_EN;  // Enabling FIFO mode of operation.
-    fcr_value |= n_UART::FCR_FIFO_EN;  // Enabling FIFO mode of operation.
-
-    // Setting the Receiver FIFO trigger level. 
-    //if(UART_TRIG_LVL_GRANULARITY_1 != rx_gra)
-    if(n_UART::TRIG_LVL_GRANULARITY_1 != rx_gra)
+     tcr_tlr_bit_val = sub_config_TCRTLR_mode_en();
+     
+     cfg_fcr.b.FIFO_EN = HIGH;
+           
+    /// Setting the Receiver FIFO trigger level. ///
+    if(n_UART::TRIG_LVL_GRANULARITY_1 != cfg_scr.b.RXTRIGGRANU1)
     {        
-        //HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_RX_TRIG_GRANU1);    // Clearing the RXTRIGGRANU1 bit in SCR.        
-        //HWREG(baseAdd + UART_TLR) &= ~(UART_TLR_RX_FIFO_TRIG_DMA);  // Clearing the RX_FIFO_TRIG_DMA field of TLR register
         m_UART_regs.SCR.b.RXTRIGGRANU1 = 0;         // Clearing the RXTRIGGRANU1 bit in SCR. 
         m_UART_regs.TLR.b.RX_FIFO_TRIG_DMA = 0;     // Clearing the RX_FIFO_TRIG_DMA field of TLR register
 
-        //fcr_value &= ~(UART_FCR_RX_FIFO_TRIG);
-        fcr_value &= ~(n_UART::FCR_RX_FIFO_TRIG);
+        cfg_fcr.b.RX_FIFO_TRIG = LOW;
         
-        // Checking if 'rx_trig' matches with the RX Trigger level values in FCR. //
-        if((n_UART::FCR_RX_FIFO_TRIG_8CHARS == rx_trig)  ||
-           (n_UART::FCR_RX_FIFO_TRIG_16CHARS == rx_trig) ||
-           (n_UART::FCR_RX_FIFO_TRIG_56CHARS == rx_trig) ||
-           (n_UART::FCR_RX_FIFO_TRIG_60CHARS == rx_trig))
+        // Checking if 'fifo_trigger_lvl' matches with the RX Trigger level values in FCR.
+        if((n_UART::FCR_RX_FIFO_TRIG_8CHARS == fifo_trigger_lvl.b.RX_FIFO_TRIG_DMA)  ||
+           (n_UART::FCR_RX_FIFO_TRIG_16CHARS == fifo_trigger_lvl.b.RX_FIFO_TRIG_DMA) ||
+           (n_UART::FCR_RX_FIFO_TRIG_56CHARS == fifo_trigger_lvl.b.RX_FIFO_TRIG_DMA) ||
+           (n_UART::FCR_RX_FIFO_TRIG_60CHARS == fifo_trigger_lvl.b.RX_FIFO_TRIG_DMA))
         {
-          //fcr_value |= (rx_trig & UART_FCR_RX_FIFO_TRIG);
-            fcr_value |= (rx_trig & n_UART::FCR_RX_FIFO_TRIG);
+            cfg_fcr.b.RX_FIFO_TRIG = fifo_trigger_lvl.b.RX_FIFO_TRIG_DMA;
         }
         else
         {
             // RX Trigger level will be a multiple of 4.
             // Programming the RX_FIFO_TRIG_DMA field of TLR register.
-            //HWREG(baseAdd + UART_TLR) |= ((rx_trig << UART_TLR_RX_FIFO_TRIG_DMA_SHIFT) &
-            //                                          UART_TLR_RX_FIFO_TRIG_DMA);
-            m_UART_regs.TLR.b.RX_FIFO_TRIG_DMA = rx_trig;
+            m_UART_regs.TLR.b.RX_FIFO_TRIG_DMA = fifo_trigger_lvl.b.RX_FIFO_TRIG_DMA;
         }
     }
     else
-    {        
-        rx_trig &= 0x003F;                                                              // 'rx_trig' now has the 6-bit RX Trigger level value.        
-        tlr_value = (rx_trig & 0x003C) >> 2;                                            // Collecting the bits rx_trig[5:2].        
-        // fcr_value |= (rx_trig & 0x0003) << UART_FCR_RX_FIFO_TRIG_SHIFT;                 // Collecting the bits rx_trig[1:0] and writing to 'fcr_value'.
-        fcr_value |= (rx_trig & 0x0003) << n_UART::FCR_RX_FIFO_TRIG_SHIFT;                 // Collecting the bits rx_trig[1:0] and writing to 'fcr_value'.
-        
-        // HWREG(baseAdd + UART_SCR) |= UART_SCR_RX_TRIG_GRANU1;                           // Setting the RXTRIGGRANU1 bit of SCR register.
-        // HWREG(baseAdd + UART_TLR) |= (tlr_value << UART_TLR_RX_FIFO_TRIG_DMA_SHIFT);    // Programming the RX_FIFO_TRIG_DMA field of TLR register.
-        m_UART_regs.SCR.b.RXTRIGGRANU1 = HIGH;              // Setting the RXTRIGGRANU1 bit of SCR register.
-        m_UART_regs.TLR.b.RX_FIFO_TRIG_DMA = tlr_value;     // Programming the RX_FIFO_TRIG_DMA field of TLR register.
+    {   
+        m_UART_regs.SCR.b.RXTRIGGRANU1 = HIGH;                                        // Setting the RXTRIGGRANU1 bit of SCR register.
+        m_UART_regs.TLR.b.RX_FIFO_TRIG_DMA = fifo_trigger_lvl.b.RX_FIFO_TRIG_DMA;     // Programming the RX_FIFO_TRIG_DMA field of TLR register.
     }
 
-    /* Setting the Transmitter FIFO trigger level. */
-    //if(UART_TRIG_LVL_GRANULARITY_1 != tx_gra)
-    if(n_UART::TRIG_LVL_GRANULARITY_1 != tx_gra)
-    {        
-        //HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_TX_TRIG_GRANU1);    // Clearing the TXTRIGGRANU1 bit in SCR.        
-        //HWREG(baseAdd + UART_TLR) &= ~(UART_TLR_TX_FIFO_TRIG_DMA);  // Clearing the TX_FIFO_TRIG_DMA field of TLR register.
+    /// Setting the Transmitter FIFO trigger level. ///
+    if(n_UART::TRIG_LVL_GRANULARITY_1 != cfg_scr.b.TXTRIGGRANU1)
+    {  
         m_UART_regs.SCR.b.TXTRIGGRANU1 = 0;  
         m_UART_regs.TLR.b.TX_FIFO_TRIG_DMA = 0;
           
-        //fcr_value &= ~(UART_FCR_TX_FIFO_TRIG);
-        fcr_value &=~(n_UART::FCR_TX_FIFO_TRIG);
+        cfg_fcr.b.TX_FIFO_TRIG = LOW;
 
-        // Checking if 'tx_trig' matches with the TX Trigger level values in FCR.//
-        if((n_UART::FCR_TX_FIFO_TRIG_8CHARS == (tx_trig))  ||
-           (n_UART::FCR_TX_FIFO_TRIG_16CHARS == (tx_trig)) ||
-           (n_UART::FCR_TX_FIFO_TRIG_32CHARS == (tx_trig)) ||
-           (n_UART::FCR_TX_FIFO_TRIG_56CHARS == (tx_trig)))
+        // Checking if 'fifo_trigger_lvl' matches with the TX Trigger level values in FCR.//
+        if((n_UART::FCR_TX_FIFO_TRIG_8CHARS == (fifo_trigger_lvl.b.TX_FIFO_TRIG_DMA))  ||
+           (n_UART::FCR_TX_FIFO_TRIG_16CHARS == (fifo_trigger_lvl.b.TX_FIFO_TRIG_DMA)) ||
+           (n_UART::FCR_TX_FIFO_TRIG_32CHARS == (fifo_trigger_lvl.b.TX_FIFO_TRIG_DMA)) ||
+           (n_UART::FCR_TX_FIFO_TRIG_56CHARS == (fifo_trigger_lvl.b.TX_FIFO_TRIG_DMA)))
         {
-            //fcr_value |= (tx_trig & UART_FCR_TX_FIFO_TRIG);
-            fcr_value |= (tx_trig & n_UART::FCR_TX_FIFO_TRIG);
+            cfg_fcr.b.TX_FIFO_TRIG = fifo_trigger_lvl.b.TX_FIFO_TRIG_DMA;
         }
         else
         {
             // TX Trigger level will be a multiple of 4.
             // Programming the TX_FIFO_TRIG_DMA field of TLR register.
-            //HWREG(baseAdd + UART_TLR) |= ((tx_trig <<
-            //                               UART_TLR_TX_FIFO_TRIG_DMA_SHIFT) &
-            //                               UART_TLR_TX_FIFO_TRIG_DMA);
-            m_UART_regs.TLR.b.TX_FIFO_TRIG_DMA = tx_trig;
-          
+            m_UART_regs.TLR.b.TX_FIFO_TRIG_DMA = fifo_trigger_lvl.b.TX_FIFO_TRIG_DMA;          
         }
     }
     else
-    { 
-        tx_trig &= 0x003F;                                                      // 'tx_trig' now has the 6-bit TX Trigger level value.
-        tlr_value = (tx_trig & 0x003C) >> 2;                                    // Collecting the bits tx_trig[5:2].        
-        //fcr_value |= (tx_trig & 0x0003) << UART_FCR_TX_FIFO_TRIG_SHIFT;       // Collecting the bits tx_trig[1:0] and writing to 'fcr_value'.
-          fcr_value |= (tx_trig & 0x0003) << n_UART::FCR_TX_FIFO_TRIG_SHIFT;    // Collecting the bits tx_trig[1:0] and writing to 'fcr_value'.
-       
-        // HWREG(baseAdd + UART_SCR) |= UART_SCR_TX_TRIG_GRANU1;    // Setting the TXTRIGGRANU1 bit of SCR register.       
-        // HWREG(baseAdd + UART_TLR) |= (tlr_value << UART_TLR_TX_FIFO_TRIG_DMA_SHIFT);     // Programming the TX_FIFO_TRIG_DMA field of TLR register.
-          m_UART_regs.SCR.b.TXTRIGGRANU1 = HIGH;            // Setting the TXTRIGGRANU1 bit of SCR register.
-          m_UART_regs.TLR.b.TX_FIFO_TRIG_DMA = tlr_value;   // Programming the TX_FIFO_TRIG_DMA field of TLR register.
+    {        
+        m_UART_regs.SCR.b.TXTRIGGRANU1 = HIGH;                                     // Setting the TXTRIGGRANU1 bit of SCR register.
+        m_UART_regs.TLR.b.TX_FIFO_TRIG_DMA = fifo_trigger_lvl.b.TX_FIFO_TRIG_DMA;  // Programming the TX_FIFO_TRIG_DMA field of TLR register.
     }
 
-    if(n_UART::DMA_EN_PATH_FCR == dma_en_path)
-    {       
-        //HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_DMA_MODE_CTL);   // Configuring the UART DMA Mode through FCR register.
-        m_UART_regs.SCR.b.DMAMODECTL = 0;                          // Configuring the UART DMA Mode through FCR register.
-        dma_mode &= 0x1;
-        
-        //fcr_value &= ~(UART_FCR_DMA_MODE);                        // Clearing the bit corresponding to the DMA_MODE in 'fcr_value'.       
-        // fcr_value |= (dma_mode << UART_FCR_DMA_MODE_SHIFT);      // Setting the DMA Mode of operation.
-        fcr_value &= ~(n_UART::FCR_DMA_MODE);                 // Clearing the bit corresponding to the DMA_MODE in 'fcr_value'.
-        fcr_value |= (dma_mode << n_UART::FCR_DMA_MODE_SHIFT);      // Setting the DMA Mode of operation.
+    if(n_UART::DMA_EN_PATH_SCR == cfg_scr.b.DMAMODECTL)
+    {              
+        m_UART_regs.SCR.b.DMAMODECTL = HIGH;                    // Configuring the UART DMA Mode through SCR register.
+        m_UART_regs.SCR.b.DMAMODE2   = 0x0;                     // Clearing the DMAMODE2 field in SCR.
+        m_UART_regs.SCR.b.DMAMODE2   = cfg_scr.b.DMAMODE2;      // Programming the DMAMODE2 field in SCR.
     }
     else
     {
-        dma_mode &= 0x3;
-        
-        // HWREG(baseAdd + UART_SCR) |= UART_SCR_DMA_MODE_CTL;                     // Configuring the UART DMA Mode through SCR register.        
-        // HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_DMA_MODE_2);                    // Clearing the DMAMODE2 field in SCR.        
-        // HWREG(baseAdd + UART_SCR) |= (dma_mode << UART_SCR_DMA_MODE_2_SHIFT);   // Programming the DMAMODE2 field in SCR.
-           m_UART_regs.SCR.b.DMAMODECTL = HIGH;         // Configuring the UART DMA Mode through SCR register.
-           m_UART_regs.SCR.b.DMAMODE2   = 0x0;          // Clearing the DMAMODE2 field in SCR.
-           m_UART_regs.SCR.b.DMAMODE2   = dma_mode;     // Programming the DMAMODE2 field in SCR.
+        m_UART_regs.SCR.b.DMAMODECTL = LOW;                       // Configuring the UART DMA Mode through FCR register.        
     }
-
-    // Programming the bits which clear the RX and TX FIFOs.
-    //fcr_value |= (rx_clr << UART_FCR_RX_FIFO_CLEAR_SHIFT);
-    //fcr_value |= (tx_clr << UART_FCR_TX_FIFO_CLEAR_SHIFT);
-    fcr_value |= (rx_clr << n_UART::FCR_RX_FIFO_CLEAR_SHIFT);
-    fcr_value |= (tx_clr << n_UART::FCR_TX_FIFO_CLEAR_SHIFT);
-
     
-    FIFO_register_write(fcr_value);                 // Writing 'fcr_value' to the FIFO Control Register(FCR)    
+    FIFO_register_write(cfg_fcr);                 // Writing 'fcr_value' to the FIFO Control Register(FCR)    
     TCRTLR_bit_val_restore(tcr_tlr_bit_val);        // Restoring the value of TCRTLR bit in MCR    
     enhan_func_bit_val_restore(enhan_fn_bit_val);   // Restoring the value of EFR[4] to the original value
 
-    return fcr_value;
+    return cfg_fcr;
+}
+
+#define UART_MODULE_INPUT_CLK  (48000000)
+// Over-sampling rate for MIR mode used to obtain the Divisor Values.
+#define UART_MIR_OVERSAMPLING_RATE_41          (41)
+#define UART_MIR_OVERSAMPLING_RATE_42          (42)
+void  AM335x_UART::BAUD_set(unsigned int baud_rate)
+{
+    uint32_t divisor_value = 0;
+
+    // Computing the Divisor Value.
+    divisor_value = divisor_val_compute(UART_MODULE_INPUT_CLK,
+                                        baud_rate,
+                                        n_UART::MODE_UART_16x,
+                                        UART_MIR_OVERSAMPLING_RATE_42);
+
+
+    divisor_latch_write(divisor_value);
+}
+
+/**
+ * \brief  This API configures the specified Register Configuration mode for
+ *         the UART.
+ *
+ * \param  baseAdd   Memory address of the UART instance being used.
+ * \param  mode_flag  This specifies the register configuration mode to be
+ *                   enabled.
+ *
+ * 'mode_flag' can take one of the following values:
+ * - UART_REG_CONFIG_MODE_A - to enable Register Configuration Mode A\n
+ * - UART_REG_CONFIG_MODE_B - to enable Register Configuration Mode B\n
+ * - UART_REG_OPERATIONAL_MODE - to enable Register Operational Mode\n
+ *
+ * \return The contents of the Line Control Register(LCR) before it was
+ *         modified.
+ *
+ * \note   Since the UART module registers that can be accessed at any time
+ *         depends on the value in the Line Control Register(LCR), three
+ *         register configuration modes have been defined, each corresponding
+ *         to a specific state of the LCR. The three register configuration
+ *         modes are:\n
+ *         - Configuration Mode A: LCR[7] = 1 and LCR[7:0] != 0xBF.\n
+ *         - Configuration Mode B: LCR[7:0] = 0xBF.\n
+ *         - Operational Mode    : LCR[7] = 0.\n
+ *
+ *         Refer to the Register Listing in the UART/IrDA/CIR peripheral
+ *         document for more information.\n
+ *
+ */
+uint32_t  AM335x_UART::reg_config_mode_enable(n_UART::e_UART_CONFIG_MODE mode_flag)
+{
+    volatile uint32_t LCR_reg_value = 0;
+    
+    LCR_reg_value = m_UART_regs.LCR.reg;        // Preserving the current value of LCR.
+    
+    switch(mode_flag)
+    {
+        case n_UART::CONFIG_MODE_A:
+        case n_UART::CONFIG_MODE_B:
+             m_UART_regs.LCR.reg = (mode_flag & 0xFF);
+        break;
+        case n_UART::OPERATIONAL_MODE:
+            m_UART_regs.LCR.reg &= 0x7F;
+        break;
+
+        default:
+        break;
+    }
+
+    return LCR_reg_value;
+}
+
+/**
+ * \brief  This API configures the Line Characteristics for the
+ *         UART instance. The Line Characteristics include:
+ *         - Word length per frame\n
+ *         - Number of Stop Bits per frame\n
+ *         - Parity feature configuration\n
+ *
+ * \param   baseAdd     Memory address of the UART instance being used.
+ * \param   wlen_stb_flag Bit mask value of the bits pertaining to word
+ *                      length selection and stop bits selection in LCR.
+ * \param   parity_flag  Bit mask value of the bits pertaining to parity
+ *                      feature selection in LCR.
+ *
+ * 'wlen_stb_flag' can take one of the following macros:
+ *  - (UART_FRAME_WORD_LENGTH_n | UART_FRAME_NUM_STB_1), where
+ *    n = 5,6,7 or 8. -- This signifies that 1 stop bit and
+ *    one among 5,6,7 and 8 bits are chosen as the word length
+ *    per frame.
+ *  - (UART_FRAME_WORD_LENGTH_n | UART_FRAME_NUM_STB_1_5_2), where
+ *    n = 5,6,7 or 8. -- This signifies that the word length and
+ *    number of stop bits per frame could be one among the below
+ *    four choices:
+ *    --- WL = 5          NUM_STB = 1.5
+ *    --- WL = 6,7 or 8   NUM_STB = 2
+ *
+ * 'parity_flag' can take one of the following macros:
+ *  - (UART_ODD_PARITY) - signifying that odd parity be enabled and the
+ *     parity bit be represented in a default manner.\n
+ *  - (UART_EVEN_PARITY) - signifying that even parity be enabled and the
+ *     parity bit be represented in a default manner.\n
+ *  - (UART_PARITY_REPR_1) - signifying that the parity bit be represented
+ *     by a logic 1 in the transmitted and received data.\n
+ *  - (UART_PARITY_REPR_0) - signifying that the parity bit be represented
+ *     by a logic 0 in the transmitted and received data.\n
+ *  - (UART_PARITY_NONE) - signifying that no parity be enabled.\n
+ *
+ * \return  None.
+ */ 
+void  AM335x_UART::line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag)
+{   
+    // Clearing the CHAR_LENGTH and NB_STOP fields in LCR.
+    m_UART_regs.LCR.b.CHAR_LENGTH = 0;  
+    m_UART_regs.LCR.b.NB_STOP = 0;
+    // Programming the CHAR_LENGTH and NB_STOP fields in LCR.
+    m_UART_regs.LCR.reg |= (wlen_stb_flag & 
+                            (n_UART::LCR_CHAR_LENGTH | 
+                             n_UART::LCR_NB_STOP));
+    
+    // Clearing the PARITY_EN, PARITY_TYPE1 and PARITY_TYPE2 fields in LCR.
+    m_UART_regs.LCR.b.PARITY_EN = 0;
+    m_UART_regs.LCR.b.PARITY_TYPE1 = 0;
+    m_UART_regs.LCR.b.PARITY_TYPE2 = 0;
+    
+    // Programming the PARITY_EN, PARITY_TYPE1 and PARITY_TYPE2 fields in LCR.
+    m_UART_regs.LCR.reg |= (parity_flag & 
+                           (n_UART::LCR_PARITY_EN | 
+                            n_UART::LCR_PARITY_TYPE1 |
+                            n_UART::LCR_PARITY_TYPE2));
+}
+
+/**
+ * \brief  This API configures the operating mode for the UART instance.
+ *         The different operating modes are:
+ *         - UART(16x, 13x, 16x Auto-Baud)\n
+ *         - IrDA(SIR, MIR, FIR)\n
+ *         - CIR\n
+ *         - Disabled state(default state)\n
+ *
+ * \param   baseAdd   Memory address of the UART instance being used.
+ * \param   mode_flag  A value which holds the mode number. This mode  
+ *                    number is referred from the MODESELECT field in MDR1.
+ *
+ * 'mode_flag' can take one of the following values:
+ * - UART16x_OPER_MODE - to switch to UART 16x operating mode\n
+ * - UART_SIR_OPER_MODE - to swith to IrDA SIR operating mode\n
+ * - UART16x_AUTO_BAUD_OPER_MODE - to switch to UART 16x Auto Baud operating
+ *   mode\n
+ * - UART13x_OPER_MODE - to switch to UART 13x operating mode\n
+ * - UART_MIR_OPER_MODE - to switch to IrDA MIR operating mode\n 
+ * - UART_FIR_OPER_MODE - to switch to IrDA FIR operating mode\n
+ * - UART_CIR_OPER_MODE - to switch to CIR operating mode\n
+ * - UART_DISABLED_MODE - to switch to Disabled state\n
+ *
+ * \return  The mode number in the MODESELECT field of MDR1 before it
+ *          was  modified.
+ */
+n_UART::e_MODESELECT  AM335x_UART::operating_mode_select(n_UART::e_MODESELECT mode_flag)
+{
+    n_UART::e_MODESELECT op_mode = (n_UART::e_MODESELECT)0;
+    
+    op_mode = (n_UART::e_MODESELECT)m_UART_regs.MDR1.b.MODESELECT;
+    m_UART_regs.MDR1.b.MODESELECT = 0;                              // Clearing the MODESELECT field in MDR1.
+    m_UART_regs.MDR1.b.MODESELECT = mode_flag;                      // Programming the MODESELECT field in MDR1.
+    
+    return op_mode;
+}
+
+/**
+ * \brief   This API computes the divisor value for the specified operating
+ *          mode. Not part of this API, the divisor value returned is written
+ *          to the Divisor Latches to configure the Baud Rate.
+ *
+ * \param   module_clk        The frequency of the input clock to the UART module
+ * \param   mode_flag         A value which represents the current operating mode
+ * \param   baud_rate         The required baud rate of communication in bits
+ *                           per second(bps)
+ * \param   mirOverSampRate  Over-sampling rate for MIR mode.This is applicable
+ *                           only when MIR mode of operation is chosen.
+ *                           Otherwise, this value is not considered.
+ *
+ * 'mode_flag' can take one of the following values:\n
+ * - UART16x_OPER_MODE - indicating 16x operating mode\n
+ * - UART13x_OPER_MODE - indicating 13x operating mode\n 
+ * - UART_SIR_OPER_MODE - indicating SIR operating mode\n
+ * - UART_MIR_OPER_MODE - indicating MIR operating mode\n
+ * - UART_FIR_OPER_MODE - indicating FIR operating mode\n
+ *
+ * 'mirOverSampRate' can take one of the following values:
+ * - UART_MIR_OVERSAMPLING_RATE_41 - for an over-sampling rate of 41\n
+ * - UART_MIR_OVERSAMPLING_RATE_42 - for an over-smapling rate of 42\n
+ *
+ * \return The divisor value computed for the specified mode.
+ *
+ * \note   Refer to the section in the user guide that specifies the baud rate
+ *         computation method to find the supported values of baud rates.
+ */
+uint32_t  AM335x_UART::divisor_val_compute(uint32_t module_clk,
+                                           uint32_t baud_rate,
+                                           n_UART::e_MODESELECT  mode_flag,
+                                           uint32_t mir_over_samp_rate)
+{
+    uint32_t divisor_value = 0;
+        
+    switch(mode_flag)
+    {
+        case n_UART::MODE_UART_16x:
+        case n_UART::MODE_SIR:
+            divisor_value = (module_clk)/(16 * baud_rate);
+            break;
+        case n_UART::MODE_UART_13x:
+            divisor_value = (module_clk)/(13 * baud_rate);
+            break;        
+        case n_UART::MODE_MIR:
+            divisor_value = (module_clk)/(mir_over_samp_rate * baud_rate);
+            break;
+        case n_UART::MODE_FIR:
+            divisor_value = 0;
+            break;
+        default:
+            break;
+    }
+  
+    return divisor_value;
+}
+
+/**
+ * \brief  This API is used to write the specified divisor value to Divisor
+ *         Latch registers DLL and DLH.
+ *
+ * \param  baseAdd       Memory address of the UART instance being used.
+ * \param  divisorValue  The 14-bit value whose least 8 bits go to DLL
+ *                       and highest 6 bits go to DLH.
+ * 
+ * \return A concatenated value of DLH and DLL registers(DLH:DLL, a 14-bit 
+ *         value) before they are modified in the current API.
+ */
+uint32_t  AM335x_UART::divisor_latch_write(uint32_t divisor_value)
+{
+    volatile             uint32_t  enhan_fn_bit_val = 0;
+    volatile             uint32_t  sleep_md_bit_val = 0;
+    volatile             uint32_t  LCR_reg_value    = 0;
+    volatile n_UART::e_MODESELECT  op_mode          = (n_UART::e_MODESELECT)0;
+                         uint32_t  div_reg_val      = 0;
+    
+    LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);      // Switching to Register Configuration Mode B.    
+    enhan_fn_bit_val = m_UART_regs.EFR.b.ENHANCEDEN;                    // Collecting the current value of EFR[4] and later setting it.    
+    m_UART_regs.EFR.b.ENHANCEDEN = HIGH;    
+    reg_config_mode_enable(n_UART::OPERATIONAL_MODE);                   // Switching to Register Operational Mode.
+
+    /// Collecting the current value of IER[4](SLEEPMODE bit) and later clearing it.///
+    sleep_md_bit_val = m_UART_regs.IER_UART.b.SLEEPMODE;
+    m_UART_regs.IER_UART.b.SLEEPMODE = 0;        
+    
+    reg_config_mode_enable(n_UART::CONFIG_MODE_B);             // Switching to Register Configuration Mode B.
+
+    /// Collecting the current value of Divisor Latch Registers. ///
+    div_reg_val = m_UART_regs.DLL.reg & 0xFF;
+    div_reg_val |= ((m_UART_regs.DLH.reg & 0x3F) << 8);
+    
+    op_mode = operating_mode_select(n_UART::MODE_DISABLE);     // Switch the UART instance to Disabled state.
+    
+    m_UART_regs.DLL.reg = (divisor_value & 0x00FF);            // Writing to Divisor Latch Low(DLL) register.    
+    m_UART_regs.DLH.reg = ((divisor_value & 0x3F00) >> 8);     // Writing to Divisor Latch High(DLH) register.    
+    
+    operating_mode_select(op_mode);                           // Restoring the Operating Mode of UART.
+    
+    reg_config_mode_enable(n_UART::OPERATIONAL_MODE);         // Switching to Register Operational Mode.    
+    m_UART_regs.IER_UART.b.SLEEPMODE = sleep_md_bit_val;      // Restoring the value of IER[4] to its original value.    
+    reg_config_mode_enable(n_UART::CONFIG_MODE_B);            // Switching to Register Configuration Mode B.
+
+    /// Restoring the value of EFR[4] to its original value. ///
+    m_UART_regs.EFR.b.ENHANCEDEN = LOW;
+    m_UART_regs.EFR.b.ENHANCEDEN = enhan_fn_bit_val;
+    m_UART_regs.LCR.reg = LCR_reg_value;                     // Restoring the value of LCR Register.  
+    
+    return div_reg_val;
+}
+
+/**
+ * \brief  This API enables write access to Divisor Latch registers DLL and
+ *         DLH.
+ *
+ * \param  baseAdd   Memory address of the UART instance being used.
+ *
+ * \return None.
+ */
+void  AM335x_UART::divisor_latch_enable()
+{
+    /* Enable access to Divisor Latch registers by setting LCR[7] bit. */
+    // HWREG(baseAdd + UART_LCR) |= (UART_LCR_DIV_EN);
+    m_UART_regs.LCR.b.DIV_EN = HIGH;
+}
+
+/**
+ * \brief  This API disables write access to Divisor Latch registers DLL and
+ *         DLH.
+ *
+ * \param  baseAdd   Memory address of the UART instance being used.
+ *
+ * \return None.
+ *
+ * \note   Disabling write access to Divisor Latch Registers enables access to
+ *         MCR, FCR, IER, BLR, EBLR, RHR registers.
+ */
+void  AM335x_UART::divisor_latch_disable()
+{
+    /// Disabling access to Divisor Latch registers by clearing LCR[7] bit. ///
+    m_UART_regs.LCR.b.DIV_EN = LOW;
+}
+
+
+/**
+ * \brief  This API is used to restore the UART to the specified Register
+ *         Configuration Mode. 
+ *
+ * \param  baseAdd      Memory address of the UART instance being used.
+ * \param  lcr_reg_value  The value to be loaded to the Line Control Register(LCR).
+ *
+ * \return None
+ *
+ * \note   The API UARTRegConfigModeEnable() and the current API are used
+ *         hand-in-hand. While UARTRegConfigModeEnable() switches the UART to
+ *         the requested operating mode, the current API restores the UART to
+ *         that register configuration mode prevalent before
+ *         UARTRegConfigModeEnable() was called.
+ */
+void  AM335x_UART::reg_conf_mode_restore(uint32_t lcr_reg_value)
+{
+    /* Programming the Line Control Register(LCR). */
+    //HWREG(baseAdd + UART_LCR) = lcr_reg_value;
+    m_UART_regs.LCR.reg = lcr_reg_value;
+}
+
+/**
+ * \brief  This API is used to introduce or to remove a Break condition.
+ * 
+ * \param  baseAdd     Memory address of the UART instance being used.
+ * \param  break_state  This specifies whether the break condition should be
+ *                     introduced or removed.
+ *
+ * 'break_state' can take one of the following two values:
+ * - UART_BREAK_COND_DISABLE - to disable the Break condition if it has
+ *   already been enabled\n
+ * - UART_BREAK_COND_ENABLE - to enable the Break condition\n
+ *
+ * \return None
+ *
+ * \note  When the Break Condition is imposed, the Transmitter output line TX
+ *        goes low to alert the communication terminal.
+ */
+void  AM335x_UART::break_ctl(bool break_state)
+{
+    /// Clearing the BREAK_EN bit in LCR. ///
+    m_UART_regs.LCR.b.BREAK_EN = 0;
+
+    /// Programming the BREAK_EN bit in LCR. ///
+    m_UART_regs.LCR.b.BREAK_EN = break_state;
+}
+
+/**
+ * \brief  This API configures the Parity feature for the UART.
+ *
+ * \param  baseAdd     Memory address of the UART instance being used
+ * \param  parity_flag  This specifies the parity configuration to be
+ *                     programmed to the Line Control Register(LCR)
+ *
+ * 'parity_flag' can take one of the following values:
+ *  - (UART_ODD_PARITY) - signifying that odd parity be enabled and the parity
+ *     bit be represented in a default manner\n
+ *  - (UART_EVEN_PARITY) - signifying that even parity be enabled and the
+ *     parity bit be represented in a default manner\n
+ *  - (UART_ODD_PARITY_REPR_1) - signifying that odd parity be enabled and the
+ *     parity bit be represented by a logic 1\n
+ *  - (UART_EVEN_PARITY_REPR_0)- signifying that even parity be enabled and the
+ *     parity bit be represented by a logic 0\n
+ *  - (UART_PARITY_NONE) - signifying that no parity be enabled\n
+ *
+ * \return None
+ */
+void  AM335x_UART::parity_mode_set(uint32_t parity_flag)
+{
+    //HWREG(baseAdd + UART_LCR) &= ~((UART_LCR_PARITY_TYPE2 |
+    //                                UART_LCR_PARITY_TYPE1 |
+    //                                UART_LCR_PARITY_EN));
+    m_UART_regs.LCR.b.PARITY_EN = 0;
+    m_UART_regs.LCR.b.PARITY_TYPE1 = 0;
+    m_UART_regs.LCR.b.PARITY_TYPE2 = 0;
+
+    // Programming the PARITY_TYPE2, PARITY_TYPE1 and PARITY_EN fields of LCR.
+    //HWREG(baseAdd + UART_LCR) |= (parity_flag & (UART_LCR_PARITY_TYPE2 |
+    //                                            UART_LCR_PARITY_TYPE1 |
+    //                                            UART_LCR_PARITY_EN));
+    m_UART_regs.LCR.reg = (parity_flag & 
+                           (n_UART::LCR_PARITY_EN | 
+                            n_UART::LCR_PARITY_TYPE1 |
+                            n_UART::LCR_PARITY_TYPE2));
+}
+
+/**
+ * \brief  This API reads the Parity configuration being set in the UART.
+ *
+ * \param  baseAdd     Memory address of the UART instance being used
+ *
+ * \return This returs one of the following values:
+ *  - (UART_ODD_PARITY) - signifying that odd parity is enabled and the parity
+ *     bit is represented in a default manner\n
+ *  - (UART_EVEN_PARITY) - signifying that even parity is enabled and the
+ *     parity bit is represented in a default manner\n
+ *  - (UART_ODD_PARITY_REPR_1) - signifying that odd parity is enabled and the
+ *     parity bit is represented by a logic 1\n
+ *  - (UART_EVEN_PARITY_REPR_0)- signifying that even parity is enabled and the
+ *     parity bit is represented by a logic 0\n
+ *  - (UART_PARITY_NONE) - signifying that no parity is enabled\n
+ *
+ */
+uint32_t  AM335x_UART::parity_mode_get()
+{
+    //return (HWREG(baseAdd + UART_LCR) & (UART_LCR_PARITY_TYPE2 |
+    //                                     UART_LCR_PARITY_TYPE1 |
+    //                                     UART_LCR_PARITY_EN));
+    return (m_UART_regs.LCR.reg & (n_UART::LCR_PARITY_EN | 
+                                   n_UART::LCR_PARITY_TYPE1 |
+                                   n_UART::LCR_PARITY_TYPE2));
 }
 
 /**
@@ -820,25 +729,22 @@ void  AM335x_UART::DMA_disable()
  *        It also restores the respective bit values after FCR has been
  *        written to.\n
  */
-void  AM335x_UART::FIFO_register_write(uint32_t fcr_value)
+void  AM335x_UART::FIFO_register_write(n_UART::FCR_reg_t  cfg_fcr)
 {
     uint32_t div_latch_reg_val = 0;
     uint32_t enhan_fn_bit_val = 0;
     uint32_t LCR_reg_value = 0;
     
-    //LCR_reg_value = reg_config_mode_enable(UART_REG_CONFIG_MODE_A);   // Switching to Register Configuration Mode A of operation. 
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_A);      // Switching to Register Configuration Mode A of operation.
     div_latch_reg_val = divisor_latch_write(0x0000);                    // Clearing the contents of Divisor Latch Registers.
     
     enhan_fn_bit_val = enhan_func_enable();                             // Set the EFR[4] bit to 1.
     
-    //HWREG(baseAdd + UART_FCR) = fcr_value;                            // Writing the 'fcr_value' to the FCR register.
-    m_UART_regs.FCR.reg = fcr_value;                                    // Writing the 'fcr_value' to the FCR register.
+    m_UART_regs.FCR.reg = cfg_fcr.reg;                                  // Writing the 'cfg_fcr' to the FCR register.
     
     enhan_func_bit_val_restore(enhan_fn_bit_val);                       // Restoring the value of EFR[4] to its original value.    
     divisor_latch_write(div_latch_reg_val);                             // Programming the Divisor Latch Registers with the collected value.
     
-    //HWREG(baseAdd + UART_LCR) = LCR_reg_value;                        // Reinstating LCR with its original value.
     m_UART_regs.LCR.reg = LCR_reg_value;                                // Reinstating LCR with its original value.
 }
 
@@ -861,15 +767,9 @@ uint32_t  AM335x_UART::enhan_func_enable()
     uint32_t LCR_reg_value = 0;
 
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);      // Enabling Configuration Mode B of operation.
-    
-  //enhan_fn_bit_val = (HWREG(baseAdd + UART_EFR) & UART_EFR_ENHANCED_EN);  // Collecting the current value of ENHANCEDEN bit of EFR.
-    enhan_fn_bit_val = m_UART_regs.EFR.b.ENHANCEDEN;
-    
-  //HWREG(baseAdd + UART_EFR) |= UART_EFR_ENHANCED_EN;                    // Setting the ENHANCEDEN bit in EFR register.
+    enhan_fn_bit_val = m_UART_regs.EFR.b.ENHANCEDEN; 
     m_UART_regs.EFR.b.ENHANCEDEN = HIGH;
-   
-  //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Programming LCR with the collected value.
-    m_UART_regs.LCR.reg = LCR_reg_value;        // Programming LCR with the collected value.
+    m_UART_regs.LCR.reg = LCR_reg_value;                    // Programming LCR with the collected value.
 
     return enhan_fn_bit_val;
 }
@@ -902,12 +802,9 @@ void  AM335x_UART::enhan_func_bit_val_restore(bool enhan_fn_bit_val)
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);
 
     // Restoring the value of EFR[4].
-    //HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_ENHANCED_EN);   
-    //HWREG(baseAdd + UART_EFR) |= (enhan_fn_bit_val & UART_EFR_ENHANCED_EN);
     m_UART_regs.EFR.b.ENHANCEDEN = 0;
     m_UART_regs.EFR.b.ENHANCEDEN = enhan_fn_bit_val;
     
-    // HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Programming LCR with the collected value.
     m_UART_regs.LCR.reg = LCR_reg_value;  // Programming LCR with the collected value.
 }
 
@@ -998,30 +895,23 @@ uint32_t  AM335x_UART::sub_config_TCRTLR_mode_en()
     
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
 
-    // Collecting the current value of EFR[4] and later setting it.
-    //enhan_fn_bit_val = HWREG(baseAdd + UART_EFR) & UART_EFR_ENHANCED_EN;
-    //HWREG(baseAdd + UART_EFR) |= UART_EFR_ENHANCED_EN;    
+    // Collecting the current value of EFR[4] and later setting it.    
     enhan_fn_bit_val = m_UART_regs.EFR.b.ENHANCEDEN;
     m_UART_regs.EFR.b.ENHANCEDEN = HIGH;
     
     reg_config_mode_enable(n_UART::CONFIG_MODE_A);  // Switching to Register Configuration Mode A.
     
-    //TCR_TLR_value = (HWREG(baseAdd + UART_MCR) & UART_MCR_TCR_TLR);   // Collecting the bit value of MCR[6].
-    TCR_TLR_value = m_UART_regs.MCR.b.TCRTLR;   // Collecting the bit value of MCR[6].
+    TCR_TLR_value = m_UART_regs.MCR.b.TCRTLR;       // Collecting the bit value of MCR[6].
     
-    //HWREG(baseAdd + UART_MCR) |= (UART_MCR_TCR_TLR);    // Setting the TCRTLR bit in Modem Control Register(MCR).
     m_UART_regs.MCR.b.TCRTLR = HIGH;                // Setting the TCRTLR bit in Modem Control Register(MCR).
     
     reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
 
     // Restoring the value of EFR[4] to its original value.
-    //HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_ENHANCED_EN);
-    //HWREG(baseAdd + UART_EFR) |= enhan_fn_bit_val;
     m_UART_regs.EFR.b.ENHANCEDEN = 0;
     m_UART_regs.EFR.b.ENHANCEDEN = enhan_fn_bit_val;
-    
-    //HWREG(baseAdd + UART_LCR) = LCR_reg_value;  // Restoring the value of LCR. 
-     m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
+     
+    m_UART_regs.LCR.reg = LCR_reg_value;   // Restoring the value of LCR.
 
     return TCR_TLR_value;
 }
@@ -1095,25 +985,19 @@ void  AM335x_UART::TCRTLR_bit_val_restore(uint32_t tcr_tlr_bit_val)
 
     LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
 
-    // Collecting the current value of EFR[4] and later setting it.
-    //enhan_fn_bit_val = HWREG(baseAdd + UART_EFR) & UART_EFR_ENHANCED_EN;
-    //HWREG(baseAdd + UART_EFR) |= UART_EFR_ENHANCED_EN;    
+    // Collecting the current value of EFR[4] and later setting it.    
     enhan_fn_bit_val = m_UART_regs.EFR.b.ENHANCEDEN;
     m_UART_regs.EFR.b.ENHANCEDEN = HIGH;
 
     reg_config_mode_enable(n_UART::CONFIG_MODE_A);  // Switching to Configuration Mode A of operation.
 
     // Programming MCR[6] with the corresponding bit value in 'tcr_tlr_bit_val'.
-    //HWREG(baseAdd + UART_MCR) &= ~(UART_MCR_TCR_TLR);
-    //HWREG(baseAdd + UART_MCR) |= (tcr_tlr_bit_val & UART_MCR_TCR_TLR);
     m_UART_regs.MCR.b.TCRTLR = 0;
     m_UART_regs.MCR.b.TCRTLR = tcr_tlr_bit_val;    
 
     reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
 
     // Restoring the value of EFR[4] to its original value.
-    //HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_ENHANCED_EN);
-    //HWREG(baseAdd + UART_EFR) |= enhan_fn_bit_val;
     m_UART_regs.EFR.b.ENHANCEDEN = 0;
     m_UART_regs.EFR.b.ENHANCEDEN = enhan_fn_bit_val;
 
@@ -1861,29 +1745,6 @@ void  AM335x_UART::pulse_shaping_control(uint32_t shape_control)
     // Programming the UARTPULSE bit in MDR2.
     //HWREG(baseAdd + UART_MDR2) |= (shape_control & UART_MDR2_UART_PULSE);
     m_UART_regs.MDR2.b.UARTPULSE = shape_control;
-}
-
-/**
- * \brief  This API performs a module reset of the UART module. It also
- *         waits until the reset process is complete.
- *
- * \param  baseAdd  Memory address of the UART instance being used.
- *
- * \return None.
- *
- * \note   This API accesses the System Configuration Register(SYSC) and 
- *         System Status Register(SYSS) to perform module reset and to 
- *         wait until the same is complete.
- */
-void  AM335x_UART::module_reset()
-{
-    // Performing Software Reset of the module.
-    //HWREG(baseAdd + UART_SYSC) |= (UART_SYSC_SOFTRESET);
-    m_UART_regs.SYSC.b.SOFTRESET = HIGH;
-
-    // Wait until the process of Module Reset is complete.
-    //while(!(HWREG(baseAdd + UART_SYSS) & UART_SYSS_RESETDONE));
-    while(!m_UART_regs.SYSS.b.RESETDONE);
 }
 
 /**
@@ -2804,3 +2665,5 @@ void  AM335x_UART::TX_DMA_threshold_val_config(uint32_t thrs_value)
     //HWREG(baseAdd + UART_TX_DMA_THRESHOLD) |=  (thrs_value & UART_TX_DMA_THRESHOLD_TX_DMA_THRESHOLD);
      m_UART_regs.TX_DMA_THRESHOLD.b.TX_DMA_THRESHOLD = thrs_value;
 }
+
+AM335x_UART uart_0(n_UART::AM335X_UART_0_regs);

@@ -1484,7 +1484,6 @@ constexpr uint32_t TCR_RX_FIFO_TRIG_START_SHIFT = 0x00000004;
         CONFIG_MODE_B      = 0x00BF,
         OPERATIONAL_MODE   = 0x007F,
     };
-
 }
 
 class AM335x_UART
@@ -1492,7 +1491,18 @@ class AM335x_UART
 public:
             AM335x_UART(n_UART::AM335x_UART_Type *p_uart_regs);
             ~AM335x_UART() {}
-            
+     
+      void  module_reset();
+      void  FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl);
+      
+n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr, 
+                               n_UART::TLR_reg_t  fifo_trigger_lvl, 
+                               n_UART::FCR_reg_t  cfg_fcr);
+
+      void  BAUD_set(unsigned int baud_rate);
+  uint32_t  reg_config_mode_enable(n_UART::e_UART_CONFIG_MODE mode_flag);
+      void  line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag);
+
   n_UART::e_MODESELECT  operating_mode_select(n_UART::e_MODESELECT mode_flag);
   uint32_t  divisor_val_compute(uint32_t  module_clk,
                                 uint32_t  baud_rate,
@@ -1501,16 +1511,14 @@ public:
   uint32_t  divisor_latch_write(uint32_t divisor_value);
       void  divisor_latch_enable();
       void  divisor_latch_disable();
-  uint32_t  reg_config_mode_enable(n_UART::e_UART_CONFIG_MODE mode_flag);
       void  reg_conf_mode_restore(uint32_t lcr_reg_value);
       void  break_ctl(bool break_state);
-      void  line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag);
       void  parity_mode_set(uint32_t parity_flag);
   uint32_t  parity_mode_get();
-  uint32_t  FIFO_config(uint32_t fifo_config);
+
       void  DMA_enable(uint32_t dma_mode_flag);
       void  DMA_disable();
-      void  FIFO_register_write(uint32_t fcr_value);
+      void  FIFO_register_write(n_UART::FCR_reg_t  cfg_fcr);
   uint32_t  enhan_func_enable();
       void  enhan_func_bit_val_restore(bool enhan_fn_bit_val);
   uint32_t  sub_config_MSRSPR_mode_en();
@@ -1537,7 +1545,7 @@ public:
       void  special_char_detect_control(uint32_t control_flag);
       void  software_flow_ctrl_opt_set(uint32_t sw_flow_ctrl);
       void  pulse_shaping_control(uint32_t shape_control);
-      void  module_reset();
+      
       void  idle_mode_configure(n_UART::e_IDLEMODE mode_flag);
       void  wakeup_control(uint32_t control_flag);
       void  auto_idle_mode_control(uint32_t mode_flag);
@@ -1575,4 +1583,5 @@ private:
     n_UART::AM335x_UART_Type &m_UART_regs;
 };
 
+extern AM335x_UART uart_0;
 #endif // _N_UART_H_
