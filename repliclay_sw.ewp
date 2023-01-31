@@ -359,7 +359,8 @@
                     <state>$PROJ_DIR$\vendor\uCOS-II\Source</state>
                     <state>$PROJ_DIR$\vendor\uC-CPU</state>
                     <state>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A</state>
-                    <state>$PROJ_DIR$\src\cppdrivers</state>
+                    <state>$PROJ_DIR$\src\periphery</state>
+                    <state>$PROJ_DIR$\src\device_drivers</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2688,51 +2689,63 @@
             </file>
         </group>
         <group>
-            <name>cppdrivers</name>
+            <name>device_drivers</name>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.CPP</name>
+                <name>$PROJ_DIR$\src\device_drivers\Device_driver.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.h</name>
+                <name>$PROJ_DIR$\src\device_drivers\UART_DT_driver.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.cpp</name>
+                <name>$PROJ_DIR$\src\device_drivers\UART_DT_driver.h</name>
+            </file>
+        </group>
+        <group>
+            <name>periphery</name>
+            <file>
+                <name>$PROJ_DIR$\src\periphery\CONTROL_MODULE.CPP</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.h</name>
+                <name>$PROJ_DIR$\src\periphery\CONTROL_MODULE.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.cpp</name>
+                <name>$PROJ_DIR$\src\periphery\DM_Timer.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.h</name>
+                <name>$PROJ_DIR$\src\periphery\DM_Timer.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.CPP</name>
+                <name>$PROJ_DIR$\src\periphery\HS_I2C.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.h</name>
+                <name>$PROJ_DIR$\src\periphery\HS_I2C.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\INTC.cpp</name>
+                <name>$PROJ_DIR$\src\periphery\I2C_EEPROM.CPP</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\INTC.h</name>
+                <name>$PROJ_DIR$\src\periphery\I2C_EEPROM.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\n_UART.cpp</name>
+                <name>$PROJ_DIR$\src\periphery\INTC.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\n_UART.h</name>
+                <name>$PROJ_DIR$\src\periphery\INTC.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\OS_Timer.h</name>
+                <name>$PROJ_DIR$\src\periphery\n_UART.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\PRCM.cpp</name>
+                <name>$PROJ_DIR$\src\periphery\n_UART.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\cppdrivers\PRCM.h</name>
+                <name>$PROJ_DIR$\src\periphery\OS_Timer.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\periphery\PRCM.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\src\periphery\PRCM.h</name>
             </file>
         </group>
         <file>

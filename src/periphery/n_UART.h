@@ -1484,6 +1484,17 @@ constexpr uint32_t TCR_RX_FIFO_TRIG_START_SHIFT = 0x00000004;
         CONFIG_MODE_B      = 0x00BF,
         OPERATIONAL_MODE   = 0x007F,
     };
+    
+    enum e_UART_INSTANCE_NUM : int
+    {
+        UART_INSTANCE_NA  = -1,
+        UART_INSTANCE_0   = 0x0,
+        UART_INSTANCE_1   = 0x1,
+        UART_INSTANCE_2   = 0x2,
+        UART_INSTANCE_3   = 0x3,
+        UART_INSTANCE_4   = 0x4,
+        UART_INSTANCE_5   = 0x5
+    };
 }
 
 class AM335x_UART
