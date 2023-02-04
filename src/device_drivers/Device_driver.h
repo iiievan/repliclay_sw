@@ -1,6 +1,8 @@
 #ifndef __DEVICE_DRIVER_H_
 #define __DEVICE_DRIVER_H_
 
+#include <stdio.h>
+
 typedef struct 
 {
       char  name[32];
@@ -9,10 +11,17 @@ typedef struct
 const void *data;
 } DT_device_id_t;
 
+typedef struct
+{
+        int  (*write)(void *p_Obj, const char *buffer, size_t len);    
+       char  (*read)(void *p_Obj);
+       void  (*isr_handler)(void *p_Obj);
+} Dev_ops_t;
+
 class Device_driver
 {
     public:
-             Device_driver(const char *name, DT_device_id_t  *match_table)
+             Device_driver(const char *name, const DT_device_id_t *match_table)
              : m_Name(name), m_Of_match_table(match_table)
              {}
      
@@ -28,14 +37,15 @@ virtual  int  resume (void* dev)    = 0;
 virtual  int  exit(void)            = 0;
 
     protected:
-            const struct dev_pm_ops *pm;
+                  Dev_ops_t *mp_Ops           { nullptr };    // Driver callbacks options struct pointer             
                  const char *m_Name           { nullptr };    // driver name
                        void *m_Owner          { nullptr };    // who uses driver now
        const DT_device_id_t *m_Of_match_table { nullptr };    // device tree load table
 };
 
-extern void Device_driver_register(Device_driver& r_Drv);
+// @brief  device driver manager functions
+extern bool Device_driver_register(Device_driver& r_Drv);
 extern void Device_driver_unregister(Device_driver& r_Drv);
-extern void Device_driver_set_client_ops(Device_driver& r_Drv, void * p_options);
+extern void Device_driver_set_client_ops(Device_driver& r_Drv, Dev_ops_t *p_Ops);
 
 #endif  //__DEVICE_DRIVER_H_

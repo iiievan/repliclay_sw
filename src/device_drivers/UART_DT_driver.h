@@ -7,36 +7,37 @@
 #include "CONTROL_MODULE.h"
 #include "n_UART.h"
 
-static struct UART_device_ops UART_ops = 
+static char UART_read(void *p_Obj);
+static int UART_write(void *p_Obj, const char *buffer, size_t len);
+
+// @brief  UART device opertaion functions callbacks
+// @detail
+static Dev_ops_t UART_ops = 
 {
-    .receive_buf = UART_receive,
-}
+    .write = UART_write,
+    .read = UART_read,
+    .isr_handler = nullptr
+};
 
-// @brief This Callback is called when charater is receive
-static int UART_receive(UART_Driver *p_Drv, const uint8_t *buffer, size_t size)
-{
-    print.f("Received %ld bytes with \"%s\"\n", size, buffer);
-
-    return device_write_buf(pdev, buffer, size);
-}
-
-static DT_device_id_t  UART_DT_driver_ids =
+// @brief  device tree property
+// @details
+static const DT_device_id_t  AM335x_UART_ids =
 {
     .compatible = "AM335x_UART"
 };
 
-class UART_Driver : public Device_driver
+class UART_DT_Driver : public Device_driver
 {
     public:
-            UART_Driver()
-            : Device_driver("UART_driver", &UART_DT_driver_ids),
-              m_UART_device(uart_0),
+            UART_DT_Driver(AM335x_UART &uart_instance)
+            : Device_driver("AM335x_serial_driver", &AM335x_UART_ids),
+              m_UART_device(uart_instance),
               m_prcm_module(prcm_module),
               m_int_controller(intc),
               m_pinmux_ctrl(ctrl_module)
              { }
 
-           ~UART_Driver() { }
+           ~UART_DT_Driver() { }
     
        int  probe(void* dev);
        int  init(void);
@@ -58,5 +59,7 @@ class UART_Driver : public Device_driver
          Interrupt_controller &m_int_controller;   // for interrupt setup and management
              x_CONTROL_MODULE &m_pinmux_ctrl;      // for PINMUX
 };
+
+extern UART_DT_Driver uart_console;
 
 #endif  //__UART_DT_DRIVER_H_
