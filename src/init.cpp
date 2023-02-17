@@ -20,6 +20,7 @@
 #include "cp15.h"
 #include "hal_mmu.h"
 #include "uart_irda_cir.h"
+#include "UART_DT_driver.h"
 
 #ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
      OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_1);
@@ -48,17 +49,8 @@ void init_board(void)
     intc.init();                   // Initializing the ARM Interrupt Controller.
     
     /// Initialize the UART console /// 
-    prcm_module.run_clk_UART0();                            // Configuring the system clocks for UART0 instance.
-    ctrl_module.UART0_pin_mux_setup();                      // Performing the Pin Multiplexing for UART0 instance.                            
-    uart_0.module_reset();                                  // Performing a module reset.        
-    uart_0.FIFO_configure_no_DMA(1, 1);                     // Performing FIFO configurations.
-    
-    uart_0.BAUD_set(115200);                                // Performing Baud Rate settings.
-    uart_0.reg_config_mode_enable(n_UART::CONFIG_MODE_B);   // Switching to Configuration Mode B.
-    uart_0.line_char_config((UART_FRAME_WORD_LENGTH_8 | UART_FRAME_NUM_STB_1), UART_PARITY_NONE);   // Programming the Line Characteristics.        
-    uart_0.divisor_latch_disable();                         // Disabling write access to Divisor Latches.        
-    uart_0.break_ctl(false);                                // Disabling Break Control.
-    uart_0.operating_mode_select(n_UART::MODE_UART_16x);    // Switching to UART16x operating mode.    
+    uart_console.probe();
+    uart_console.init();
     
     ConsoleUtilsSetType(CONSOLE_UART);                      // Select the console type based on compile time check
     

@@ -1,30 +1,15 @@
 #ifndef __UART_DT_DRIVER_H_
 #define __UART_DT_DRIVER_H_
 
+#include "uart_irda_cir.h"
 #include "Device_driver.h"
 #include "PRCM.h"
 #include "INTC.h"
 #include "CONTROL_MODULE.h"
 #include "n_UART.h"
 
-static char UART_read(void *p_Obj);
-static int UART_write(void *p_Obj, const char *buffer, size_t len);
-
-// @brief  UART device opertaion functions callbacks
-// @detail
-static Dev_ops_t UART_ops = 
-{
-    .write = UART_write,
-    .read = UART_read,
-    .isr_handler = nullptr
-};
-
-// @brief  device tree property
-// @details
-static const DT_device_id_t  AM335x_UART_ids =
-{
-    .compatible = "AM335x_UART"
-};
+extern            Dev_ops_t  UART_ops;
+extern const DT_device_id_t  AM335x_UART_ids;
 
 class UART_DT_Driver : public Device_driver
 {
@@ -39,13 +24,13 @@ class UART_DT_Driver : public Device_driver
 
            ~UART_DT_Driver() { }
     
-       int  probe(void* dev);
+       int  probe(void);
        int  init(void);
-      void  sync_state(void* dev);
-       int  remove(void* dev);
-      void  shutdown(void* dev);
-       int  suspend(void* dev);
-       int  resume(void* dev);
+      void  sync_state(void* p_dev);
+       int  remove(void* p_dev);
+      void  shutdown(void* p_dev);
+       int  suspend(void* p_dev);
+       int  resume(void* p_dev);
        int  exit(void);
 
     private:
