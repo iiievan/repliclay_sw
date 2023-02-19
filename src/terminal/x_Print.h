@@ -1,9 +1,13 @@
 #ifndef _X_PRINT_H
 #define _X_PRINT_H
 
-#include "include.h"
 #include <string>
 #include <stdarg.h>
+#include "n_UART.h"
+#include "UART_DT_driver.h"
+
+class AM335x_UART;
+class UART_DT_driver;
 
 enum e_DW_BASE : uint32_t
 {
@@ -39,11 +43,36 @@ enum e_DW_SIZE : uint32_t
     print.ln(10.0567, 4);           // use this instead
 **/
 
-class x_Print
+class x_Print : public UART_client_ops
 {
 public:
-                  x_Print(x_NRF_serial *p_Serial) 
+                  x_Print(UART_DT_Driver *p_Serial) 
                   : m_Write_error(0), m_Serial(*p_Serial)  {}
+ 
+            inline char  read(const char *data, size_t len)
+            { 
+                return UART_client_ops::read((void *)UART_client_ops::p_UART_instance);            
+            }
+            
+            inline int  write(const char *data, size_t len)
+            { 
+                return UART_client_ops::write((void *)UART_client_ops::p_UART_instance, data, len);            
+            }
+            
+            inline void  write(char c)
+            {
+                write(&c,1);
+            } 
+            
+            inline void  write(const char *s)
+            {
+                if (s == NULL) 
+                    return;
+
+                volatile uint32_t len = strlen(s);
+
+                write(s, len);  
+            }
             
             void  f(const std::string &); 
             void  f(const char* fmt, ...);
@@ -78,9 +107,8 @@ public:
             void  vf (const char*	fmt,	    // Pointer to the format string
                            va_list arp   );	    // Pointer to arguments
 private:
-
-
-    x_NRF_serial &m_Serial;
+  
+  UART_DT_Driver &m_Serial;
              int  m_Write_error;
             void  m_Print_number(unsigned long, uint8_t);
             void  m_Print_float(double, uint8_t);

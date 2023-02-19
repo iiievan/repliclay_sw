@@ -2,7 +2,7 @@
 #define _PRCM_H_
 
 #include <stdint.h>
-#include "app_utils.h"
+#include "utils.h"
 #include "DM_Timer.h"
 
 //This is power reset clock manager class and his namespace

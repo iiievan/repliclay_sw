@@ -1,9 +1,8 @@
-#include "include.h"
 #include "x_Print.h"
 
 void x_Print::f(const std::string &s)
 {    
-    m_Serial.write(s.c_str(), s.length());
+    write(s.c_str(), s.length());
 }
 
 void x_Print::f(const char* fmt,	// Pointer to the format string
@@ -18,7 +17,7 @@ void x_Print::f(const char* fmt,	// Pointer to the format string
 
 void x_Print::f(char c)
 {  
-    m_Serial.write(c);
+    write(c);
 }
 
 void x_Print::f(unsigned char c, e_DW_BASE base)
@@ -39,7 +38,7 @@ void x_Print::f(unsigned int n, e_DW_BASE base)
 void x_Print::f(long n, e_DW_BASE base)
 { 
     if (base == 0) 
-        m_Serial.write(n);
+        write(n);
     else 
     if (base == 10) 
     {
@@ -59,7 +58,7 @@ void x_Print::f(long n, e_DW_BASE base)
 void x_Print::f(unsigned long n, e_DW_BASE base)
 { 
     if (base == 0) 
-        m_Serial.write(n);
+        write(n);
     else 
         m_Print_number(n, base);
 }
@@ -130,7 +129,7 @@ void x_Print::ln(double num, int digits)
 
 void x_Print::ln()
 {  
-    m_Serial.write("\r\n");
+    write("\n");
 }
 
 // Dump a line of binary dump
@@ -154,10 +153,10 @@ void x_Print::dump (const void* buff,		// Pointer to the array to be dumped
 		for (i = 0; i < len; i++)		// Hexdecimal dump
 			f(" %02X", bp[i]);
         
-		m_Serial.write(' ');
+		write(' ');
         
 		for (i = 0; i < len; i++)		// ASCII dump
-			m_Serial.write((bp[i] >= ' ' && bp[i] <= '~') ? bp[i] : '.');
+			write((bp[i] >= ' ' && bp[i] <= '~') ? bp[i] : '.');
         
 		break;
         
@@ -193,7 +192,7 @@ void x_Print::vf (const char*	fmt,	// Pointer to the format string
         
 		if (c != '%')   // Pass through it if not a % sequense
         {				
-			m_Serial.write(c); 
+			write(c); 
             continue;
 		}
         
@@ -239,16 +238,16 @@ void x_Print::vf (const char*	fmt,	// Pointer to the format string
 			for (j = 0; p[j]; j++);
             
 			while (!(f & 2) && j++ < w) 
-                m_Serial.write(' ');
+                write(' ');
             
-			m_Serial.write(p);
+			write(p);
             
 			while (j++ < w) 
-                m_Serial.write(' ');
+                write(' ');
             
 			continue;
 		case 'C' :					// Character
-			m_Serial.write((char)va_arg(arp, int)); 
+			write((char)va_arg(arp, int)); 
             continue;
 		case 'B' :					// Binary
 			r = 2; 
@@ -266,7 +265,7 @@ void x_Print::vf (const char*	fmt,	// Pointer to the format string
     	case 'f' :					// float 
             break;
 		default:					// Unknown type (passthrough)
-			m_Serial.write(c); 
+			write(c); 
             continue;
 		}
 
@@ -297,14 +296,14 @@ void x_Print::vf (const char*	fmt,	// Pointer to the format string
         
 		while (!(f & 2) && 
                j++ < w) 
-            m_Serial.write(d);
+            write(d);
         
 		do 
-            m_Serial.write(s[--i]); 
+            write(s[--i]); 
         while(i);
         
 		while (j++ < w) 
-          m_Serial.write(' ');
+          write(' ');
 	}
 }
 
@@ -327,7 +326,7 @@ void x_Print::m_Print_number(unsigned long n, uint8_t base)
         *--str = c < 10 ? c + '0' : c + 'A' - 10;
     } while(n);
     
-    m_Serial.write(str);
+    write(str);
 }
 
 void x_Print::m_Print_float(double number, uint8_t digits) 
@@ -373,4 +372,4 @@ void x_Print::m_Print_float(double number, uint8_t digits)
     }
 }
 
-x_Print print(&dbg_serial);
+x_Print print(&uart_driver);

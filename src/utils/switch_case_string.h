@@ -1,8 +1,6 @@
 #ifndef _SWITCH_CASE_STRING_H_
 #define _SWITCH_CASE_STRING_H_
 
-#include "include.h"
-
 #define SWITCH(str)  switch(switch_string::str_hash_for_switch(str))
 #define CASE(str)    static_assert(switch_string::str_is_correct(str) && (switch_string::str_len(str) <= switch_string::MAX_LEN),\
 "CASE string contains wrong characters, or its length is greater than 9");\

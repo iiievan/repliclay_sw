@@ -1,20 +1,20 @@
-#include"swTimer.h"
+#include"sw_Timer.h"
 
-swTimer::swTimer(uint64_t preset, system_timer& s_Source, tmrCallback clb) 
+sw_Timer::sw_Timer(uint64_t preset, OS_Timer& s_Source, tmrCallback clb) 
 : m_timeSource(s_Source)
 {  
     set_period(preset);
     set_callback(clb); 
 }
 
-swTimer& swTimer::update()
+sw_Timer& sw_Timer::update()
 { 
     m_Timer = m_timeSource.get_mseconds() + m_Preset; 
 
     return *this;
 }
 
-swTimer& swTimer::start()
+sw_Timer& sw_Timer::start()
 {
     // start timer.
     // while m_CountPprogress is true off_delay in other places in program not working;
@@ -27,7 +27,7 @@ swTimer& swTimer::start()
     return *this;
 }
 
-bool  swTimer::on_delay(void * p_Obj)
+bool  sw_Timer::on_delay(void * p_Obj)
 {
     bool result = false;
 
@@ -49,7 +49,7 @@ bool  swTimer::on_delay(void * p_Obj)
     return result;
 }
 
-bool  swTimer::off_delay(void * p_Obj)
+bool  sw_Timer::off_delay(void * p_Obj)
 {
     bool result = false;
 

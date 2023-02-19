@@ -6,6 +6,7 @@
 #include "interrupt.h"
 #include "dmtimer.h"
 #include "error.h"
+#include "utils.h"
 
 
 #include "init.h"
@@ -15,7 +16,11 @@
 #include "PRCM.h"
 #include "INTC.h"
 #include "I2C_EEPROM.h"
-#include "app_utils.h"
+#include "utils.h"
+#include  "utils/paired_buffer.h"
+#include  "utils/frame_buffer.h"
+#include  "utils/ring_buffer.h"
+#include  "terminal/x_Print.h"
 #include  <uC_cpu.h>
 #include  <app_cfg.h>
 #include  <cpu_cfg.h>
@@ -63,7 +68,7 @@ static  void  AppTaskStart (void *p_arg)
     (void)p_arg;
     CPU_INT32U tm;
 	
-    ConsoleUtilsPrintf("Enabling timer interrupt!\r\n");
+    print.ln("Enabling timer interrupt!");
     
     os_timer.IRQ_enable(DMTIMER::IRQ_OVF);
 	
@@ -73,15 +78,15 @@ static  void  AppTaskStart (void *p_arg)
 #if (OS_TASK_STAT_EN > 0)
     OSStatInit();                                               /* Determine CPU capacity                               */
 #endif
-    //ConsoleUtilsPrintf("\n\n\r");
-    //ConsoleUtilsPrintf("Creating Application Objects...\n\r");
+    //print.ln("\n");
+    //print.ln("Creating Application Objects...");
     //AppEventCreate();                                           /* Create Application Events                            */
-    //ConsoleUtilsPrintf("Creating Application Tasks...\n\r");
+    //print.ln("Creating Application Tasks...");
     //AppTaskCreate();                                            /* Create Application Tasks                             */
       
     while (DEF_TRUE) 
     {
-        ConsoleUtilsPrintf("Task 1 message %d!\r\n", tm++);
+        print.ln("Task 1 message %d!", tm++);
         OSTimeDlyHMSM(0, 0, 5,0);
     }
 }
@@ -112,7 +117,7 @@ int main()
     init_board();
 	
     CPU_IntDis();
-    ConsoleUtilsPrintf("Platform initialized.\r\n");
+    print.ln("Platform initialized.");
 	
     OSInit();                                                   /* Init uC/OS-II                                        */
 
@@ -132,7 +137,5 @@ int main()
                   (INT8U *)&os_err);
 #endif
 
-    OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II.   */
-
-
+    OSStart();  /* Start multitasking (i.e. give control to uC/OS-II.   */
 }

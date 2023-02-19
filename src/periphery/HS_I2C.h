@@ -2,7 +2,7 @@
 #define _AM335X_MEM_MAP_H_
 
 #include <stdint.h>
-#include "app_utils.h"
+#include "utils.h"
 #include "INTC.h"
 
 namespace I2C

@@ -2,7 +2,7 @@
 #define _N_UART_H_
 
 #include <stdint.h>
-#include "app_utils.h"
+#include "utils.h"
 #include "INTC.h"
 
 //This is UART class and his namespace

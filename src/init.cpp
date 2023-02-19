@@ -21,6 +21,7 @@
 #include "hal_mmu.h"
 #include "uart_irda_cir.h"
 #include "UART_DT_driver.h"
+#include "terminal/x_Print.h"
 
 #ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
      OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_1);
@@ -48,14 +49,13 @@ void init_board(void)
     intc.master_IRQ_enable();      // Enable IRQ in CPSR
     intc.init();                   // Initializing the ARM Interrupt Controller.
     
-    /// Initialize the UART console /// 
-    uart_console.probe();
-    uart_console.init();
-    
-    ConsoleUtilsSetType(CONSOLE_UART);                      // Select the console type based on compile time check
-    
     /// Initialize the OS-tick timer console /// 
     os_timer.setup(OS_TIMER_RLD_COUNT);
+    
+    /// Initialize the UART console /// 
+    uart_driver.init();
+    uart_driver.probe((void *)&print);  // set read and write methods to "print" obj
+    print.ln("AM335x UART Driver started!");
     
     /// Initialize GPIO's ///
     GPIOModuleClkConfig(1);             // Enabling functional clocks for GPIO1 instance.

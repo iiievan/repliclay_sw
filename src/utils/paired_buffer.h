@@ -1,8 +1,6 @@
 #ifndef _PAIRED_BUFFER_H_
 #define _PAIRED_BUFFER_H_
 
-#include "include.h"
-
 template <typename T, size_t BUF_SIZE = 16UL >
 class paired_buffer;
 

@@ -1,13 +1,19 @@
 #ifndef _FRAME_BUFER_H_
 #define _FRAME_BUFER_H_
 
-#include "include.h"
 #include "paired_buffer.h"
 #include <math.h>
 
 #define FRAMES_DEBUG
 
+#ifndef RECEIVER_SUB_FRAME_MAX
+    #define RECEIVER_SUB_FRAME_MAX        (5)                                         //количество подкадров у приемника
+    #define RAW_FRAMESIZE                 (80)                                        //размер при передаче или приеме в кодек
+    #define RECEIVER_SUB_FRAME_SIZE       (RAW_FRAMESIZE/RECEIVER_SUB_FRAME_MAX)      //размер подкадра для приемника 
+#endif
+
 #ifdef FRAMES_DEBUG
+    #define DEMODULATE_SAMPLES_MAX     (64)
     #define DEBUG_FRAMESIZE  DEMODULATE_SAMPLES_MAX
 #endif
 

@@ -21,6 +21,19 @@ public:
         m_isr_handler = (INTC::isr_handler_t)DM_Timer_irqhandler;
     }
 
+    uint64_t  get_mseconds(void)
+    {
+        uint64_t res;
+        
+        res = m_time_from_boot_ms;
+        
+        return res; 
+    }
+    
+    void  increment_time_from_boot(size_t dt = 1)   // 1 ms
+    {  
+        m_time_from_boot_ms += dt;
+    }
     /**
     ** Setup the timer for one-shot and compare mode.
     ** Setup the timer to generate the tick interrupts at the required frequency.
@@ -51,6 +64,8 @@ public:
     void sys_interrupt_disable() { m_int_controller.system_disable(m_DMTIMER_sys_interrupt); }
 
 private:
+          volatile uint64_t    m_time_from_boot_ms;    //system clock counter
+  
           INTC::isr_handler_t  m_isr_handler;
          DMTIMER::e_TIMER_NUM  m_DMTIMER_number;
         INTC::e_SYS_INTERRUPT  m_DMTIMER_sys_interrupt;
@@ -63,13 +78,16 @@ extern OS_Timer os_timer;
 
 inline void DM_Timer_irqhandler(void *p_obj)
 {  
-    os_timer.IRQ_disable(DMTIMER::IRQ_OVF); // Disable the DMTimer interrupts    
-    os_timer.IRQ_clear(DMTIMER::IRQ_OVF);   // Clear the status of the interrupt flags 
+    OS_Timer &s_Timer = *static_cast<OS_Timer*>(p_obj);
+    
+    s_Timer.IRQ_disable(DMTIMER::IRQ_OVF); // Disable the DMTimer interrupts    
+    s_Timer.IRQ_clear(DMTIMER::IRQ_OVF);   // Clear the status of the interrupt flags 
 
     OSTimeTick();
+    s_Timer.increment_time_from_boot();
     
-    os_timer.IRQ_enable(DMTIMER::IRQ_OVF);  // Enable the DM_Timer interrupts
-    os_timer.sys_interrupt_enable();  
+    s_Timer.IRQ_enable(DMTIMER::IRQ_OVF);  // Enable the DM_Timer interrupts
+    s_Timer.sys_interrupt_enable();  
 }
 
 #endif //__OS_TIMER_H

@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include  <cpu_core.h>
 #include  <os.h>
-#include "app_utils.h"
+#include "utils.h"
 
 //This is interrupt controller class and his namespace
 namespace INTC

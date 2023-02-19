@@ -32,25 +32,37 @@ static int UART_write(void *p_Obj, const char *buffer, size_t len)
 
 // @brief  UART device opertaion functions callbacks
 // @detail
-Dev_ops_t UART_ops = 
-{
-    .write = UART_write,
-    .read = UART_read,
-    .isr_handler = nullptr
-};
+UART_client_ops UART_ops;
 
 // @brief  device tree property
 // @details
 const DT_device_id_t  AM335x_UART_ids =
 {
-    .compatible = "AM335x_UART"
+   .compatible = "AM335x_UART",
 };
 
-int  UART_DT_Driver::probe(void)
+int  UART_DT_Driver::probe(void *p_owner)
 {   
-    Device_driver::set_Client_ops(&UART_ops);
+    UART_ops.write = UART_write;
+    UART_ops.read = UART_read;
+    set_Client_ops(p_owner,dynamic_cast<Client_ops*>(&UART_ops));
     
     return 0;
+}
+
+void UART_DT_Driver::set_Client_ops(void *p_owner, Client_ops *p_ops)
+{
+    Device_driver::m_Owner = p_owner;
+    Device_driver::mp_Ops  = p_ops;
+    
+    UART_client_ops *p_client = static_cast<UART_client_ops *>(Device_driver::m_Owner);  //static because p_owner is (void *)
+    std::string compat(m_Of_match_table->compatible);
+    
+    if(p_client->compatible.compare(compat) == 0)
+    {  
+        *p_client = *dynamic_cast<UART_client_ops*>(p_ops);
+         p_client->p_UART_instance = get_instance(); 
+    } 
 }
  
 int  UART_DT_Driver::init(void)
@@ -100,4 +112,4 @@ int  UART_DT_Driver::exit(void)
     return 0;
 }
 
-UART_DT_Driver uart_console(uart_0);
+UART_DT_Driver uart_driver(uart_0);
