@@ -79,7 +79,7 @@ void  interrupt_handler(uint32_t  src_nbr)
                     case INTC::I2C2INT:
                         isr((void *)&CAT24C256WI);
                         break;
-                case INTC::TINT2:
+                    case INTC::TINT2:
                         isr((void *)&os_timer);
                         break;
                     default:

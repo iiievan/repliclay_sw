@@ -42,9 +42,12 @@ class UART_DT_Driver : public Device_driver
               m_prcm_module(prcm_module),
               m_int_controller(intc),
               m_pinmux_ctrl(ctrl_module)
-             { }
+             { 
+                 m_UART_instance_num  = m_UART_device.get_UART_inst_number();
+                 m_UART_sys_interrupt = m_UART_device.get_UART_sys_interrupt();
+             }
 
-           ~UART_DT_Driver() { }
+            ~UART_DT_Driver() { }
     
         int  probe(void *p_owner);
         int  init(void);
@@ -63,7 +66,7 @@ AM335x_UART* get_instance(void) { return &m_UART_device; }
   n_UART::e_UART_INSTANCE_NUM  m_UART_instance_num;     // UART instance index number
         INTC::e_SYS_INTERRUPT  m_UART_sys_interrupt;
 
-                  AM335x_UART &m_UART_device;           // UART instance pointer.
+                  AM335x_UART &m_UART_device;           // UART instance reference.
     power_reset_clock_control &m_prcm_module;           // for clock contrlol setup and management
          Interrupt_controller &m_int_controller;        // for interrupt setup and management
              x_CONTROL_MODULE &m_pinmux_ctrl;           // for PINMUX

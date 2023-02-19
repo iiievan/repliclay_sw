@@ -394,6 +394,12 @@ namespace n_UART
         CHL_7_BITS = 0x02,
         CHL_8_BITS = 0x03
     };
+    
+    enum e_STOP_BIT : uint8_t
+    {
+        STOP_1    = 0x00,      // 1 stop bit (word length = 5, 6, 7, 8).;
+        STOP_15_2 = 0x01       // 1.5 stop bits (word length = 5) or 2 stop bits (word length = 6, 7, 8).
+    };
 
     enum e_LCR_BITMASK : uint32_t
     {
@@ -405,6 +411,17 @@ namespace n_UART
         LCR_BREAK_EN     = BIT(6),
         LCR_DIV_EN       = BIT(7)
     };
+    
+    enum e_LCR_PARITY : uint8_t
+    {
+         PARITY_NONE     = (0x00 << 3),
+         PARITY_ODD      = (0x01 << 3),
+         PARITY_EVEN     = (0x02 << 3),
+         PARITY_FORCED_1 = (0x04 << 3),
+         PARITY_FORCED_0 = (0x06 << 3)
+    };
+    
+    constexpr uint32_t LCR_Parity_mask = LCR_PARITY_EN | LCR_PARITY_TYPE1 |LCR_PARITY_TYPE2;
 
     /*! @brief    Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.    
     *   @details  MCR[7:5] can only be written when EFR[4] = 1. Bits 3-0 control the interface with the modem, data set, or peripheral
@@ -984,13 +1001,6 @@ constexpr uint32_t TCR_RX_FIFO_TRIG_START_SHIFT = 0x00000004;
         ABAUD_1200    = 0xA,
     };
 
-    enum e_PARITY_TYPE : uint32_t
-    {
-        PARITY_NO    = 0x0,
-        PARITY_SPACE = 0x1,
-        PARITY_EVEN  = 0x2,
-        PARITY_ODD   = 0x3
-    };
 
     /*! @brief      Refer to Section 19.3.7.1 to determine the mode(s) in which this register can be accessed.    
     *   @details    If transmit FIFO is not empty and MDR1[5] = 1, IrDA starts a new transfer with data of previous frame as soon as
@@ -1512,7 +1522,11 @@ n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr,
 
       void  BAUD_set(unsigned int baud_rate);
   uint32_t  reg_config_mode_enable(n_UART::e_UART_CONFIG_MODE mode_flag);
-      void  line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag);
+      //void  line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag);
+      // Programming the Line Characteristics. 
+      void  char_len_config(n_UART::e_CHAR_LENGHT len);
+      void  stop_bit_config(n_UART::e_STOP_BIT stop_bit);
+      void  parity_config(n_UART::e_LCR_PARITY parity);
 
   n_UART::e_MODESELECT  operating_mode_select(n_UART::e_MODESELECT mode_flag);
   uint32_t  divisor_val_compute(uint32_t  module_clk,
@@ -1526,6 +1540,9 @@ n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr,
       void  break_ctl(bool break_state);
       void  parity_mode_set(uint32_t parity_flag);
   uint32_t  parity_mode_get();
+  
+ n_UART::e_UART_INSTANCE_NUM  get_UART_inst_number();
+       INTC::e_SYS_INTERRUPT  get_UART_sys_interrupt();
 
       void  DMA_enable(uint32_t dma_mode_flag);
       void  DMA_disable();

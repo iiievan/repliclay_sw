@@ -73,9 +73,15 @@ int  UART_DT_Driver::init(void)
     m_UART_device.module_reset();                                  // Performing a module reset.        
     m_UART_device.FIFO_configure_no_DMA(1, 1);                     // Performing FIFO configurations.
     
-    m_UART_device.BAUD_set(115200);                                // Performing Baud Rate settings.
-    m_UART_device.reg_config_mode_enable(n_UART::CONFIG_MODE_B);   // Switching to Configuration Mode B.
-    m_UART_device.line_char_config((UART_FRAME_WORD_LENGTH_8 | UART_FRAME_NUM_STB_1), UART_PARITY_NONE);   // Programming the Line Characteristics.        
+    m_UART_device.BAUD_set(115200);                                // Performing Baud Rate settings.    
+    
+    m_UART_device.reg_config_mode_enable(n_UART::CONFIG_MODE_B);   // Switching to Configuration Mode B. 
+    
+    // Programming the Line Characteristics. 
+    m_UART_device.char_len_config(n_UART::CHL_8_BITS);
+    m_UART_device.stop_bit_config(n_UART::STOP_1);
+    m_UART_device.parity_config(n_UART::PARITY_NONE);
+             
     m_UART_device.divisor_latch_disable();                         // Disabling write access to Divisor Latches.        
     m_UART_device.break_ctl(false);                                // Disabling Break Control.
     m_UART_device.operating_mode_select(n_UART::MODE_UART_16x);    // Switching to UART16x operating mode.

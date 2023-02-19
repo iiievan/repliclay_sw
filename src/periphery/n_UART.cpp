@@ -331,6 +331,7 @@ uint32_t  AM335x_UART::reg_config_mode_enable(n_UART::e_UART_CONFIG_MODE mode_fl
  *
  * \return  None.
  */ 
+/*
 void  AM335x_UART::line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag)
 {   
     // Clearing the CHAR_LENGTH and NB_STOP fields in LCR.
@@ -351,6 +352,32 @@ void  AM335x_UART::line_char_config(uint32_t wlen_stb_flag, uint32_t parity_flag
                            (n_UART::LCR_PARITY_EN | 
                             n_UART::LCR_PARITY_TYPE1 |
                             n_UART::LCR_PARITY_TYPE2));
+}
+*/
+   
+void  AM335x_UART::char_len_config(n_UART::e_CHAR_LENGHT len)
+{   
+    // Clearing the CHAR_LENGTH  fields in LCR.
+    m_UART_regs.LCR.b.CHAR_LENGTH = 0;  
+    m_UART_regs.LCR.b.CHAR_LENGTH = len;    // then write
+    
+}
+
+void  AM335x_UART::stop_bit_config(n_UART::e_STOP_BIT stop_bit)
+{   
+    // Clearing the NB_STOP fields in LCR.
+    m_UART_regs.LCR.b.NB_STOP = 0;
+    m_UART_regs.LCR.b.NB_STOP = stop_bit;  // then write
+}
+
+void  AM335x_UART::parity_config(n_UART::e_LCR_PARITY parity)
+{   
+    // Clearing the PARITY_EN, PARITY_TYPE1 and PARITY_TYPE2 fields in LCR.
+    m_UART_regs.LCR.b.PARITY_EN = 0;
+    m_UART_regs.LCR.b.PARITY_TYPE1 = 0;
+    m_UART_regs.LCR.b.PARITY_TYPE2 = 0;
+    
+    m_UART_regs.LCR.reg |= (parity & n_UART::LCR_Parity_mask);
 }
 
 /**
@@ -646,6 +673,56 @@ uint32_t  AM335x_UART::parity_mode_get()
     return (m_UART_regs.LCR.reg & (n_UART::LCR_PARITY_EN | 
                                    n_UART::LCR_PARITY_TYPE1 |
                                    n_UART::LCR_PARITY_TYPE2));
+}
+
+n_UART::e_UART_INSTANCE_NUM  AM335x_UART::get_UART_inst_number()
+{
+    uint32_t UART_inst = (uint32_t)&m_UART_regs;
+     
+    switch(UART_inst)
+    {
+        case n_UART::AM335x_UART_0_BASE:     
+            return n_UART::UART_INSTANCE_0;
+        case n_UART::AM335x_UART_1_BASE:     
+            return n_UART::UART_INSTANCE_1;
+        case n_UART::AM335x_UART_2_BASE:     
+            return n_UART::UART_INSTANCE_2;
+        case n_UART::AM335x_UART_3_BASE:     
+            return n_UART::UART_INSTANCE_3;
+        case n_UART::AM335x_UART_4_BASE:     
+            return n_UART::UART_INSTANCE_4;
+        case n_UART::AM335x_UART_5_BASE:     
+            return n_UART::UART_INSTANCE_5;
+        default:
+            break;
+    } 
+    
+    return n_UART::UART_INSTANCE_NA;
+}
+ 
+ INTC::e_SYS_INTERRUPT  AM335x_UART::get_UART_sys_interrupt()
+{
+   uint32_t UART_inst = (uint32_t)&m_UART_regs;
+     
+    switch(UART_inst)
+    {
+        case n_UART::AM335x_UART_0_BASE:     
+            return INTC::UART0INT;
+        case n_UART::AM335x_UART_1_BASE:     
+            return INTC::UART1INT;
+        case n_UART::AM335x_UART_2_BASE:     
+            return INTC::UART2INT;
+        case n_UART::AM335x_UART_3_BASE:     
+            return INTC::UART3INT;
+        case n_UART::AM335x_UART_4_BASE:     
+            return INTC::UART4INT;
+        case n_UART::AM335x_UART_5_BASE:     
+            return INTC::UART5INT;
+        default:
+            break;
+    } 
+    
+    return INTC::INTERRUPTS_NUM_MAX;
 }
 
 /**
