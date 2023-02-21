@@ -4,7 +4,11 @@
 AM335x_UART::AM335x_UART(n_UART::AM335x_UART_Type *p_uart_regs)
 : m_UART_regs(*p_uart_regs)
 {
-
+    m_TX_busy = false;
+    m_RX_sts = RX_IDLE;   
+    
+    m_RX_data.reset();
+    m_TX_data.reset();
 }
 
 
@@ -1151,7 +1155,7 @@ void  AM335x_UART::int_enable(uint32_t int_flag)
     //HWREG(baseAdd + UART_IER) |= (int_flag & 0xF0); // Programming the bits IER[7:4].
     m_UART_regs.IER_UART.reg |= (int_flag & 0xF0);
 
-    LCR_reg_value = reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
+    reg_config_mode_enable(n_UART::CONFIG_MODE_B);  // Switching to Register Configuration Mode B.
 
     // Restoring the value of EFR[4] to its original value.
     //HWREG(baseAdd + UART_EFR) &= ~(UART_EFR_ENHANCED_EN);
@@ -2506,10 +2510,14 @@ void  AM335x_UART::DMA_counter_reset_control(uint32_t control_flag)
  *         - UART_TX_FIFO_NOT_FULL - indicating that the TX FIFO is not full\n
  *         - UART_TX_FIFO_FULL - indicating that the TX FIFO is full\n
  */
-uint32_t  AM335x_UART::TX_FIFO_full_status_get()
+bool  AM335x_UART::TX_FIFO_full_status_get()
 {
-    //return (HWREG(baseAdd + UART_SSR) & UART_SSR_TX_FIFO_FULL);
-    return (uint32_t)m_UART_regs.SSR.b.TXFIFOFULL;
+    bool  result = false;
+    
+    if(m_UART_regs.SSR.b.TXFIFOFULL)
+        result = true;
+
+    return result;
 }
 
 /**
@@ -2741,6 +2749,121 @@ void  AM335x_UART::TX_DMA_threshold_val_config(uint32_t thrs_value)
     // Programming the TX_DMA_THRESHOLD field of TX DMA Threshold register.
     //HWREG(baseAdd + UART_TX_DMA_THRESHOLD) |=  (thrs_value & UART_TX_DMA_THRESHOLD_TX_DMA_THRESHOLD);
      m_UART_regs.TX_DMA_THRESHOLD.b.TX_DMA_THRESHOLD = thrs_value;
+}
+
+bool  AM335x_UART::is_RX_data_rdy(ring_buffer<n_UART::RX_FIFO_MAX*4>* p_Data)
+{
+    bool result = false;
+    
+    RX_end_timer.on_delay((void *)this);
+
+    if(m_RX_sts == RX_CHUNK_RECEIVED)
+    {  
+        //read(p_Data);
+        m_RX_sts = RX_IN_PROGESS;
+    }
+
+    //-----|
+    //     |----- - transition mean that RX end with timeout.
+    if(m_RX_sts == RX_TOUT_IS_OUT)
+    {        
+        //read(p_Data);
+        m_RX_data.reset();
+        m_RX_sts = RX_STOPPED;
+        result = true;
+    }
+        
+    return result; 
+}
+
+void AM335x_UART::m_Start_TX(size_t amount)
+{
+    n_UART::IER_UART_reg_t  interrupt = { .reg = 0x0 };
+    
+    m_TX_data.increment(amount);
+    m_TX_data.switch_buffers();
+    
+    interrupt.b.THRIT = HIGH;      // enable TX interrupt.
+    int_enable(interrupt.reg);
+}
+
+void AM335x_UART::m_Start_RX(size_t amount)
+{
+    n_UART::IER_UART_reg_t  interrupt = { .reg = 0x0 };
+    
+    m_RX_data.switch_buffers();
+    
+    interrupt.b.RHRIT = HIGH;      // enable RX interrupt and RX timout interrupt.
+    int_enable(interrupt.reg);
+}
+
+// need to be placed in IRQ_Handler if RX used
+void  AM335x_UART::rx_irq(void)
+{
+    uint32_t status = int_identity_get(); 
+    
+    if(status & n_UART::RHR_IT)
+    {
+        m_TX_busy = false;
+        
+        // TODO: rx FIFO buffer get to m_RX_data
+        
+        m_RX_data.increment();
+        
+        if(m_RX_sts != RX_CHUNK_RECEIVED &&
+           m_RX_sts != RX_IN_PROGESS)
+            m_RX_sts = RX_IN_PROGESS;
+        
+        if(RX_end_timer.is_working())
+            RX_end_timer.update();            
+        else
+            RX_end_timer.start(); 
+    } 
+    
+    if(status & n_UART::RX_TOUT_IT)
+    {
+        m_RX_sts = RX_CHUNK_RECEIVED;
+        
+        // TODO: rx FIFO buffer get to m_RX_data
+    }
+}
+
+void RX_end_callback(void * p_Obj)
+{
+    AM335x_UART *p_Serial = static_cast<AM335x_UART *>(p_Obj);
+    
+    p_Serial->m_RX_data.switch_buffers();
+    p_Serial->m_RX_sts = p_Serial->RX_TOUT_IS_OUT;
+}
+
+// need to be placed in IRQ_Handler if TX used
+void  AM335x_UART::tx_irq(void)
+{
+    uint32_t status = int_identity_get(); 
+    uint32_t avail;
+    char *data = nullptr;
+    n_UART::IER_UART_reg_t  interrupt = { .reg = 0x0 };
+    
+    if(status & n_UART::THR_IT)
+    {  
+        avail = m_TX_data.get_avail();
+         data = m_TX_data.get_complete_buf();
+        
+        for(uint32_t index = 0; index < avail; index++)
+        {
+           char_put(*data);  // Write the byte to the Transmit Holding Register(or TX FIFO).
+            
+           data++;
+            
+           m_TX_data.decrement(1);
+        }
+    
+        // turn off TX interrupt
+        interrupt.b.THRIT = HIGH;   
+        int_disable(interrupt.reg);
+        
+        m_TX_busy = false;
+    }    
 }
 
 AM335x_UART uart_0(n_UART::AM335X_UART_0_regs);

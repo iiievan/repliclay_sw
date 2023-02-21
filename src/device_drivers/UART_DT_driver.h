@@ -12,7 +12,8 @@ struct UART_client_ops : public Client_ops
 {
     std::string  compatible;
     AM335x_UART *p_UART_instance { nullptr };
-    
+            int  (*pollrx)(void *p_Obj);
+            
     UART_client_ops() 
     :compatible("AM335x_UART")
     { }
@@ -27,6 +28,8 @@ struct UART_client_ops : public Client_ops
     {
         write = right.write;
         read = right.read;
+        p_UART_instance = right.p_UART_instance;
+        pollrx = right.pollrx;
     }
 };
 
@@ -60,8 +63,12 @@ class UART_DT_Driver : public Device_driver
        
 AM335x_UART* get_instance(void) { return &m_UART_device; }
 
-    private:
+       void  AINTC_configure(void);
+       void  sys_interrupt_enable()  { m_int_controller.system_enable(m_UART_sys_interrupt);  }
+       void  sys_interrupt_disable() { m_int_controller.system_disable(m_UART_sys_interrupt); }
+private:
                          void  set_Client_ops(void *p_owner, Client_ops *p_ops);
+                         
           INTC::isr_handler_t  m_isr_handler;
   n_UART::e_UART_INSTANCE_NUM  m_UART_instance_num;     // UART instance index number
         INTC::e_SYS_INTERRUPT  m_UART_sys_interrupt;

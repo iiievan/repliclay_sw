@@ -2,6 +2,7 @@
 #define _FRAME_BUFER_H_
 
 #include "paired_buffer.h"
+#include <cstring>
 #include <math.h>
 
 #define FRAMES_DEBUG

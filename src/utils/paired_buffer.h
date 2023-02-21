@@ -1,6 +1,8 @@
 #ifndef _PAIRED_BUFFER_H_
 #define _PAIRED_BUFFER_H_
 
+#include <cstring>
+
 template <typename T, size_t BUF_SIZE = 16UL >
 class paired_buffer;
 
@@ -78,13 +80,13 @@ inline           T* switch_buffers()
                     return &m_Complete_buf[i - m_Size];                   
             }
 
-inline      bool  increment()
+inline      bool  increment(uint32_t index = 1)
             { 
                 if (is_full())
                     return false;
                 else
                 { 
-                    m_Avail++; 
+                    m_Avail += index; 
                     return true;                      
                 }
             } 

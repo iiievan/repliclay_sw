@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string>
+#include "INTC.h"
 
 typedef struct 
 {
@@ -15,9 +16,9 @@ typedef struct
 // specify user driver interface options
 struct Client_ops
 {
-        int  (*write)(void *p_Obj, const char *buffer, size_t len);    
-       char  (*read)(void *p_Obj);
-       void  (*isr_handler)(void *p_Obj);
+                int  (*write)(void *p_Obj, const char *buffer, size_t len);    
+               char  (*read)(void *p_Obj);
+INTC::isr_handler_t  isr;
        
      virtual void operator=(Client_ops &right) = 0;
 };
@@ -39,7 +40,9 @@ virtual void  shutdown (void* dev)  = 0;
 virtual  int  suspend (void* dev)   = 0;
 virtual  int  resume (void* dev)    = 0;
 virtual  int  exit(void)            = 0;
+
 virtual void  set_Client_ops(void *p_owner, Client_ops *p_ops) = 0;
+  Client_ops& get_Client_ops() const { return *mp_Ops; }   
                               
     protected:
        const DT_device_id_t *m_Of_match_table { nullptr };    // device tree load table

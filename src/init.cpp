@@ -44,7 +44,7 @@ void init_board(void)
     /// Initialize MMU,Cache,Branch prediction etc... ///
     InitMem();                     // Initiate MMU and ... Invoke Cache  
     CP15BranchPredictionEnable();  // Enable Branch Prediction Shit */
- 
+    
     /// Initialize Interrupt controller /// 
     intc.master_IRQ_enable();      // Enable IRQ in CPSR
     intc.init();                   // Initializing the ARM Interrupt Controller.
@@ -53,8 +53,14 @@ void init_board(void)
     os_timer.setup(OS_TIMER_RLD_COUNT);
     
     /// Initialize the UART console /// 
-    uart_driver.init();
+    // If UART interrupts are used, 
+    // setup them before the interrupt controller (INTC) is initiated
     uart_driver.probe((void *)&print);  // set read and write methods to "print" obj
+    uart_driver.init();   
+    char str[] = "Hello world";
+    
+    uart_0.write(str, sizeof(str));
+    
     print.ln("AM335x UART Driver started!");
     
     /// Initialize GPIO's ///

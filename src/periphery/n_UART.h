@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include "utils.h"
 #include "INTC.h"
+#include "utils/ring_buffer.h"
+#include "utils/frame_buffer.h"
+#include "utils/Paired_buffer.h"
+#include "utils/sw_Timer.h"
 
 //This is UART class and his namespace
 namespace n_UART
@@ -1505,10 +1509,29 @@ constexpr uint32_t TCR_RX_FIFO_TRIG_START_SHIFT = 0x00000004;
         UART_INSTANCE_4   = 0x4,
         UART_INSTANCE_5   = 0x5
     };
+    
+    constexpr uint32_t RX_FIFO_MAX = 64U;    // must be same as embedded FIFO of AM335x UART
+    constexpr uint32_t TX_FIFO_MAX = 64U;    // must be same as embedded FIFO of AM335x UART
 }
+
+
+class sw_Timer;
+extern sw_Timer RX_end_timer;
+extern void RX_end_callback(void * p_Obj);
 
 class AM335x_UART
 {
+    enum e_UART_RX_fsm_sts : uint32_t
+    {
+        RX_IDLE             = 0x0,  // nothing to happen, ready to operation
+        RX_IN_PROGESS       = 0x1,  // RX transaction started and in progress 
+        RX_CHUNK_RECEIVED   = 0x2,  // one of two of RX paired buffer is full
+        RX_TOUT_IS_OUT      = 0x3,  // timeout after the last received byte has expired, the reception is over
+        RX_STOPPED          = 0x4   // receiver stopped 
+    };
+    
+    friend void  RX_end_callback(void * p_Obj);
+    
 public:
             AM335x_UART(n_UART::AM335x_UART_Type *p_uart_regs);
             ~AM335x_UART() {}
@@ -1595,7 +1618,7 @@ n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr,
       void  RXCTSDSR_wakeup_configure(uint32_t wake_up_flag);
   uint32_t  RXCTSDSR_transition_status_get();
       void  DMA_counter_reset_control(uint32_t control_flag);
-  uint32_t  TX_FIFO_full_status_get();
+      bool  TX_FIFO_full_status_get();
   uint32_t  TX_FIFO_level_get();
   uint32_t  RX_FIFO_level_get();
   uint32_t  autobaud_parity_get();
@@ -1606,9 +1629,45 @@ n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr,
   uint32_t  module_version_number_get();
       void  TX_DMA_threshold_control(uint32_t thrs_ctrl_flag);
       void  TX_DMA_threshold_val_config(uint32_t thrs_value);
-
+      
+       bool  is_RX_data_rdy(ring_buffer<n_UART::RX_FIFO_MAX*4>* p_Data); 
+                  
+       void  rx_irq(void);                  // need to be placed in IRQ_Handler if RX used
+       void  tx_irq(void);                  // need to be placed in IRQ_Handler if TX used
+       
+       inline void  write(const char *data, size_t len)
+       {
+            auto already_sent = 0;
+            auto left_to_send = 0;
+            
+            while(m_RX_data.get_avail()); 
+            
+            do
+            {
+                left_to_send = len - already_sent;
+                left_to_send = (left_to_send > n_UART::TX_FIFO_MAX) ? n_UART::TX_FIFO_MAX : left_to_send;                
+                
+                memcpy(m_TX_data.get_empty_buf(), data + already_sent, left_to_send);
+                m_TX_busy = true;
+                m_Start_TX(left_to_send);  
+        
+                while(m_TX_busy);
+        
+                already_sent += left_to_send;
+            }
+            while (already_sent < len);            
+       }
+       
 private:
-    n_UART::AM335x_UART_Type &m_UART_regs;
+        n_UART::AM335x_UART_Type &m_UART_regs;
+        
+paired_buffer<char, n_UART::RX_FIFO_MAX>  m_RX_data;   // cumulative received data buffer
+paired_buffer<char, n_UART::TX_FIFO_MAX>  m_TX_data;   // storage data buffer for sending
+
+                            void  m_Start_TX(size_t amount);
+                            void  m_Start_RX(size_t amount);
+                            bool  m_TX_busy;
+               e_UART_RX_fsm_sts  m_RX_sts;
 };
 
 extern AM335x_UART uart_0;
