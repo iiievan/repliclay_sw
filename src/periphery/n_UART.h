@@ -1635,28 +1635,7 @@ n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr,
        void  rx_irq(void);                  // need to be placed in IRQ_Handler if RX used
        void  tx_irq(void);                  // need to be placed in IRQ_Handler if TX used
        
-       inline void  write(const char *data, size_t len)
-       {
-            auto already_sent = 0;
-            auto left_to_send = 0;
-            
-            while(m_RX_data.get_avail()); 
-            
-            do
-            {
-                left_to_send = len - already_sent;
-                left_to_send = (left_to_send > n_UART::TX_FIFO_MAX) ? n_UART::TX_FIFO_MAX : left_to_send;                
-                
-                memcpy(m_TX_data.get_empty_buf(), data + already_sent, left_to_send);
-                m_TX_busy = true;
-                m_Start_TX(left_to_send);  
-        
-                while(m_TX_busy);
-        
-                already_sent += left_to_send;
-            }
-            while (already_sent < len);            
-       }
+       void  write(const char *data, size_t len);
        
 private:
         n_UART::AM335x_UART_Type &m_UART_regs;

@@ -57,9 +57,6 @@ void init_board(void)
     // setup them before the interrupt controller (INTC) is initiated
     uart_driver.probe((void *)&print);  // set read and write methods to "print" obj
     uart_driver.init();   
-    char str[] = "Hello world";
-    
-    uart_0.write(str, sizeof(str));
     
     print.ln("AM335x UART Driver started!");
     

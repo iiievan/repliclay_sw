@@ -80,10 +80,10 @@ const DT_device_id_t  AM335x_UART_ids =
 
 int  UART_DT_Driver::probe(void *p_owner)
 {   
-    UART_ops.write = UART_write_isr;
+    UART_ops.write = UART_write;
     UART_ops.read = UART_read;
-    UART_ops.isr = UART_0_irqhandler;
-    UART_ops.pollrx = console_pollrx;
+    UART_ops.isr = nullptr;
+    UART_ops.pollrx = nullptr;
     set_Client_ops(p_owner,dynamic_cast<Client_ops*>(&UART_ops));
     
     return 0;
@@ -115,11 +115,9 @@ int  UART_DT_Driver::init(void)
     m_prcm_module.run_clk_UART0();                                 // Configuring the system clocks for UART0 instance.
     m_pinmux_ctrl.UART0_pin_mux_setup();                           // Performing the Pin Multiplexing for UART0 instance.                            
     m_UART_device.module_reset();                                  // Performing a module reset.        
-    //m_UART_device.FIFO_configure_no_DMA(1, (RX_FIFO_MAX - 4));   // Performing FIFO configurations.
     m_UART_device.FIFO_configure_no_DMA(1, 1);                     // Performing FIFO configurations.
-
     
-    m_UART_device.BAUD_set(115200);                                // Performing Baud Rate settings.    
+    m_UART_device.BAUD_set(921600);                                // Performing Baud Rate settings.    
     
     m_UART_device.reg_config_mode_enable(n_UART::CONFIG_MODE_B);   // Switching to Configuration Mode B. 
     
@@ -130,9 +128,7 @@ int  UART_DT_Driver::init(void)
              
     m_UART_device.divisor_latch_disable();                         // Disabling write access to Divisor Latches.        
     m_UART_device.break_ctl(false);                                // Disabling Break Control.
-    m_UART_device.operating_mode_select(n_UART::MODE_UART_16x);    // Switching to UART16x operating mode.    
-
-    AINTC_configure();    
+    m_UART_device.operating_mode_select(n_UART::MODE_UART_13x);    // Switching to UART16x operating mode.     
     
     return 0;
 }

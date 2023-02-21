@@ -238,7 +238,7 @@ void  AM335x_UART::BAUD_set(unsigned int baud_rate)
     // Computing the Divisor Value.
     divisor_value = divisor_val_compute(UART_MODULE_INPUT_CLK,
                                         baud_rate,
-                                        n_UART::MODE_UART_16x,
+                                        n_UART::MODE_UART_13x,
                                         UART_MIR_OVERSAMPLING_RATE_42);
 
 
@@ -2751,7 +2751,7 @@ void  AM335x_UART::TX_DMA_threshold_val_config(uint32_t thrs_value)
      m_UART_regs.TX_DMA_THRESHOLD.b.TX_DMA_THRESHOLD = thrs_value;
 }
 
-bool  AM335x_UART::is_RX_data_rdy(ring_buffer<n_UART::RX_FIFO_MAX*4>* p_Data)
+bool  AM335x_UART::is_RX_data_rdy(ring_buffer<n_UART::RX_FIFO_MAX*4>*  )
 {
     bool result = false;
     
@@ -2778,13 +2778,14 @@ bool  AM335x_UART::is_RX_data_rdy(ring_buffer<n_UART::RX_FIFO_MAX*4>* p_Data)
 
 void AM335x_UART::m_Start_TX(size_t amount)
 {
-    n_UART::IER_UART_reg_t  interrupt = { .reg = 0x0 };
+    //n_UART::IER_UART_reg_t  interrupt = { .reg = 0x0 };
     
     m_TX_data.increment(amount);
     m_TX_data.switch_buffers();
-    
-    interrupt.b.THRIT = HIGH;      // enable TX interrupt.
-    int_enable(interrupt.reg);
+   
+    //interrupt.b.THRIT = HIGH;      // enable TX interrupt.
+    //int_enable(interrupt.reg);
+    m_UART_regs.IER_UART.b.THRIT = HIGH;
 }
 
 void AM335x_UART::m_Start_RX(size_t amount)
@@ -2842,7 +2843,7 @@ void  AM335x_UART::tx_irq(void)
     uint32_t status = int_identity_get(); 
     uint32_t avail;
     char *data = nullptr;
-    n_UART::IER_UART_reg_t  interrupt = { .reg = 0x0 };
+    //n_UART::IER_UART_reg_t  interrupt = { .reg = 0x0 };
     
     if(status & n_UART::THR_IT)
     {  
@@ -2851,7 +2852,7 @@ void  AM335x_UART::tx_irq(void)
         
         for(uint32_t index = 0; index < avail; index++)
         {
-           char_put(*data);  // Write the byte to the Transmit Holding Register(or TX FIFO).
+           m_UART_regs.THR.b.THR = *data;  // Write the byte to the Transmit Holding Register(or TX FIFO).
             
            data++;
             
@@ -2859,11 +2860,34 @@ void  AM335x_UART::tx_irq(void)
         }
     
         // turn off TX interrupt
-        interrupt.b.THRIT = HIGH;   
-        int_disable(interrupt.reg);
-        
+        //interrupt.b.THRIT = HIGH;   
+        //int_disable(interrupt.reg);
+        m_UART_regs.IER_UART.b.THRIT = LOW;
         m_TX_busy = false;
     }    
+}
+
+void  AM335x_UART::write(const char *data, size_t len)
+{
+     uint32_t already_sent = 0;
+     uint32_t left_to_send = 0;
+     
+     while(m_RX_data.get_avail()); 
+     
+     do
+     {
+         left_to_send = len - already_sent;
+         left_to_send = (left_to_send > n_UART::TX_FIFO_MAX) ? n_UART::TX_FIFO_MAX : left_to_send;                
+         
+         memcpy(m_TX_data.get_empty_buf(), data + already_sent, left_to_send);
+         m_TX_busy = true;
+         m_Start_TX(left_to_send);  
+ 
+         while(m_TX_busy);
+ 
+         already_sent += left_to_send;
+     }
+     while (already_sent < len);            
 }
 
 AM335x_UART uart_0(n_UART::AM335X_UART_0_regs);

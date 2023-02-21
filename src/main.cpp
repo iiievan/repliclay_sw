@@ -66,8 +66,6 @@ static  void  AppTaskStart (void *p_arg)
 {
     (void)p_arg;
     CPU_INT32U tm;
-    
-    UART_client_ops& p_UART_console = dynamic_cast<UART_client_ops &>(uart_driver.get_Client_ops());
 	
     print.ln("Enabling timer interrupt!");
     
@@ -89,7 +87,6 @@ static  void  AppTaskStart (void *p_arg)
     {
         print.ln("Task 1 message %d!", tm++);
         OSTimeDlyHMSM(0, 0, 5,0);
-        p_UART_console.pollrx(&uart_0);
     }
 }
 
