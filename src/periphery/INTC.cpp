@@ -55,6 +55,11 @@ class I2C_EEPROM;
 extern I2C_EEPROM<(32*1024),32> BRDINFO_24LC32A;
 extern I2C_EEPROM<(32*1024),64> CAT24C256WI;
 
+class OS_Timer;
+class AM335x_UART;
+extern OS_Timer os_timer;
+extern AM335x_UART uart_0;
+
 void  interrupt_handler(uint32_t  src_nbr)
 {
  INTC::e_SYS_INTERRUPT  int_nbr;
@@ -75,6 +80,12 @@ void  interrupt_handler(uint32_t  src_nbr)
                         break;
                     case INTC::I2C2INT:
                         isr((void *)&CAT24C256WI);
+                        break;
+                    case INTC::TINT2:
+                        isr((void *)&os_timer);
+                        break;
+                    case INTC::UART0INT:
+                        isr((void *)&uart_0);
                         break;
                     default:
                         isr((void *)int_nbr);

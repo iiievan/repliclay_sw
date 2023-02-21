@@ -2,7 +2,7 @@
 #define __DM_TIMER_H
 
 #include <stdint.h>
-#include "app_utils.h"
+#include "utils.h"
 #include "PRCM.h"
 #include "INTC.h"
 

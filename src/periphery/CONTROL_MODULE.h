@@ -2,7 +2,7 @@
 #define _CONTROL_MODULE_H_
 
 #include <stdint.h>
-#include "app_utils.h"
+#include "utils.h"
 
 //This control module namespace
 namespace CONTROL_MODULE
@@ -1847,6 +1847,7 @@ public:
     void  I2C0_pin_mux_setup();
     void  I2C1_pin_mux_setup();
     void  I2C2_pin_mux_setup();
+    void  UART0_pin_mux_setup();
     
 private:
     

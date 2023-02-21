@@ -359,10 +359,7 @@
                     <state>$PROJ_DIR$\vendor\uCOS-II\Source</state>
                     <state>$PROJ_DIR$\vendor\uC-CPU</state>
                     <state>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A</state>
-                    <state>$PROJ_DIR$\src\periphery</state>
-                    <state>$PROJ_DIR$\src\device_drivers</state>
-                    <state>$PROJ_DIR$\src\utils</state>
-                    <state>$PROJ_DIR$\src\terminal</state>
+                    <state>$PROJ_DIR$\src\cppdrivers</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -464,7 +461,7 @@
                 </option>
                 <option>
                     <name>IccRTTI2</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OICompilerExtraOption</name>
@@ -685,7 +682,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>240</hasPrio>
+                <hasPrio>0</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -2691,363 +2688,45 @@
             </file>
         </group>
         <group>
-            <name>device_drivers</name>
+            <name>cppdrivers</name>
             <file>
-                <name>$PROJ_DIR$\src\device_drivers\Device_driver.h</name>
+                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.CPP</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\device_drivers\UART_DT_driver.cpp</name>
+                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\device_drivers\UART_DT_driver.h</name>
-            </file>
-        </group>
-        <group>
-            <name>periphery</name>
-            <file>
-                <name>$PROJ_DIR$\src\periphery\CONTROL_MODULE.CPP</name>
+                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\CONTROL_MODULE.h</name>
+                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\DM_Timer.cpp</name>
+                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\DM_Timer.h</name>
+                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\HS_I2C.cpp</name>
+                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.CPP</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\HS_I2C.h</name>
+                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\I2C_EEPROM.CPP</name>
+                <name>$PROJ_DIR$\src\cppdrivers\INTC.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\I2C_EEPROM.h</name>
+                <name>$PROJ_DIR$\src\cppdrivers\INTC.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\INTC.cpp</name>
+                <name>$PROJ_DIR$\src\cppdrivers\OS_Timer.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\INTC.h</name>
+                <name>$PROJ_DIR$\src\cppdrivers\PRCM.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\periphery\n_UART.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\periphery\n_UART.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\periphery\OS_Timer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\periphery\PRCM.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\periphery\PRCM.h</name>
-            </file>
-        </group>
-        <group>
-            <name>terminal</name>
-            <file>
-                <name>$PROJ_DIR$\src\terminal\x_Print.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\terminal\x_Print.h</name>
-            </file>
-        </group>
-        <group>
-            <name>utils</name>
-            <file>
-                <name>$PROJ_DIR$\src\utils\frame_buffer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\utils\Paired_buffer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\utils\ring_buffer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\utils\sw_Timer.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\utils\sw_Timer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\utils\switch_case_string.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\utils\utils.c</name>
-                <configuration>
-                    <name>Debug</name>
-                    <settings>
-                        <name>ICCARM</name>
-                        <data>
-                            <version>37</version>
-                            <wantNonLocal>0</wantNonLocal>
-                            <debug>1</debug>
-                            <option>
-                                <name>CCOptimizationNoSizeConstraints</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCDefines</name>
-                                <state>am335x</state>
-                                <state>beaglebone_black</state>
-                            </option>
-                            <option>
-                                <name>CCPreprocFile</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCPreprocComments</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCPreprocLine</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCListCFile</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCListCMnemonics</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCListCMessages</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCListAssFile</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCListAssSource</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCEnableRemarks</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCDiagSuppress</name>
-                                <state></state>
-                            </option>
-                            <option>
-                                <name>CCDiagRemark</name>
-                                <state></state>
-                            </option>
-                            <option>
-                                <name>CCDiagWarning</name>
-                                <state></state>
-                            </option>
-                            <option>
-                                <name>CCDiagError</name>
-                                <state></state>
-                            </option>
-                            <option>
-                                <name>CCObjPrefix</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>CCAllowList</name>
-                                <version>1</version>
-                                <state>00000000</state>
-                            </option>
-                            <option>
-                                <name>CCDebugInfo</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>IEndianMode</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>IProcessor</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>IExtraOptionsCheck</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>IExtraOptions</name>
-                                <state></state>
-                            </option>
-                            <option>
-                                <name>CCLangConformance</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCSignedPlainChar</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCRequirePrototypes</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCDiagWarnAreErr</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCCompilerRuntimeInfo</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>IFpuProcessor</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>OutputFile</name>
-                                <state>$FILE_BNAME$.o</state>
-                            </option>
-                            <option>
-                                <name>CCLibConfigHeader</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>PreInclude</name>
-                                <state></state>
-                            </option>
-                            <option>
-                                <name>CCIncludePath2</name>
-                                <state>$PROJ_DIR$\src</state>
-                                <state>$PROJ_DIR$\src\app</state>
-                                <state>$PROJ_DIR$\lib\include</state>
-                                <state>$PROJ_DIR$\lib</state>
-                                <state>$PROJ_DIR$\lib\include\hw</state>
-                                <state>$PROJ_DIR$\lib\include\armv7a</state>
-                                <state>$PROJ_DIR$\lib\include\armv7a\am335x</state>
-                                <state>$PROJ_DIR$\lib\include\usblib</state>
-                                <state>$PROJ_DIR$\lib\drivers</state>
-                                <state>$PROJ_DIR$\lib\platform</state>
-                                <state>$PROJ_DIR$\lib\system_config</state>
-                                <state>$PROJ_DIR$\lib\system_config\am335x</state>
-                                <state>$PROJ_DIR$\lib\utils</state>
-                                <state>$PROJ_DIR$\lib\uC-LIB</state>
-                                <state>$PROJ_DIR$\lib\uC-LIB\Ports\ARM</state>
-                                <state>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A</state>
-                                <state>$PROJ_DIR$\vendor\uCOS-II\Source</state>
-                                <state>$PROJ_DIR$\vendor\uC-CPU</state>
-                                <state>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A</state>
-                                <state>$PROJ_DIR$\src\periphery</state>
-                                <state>$PROJ_DIR$\src\device_drivers</state>
-                                <state>$PROJ_DIR$\src\utils</state>
-                            </option>
-                            <option>
-                                <name>CCStdIncCheck</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCCodeSection</name>
-                                <state>.text</state>
-                            </option>
-                            <option>
-                                <name>IProcessorMode2</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCOptLevel</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCOptStrategy</name>
-                                <version>0</version>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCOptLevelSlave</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCPosIndRopi</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCPosIndRwpi</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCPosIndNoDynInit</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>IccLang</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>IccCDialect</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>IccAllowVLA</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>IccStaticDestr</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>IccCppInlineSemantics</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>IccCmsis</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>IccFloatSemantics</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCNoLiteralPool</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCOptStrategySlave</name>
-                                <version>0</version>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCEncSource</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCEncOutput</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCEncOutputBom</name>
-                                <state>1</state>
-                            </option>
-                            <option>
-                                <name>CCEncInput</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>IccExceptions2</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>IccRTTI2</name>
-                                <state>0</state>
-                            </option>
-                            <option>
-                                <name>CCStackProtection</name>
-                                <state>0</state>
-                            </option>
-                        </data>
-                    </settings>
-                </configuration>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\utils\utils.h</name>
+                <name>$PROJ_DIR$\src\cppdrivers\PRCM.h</name>
             </file>
         </group>
         <file>

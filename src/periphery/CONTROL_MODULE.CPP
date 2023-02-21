@@ -46,3 +46,13 @@ void  x_CONTROL_MODULE::I2C2_pin_mux_setup()
     m_CTRL_MODULE_regs.conf_uart1_ctsn.b.slewctrl  = CONTROL_MODULE::SLOW; 
     m_CTRL_MODULE_regs.conf_uart1_ctsn.b.mode      = CONTROL_MODULE::PINMODE_3;
 }
+
+void  x_CONTROL_MODULE::UART0_pin_mux_setup()
+{
+   /** RXD **/
+   m_CTRL_MODULE_regs.conf_uart0_rxd.b.putypesel = CONTROL_MODULE::PULL_UP;
+   m_CTRL_MODULE_regs.conf_uart0_rxd.b.putypesel = CONTROL_MODULE::INPUT_ENABLE;
+    
+   /** TXD **/
+   m_CTRL_MODULE_regs.conf_uart0_txd.b.putypesel = CONTROL_MODULE::PULL_UP;
+}

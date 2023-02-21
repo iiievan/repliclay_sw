@@ -1,7 +1,7 @@
 #ifndef __INIT_H
 #define __INIT_H
 
-#include "app_utils.h"
+#include "utils.h"
 #include <uC_cpu.h>
 #include <os.h>
 

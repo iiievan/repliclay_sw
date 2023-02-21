@@ -329,145 +329,49 @@ typedef struct edmaContext {
 /****************************************************************************
 **                 API FUNCTION PROTOTYPES
 ****************************************************************************/
-
-
-void EDMA3Init(unsigned int baseAdd,
-               unsigned int queNum);
-
-void EDMA3EnableChInShadowReg(unsigned int baseAdd,
-                              unsigned int chType,
-                              unsigned int chNum);
-
-void EDMA3DisableChInShadowReg(unsigned int baseAdd,
-                               unsigned int chType,
-                               unsigned int chNum);
-
-void EDMA3MapChToEvtQ(unsigned int baseAdd,
-                      unsigned int chType,
-                      unsigned int chNum,
-                      unsigned int evtQNum);
-
-void EDMA3UnmapChToEvtQ(unsigned int baseAdd,
-                        unsigned int chType,
-                        unsigned int chNum);
-
-void EDMA3MapQdmaChToPaRAM(unsigned int baseAdd,
-                           unsigned int chNum,
-                           unsigned int *paRAMId);
-
-void EDMA3SetQdmaTrigWord(unsigned int baseAdd,
-                          unsigned int chNum,
-                          unsigned int trigWord);
-
-void EDMA3ClrMissEvt(unsigned int baseAdd,
-                     unsigned int chNum);
-
-void EDMA3QdmaClrMissEvt(unsigned int baseAdd,
-                         unsigned int chNum);
-
-void EDMA3ClrCCErr(unsigned int baseAdd,
-                   unsigned int Flags);
-
-void EDMA3SetEvt(unsigned int baseAdd,
-                 unsigned int chNum);
-
-void EDMA3ClrEvt(unsigned int baseAdd,
-                 unsigned int chNum);
-
-void EDMA3EnableDmaEvt(unsigned int baseAdd,
-                       unsigned int chNum);
-
-void EDMA3DisableDmaEvt(unsigned int baseAdd,
-                        unsigned int chNum);
-
-void EDMA3EnableQdmaEvt(unsigned int baseAdd,
-                        unsigned int chNum);
-
-void EDMA3DisableQdmaEvt(unsigned int baseAdd,
-                         unsigned int chNum);
-
+        void EDMA3Init(unsigned int baseAdd, unsigned int queNum);
+        void EDMA3EnableChInShadowReg(unsigned int baseAdd, unsigned int chType, unsigned int chNum);
+        void EDMA3DisableChInShadowReg(unsigned int baseAdd, unsigned int chType, unsigned int chNum);
+        void EDMA3MapChToEvtQ(unsigned int baseAdd, unsigned int chType, unsigned int chNum, unsigned int evtQNum);
+        void EDMA3UnmapChToEvtQ(unsigned int baseAdd, unsigned int chType, unsigned int chNum);
+        void EDMA3MapQdmaChToPaRAM(unsigned int baseAdd, unsigned int chNum, unsigned int *paRAMId);
+        void EDMA3SetQdmaTrigWord(unsigned int baseAdd, unsigned int chNum, unsigned int trigWord);
+        void EDMA3ClrMissEvt(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3QdmaClrMissEvt(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3ClrCCErr(unsigned int baseAdd, unsigned int Flags);
+        void EDMA3SetEvt(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3ClrEvt(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3EnableDmaEvt(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3DisableDmaEvt(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3EnableQdmaEvt(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3DisableQdmaEvt(unsigned int baseAdd, unsigned int chNum);
 unsigned int EDMA3GetIntrStatus(unsigned int baseAdd);
-
-void EDMA3EnableEvtIntr(unsigned int baseAdd,
-                        unsigned int chNum);
-
-void EDMA3DisableEvtIntr(unsigned int baseAdd,
-                         unsigned int chNum);
-
-void EDMA3ClrIntr(unsigned int baseAdd, unsigned int value);
-
-void EDMA3GetPaRAM(unsigned int baseAdd,
-                   unsigned int chNum,
-                   EDMA3CCPaRAMEntry* currPaRAM);
-
-void EDMA3QdmaGetPaRAM(unsigned int baseAdd,
-                       unsigned int chNum,
-                       unsigned int paRAMId,
-                       EDMA3CCPaRAMEntry* currPaRAM);
-
-void EDMA3SetPaRAM(unsigned int baseAdd,
-                   unsigned int chNum,
-                   EDMA3CCPaRAMEntry* newPaRAM);
-
-void EDMA3QdmaSetPaRAM(unsigned int baseAdd,
-                       unsigned int chNum,
-                       unsigned int paRAMId,
-                       EDMA3CCPaRAMEntry* newPaRAM);
-
-void EDMA3QdmaSetPaRAMEntry(unsigned int baseAdd,
-                            unsigned int paRAMId,
-                            unsigned int paRAMEntry,
-                            unsigned int newPaRAMEntryVal);
-
-unsigned int EDMA3QdmaGetPaRAMEntry(unsigned int baseAdd,
-                                    unsigned int paRAMId,
-                                    unsigned int paRAMEntry);
-
-unsigned int EDMA3RequestChannel(unsigned int baseAdd, unsigned int chType,
-                                 unsigned int chNum, unsigned int tccNum,
-                                 unsigned int evtQNum);
-
-unsigned int EDMA3FreeChannel(unsigned int baseAdd, unsigned int chType,
-                              unsigned int chNum, unsigned int trigMode,
-                              unsigned int tccNum, unsigned int evtQNum);
-
-unsigned int EDMA3EnableTransfer(unsigned int baseAdd,
-                                 unsigned int chNum,
-                                 unsigned int trigMode);
-
-unsigned int EDMA3DisableTransfer(unsigned int baseAdd,
-                                  unsigned int chNum,
-                                  unsigned int trigMode);
-
-void EDMA3ClearErrorBits(unsigned int baseAdd,
-                         unsigned int chNum,
-                         unsigned int evtQNum);
-
+        void EDMA3EnableEvtIntr(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3DisableEvtIntr(unsigned int baseAdd, unsigned int chNum);
+        void EDMA3ClrIntr(unsigned int baseAdd, unsigned int value);
+        void EDMA3GetPaRAM(unsigned int baseAdd, unsigned int chNum, EDMA3CCPaRAMEntry* currPaRAM);
+        void EDMA3QdmaGetPaRAM(unsigned int baseAdd, unsigned int chNum, unsigned int paRAMId, EDMA3CCPaRAMEntry* currPaRAM);
+        void EDMA3SetPaRAM(unsigned int baseAdd,unsigned int chNum, EDMA3CCPaRAMEntry* newPaRAM);
+        void EDMA3QdmaSetPaRAM(unsigned int baseAdd, unsigned int chNum, unsigned int paRAMId, EDMA3CCPaRAMEntry* newPaRAM);
+        void EDMA3QdmaSetPaRAMEntry(unsigned int baseAdd, unsigned int paRAMId, unsigned int paRAMEntry, unsigned int newPaRAMEntryVal);
+unsigned int EDMA3QdmaGetPaRAMEntry(unsigned int baseAdd, unsigned int paRAMId, unsigned int paRAMEntry);
+unsigned int EDMA3RequestChannel(unsigned int baseAdd, unsigned int chType, unsigned int chNum, unsigned int tccNum, unsigned int evtQNum);
+unsigned int EDMA3FreeChannel(unsigned int baseAdd, unsigned int chType, unsigned int chNum, unsigned int trigMode, unsigned int tccNum, unsigned int evtQNum);
+unsigned int EDMA3EnableTransfer(unsigned int baseAdd, unsigned int chNum, unsigned int trigMode);
+unsigned int EDMA3DisableTransfer(unsigned int baseAdd, unsigned int chNum, unsigned int trigMode);
+        void EDMA3ClearErrorBits(unsigned int baseAdd, unsigned int chNum, unsigned int evtQNum);
 unsigned int EDMA3GetCCErrStatus(unsigned int baseAdd);
-
 unsigned int EDMA3GetErrIntrStatus(unsigned int baseAdd);
-
 unsigned int EDMA3QdmaGetErrIntrStatus(unsigned int baseAdd);
-
-void EDMA3CCErrorEvaluate(unsigned int baseAddr);
-
-void EDMA3Deinit(unsigned int baseAdd,
-                 unsigned int queNum);
-
+        void EDMA3CCErrorEvaluate(unsigned int baseAddr);
+        void EDMA3Deinit(unsigned int baseAdd, unsigned int queNum);
 unsigned int EDMAVersionGet(void);
-
 unsigned int EDMA3PeripheralIdGet(unsigned int baseAdd);
 unsigned int EDMA3IntrStatusHighGet(unsigned int baseAdd);
 unsigned int EDMA3ErrIntrHighStatusGet(unsigned int baseAdd);
-
-void EDMA3ChannelToParamMap(unsigned int baseAdd,
-                            unsigned int channel,
-                            unsigned int paramSet);
-
-extern void EDMA3ContextSave(unsigned int baseAddr,
-                                EDMACONTEXT *edmaCntxPtr);
-extern void EDMA3ContextRestore(unsigned int baseAddr,
-                                EDMACONTEXT *edmaCntxPtr);
+        void EDMA3ChannelToParamMap(unsigned int baseAdd, unsigned int channel, unsigned int paramSet);
+ extern void EDMA3ContextSave(unsigned int baseAddr, EDMACONTEXT *edmaCntxPtr);
+ extern void EDMA3ContextRestore(unsigned int baseAddr, EDMACONTEXT *edmaCntxPtr);
 
 #ifdef __cplusplus
 }

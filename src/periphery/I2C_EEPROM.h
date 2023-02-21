@@ -3,6 +3,7 @@
 
 #include "HS_I2C.h"
 #include "PRCM.h"
+#include "INTC.h"
 #include "CONTROL_MODULE.h"
 #include <cstring>
 

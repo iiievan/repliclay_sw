@@ -6,15 +6,21 @@
 #include "interrupt.h"
 #include "dmtimer.h"
 #include "error.h"
+#include "utils.h"
 
 
 #include "init.h"
+#include "n_UART.h"
 #include "DM_Timer.h"
 #include "OS_Timer.h"
 #include "PRCM.h"
 #include "INTC.h"
 #include "I2C_EEPROM.h"
-#include "app_utils.h"
+#include "utils.h"
+#include  "utils/paired_buffer.h"
+#include  "utils/frame_buffer.h"
+#include  "utils/ring_buffer.h"
+#include  "terminal/x_Print.h"
 #include  <uC_cpu.h>
 #include  <app_cfg.h>
 #include  <cpu_cfg.h>
@@ -44,8 +50,7 @@ extern "C" {
 *********************************************************************************************************
 */
 
-static  OS_STK        AppTaskStartStk[APP_CFG_TASK_START_STK_SIZE];
-
+static  OS_STK        AppTaskStartStk[APP_CFG_TASK_START_STK_SIZE];   
 
 /*
 *********************************************************************************************************
@@ -53,7 +58,7 @@ static  OS_STK        AppTaskStartStk[APP_CFG_TASK_START_STK_SIZE];
 *********************************************************************************************************
 */
 
-static  void  AppTaskStart              (void *p_arg);
+static  void  AppTaskStart (void *p_arg);
 //static  void  AppTaskCreate             (void);
 //static  void  AppEventCreate            (void);
 
@@ -61,14 +66,8 @@ static  void  AppTaskStart (void *p_arg)
 {
     (void)p_arg;
     CPU_INT32U tm;
-uint8_t data_read[64];
-EEPROM_byte_address_t addr1 = {.addr = 0x0002};
-EEPROM_byte_address_t addr2 = {.addr = 0x0050};
-EEPROM_byte_address_t addr3 = {.addr = 0x0030};
-
-char str2[] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456123456";
 	
-    ConsoleUtilsPrintf("Enabling timer interrupt!\r\n");
+    print.ln("Enabling timer interrupt!");
     
     os_timer.IRQ_enable(DMTIMER::IRQ_OVF);
 	
@@ -78,35 +77,18 @@ char str2[] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456123456"
 #if (OS_TASK_STAT_EN > 0)
     OSStatInit();                                               /* Determine CPU capacity                               */
 #endif
-    //ConsoleUtilsPrintf("\n\n\r");
-    //ConsoleUtilsPrintf("Creating Application Objects...\n\r");
+    //print.ln("\n");
+    //print.ln("Creating Application Objects...");
     //AppEventCreate();                                           /* Create Application Events                            */
-    //ConsoleUtilsPrintf("Creating Application Tasks...\n\r");
+    //print.ln("Creating Application Tasks...");
     //AppTaskCreate();                                            /* Create Application Tasks                             */
       
-
-    //CAT24C256WI.write({.addr = 0x0000},(uint8_t *)str2, (sizeof(str2) - 1));    // get rid of /0 symbol
-      CAT24C256WI.write_byte(addr1, 0xEE);
-      CAT24C256WI.write_byte(addr2, 0xAA);
-      CAT24C256WI.write_byte(addr3, 0x55);
-
-
-        
-    //uint8_t * p_Read = CAT24C256WI.read({.addr = 0x0002},64);
-    uint8_t p_Read = CAT24C256WI.read_byte(addr1);
-            p_Read = CAT24C256WI.read_byte(addr2);
-            p_Read = CAT24C256WI.read_byte(addr3);
-
-       
-    //std::memcpy(&data_read[0],p_Read, sizeof(data_read));    
-    
     while (DEF_TRUE) 
     {
-        ConsoleUtilsPrintf("Task 1 message %d!\r\n", tm++);
+        print.ln("Task 1 message %d!", tm++);
         OSTimeDlyHMSM(0, 0, 5,0);
     }
 }
-
 
 #ifdef __cplusplus
 }
@@ -134,7 +116,7 @@ int main()
     init_board();
 	
     CPU_IntDis();
-    ConsoleUtilsPrintf("Platform initialized.\r\n");
+    print.ln("Platform initialized.");
 	
     OSInit();                                                   /* Init uC/OS-II                                        */
 
@@ -154,7 +136,6 @@ int main()
                   (INT8U *)&os_err);
 #endif
 
-    OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II.   */
+    OSStart();  /* Start multitasking (i.e. give control to uC/OS-II.   */
+} 
 
-
-}

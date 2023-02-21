@@ -136,18 +136,6 @@ void EDMA3Init(unsigned int baseAdd,
 }
 
 /**
- * \brief   This API return the revision Id of the peripheral.
- *
- * \param   baseAdd     Memory address of the EDMA instance used.\n
- *
- *  \return  None
- */
-unsigned int EDMA3PeripheralIdGet(unsigned int baseAdd)
-{
-    return (HWREG(baseAdd + EDMA3CC_REVID));
-}
-
-/**
  * \brief  Enable channel to Shadow region mapping
  *
  * This API allocates DMA/QDMA channels or TCCs, and the same resources are 
@@ -243,26 +231,6 @@ void EDMA3DisableChInShadowReg(unsigned int baseAdd,
         HWREG(baseAdd + EDMA3CC_QRAE(regionId)) &= ((~0x01u) << chNum);
     }
 }
-
-/**
- *  \brief   This function maps DMA channel to any of the PaRAM sets
- *           in the PaRAM memory map.
- *
- *  \param   baseAdd   Memory address of the EDMA instance used.
- *
- *  \param   channel   The DMA channel number required to be mapped.
- *
- *  \param   paramSet  It specifies the paramSet to which DMA channel
- *                     required to be mapped.
- *
- *  \return  None
- */
-void EDMA3ChannelToParamMap(unsigned int baseAdd,
-                            unsigned int channel,
-                            unsigned int paramSet)
-{
-    HWREG(baseAdd + EDMA3CC_DCHMAP(channel)) = paramSet << 5;
-} 
 
 /**
  *  \brief  Map channel to Event Queue
@@ -633,22 +601,6 @@ void EDMA3DisableQdmaEvt(unsigned int baseAdd,
 }
 
 /**
- *  \brief   This returns EDMA3 CC error status.
- *
- *  \param   baseAdd                Memory address of the EDMA instance used.\n
- *
- *  \return  value                  Status of the Interrupt Pending Register
- *
- */
-unsigned int EDMA3GetCCErrStatus(unsigned int baseAdd)
-{
-    unsigned int IntrStatusVal = 0;
-    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_CCERR);
-
-    return IntrStatusVal;
-}
-
-/**
  *  \brief   This function returns interrupts status of those events
  *           which is less than 32.
  *
@@ -666,75 +618,6 @@ unsigned int EDMA3GetIntrStatus(unsigned int baseAdd)
     return IntrStatusVal;
 }
 
-/**
- *  \brief   This function returns interrupts status of those events
- *           which is greater than 32.
- *
- *  \param   baseAdd                Memory address of the EDMA instance used.\n
- *
- *  \return  value                  Status of the Interrupt Pending Register
- *
- */
-unsigned int EDMA3IntrStatusHighGet(unsigned int baseAdd)
-{
-    unsigned int IntrStatusVal = 0;
-
-    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_S_IPRH(regionId));
-
-    return IntrStatusVal;
-}
-
-/**
- *  \brief   This returns error interrupt status for those events whose
- *           event number is less than 32.
- *
- *  \param   baseAdd                Memory address of the EDMA instance used.\n
- *
- *  \return  value                  Status of the Interrupt Pending Register
- *
- */
-unsigned int EDMA3GetErrIntrStatus(unsigned int baseAdd)
-{
-    unsigned int IntrStatusVal = 0;
-
-    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_EMR);
-
-    return IntrStatusVal;
-}
-
-/**
- *  \brief   This returns error interrupt status for those events whose
- *           event number is greater than 32.
- *
- *  \param   baseAdd                Memory address of the EDMA instance used.\n
- *
- *  \return  value                  Status of the Interrupt Pending Register
- *
- */
-unsigned int EDMA3ErrIntrHighStatusGet(unsigned int baseAdd)
-{
-    unsigned int IntrStatusVal = 0;
-
-    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_EMRH);
-
-    return IntrStatusVal;
-}
-
-/**
- *  \brief   This returns QDMA error interrupt status.
- *
- *  \param   baseAdd            Memory address of the EDMA instance used.\n
- *
- *  \return  value              Status of the QDMA Interrupt Pending Register
- *
- */
-unsigned int EDMA3QdmaGetErrIntrStatus(unsigned int baseAdd)
-{
-    unsigned int IntrStatusVal = 0;
-    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_QEMR);
-
-    return IntrStatusVal;
-}
 
 /**
  *  \brief   Enables the user to enable the transfer completion interrupt 
@@ -1431,6 +1314,56 @@ void EDMA3ClearErrorBits(unsigned int baseAdd,
 }
 
 /**
+ *  \brief   This returns EDMA3 CC error status.
+ *
+ *  \param   baseAdd                Memory address of the EDMA instance used.\n
+ *
+ *  \return  value                  Status of the Interrupt Pending Register
+ *
+ */
+unsigned int EDMA3GetCCErrStatus(unsigned int baseAdd)
+{
+    unsigned int IntrStatusVal = 0;
+    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_CCERR);
+
+    return IntrStatusVal;
+}
+
+/**
+ *  \brief   This returns error interrupt status for those events whose
+ *           event number is less than 32.
+ *
+ *  \param   baseAdd                Memory address of the EDMA instance used.\n
+ *
+ *  \return  value                  Status of the Interrupt Pending Register
+ *
+ */
+unsigned int EDMA3GetErrIntrStatus(unsigned int baseAdd)
+{
+    unsigned int IntrStatusVal = 0;
+
+    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_EMR);
+
+    return IntrStatusVal;
+}
+
+/**
+ *  \brief   This returns QDMA error interrupt status.
+ *
+ *  \param   baseAdd            Memory address of the EDMA instance used.\n
+ *
+ *  \return  value              Status of the QDMA Interrupt Pending Register
+ *
+ */
+unsigned int EDMA3QdmaGetErrIntrStatus(unsigned int baseAdd)
+{
+    unsigned int IntrStatusVal = 0;
+    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_QEMR);
+
+    return IntrStatusVal;
+}
+
+/**
  *  \brief   This API enables to evaluate the subsequent errors. On writing 
  *           to the EEVAL register EDMA3CC error interrupt will be reasserted, 
  *           if there are any outstanding error bits set due to subsequent 
@@ -1493,6 +1426,75 @@ void EDMA3Deinit(unsigned int baseAdd,
     }
 }
 
+/**
+ * \brief   This API return the revision Id of the peripheral.
+ *
+ * \param   baseAdd     Memory address of the EDMA instance used.\n
+ *
+ *  \return  None
+ */
+unsigned int EDMA3PeripheralIdGet(unsigned int baseAdd)
+{
+    return (HWREG(baseAdd + EDMA3CC_REVID));
+}
+
+/**
+ *  \brief   This function returns interrupts status of those events
+ *           which is greater than 32.
+ *
+ *  \param   baseAdd                Memory address of the EDMA instance used.\n
+ *
+ *  \return  value                  Status of the Interrupt Pending Register
+ *
+ */
+unsigned int EDMA3IntrStatusHighGet(unsigned int baseAdd)
+{
+    unsigned int IntrStatusVal = 0;
+
+    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_S_IPRH(regionId));
+
+    return IntrStatusVal;
+}
+
+
+/**
+ *  \brief   This returns error interrupt status for those events whose
+ *           event number is greater than 32.
+ *
+ *  \param   baseAdd                Memory address of the EDMA instance used.\n
+ *
+ *  \return  value                  Status of the Interrupt Pending Register
+ *
+ */
+unsigned int EDMA3ErrIntrHighStatusGet(unsigned int baseAdd)
+{
+    unsigned int IntrStatusVal = 0;
+
+    IntrStatusVal = (unsigned int)HWREG(baseAdd + EDMA3CC_EMRH);
+
+    return IntrStatusVal;
+}
+
+
+/**
+ *  \brief   This function maps DMA channel to any of the PaRAM sets
+ *           in the PaRAM memory map.
+ *
+ *  \param   baseAdd   Memory address of the EDMA instance used.
+ *
+ *  \param   channel   The DMA channel number required to be mapped.
+ *
+ *  \param   paramSet  It specifies the paramSet to which DMA channel
+ *                     required to be mapped.
+ *
+ *  \return  None
+ */
+void EDMA3ChannelToParamMap(unsigned int baseAdd,
+                            unsigned int channel,
+                            unsigned int paramSet)
+{
+    HWREG(baseAdd + EDMA3CC_DCHMAP(channel)) = paramSet << 5;
+} 
 /**
  *  \brief   This API can be used to save the register context for EDMA
  *

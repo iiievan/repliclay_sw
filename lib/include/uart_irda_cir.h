@@ -531,8 +531,7 @@ extern "C" {
 
 /* APIs pertaining to UART. */
 
-extern unsigned int UARTOperatingModeSelect(unsigned int baseAdd,
-                                            unsigned int modeFlag);
+extern unsigned int UARTOperatingModeSelect(unsigned int baseAdd, unsigned int modeFlag);
 extern unsigned int UARTDivisorValCompute(unsigned int moduleClk,
                                           unsigned int baudRate,
                                           unsigned int modeFlag,
@@ -541,113 +540,73 @@ extern unsigned int UARTDivisorLatchWrite(unsigned int baseAdd,
                                           unsigned int divisorValue);
 extern void UARTDivisorLatchEnable(unsigned int baseAdd);
 extern void UARTDivisorLatchDisable(unsigned int baseAdd);
-extern unsigned int UARTRegConfigModeEnable(unsigned int baseAdd,
-                                     unsigned int modeFlag);
-extern void UARTRegConfModeRestore(unsigned int baseAdd,
-                                   unsigned int lcrRegValue);
+extern unsigned int UARTRegConfigModeEnable(unsigned int baseAdd, unsigned int modeFlag);
+extern void UARTRegConfModeRestore(unsigned int baseAdd, unsigned int lcrRegValue);
 extern void UARTBreakCtl(unsigned int baseAdd, unsigned int breakState);
-extern void UARTLineCharacConfig(unsigned int baseAdd,
-                                 unsigned int wLenStbFlag,
-                                 unsigned int parityFlag);
+extern void UARTLineCharacConfig(unsigned int baseAdd, unsigned int wLenStbFlag, unsigned int parityFlag);
 extern void UARTParityModeSet(unsigned int baseAdd, unsigned int parityFlag);
-
 extern unsigned int UARTParityModeGet(unsigned int baseAdd);
+extern unsigned int UARTFIFOConfig(unsigned int baseAdd, unsigned int fifoConfig);
 extern void UARTDMAEnable(unsigned int baseAdd, unsigned int dmaModeFlag);
 extern void UARTDMADisable(unsigned int baseAdd);
-extern unsigned int UARTFIFOConfig(unsigned int baseAdd,
-                                   unsigned int fifoConfig);
+extern void UARTFIFORegisterWrite(unsigned int baseAdd, unsigned int fcrValue);
 extern unsigned int UARTEnhanFuncEnable(unsigned int baseAdd);
-extern void UARTEnhanFuncBitValRestore(unsigned int baseAdd,
-                                       unsigned int enhanFnBitVal);
+extern void UARTEnhanFuncBitValRestore(unsigned int baseAdd, unsigned int enhanFnBitVal);
 extern unsigned int UARTSubConfigMSRSPRModeEn(unsigned int baseAdd);
-
 extern unsigned int UARTSubConfigTCRTLRModeEn(unsigned int baseAdd);
 extern unsigned int UARTSubConfigXOFFModeEn(unsigned int baseAdd);
-extern void UARTTCRTLRBitValRestore(unsigned int baseAdd,
-                                    unsigned int tcrTlrBitVal);
+extern void UARTTCRTLRBitValRestore(unsigned int baseAdd, unsigned int tcrTlrBitVal);
 extern void UARTIntEnable(unsigned int baseAdd, unsigned int intFlag);
 extern void UARTIntDisable(unsigned int baseAdd, unsigned int intFlag);
 extern unsigned int UARTSpaceAvail(unsigned int baseAdd);
 extern unsigned int UARTCharsAvail(unsigned int baseAdd);
-extern unsigned int UARTCharPutNonBlocking(unsigned int baseAdd,
-                                           unsigned char byteWrite);
+extern unsigned int UARTCharPutNonBlocking(unsigned int baseAdd, unsigned char byteWrite);
 extern signed char UARTCharGetNonBlocking(unsigned int baseAdd);
 extern signed char UARTCharGet(unsigned int baseAdd);
-extern int UARTCharGetTimeout(unsigned int baseAdd,
-                                        unsigned int timeOutVal);
-
+extern int UARTCharGetTimeout(unsigned int baseAdd, unsigned int timeOutVal);
 extern void UARTCharPut(unsigned int baseAdd, unsigned char byteTx);
 extern void UARTFIFOCharPut(unsigned int baseAdd, unsigned char byteTx);
 extern signed char UARTFIFOCharGet(unsigned int baseAdd);
-extern unsigned int UARTFIFOWrite(unsigned int baseAdd, unsigned char *pBuffer,
-                                  unsigned int numTxBytes);
+extern unsigned int UARTFIFOWrite(unsigned int baseAdd, unsigned char *pBuffer, unsigned int numTxBytes);
 extern unsigned int UARTRxErrorGet(unsigned int baseAdd);
 extern unsigned int UARTIntIdentityGet(unsigned int baseAdd);
 extern unsigned int UARTIntPendingStatusGet(unsigned int baseAdd);
 extern unsigned int UARTFIFOEnableStatusGet(unsigned int baseAdd);
-extern void UARTAutoRTSAutoCTSControl(unsigned int baseAdd,
-                                      unsigned int autoCtsControl,
-                                      unsigned int autoRtsControl);
-extern void UARTSpecialCharDetectControl(unsigned int baseAdd,
-                                         unsigned int controlFlag);
-extern void UARTSoftwareFlowCtrlOptSet(unsigned int baseAdd,
-                                       unsigned int swFlowCtrl);
-extern void UARTPulseShapingControl(unsigned int baseAdd,
-                                    unsigned int shapeControl);
-
+extern void UARTAutoRTSAutoCTSControl(unsigned int baseAdd, unsigned int autoCtsControl, unsigned int autoRtsControl);
+extern void UARTSpecialCharDetectControl(unsigned int baseAdd, unsigned int controlFlag);
+extern void UARTSoftwareFlowCtrlOptSet(unsigned int baseAdd, unsigned int swFlowCtrl);
+extern void UARTPulseShapingControl(unsigned int baseAdd, unsigned int shapeControl);
 extern void UARTModuleReset(unsigned int baseAdd);
 extern void UARTIdleModeConfigure(unsigned int baseAdd, unsigned int modeFlag);
 extern void UARTWakeUpControl(unsigned int baseAdd, unsigned int controlFlag);
-extern void UARTAutoIdleModeControl(unsigned int baseAdd,
-                                    unsigned int modeFlag);
-extern void UARTFlowCtrlTrigLvlConfig(unsigned int baseAdd,
-                                      unsigned int rtsHaltFlag,
-                                      unsigned int rtsStartFlag);
-extern void UARTXON1XOFF1ValProgram(unsigned int baseAdd,
-                                    unsigned char xon1Value,
-                                    unsigned char xoff1Value);
-extern void UARTXON2XOFF2ValProgram(unsigned int baseAdd,
-                                    unsigned char xon2Value,
-                                    unsigned char xoff2Value);
-extern void UARTXONAnyFeatureControl(unsigned int baseAdd,
-                                     unsigned int controlFlag);
-extern void UARTLoopbackModeControl(unsigned int baseAdd,
-                                    unsigned int controlFlag);
+extern void UARTAutoIdleModeControl(unsigned int baseAdd, unsigned int modeFlag);
+extern void UARTFlowCtrlTrigLvlConfig(unsigned int baseAdd, unsigned int rtsHaltFlag, unsigned int rtsStartFlag);
+extern void UARTXON1XOFF1ValProgram(unsigned int baseAdd, unsigned char xon1Value, unsigned char xoff1Value);
+extern void UARTXON2XOFF2ValProgram(unsigned int baseAdd, unsigned char xon2Value, unsigned char xoff2Value);
+extern void UARTXONAnyFeatureControl(unsigned int baseAdd, unsigned int controlFlag);
+extern void UARTLoopbackModeControl(unsigned int baseAdd, unsigned int controlFlag);
 extern void UARTModemControlSet(unsigned int baseAdd, unsigned int modeFlag);
-
 extern void UARTModemControlClear(unsigned int baseAdd, unsigned int modeFlag);
 extern unsigned int UARTModemStatusGet(unsigned int baseAdd);
 extern unsigned int UARTModemStatusChangeCheck(unsigned int baseAdd);
 extern void UARTResumeOperation(unsigned int baseAdd);
-
-extern void UARTWakeUpEventsEnable(unsigned int baseAdd,
-                                   unsigned int wakeUpFlag);
-extern void UARTWakeUpEventsDisable(unsigned int baseAdd,
-                                    unsigned int wakeUpFlag);
-extern void UARTFIFOTrigLvlGranControl(unsigned int baseAdd,
-                                       unsigned int rxFIFOGranCtrl,
-                                       unsigned int txFIFOGranCtrl);
-extern void UARTDSRInterruptControl(unsigned int baseAdd,
-                                    unsigned int controlFlag);
-extern void UARTTxEmptyIntControl(unsigned int baseAdd,
-                                  unsigned int controlFlag);
-extern void UARTRXCTSDSRWakeUpConfigure(unsigned int baseAdd,
-                                        unsigned int wakeUpFlag);
+extern void UARTWakeUpEventsEnable(unsigned int baseAdd, unsigned int wakeUpFlag);
+extern void UARTWakeUpEventsDisable(unsigned int baseAdd, unsigned int wakeUpFlag);
+extern void UARTFIFOTrigLvlGranControl(unsigned int baseAdd, unsigned int rxFIFOGranCtrl, unsigned int txFIFOGranCtrl);
+extern void UARTDSRInterruptControl(unsigned int baseAdd, unsigned int controlFlag);
+extern void UARTTxEmptyIntControl(unsigned int baseAdd, unsigned int controlFlag);
+extern void UARTRXCTSDSRWakeUpConfigure(unsigned int baseAdd, unsigned int wakeUpFlag);
 extern unsigned int UARTRXCTSDSRTransitionStatusGet(unsigned int baseAdd);
-
-extern void UARTDMACounterResetControl(unsigned int baseAdd,
-                                       unsigned int controlFlag);
+extern void UARTDMACounterResetControl(unsigned int baseAdd, unsigned int controlFlag);
 extern unsigned int UARTTxFIFOFullStatusGet(unsigned int baseAdd);
 extern unsigned int UARTTxFIFOLevelGet(unsigned int baseAdd);
 extern unsigned int UARTRxFIFOLevelGet(unsigned int baseAdd);
 extern unsigned int UARTAutobaudParityGet(unsigned int baseAdd);
 extern unsigned int UARTAutobaudWordLenGet(unsigned int baseAdd);
 extern unsigned int UARTAutobaudSpeedGet(unsigned int baseAdd);
-extern void UARTScratchPadRegWrite(unsigned int baseAdd,
-                                   unsigned int scratchValue);
+extern void UARTScratchPadRegWrite(unsigned int baseAdd, unsigned int scratchValue);
 extern unsigned int UARTScratchPadRegRead(unsigned int baseAdd);
 extern unsigned int UARTModuleVersionNumberGet(unsigned int baseAdd);
-extern void UARTFIFORegisterWrite(unsigned int baseAdd, unsigned int fcrValue);
 extern void UARTTxDMAThresholdControl(unsigned int baseAdd, unsigned int thrsCtrlFlag);
 extern void UARTTxDMAThresholdValConfig(unsigned int baseAdd, unsigned int thrsValue);
 

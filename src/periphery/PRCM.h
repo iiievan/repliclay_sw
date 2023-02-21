@@ -2,7 +2,7 @@
 #define _PRCM_H_
 
 #include <stdint.h>
-#include "app_utils.h"
+#include "utils.h"
 #include "DM_Timer.h"
 
 //This is power reset clock manager class and his namespace
@@ -3173,6 +3173,8 @@ public:
                  void  run_I2C0_clk();
                  void  run_I2C1_clk();
                  void  run_I2C2_clk();
+                 
+                 void  run_clk_UART0();
     
 private:
     

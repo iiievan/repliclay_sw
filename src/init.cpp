@@ -15,9 +15,13 @@
 #include "OS_Timer.h"
 #include "HS_I2C.h"
 #include "I2C_EEPROM.h"
+#include "n_UART.h"
 #include "error.h"
 #include "cp15.h"
 #include "hal_mmu.h"
+#include "uart_irda_cir.h"
+#include "UART_DT_driver.h"
+#include "terminal/x_Print.h"
 
 #ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
      OS_Timer os_timer(DMTIMER::AM335X_DMTIMER_1);
@@ -37,20 +41,26 @@ I2C_EEPROM<(32*1024),64> CAT24C256WI(I2C::AM335X_I2C_2, SLAVE_ADDR_CAT24C256, CA
 
 void init_board(void)   
 { 
+    /// Initialize MMU,Cache,Branch prediction etc... ///
     InitMem();                     // Initiate MMU and ... Invoke Cache  
     CP15BranchPredictionEnable();  // Enable Branch Prediction Shit */
- 
+    
+    /// Initialize Interrupt controller /// 
     intc.master_IRQ_enable();      // Enable IRQ in CPSR
     intc.init();                   // Initializing the ARM Interrupt Controller.
     
-    /* Initialize the UART console */
-    ConsoleUtilsInit();
-    ConsoleUtilsSetType(CONSOLE_UART); // Select the console type based on compile time check
-    
+    /// Initialize the OS-tick timer console /// 
     os_timer.setup(OS_TIMER_RLD_COUNT);
-    //BRDINFO_24LC32A.setup(I2C::F_400KHz); //bus i2c0 presumably burned out on this board
-    CAT24C256WI.setup(I2C::F_400KHz);
     
+    /// Initialize the UART console /// 
+    // If UART interrupts are used, 
+    // setup them before the interrupt controller (INTC) is initiated
+    uart_driver.probe((void *)&print);  // set read and write methods to "print" obj
+    uart_driver.init();   
+    
+    print.ln("AM335x UART Driver started!");
+    
+    /// Initialize GPIO's ///
     GPIOModuleClkConfig(1);             // Enabling functional clocks for GPIO1 instance.
     GPIOModuleEnable(SOC_GPIO_1_REGS);  // Enabling the GPIO module.
     GPIOModuleReset(SOC_GPIO_1_REGS);   // Resetting the GPIO module. */
@@ -110,3 +120,4 @@ uint32_t board_info_check(uint8_t *board_ver)
         return BOARD_UNKNOWN;
     }
 }
+
