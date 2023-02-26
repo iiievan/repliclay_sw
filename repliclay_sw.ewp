@@ -685,7 +685,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>240</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -2735,6 +2735,9 @@
                 <name>$PROJ_DIR$\src\periphery\INTC.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\periphery\n_EDMA.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\periphery\n_UART.cpp</name>
             </file>
             <file>
@@ -2765,7 +2768,7 @@
                 <name>$PROJ_DIR$\src\utils\frame_buffer.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\src\utils\Paired_buffer.h</name>
+                <name>$PROJ_DIR$\src\utils\paired_buffer.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\src\utils\ring_buffer.h</name>
