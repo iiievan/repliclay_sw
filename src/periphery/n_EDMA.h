@@ -180,7 +180,7 @@ namespace n_EDMA
             uint32_t    PRIQ1      :3;        // bit: 4..6    (RW) .
             uint32_t               :1;        // bit: 7        Reserved.    
             uint32_t    PRIQ2      :3;        // bit: 8..10   (RW) .
-            uint32_t               :31;       // bit: 11..31   Reserved.
+            uint32_t               :21;       // bit: 11..31   Reserved.
         } b;                                  // Structure used for bit access 
         uint32_t  reg;                        // Type used for register access 
     } QUEPRI_reg_t;
@@ -240,7 +240,7 @@ namespace n_EDMA
         struct 
         {   
             /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    En      :31;        // bit: 0..31        (W) .          
+            uint32_t    En      :31;        // bit: 0..31        (W) . 
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access 
     } EMCRH_reg_t;
@@ -255,9 +255,10 @@ namespace n_EDMA
         struct 
         {   
             /**  Register not described!!! Describe yoursef using am335x_reference_manual **/             
-            uint32_t    En      :31;         // bit: 0..31        (R) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
+            uint32_t    En      :8;         // bit: 0..7        (R) .
+            uint32_t            :24;        // bit: 8..31       (R) .          
+        } b;                                // Structure used for bit access 
+        uint32_t  reg;                      // Type used for register access 
     } QEMR_reg_t;
     
      /*! @brief      __XXX__  
@@ -268,12 +269,12 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   
+            /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    En      :8;         // bit: 0..7        (W) .
+            uint32_t            :24;        // bit: 8..31       (R) .        
+        } b;                                // Structure used for bit access 
+        uint32_t  reg;                      // Type used for register access 
     } QEMCR_reg_t;
     
     /*! @brief      __XXX__  
@@ -284,10 +285,13 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
+        {    /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    QTHRXCD0      :1;         // bit: 0        (R) .
+            uint32_t    QTHRXCD1      :1;         // bit: 1        (R) 
+            uint32_t    QTHRXCD2      :1;         // bit: 2        (R) 
+            uint32_t                  :13;        // bit: 3..15    (R) 
+            uint32_t    TCCERR        :1;         // bit: 16       (R)  
+            uint32_t                  :15;        // bit: 17..31   (R) .         
         } b;                                      // Structure used for bit access 
         uint32_t  reg;                            // Type used for register access 
     } CCERR_reg_t;
@@ -300,10 +304,13 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    QTHRXCD0      :1;         // bit: 0        (W) .
+            uint32_t    QTHRXCD1      :1;         // bit: 1        (W) 
+            uint32_t    QTHRXCD2      :1;         // bit: 2        (W) 
+            uint32_t                  :13;        // bit: 3..15    (R) 
+            uint32_t    TCCERR        :1;         // bit: 16       (W)  
+            uint32_t                  :15;        // bit: 17..31   (R) .         
         } b;                                      // Structure used for bit access 
         uint32_t  reg;                            // Type used for register access 
     } CCERRCLR_reg_t;
@@ -318,10 +325,10 @@ namespace n_EDMA
         struct 
         {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
              
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+            uint32_t    EVAL      :1;         // bit: 0       (W).  
+            uint32_t              :31;        // bit: 1..31   Reserved.         
+        } b;                                  // Structure used for bit access 
+        uint32_t  reg;                        // Type used for register access 
     } EEVAL_reg_t;
     
      /*! @brief      __XXX__  
@@ -332,12 +339,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    En      :31;         // bit: 0        (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAE0_reg_t;
     
     /*! @brief      __XXX__  
@@ -348,12 +353,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/             
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access  
     } DRAEH0_reg_t;
     
     /*! @brief      __XXX__  
@@ -364,12 +367,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access  
     } DRAE1_reg_t;
     
         /*! @brief      __XXX__  
@@ -380,12 +381,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access
     } DRAEH1_reg_t;
     
      /*! @brief      __XXX__  
@@ -396,12 +395,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAE2_reg_t;
     
     /*! @brief      __XXX__  
@@ -412,12 +409,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAEH2_reg_t;
     
     /*! @brief      __XXX__  
@@ -428,12 +423,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAE3_reg_t;
     
 /*! @brief      __XXX__  
@@ -444,12 +437,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access
     } DRAEH3_reg_t;
     
      /*! @brief      __XXX__  
@@ -460,12 +451,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAE4_reg_t;
     
     /*! @brief      __XXX__  
@@ -476,12 +465,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAEH4_reg_t;
     
     /*! @brief      __XXX__  
@@ -492,12 +479,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAE5_reg_t;
     
         /*! @brief      __XXX__  
@@ -508,12 +493,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register accesss 
     } DRAEH5_reg_t;
     
      /*! @brief      __XXX__  
@@ -524,12 +507,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAE6_reg_t;
     
     /*! @brief      __XXX__  
@@ -540,12 +521,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAEH6_reg_t;
     
     /*! @brief      __XXX__  
@@ -556,12 +535,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access 
     } DRAE7_reg_t;
 
     /*! @brief      __XXX__  
@@ -572,12 +549,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :31;         // bit: 0..31       (RW) .          
+        } b;                                 // Structure used for bit access 
+        uint32_t  reg;                       // Type used for register access
     } DRAEH7_reg_t;
     
      /*! @brief      __XXX__  
@@ -588,12 +563,11 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    En      :8;         // bit: 0..7       (RW) .  
+            uint32_t            :24;        // bit: 8..31      Reserved.
+        } b;                                // Structure used for bit access 
+        uint32_t  reg;                      // Type used for register access
     } QRAE_reg_t;
     
     /*! @brief      __XXX__  
@@ -604,12 +578,12 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    ENUM      :6;         // bit: 0..5      (R) .  
+            uint32_t    ETYPE     :2;         // bit: 6,7       (R) .
+            uint32_t              :24;        // bit: 8..31     Reserved.
+        } b;                                  // Structure used for bit access 
+        uint32_t  reg;                        // Type used for register access 
     } QE_reg_t;
     
     /*! @brief      __XXX__  
@@ -620,15 +594,20 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t    STRTPTR     :4;         // bit: 0..3      (R) .  
+            uint32_t                :4;         // bit: 4..7      Reserved.
+            uint32_t    NUMVAL      :5;         // bit: 8..12     (R) .  
+            uint32_t                :3;         // bit: 13..15    Reserved.
+            uint32_t    WM          :5;         // bit: 16..20    (R) .  
+            uint32_t                :3;         // bit: 21..23    Reserved.
+            uint32_t    THRXCD      :1;         // bit: 24        (R) .
+            uint32_t                :7;         // bit: 25..31     Reserved.
+        } b;                                    // Structure used for bit access 
+        uint32_t  reg;                          // Type used for register access  
     } QSTAT_reg_t;
     
-        /*! @brief      __XXX__  
+    /*! @brief      __XXX__  
     *   @details    __XXX__
     *               __XXX__
     *               __XXX__
@@ -636,12 +615,15 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t    bitfield      :1;         // bit: 0        (RW) Bitfield description.  
-            uint32_t                  :31;        // bit: 1..31   Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    Q0      :5;         // bit: 0..4      (RW) .  
+            uint32_t            :3;         // bit: 5..7      Reserved.
+            uint32_t    Q1      :5;         // bit: 8..12     (RW) .  
+            uint32_t            :3;         // bit: 13..15    Reserved.
+            uint32_t    Q2      :5;         // bit: 16..20    (RW) .  
+            uint32_t            :12;        // bit: 21..31    Reserved.       
+        } b;                                // Structure used for bit access 
+        uint32_t  reg;                      // Type used for register access 
     } QWMTHRA_reg_t;
     
      /*! @brief      __XXX__  
