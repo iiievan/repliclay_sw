@@ -16,6 +16,7 @@
 #include "HS_I2C.h"
 #include "I2C_EEPROM.h"
 #include "n_UART.h"
+#include "n_EDMA.h"
 #include "error.h"
 #include "cp15.h"
 #include "hal_mmu.h"
@@ -41,6 +42,8 @@ I2C_EEPROM<(32*1024),64> CAT24C256WI(I2C::AM335X_I2C_2, SLAVE_ADDR_CAT24C256, CA
 
 void init_board(void)   
 { 
+    volatile uint32_t EDMA_size = sizeof(n_EDMA::AM335x_EDMA_Type);
+    
     /// Initialize MMU,Cache,Branch prediction etc... ///
     InitMem();                     // Initiate MMU and ... Invoke Cache  
     CP15BranchPredictionEnable();  // Enable Branch Prediction Shit */
