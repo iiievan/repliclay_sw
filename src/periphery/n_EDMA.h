@@ -71,7 +71,7 @@ namespace n_EDMA
             uint32_t                  :28;        // bit: 4..31   Reserved.         
         } b;                                      // Structure used for bit access 
         uint32_t  reg;                            // Type used for register access 
-    } SYSCONFIG_reg_t;
+    } SYSCONFIGCC_reg_t;
     
     /*! @brief      __XXX__  
     *   @details    __XXX__
@@ -625,7 +625,7 @@ namespace n_EDMA
             uint32_t    Q1      :5;         // bit: 8..12     (RW) .  
             uint32_t            :3;         // bit: 13..15    Reserved.
             uint32_t    Q2      :5;         // bit: 16..20    (RW) .  
-            uint32_t            :12;        // bit: 21..31    Reserved.       
+            uint32_t            :11;        // bit: 21..31    Reserved.       
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access 
     } QWMTHRA_reg_t;
@@ -664,7 +664,7 @@ namespace n_EDMA
     { 
         struct 
         {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    FADDR      :31;         // bit: 0..31       (R) .          
+            uint32_t    FADDR      :32;         // bit: 0..31       (R) .          
         } b;                                    // Structure used for bit access 
         uint32_t  reg;                          // Type used for register access 
     } MPFAR_reg_t;
@@ -1304,7 +1304,7 @@ namespace n_EDMA
             uint32_t                  :26;  // bit: 6..31    Reserved.          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
-    } SYSCONFIG_reg_t;
+    } SYSCONFIGTC_reg_t;
     
     /*! @brief      __XXX__  
     *   @details    __XXX__
@@ -1389,11 +1389,16 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    STAT      :4;   // bit: 0..3      (R) .
+            uint32_t              :4;   // bit: 4..7      Reserved.
+            uint32_t    TCC       :6;   // bit: 8..13     (R) .
+            uint32_t              :2;   // bit: 14,15     Reserved.
+            uint32_t    TCINTEN   :1;   // bit: 16        (R) .
+            uint32_t    TCCHEN    :1;   // bit: 17        (R) .
+            uint32_t              :14;  // bit: 18..31    Reserved.          
+        } b;                            // Structure used for bit access 
+        uint32_t  reg;                  // Type used for register access
     } ERRDET_reg_t;
     
     /*! @brief      __XXX__  
@@ -1405,10 +1410,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    EVAL      :1;   // bit: 0        (W) . 
+            uint32_t              :31;  // bit: 1..31    Reserved.          
+        } b;                            // Structure used for bit access 
+        uint32_t  reg;                  // Type used for register access
     } ERRCMD_reg_t;
     
     /*! @brief      __XXX__  
@@ -1420,10 +1425,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    RDRATE      :3;   // bit: 0..2        (W) . 
+            uint32_t                :29;  // bit: 3..31    Reserved.          
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } RDRATE_reg_t;
     
     /*! @brief      __XXX__  
@@ -1435,10 +1440,21 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    SAM         :1;   // bit: 0        (R) . 
+            uint32_t    DAM         :1;   // bit: 1        (R) .
+            uint32_t                :2;   // bit: 2,3      Reserved.
+            uint32_t    PRI         :3;   // bit: 4..6     (R) .
+            uint32_t                :1;   // bit: 7        Reserved.
+            uint32_t    FWID        :3;   // bit: 8..10    (R) .
+            uint32_t                :1;   // bit: 11       Reserved.
+            uint32_t    TCC         :6;   // bit: 12..17   (R) .
+            uint32_t                :2;   // bit: 18,19    Reserved.
+            uint32_t    TCINTEN     :1;   // bit: 20       (R) .
+            uint32_t                :1;   // bit: 21       Reserved.
+            uint32_t    TCCHEN      :1;   // bit: 22       (R) .
+            uint32_t                :9;   // bit: 23..31   Reserved.          
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } SAOPT_reg_t; 
 
     /*! @brief      __XXX__  
@@ -1450,10 +1466,9 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    SADDR      :32;   // bit: 0..31       (R) .         
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } SASRC_reg_t;
 
     /*! @brief      __XXX__  
@@ -1464,11 +1479,11 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    ACNT      :16;   // bit: 0..15       (R) . 
+            uint32_t    BCNT      :16;   // bit: 16..31      (R) .          
+        } b;                             // Structure used for bit access 
+        uint32_t  reg;                   // Type used for register access
     } SACNT_reg_t;
     
     /*! @brief      __XXX__  
@@ -1480,8 +1495,7 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t  R_BITFIELD       :32;  // bit: 0..31    Reserved.          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } SADST_reg_t;
@@ -1494,11 +1508,11 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    SBIDX      :16;   // bit: 0..15       (R) . 
+            uint32_t    DBIDX      :16;   // bit: 16..31      (R) .           
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } SABIDX_reg_t;
     
     /*! @brief      __XXX__  
@@ -1510,8 +1524,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t    PRIVID      :4;   // bit: 0..3     (R) . 
+            uint32_t                :4;   // bit: 4..7     Reserved.
+            uint32_t    PRIV        :1;   // bit: 8        (R) .
+            uint32_t                :23;  // bit: 9..31    Reserved.           
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } SAMPPRXY_reg_t; 
@@ -1524,9 +1540,9 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    ACNTRLD      :16;   // bit: 0        (R) . 
+            uint32_t                 :16;   // bit: 1..31    Reserved.          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } SACNTRLD_reg_t;
@@ -1539,11 +1555,10 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    SADDRBREF      :32;   // bit: 0..31        (R) .           
+        } b;                                  // Structure used for bit access 
+        uint32_t  reg;                        // Type used for register access
     } SASRCBREF_reg_t;
     
     /*! @brief      __XXX__  
@@ -1555,8 +1570,7 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t   R_BITFIELD      :32;  // bit: 0..31    Reserved.          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } SADSTBREF_reg_t;
@@ -1569,9 +1583,9 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    ACNTRLD      :16;   // bit: 0..15     (R) .
+            uint32_t                 :16;   // bit: 16..31    Reserved.           
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFCNTRLD_reg_t;
@@ -1584,9 +1598,8 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
+            uint32_t   R_BITFIELD    :32;    // bit: 0..31    Reserved.          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFSRCBREF_reg_t; 
@@ -1600,10 +1613,9 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t   DADDRBREF  :32;   // bit: 0..31        (R) .           
+        } b;                             // Structure used for bit access 
+        uint32_t  reg;                   // Type used for register access
     } DFDSTBREF_reg_t;
 
     /*! @brief      __XXX__  
@@ -1615,10 +1627,21 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    SAM         :1;   // bit: 0        (R) . 
+            uint32_t    DAM         :1;   // bit: 1        (R) .
+            uint32_t                :2;   // bit: 2,3      Reserved.
+            uint32_t    PRI         :3;   // bit: 4..6     (R) .
+            uint32_t                :1;   // bit: 7        Reserved.
+            uint32_t    FWID        :3;   // bit: 8..10    (R) .
+            uint32_t                :1;   // bit: 11       Reserved.
+            uint32_t    TCC         :6;   // bit: 12..17   (R) .
+            uint32_t                :2;   // bit: 18,19    Reserved.
+            uint32_t    TCINTEN     :1;   // bit: 20       (R) .
+            uint32_t                :1;   // bit: 21       Reserved.
+            uint32_t    TCCHEN      :1;   // bit: 22       (R) .
+            uint32_t                :9;   // bit: 23..31   Reserved.           
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFOPT0_reg_t;
     
     /*! @brief      __XXX__  
@@ -1630,8 +1653,7 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t    R_BITFIELD    :32;  // bit: 0..32       (R) .         
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFSRC0_reg_t;
@@ -1644,11 +1666,11 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    ACNT      :16;   // bit: 0..15        (R) . 
+            uint32_t    BCNT      :16;   // bit: 16..31       (R) .         
+        } b;                             // Structure used for bit access 
+        uint32_t  reg;                   // Type used for register access
     } DFCNT0_reg_t;
     
     /*! @brief      __XXX__  
@@ -1660,10 +1682,9 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    DADDR      :32;   // bit: 0..31        (W) .           
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFDST0_reg_t; 
 
     /*! @brief      __XXX__  
@@ -1675,10 +1696,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    SBIDX      :16;  // bit: 0..15     (R) . 
+            uint32_t    DBIDX      :16;  // bit: 16..31    (R) .          
+        } b;                             // Structure used for bit access 
+        uint32_t  reg;                   // Type used for register access
     } DFBIDX0_reg_t;
 
     /*! @brief      __XXX__  
@@ -1690,10 +1711,12 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    PRIVID      :4;   // bit: 0..3     (R) . 
+            uint32_t                :4;   // bit: 4..7     Reserved.
+            uint32_t    PRIV        :1;   // bit: 8        (R) .
+            uint32_t                :23;  // bit: 9..31    Reserved.          
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFMPPRXY0_reg_t;
     
     /*! @brief      __XXX__  
@@ -1705,10 +1728,21 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    SAM         :1;   // bit: 0        (R) . 
+            uint32_t    DAM         :1;   // bit: 1        (R) .
+            uint32_t                :2;   // bit: 2,3      Reserved.
+            uint32_t    PRI         :3;   // bit: 4..6     (R) .
+            uint32_t                :1;   // bit: 7        Reserved.
+            uint32_t    FWID        :3;   // bit: 8..10    (R) .
+            uint32_t                :1;   // bit: 11       Reserved.
+            uint32_t    TCC         :6;   // bit: 12..17   (R) .
+            uint32_t                :2;   // bit: 18,19    Reserved.
+            uint32_t    TCINTEN     :1;   // bit: 20       (R) .
+            uint32_t                :1;   // bit: 21       Reserved.
+            uint32_t    TCCHEN      :1;   // bit: 22       (R) .
+            uint32_t                :9;   // bit: 23..31   Reserved.           
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFOPT1_reg_t;
     
     /*! @brief      __XXX__  
@@ -1720,10 +1754,9 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    R_BITFIELD      :32;   // bit: 0..31        Reserved.           
+        } b;                                   // Structure used for bit access 
+        uint32_t  reg;                         // Type used for register access
     } DFSRC1_reg_t;
     
     /*! @brief      __XXX__  
@@ -1734,9 +1767,9 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    ACNT      :16;   // bit: 0..15        (R) . 
+            uint32_t    BCNT      :16;   // bit: 16..31       (R) .          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFCNT1_reg_t; 
@@ -1750,10 +1783,9 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    DADDR      :32;   // bit: 0..31       (R) .        
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFDST1_reg_t;
 
     /*! @brief      __XXX__  
@@ -1764,11 +1796,11 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    SBIDX      :16;   // bit: 0..15       (R) . 
+            uint32_t    DBIDX      :16;   // bit: 16..31      (R) .         
+        } b;                             // Structure used for bit access 
+        uint32_t  reg;                   // Type used for register access
     } DFBIDX1_reg_t;
     
     /*! @brief      __XXX__  
@@ -1779,11 +1811,13 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
+            uint32_t    PRIVID      :4;   // bit: 0..3     (R) . 
+            uint32_t                :4;   // bit: 4..7     Reserved.
+            uint32_t    PRIV        :1;   // bit: 8        (R) .
+            uint32_t                :23;  // bit: 9..31    Reserved.         
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFMPPRXY1_reg_t;
     
     /*! @brief      __XXX__  
@@ -1795,8 +1829,19 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t    SAM         :1;   // bit: 0        (R) . 
+            uint32_t    DAM         :1;   // bit: 1        (R) .
+            uint32_t                :2;   // bit: 2,3      Reserved.
+            uint32_t    PRI         :3;   // bit: 4..6     (R) .
+            uint32_t                :1;   // bit: 7        Reserved.
+            uint32_t    FWID        :3;   // bit: 8..10    (R) .
+            uint32_t                :1;   // bit: 11       Reserved.
+            uint32_t    TCC         :6;   // bit: 12..17   (R) .
+            uint32_t                :2;   // bit: 18,19    Reserved.
+            uint32_t    TCINTEN     :1;   // bit: 20       (R) .
+            uint32_t                :1;   // bit: 21       Reserved.
+            uint32_t    TCCHEN      :1;   // bit: 22       (R) .
+            uint32_t                :9;   // bit: 23..31   Reserved.           
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFOPT2_reg_t;
@@ -1810,8 +1855,7 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t    R_BITFIELD   :32;   // bit: 0..31       Reserved.         
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFSRC2_reg_t; 
@@ -1825,10 +1869,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    ACNT      :16;   // bit: 0..15        (R) . 
+            uint32_t    BCNT      :16;   // bit: 16..31       (R) .          
+        } b;                             // Structure used for bit access 
+        uint32_t  reg;                   // Type used for register access
     } DFCNT2_reg_t;
 
     /*! @brief      __XXX__  
@@ -1840,10 +1884,9 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    DADDR      :32;  // bit: 0..31       (R) .          
+        } b;                             // Structure used for bit access 
+        uint32_t  reg;                   // Type used for register access
     } DFDST2_reg_t;
     
     /*! @brief      __XXX__  
@@ -1855,10 +1898,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    SBIDX      :16;   // bit: 0..15       (R) . 
+            uint32_t    DBIDX      :16;   // bit: 16..31      (R) .          
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFBIDX2_reg_t;
     
     /*! @brief      __XXX__  
@@ -1870,8 +1913,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t    PRIVID      :4;   // bit: 0..3     (R) . 
+            uint32_t                :4;   // bit: 4..7     Reserved.
+            uint32_t    PRIV        :1;   // bit: 8        (R) .
+            uint32_t                :23;  // bit: 9..31    Reserved.          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFMPPRXY2_reg_t;
@@ -1885,8 +1930,19 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t    SAM         :1;   // bit: 0        (R) . 
+            uint32_t    DAM         :1;   // bit: 1        (R) .
+            uint32_t                :2;   // bit: 2,3      Reserved.
+            uint32_t    PRI         :3;   // bit: 4..6     (R) .
+            uint32_t                :1;   // bit: 7        Reserved.
+            uint32_t    FWID        :3;   // bit: 8..10    (R) .
+            uint32_t                :1;   // bit: 11       Reserved.
+            uint32_t    TCC         :6;   // bit: 12..17   (R) .
+            uint32_t                :2;   // bit: 18,19    Reserved.
+            uint32_t    TCINTEN     :1;   // bit: 20       (R) .
+            uint32_t                :1;   // bit: 21       Reserved.
+            uint32_t    TCCHEN      :1;   // bit: 22       (R) .
+            uint32_t                :9;   // bit: 23..31   Reserved.         
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFOPT3_reg_t; 
@@ -1900,8 +1956,7 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t    R_BITFIELD   :32;   // bit: 0..31       Reserved.          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFSRC3_reg_t;
@@ -1915,10 +1970,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    ACNT      :16;   // bit: 0..15        (R) . 
+            uint32_t    BCNT      :16;   // bit: 16..31       (R) .          
+        } b;                             // Structure used for bit access 
+        uint32_t  reg;                   // Type used for register access
     } DFCNT3_reg_t;
     
     /*! @brief      __XXX__  
@@ -1930,8 +1985,7 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
+            uint32_t    DADDR      :32;     // bit: 0        (R) .          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } DFDST3_reg_t;
@@ -1945,10 +1999,10 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    SBIDX      :16;   // bit: 0..15       (R) . 
+            uint32_t    DBIDX      :16;   // bit: 16..31      (R) .         
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFBIDX3_reg_t;
     
     /*! @brief      __XXX__  
@@ -1960,10 +2014,12 @@ namespace n_EDMA
     { 
         struct 
         {  /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    BITFIELD      :1;   // bit: 0        (W) . 
-            uint32_t                  :31;  // bit: 1..31    Reserved.          
-        } b;                                // Structure used for bit access 
-        uint32_t  reg;                      // Type used for register access
+            uint32_t    PRIVID      :4;   // bit: 0..3     (R) . 
+            uint32_t                :4;   // bit: 4..7     Reserved.
+            uint32_t    PRIV        :1;   // bit: 8        (R) .
+            uint32_t                :23;  // bit: 9..31    Reserved.          
+        } b;                              // Structure used for bit access 
+        uint32_t  reg;                    // Type used for register access
     } DFMPPRXY3_reg_t;
     
     struct AM335x_EDMA3CC_Type
@@ -1971,7 +2027,7 @@ namespace n_EDMA
         __R   PIDCC_reg_t       PID;            // (0x00)  Peripheral Identification Register
         __R   CCCFG_reg_t       CCCFG;          // (0x04)  EDMA3CC Configuration Register
         __R   uint32_t          RESERVED1[2];
-        __RW  SYSCONFIG_reg_t   SYSCONFIG;      // (0x10)  EDMA3CC System Configuration Register
+        __RW  SYSCONFIGCC_reg_t   SYSCONFIG;    // (0x10)  EDMA3CC System Configuration Register
         __R   uint32_t          RESERVED2[59]; 
         __RW  DCHMAP_reg_t      DCHMAP_0;       // (0x100) DMA Channel Mapping Register 0
         __RW  DCHMAP_reg_t      DCHMAP_1;       // (0x104) DMA Channel Mapping Register 1
@@ -2092,6 +2148,7 @@ namespace n_EDMA
         __RW  QRAE_reg_t        QRAE_5;         // (0x394) QDMA Region Access Enable Registers for Region 5
         __RW  QRAE_reg_t        QRAE_6;         // (0x398) QDMA Region Access Enable Registers for Region 6
         __RW  QRAE_reg_t        QRAE_7;         // (0x39Ñ) QDMA Region Access Enable Registers for Region 7
+        __R   uint32_t          RESERVED7[24];  
         __R   QE_reg_t          Q0E0;           // (0x400) Event Queue 0 Entry 0 Register 
         __R   QE_reg_t          Q0E1;           // (0x404) Event Queue 0 Entry 1 Register 
         __R   QE_reg_t          Q0E2;           // (0x408) Event Queue 0 Entry 2 Register 
@@ -2140,15 +2197,15 @@ namespace n_EDMA
         __R   QE_reg_t          Q2E13;          // (0x4B4) Event Queue 2 Entry 13 Register  
         __R   QE_reg_t          Q2E14;          // (0x4B8) Event Queue 2 Entry 14 Register  
         __R   QE_reg_t          Q2E15;          // (0x4BC) Event Queue 2 Entry 15 Register 
-        __R   uint32_t          RESERVED7[80]; 
+        __R   uint32_t          RESERVED8[80]; 
         __R   QSTAT_reg_t       QSTAT_0;        // (0x600) Queue Status Registers 0
         __R   QSTAT_reg_t       QSTAT_1;        // (0x604) Queue Status Registers 1 
         __R   QSTAT_reg_t       QSTAT_2;        // (0x608) Queue Status Registers 2
-        __R   uint32_t          RESERVED8[5]; 
+        __R   uint32_t          RESERVED9[5]; 
         __RW  QWMTHRA_reg_t     QWMTHRA;        // (0x620) Queue Watermark Threshold A Register
-        __R   uint32_t          RESERVED9[7]; 
+        __R   uint32_t          RESERVED10[7]; 
         __R   CCSTAT_reg_t      CCSTAT;         // (0x640) EDMA3CC Status Register
-        __R   uint32_t          RESERVED10[111]; 
+        __R   uint32_t          RESERVED11[111]; 
         __R   MPFAR_reg_t       MPFAR;          // (0x800) Memory Protection Fault Address Register
         __R   MPFSR_reg_t       MPFSR;          // (0x804) Memory Protection Fault Status Register
         __W   MPFCR_reg_t       MPFCR;          // (0x808) Memory Protection Fault Command Register 
@@ -2161,7 +2218,7 @@ namespace n_EDMA
         __RW  MPPA_reg_t        MPPA_5;         // (0x824) Memory Protection Page Attribute Register 5 
         __RW  MPPA_reg_t        MPPA_6;         // (0x828) Memory Protection Page Attribute Register 6
         __RW  MPPA_reg_t        MPPA_7;         // (0x82C) Memory Protection Page Attribute Register 7
-        __R   uint32_t          RESERVED11[500]; 
+        __R   uint32_t          RESERVED12[500]; 
         __R   ER_reg_t          ER;             // (0x1000) Event Register  
         __R   ERH_reg_t         ERH;            // (0x1004) Event Register High 
         __W   ECR_reg_t         ECR;            // (0x1008) Event Clear Register 
@@ -2180,7 +2237,7 @@ namespace n_EDMA
         __R   SERH_reg_t        SERH;           // (0x103C) Secondary Event Register High 
         __W   SECR_reg_t        SECR;           // (0x1040) Secondary Event Clear Register 
         __W   SECRH_reg_t       SECRH;          // (0x1044) Secondary Event Clear Register High
-        __R   uint32_t          RESERVED12[2]; 
+        __R   uint32_t          RESERVED13[2]; 
         __R   IER_reg_t         IER;            // (0x1050) Interrupt Enable Register
         __R   IERH_reg_t        IERH;           // (0x1054) Interrupt Enable Register High 
         __W   IECR_reg_t        IECR;           // (0x1058) Interrupt Enable Clear Register
@@ -2192,7 +2249,7 @@ namespace n_EDMA
         __W   ICR_reg_t         ICR;            // (0x1070) Interrupt Clear Register 
         __W   ICRH_reg_t        ICRH;           // (0x1074) Interrupt Clear Register High
         __W   IEVAL_reg_t       IEVAL;          // (0x1078) Interrupt Evaluate Register
-        __R   uint32_t          RESERVED13[1]; 
+        __R   uint32_t          RESERVED14[1]; 
         __R   QER_reg_t         QER;            // (0x1080) QDMA Event Register 
         __R   QEER_reg_t        QEER;           // (0x1084) QDMA Event Enable Register
         __W   QEECR_reg_t       QEECR;          // (0x1088) QDMA Event Enable Clear Register 
@@ -2203,62 +2260,62 @@ namespace n_EDMA
 
     struct AM335x_EDMA3TC_Type
     {                                                                                      
-        __  PIDTC_reg_t         PID;                // (0x00)   Peripheral Identification Register
-        __  TCCFG_reg_t         TCCFG;              // (0x04)   EDMA3TC Configuration Register
-        __  uint32_t            RESERVED1[2];
-        __  SYSCONFIG_reg_t     SYSCONFIG;          // (0x10)   EDMA3TC System Configuration Register  
-        __  uint32_t            RESERVED2[59];
-        __  TCSTAT_reg_t        TCSTAT;             // (0x100)  EDMA3TC Channel Status Register
-        __  uint32_t            RESERVED3[7];  
-        __  ERRSTAT_reg_t       ERRSTAT;            // (0x120)  Error Register 
-        __  ERREN_reg_t         ERREN;              // (0x124)  Error Enable Register 
-        __  ERRCLR_reg_t        ERRCLR;             // (0x128)  Error Clear Register 
-        __  ERRDET_reg_t        ERRDET;             // (0x12C)  Error Details Register 
-        __  ERRCMD_reg_t        ERRCMD;             // (0x130)  Error Interrupt Command Register 
-        __  uint32_t            RESERVED4[3]; 
-        __  RDRATE_reg_t        RDRATE;             // (0x140)  Read Rate Register
-        __  uint32_t            RESERVED5[63];
-        __  SAOPT_reg_t         SAOPT;              // (0x240)  Source Active Options Register 
-        __  SASRC_reg_t         SASRC;              // (0x244)  Source Active Source Address Register
-        __  SACNT_reg_t         SACNT;              // (0x248)  Source Active Count Register  
-        __  SADST_reg_t         SADST;              // (0x24C)  Source Active Destination Address Register 
-        __  SABIDX_reg_t        SABIDX;             // (0x250)  Source Active Source B-Index Register
-        __  SAMPPRXY_reg_t      SAMPPRXY;           // (0x254)  Source Active Memory Protection Proxy Register  
-        __  SACNTRLD_reg_t      SACNTRLD;           // (0x258)  Source Active Count Reload Register
-        __  SASRCBREF_reg_t     SASRCBREF;          // (0x25C)  Source Active Source Address B-Reference Register 
-        __  SADSTBREF_reg_t     SADSTBREF;          // (0x260)  Source Active Destination Address B-Reference Register
-        __  uint32_t            RESERVED6[7];
-        __  DFCNTRLD_reg_t      DFCNTRLD;           // (0x280)  Destination FIFO Set Count Reload
-        __  DFSRCBREF_reg_t     DFSRCBREF;          // (0x284)  Destination FIFO Set Destination Address B Reference Register
-        __  DFDSTBREF_reg_t     DFDSTBREF;          // (0x288)  Destination FIFO Set Destination Address B Reference Register
-        __  uint32_t            RESERVED7[29];
-        __  DFOPT0_reg_t        DFOPT0;             // (0x300)  Destination FIFO Options Register 0
-        __  DFSRC0_reg_t        DFSRC0;             // (0x304)  Destination FIFO Source Address Register 0
-        __  DFCNT0_reg_t        DFCNT0;             // (0x308)  Destination FIFO Count Register 0
-        __  DFDST0_reg_t        DFDST0;             // (0x30C)  Destination FIFO Destination Address Register 0
-        __  DFBIDX0_reg_t       DFBIDX0;            // (0x310)  Destination FIFO BIDX Register 0
-        __  DFMPPRXY0_reg_t     DFMPPRXY0;          // (0x314)  Destination FIFO Memory Protection Proxy Register 0
-        __  uint32_t            RESERVED8[10];
-        __  DFOPT1_reg_t        DFOPT1;             // (0x340)  Destination FIFO Options Register 1
-        __  DFSRC1_reg_t        DFSRC1;             // (0x344)  Destination FIFO Source Address Register 1
-        __  DFCNT1_reg_t        DFCNT1;             // (0x348)  Destination FIFO Count Register 1
-        __  DFDST1_reg_t        DFDST1;             // (0x34C)  Destination FIFO Destination Address Register 1
-        __  DFBIDX1_reg_t       DFBIDX1;            // (0x350)  Destination FIFO BIDX Register 1
-        __  DFMPPRXY1_reg_t     DFMPPRXY1;          // (0x354)  Destination FIFO Memory Protection Proxy Register 1
-        __  uint32_t            RESERVED9[10];
-        __  DFOPT2_reg_t        DFOPT2;             // (0x380)  Destination FIFO Options Register 2
-        __  DFSRC2_reg_t        DFSRC2;             // (0x384)  Destination FIFO Source Address Register 2
-        __  DFCNT2_reg_t        DFCNT2;             // (0x388)  Destination FIFO Count Register 2
-        __  DFDST2_reg_t        DFDST2;             // (0x38C)  Destination FIFO Destination Address Register 2
-        __  DFBIDX2_reg_t       DFBIDX2;            // (0x390)  Destination FIFO BIDX Register 2
-        __  DFMPPRXY2_reg_t     DFMPPRXY2;          // (0x394)  Destination FIFO Memory Protection Proxy Register 2
-        __  uint32_t            RESERVED10[10];
-        __  DFOPT3_reg_t        DFOPT3;             // (0x3C0)  Destination FIFO Options Register 3
-        __  DFSRC3_reg_t        DFSRC3;             // (0x3C4)  Destination FIFO Source Address Register 3
-        __  DFCNT3_reg_t        DFCNT3;             // (0x3C8)  Destination FIFO Count Register 3
-        __  DFDST3_reg_t        DFDST3;             // (0x3CC)  Destination FIFO Destination Address Register 3
-        __  DFBIDX3_reg_t       DFBIDX3;            // (0x3D0)  Destination FIFO BIDX Register 3
-        __  DFMPPRXY3_reg_t     DFMPPRXY3;          // (0x3D4)  Destination FIFO Memory Protection Proxy Register 3 
+        __R   PIDTC_reg_t         PID;                // (0x00)   Peripheral Identification Register
+        __R   TCCFG_reg_t         TCCFG;              // (0x04)   EDMA3TC Configuration Register
+        __R   uint32_t            RESERVED1[2];
+        __RW  SYSCONFIGTC_reg_t   SYSCONFIG;          // (0x10)   EDMA3TC System Configuration Register  
+        __R   uint32_t            RESERVED2[59];
+        __R   TCSTAT_reg_t        TCSTAT;             // (0x100)  EDMA3TC Channel Status Register
+        __R   uint32_t            RESERVED3[7];  
+        __R   ERRSTAT_reg_t       ERRSTAT;            // (0x120)  Error Register 
+        __RW  ERREN_reg_t         ERREN;              // (0x124)  Error Enable Register 
+        __W   ERRCLR_reg_t        ERRCLR;             // (0x128)  Error Clear Register 
+        __R   ERRDET_reg_t        ERRDET;             // (0x12C)  Error Details Register 
+        __W   ERRCMD_reg_t        ERRCMD;             // (0x130)  Error Interrupt Command Register 
+        __R   uint32_t            RESERVED4[3]; 
+        __RW  RDRATE_reg_t        RDRATE;             // (0x140)  Read Rate Register
+        __R   uint32_t            RESERVED5[63];
+        __R   SAOPT_reg_t         SAOPT;              // (0x240)  Source Active Options Register 
+        __R   SASRC_reg_t         SASRC;              // (0x244)  Source Active Source Address Register
+        __R   SACNT_reg_t         SACNT;              // (0x248)  Source Active Count Register  
+        __R   SADST_reg_t         SADST;              // (0x24C)  Source Active Destination Address Register 
+        __R   SABIDX_reg_t        SABIDX;             // (0x250)  Source Active Source B-Index Register
+        __R   SAMPPRXY_reg_t      SAMPPRXY;           // (0x254)  Source Active Memory Protection Proxy Register  
+        __R   SACNTRLD_reg_t      SACNTRLD;           // (0x258)  Source Active Count Reload Register
+        __R   SASRCBREF_reg_t     SASRCBREF;          // (0x25C)  Source Active Source Address B-Reference Register 
+        __R   SADSTBREF_reg_t     SADSTBREF;          // (0x260)  Source Active Destination Address B-Reference Register
+        __R   uint32_t            RESERVED6[7];
+        __R   DFCNTRLD_reg_t      DFCNTRLD;           // (0x280)  Destination FIFO Set Count Reload
+        __R   DFSRCBREF_reg_t     DFSRCBREF;          // (0x284)  Destination FIFO Set Destination Address B Reference Register
+        __R   DFDSTBREF_reg_t     DFDSTBREF;          // (0x288)  Destination FIFO Set Destination Address B Reference Register
+        __R   uint32_t            RESERVED7[29];
+        __R   DFOPT0_reg_t        DFOPT0;             // (0x300)  Destination FIFO Options Register 0
+        __R   DFSRC0_reg_t        DFSRC0;             // (0x304)  Destination FIFO Source Address Register 0
+        __R   DFCNT0_reg_t        DFCNT0;             // (0x308)  Destination FIFO Count Register 0
+        __R   DFDST0_reg_t        DFDST0;             // (0x30C)  Destination FIFO Destination Address Register 0
+        __R   DFBIDX0_reg_t       DFBIDX0;            // (0x310)  Destination FIFO BIDX Register 0
+        __R   DFMPPRXY0_reg_t     DFMPPRXY0;          // (0x314)  Destination FIFO Memory Protection Proxy Register 0
+        __R   uint32_t            RESERVED8[10];
+        __R   DFOPT1_reg_t        DFOPT1;             // (0x340)  Destination FIFO Options Register 1
+        __R   DFSRC1_reg_t        DFSRC1;             // (0x344)  Destination FIFO Source Address Register 1
+        __R   DFCNT1_reg_t        DFCNT1;             // (0x348)  Destination FIFO Count Register 1
+        __R   DFDST1_reg_t        DFDST1;             // (0x34C)  Destination FIFO Destination Address Register 1
+        __R   DFBIDX1_reg_t       DFBIDX1;            // (0x350)  Destination FIFO BIDX Register 1
+        __R   DFMPPRXY1_reg_t     DFMPPRXY1;          // (0x354)  Destination FIFO Memory Protection Proxy Register 1
+        __R   uint32_t            RESERVED9[10];
+        __R   DFOPT2_reg_t        DFOPT2;             // (0x380)  Destination FIFO Options Register 2
+        __R   DFSRC2_reg_t        DFSRC2;             // (0x384)  Destination FIFO Source Address Register 2
+        __R   DFCNT2_reg_t        DFCNT2;             // (0x388)  Destination FIFO Count Register 2
+        __R   DFDST2_reg_t        DFDST2;             // (0x38C)  Destination FIFO Destination Address Register 2
+        __R   DFBIDX2_reg_t       DFBIDX2;            // (0x390)  Destination FIFO BIDX Register 2
+        __R   DFMPPRXY2_reg_t     DFMPPRXY2;          // (0x394)  Destination FIFO Memory Protection Proxy Register 2
+        __R   uint32_t            RESERVED10[10];
+        __R   DFOPT3_reg_t        DFOPT3;             // (0x3C0)  Destination FIFO Options Register 3
+        __R   DFSRC3_reg_t        DFSRC3;             // (0x3C4)  Destination FIFO Source Address Register 3
+        __R   DFCNT3_reg_t        DFCNT3;             // (0x3C8)  Destination FIFO Count Register 3
+        __R   DFDST3_reg_t        DFDST3;             // (0x3CC)  Destination FIFO Destination Address Register 3
+        __R   DFBIDX3_reg_t       DFBIDX3;            // (0x3D0)  Destination FIFO BIDX Register 3
+        __R   DFMPPRXY3_reg_t     DFMPPRXY3;          // (0x3D4)  Destination FIFO Memory Protection Proxy Register 3 
     };
 
     constexpr uint32_t AM335x_EDMA3CC_BASE     = 0x49000000;   
@@ -2272,14 +2329,121 @@ namespace n_EDMA
     constexpr AM335x_EDMA3TC_Type * AM335X_EDMA3TC2_regs = reinterpret_cast<AM335x_EDMA3TC_Type *>(AM335x_EDMA3TC2_BASE);
 }
 
+/**
+ * \brief EDMA3 Parameter RAM Set in User Configurable format
+ *
+ * This is a mapping of the EDMA3 PaRAM set provided to the user
+ * for ease of modification of the individual fields
+ */
+typedef struct EDMA3CCPaRAMEntry {
+        /** OPT field of PaRAM Set */
+        unsigned int opt;
+
+        /**
+         * \brief Starting byte address of Source
+         * For FIFO mode, srcAddr must be a 256-bit aligned address.
+         */
+        unsigned int srcAddr;
+
+        /**
+         * \brief Number of bytes in each Array (ACNT)
+         */
+        unsigned short aCnt;
+
+        /**
+         * \brief Number of Arrays in each Frame (BCNT)
+         */
+        unsigned short bCnt;
+
+        /**
+         * \brief Starting byte address of destination
+         * For FIFO mode, destAddr must be a 256-bit aligned address.
+         * i.e. 5 LSBs should be 0.
+         */
+        unsigned int destAddr;
+
+        /**
+         * \brief Index between consec. arrays of a Source Frame (SRCBIDX)
+         */
+        short  srcBIdx;
+
+        /**
+         * \brief Index between consec. arrays of a Destination Frame (DSTBIDX)
+         */
+        short  destBIdx;
+
+        /**
+         * \brief Address for linking (AutoReloading of a PaRAM Set)
+         * This must point to a valid aligned 32-byte PaRAM set
+         * A value of 0xFFFF means no linking
+         */
+        unsigned short linkAddr;
+
+        /**
+         * \brief Reload value of the numArrInFrame (BCNT)
+         * Relevant only for A-sync transfers
+         */
+        unsigned short bCntReload;
+
+        /**
+         * \brief Index between consecutive frames of a Source Block (SRCCIDX)
+         */
+        short  srcCIdx;
+
+        /**
+         * \brief Index between consecutive frames of a Dest Block (DSTCIDX)
+         */
+        short  destCIdx;
+
+        /**
+         * \brief Number of Frames in a block (CCNT)
+         */
+        unsigned short cCnt;
+
+        /**
+         * \brief  This field is Reserved. Write zero to this field.
+         */
+        unsigned short rsvd;
+
+}EDMA3CCPaRAMEntry;
+
+/*
+** Structure to store the EDMA context
+*/
+typedef struct edmaContext {
+    /* Channel mapping reg Val */
+    unsigned int dchMap[64];
+    /* DMA Queue Number Register Val */    
+    unsigned int dmaQNum[8];    
+    
+    /* DMA Region Access Enable Register val */    
+    unsigned int regAccEnableLow;    
+    unsigned int regAccEnableHigh;        
+
+    /* Event Set Register value */    
+    unsigned int eventSetRegLow;
+    unsigned int eventSetRegHigh;    
+    
+    /* Enable Event Set Register value */    
+    unsigned int enableEvtSetRegLow;
+    unsigned int enableEvtSetRegHigh;
+    
+    /* Interrupt Enable Set Register value */            
+    unsigned int intEnableSetRegLow;        
+    unsigned int intEnableSetRegHigh;    
+    
+    struct EDMA3CCPaRAMEntry dmaParEntry[512];    
+    
+} EDMACONTEXT;
+
 class AM335x_EDMA
 {
 public:
               AM335x_EDMA()
-              : m_EDMA3CC_regs(*AM335X_EDMA3CC_regs),
-                m_EDMA3TC0_regs(*AM335X_EDMA3TC0_regs),
-                m_EDMA3TC1_regs(*AM335X_EDMA3TC1_regs),
-                m_EDMA3TC2_regs(*AM335X_EDMA3TC2_regs) 
+                : m_EDMA3CC_regs(*(n_EDMA::AM335X_EDMA3CC_regs)),
+                m_EDMA3TC0_regs(*(n_EDMA::AM335X_EDMA3TC0_regs)),
+                m_EDMA3TC1_regs(*(n_EDMA::AM335X_EDMA3TC1_regs)),
+                m_EDMA3TC2_regs(*(n_EDMA::AM335X_EDMA3TC2_regs)) 
               { }
              ~AM335x_EDMA() { }
 
@@ -2327,10 +2491,10 @@ public:
         void  context_save(EDMACONTEXT *edmaCntxPtr);
         void  context_restore(EDMACONTEXT *edmaCntxPtr);
 private:
-    n_UART::AM335x_EDMA3CC_Type &m_EDMA3CC_regs;
-    n_UART::AM335x_EDMA3TC_Type &m_EDMA3TC0_regs;
-    n_UART::AM335x_EDMA3TC_Type &m_EDMA3TC1_regs;
-    n_UART::AM335x_EDMA3TC_Type &m_EDMA3TC2_regs;
+    n_EDMA::AM335x_EDMA3CC_Type &m_EDMA3CC_regs;
+    n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC0_regs;
+    n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC1_regs;
+    n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC2_regs;
 };
 
 #endif //__N_EDMA_H

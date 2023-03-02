@@ -42,7 +42,8 @@ I2C_EEPROM<(32*1024),64> CAT24C256WI(I2C::AM335X_I2C_2, SLAVE_ADDR_CAT24C256, CA
 
 void init_board(void)   
 { 
-    volatile uint32_t EDMA_size = sizeof(n_EDMA::AM335x_EDMA_Type);
+    volatile uint32_t EDMA3CC_size = sizeof(n_EDMA::AM335x_EDMA3CC_Type);
+    volatile uint32_t EDMA3TC_size = sizeof(n_EDMA::AM335x_EDMA3TC_Type);
     
     /// Initialize MMU,Cache,Branch prediction etc... ///
     InitMem();                     // Initiate MMU and ... Invoke Cache  
