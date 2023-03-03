@@ -2,7 +2,7 @@
 #define __N_EDMA_H
 
 #include <stdint.h>
-
+#include "utils/utils.h"
 
 namespace n_EDMA
 {  
@@ -90,53 +90,132 @@ namespace n_EDMA
         uint32_t  reg;                        // Type used for register access 
     } DCHMAP_reg_t;
     
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {                                         /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-             
-            uint32_t                  :2;         // bit: 0,1     Reserved
-            uint32_t    TRWORD        :3;         // bit: 2..4    (RW) .
-            uint32_t    PAENTRY       :9;         // bit: 5..13   (RW) .
-            uint32_t                  :18;        // bit: 14..31  Reserved.         
-        } b;                                      // Structure used for bit access 
-        uint32_t  reg;                            // Type used for register access 
-    } QCHMAP_reg_t;
-    
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
+    /*! @brief      Each QDMA channel in EDMA3CC can be associated with any PaRAM set available on the device.
+    *   @details    Furthermore, the specific trigger word (0-7) of the PaRAM set can be programmed. The PaRAM set
+    *               association and trigger word for every QDMA channel register is configurable using the QDMA channel
+    *               map register (QCHMAPn). At reset the QDMA channel map registers for all QDMA channels point to
+    *               PaRAM set 0. If an application makes use of both a DMA channel that points to PaRAM set 0 and any
+    *               QDMA channels, ensure that QCHMAP is programmed appropriately to point to a different PaRAM entry.  
     [reset state = 0x0] */ 
     typedef union 
     { 
         struct 
         {    
-            /**  Register not described!!! Describe yoursef using am335x_reference_manual **/             
-            uint32_t    E0  :3;    // bit: 0..2     (RW) .
-            uint32_t        :1;    // bit: 3        Reserved.
-            uint32_t    E1  :3;    // bit: 4..6     (RW) .
-            uint32_t        :1;    // bit: 7        Reserved
-            uint32_t    E2  :3;    // bit: 8..10    (RW) .
-            uint32_t        :1;    // bit: 11       Reserved
-            uint32_t    E3  :3;    // bit: 12..14   (RW) .
-            uint32_t        :1;    // bit: 15       Reserved
-            uint32_t    E4  :3;    // bit: 16..18   (RW) .
-            uint32_t        :1;    // bit: 19       Reserved
-            uint32_t    E5  :3;    // bit: 20..21   (RW) .
-            uint32_t        :1;    // bit: 23       Reserved
-            uint32_t    E6  :3;    // bit: 24..26   (RW) .
-            uint32_t        :1;    // bit: 27       Reserved.
-            uint32_t    E7  :3;    // bit: 28..30   (RW) .
-            uint32_t        :1;    // bit: 31       Reserved        
-        } b;                       // Structure used for bit access 
-        uint32_t  reg;             // Type used for register access 
+            uint32_t                  :2;         // bit: 0,1     Reserved
+            uint32_t    TRWORD        :3;         // bit: 2..4    (RW) Points to the specific trigger word of the PaRAM set defined by PAENTRY.
+                                                  //                   A write to the trigger word results in a QDMA event being recognized.
+            uint32_t    PAENTRY       :9;         // bit: 5..13   (RW) PAENTRY points to the PaRAM set number for QDMA channel .
+                                                  //                  [0x0 = Parameter entry 0 through 255, from 0 to FFh.
+                                                  //                   0x1 = Reserved, from 100h to 1FFh. Always write 0 to this bit. Writes
+                                                  //                         of 1 to this bit are not supported and attempts to do so may result in undefine behavior.]
+            uint32_t                  :18;        // bit: 14..31  Reserved.         
+        } b;                                      // Structure used for bit access 
+        uint32_t  reg;                            // Type used for register access 
+    } QCHMAP_reg_t;
+    
+    /*! @brief      The DMA channel queue number register (DMAQNUMn) allows programmability of each of the 64 DMA
+    *               channels in the EDMA3CC to submit its associated synchronization event to any event queue in the EDMA3CC 
+    *   @details   At reset, all channels point to event queue 0. Because the event queues in EDMA3CC have a
+    * fixed association to the transfer controllers, that is, Q0 TRs are submitted to TC0, Q1 TRs are submitted
+    * to TC1, etc., by programming DMAQNUM for a particular DMA channel also dictates which transfer
+    * controller is utilized for the data movement (or which EDMA3TC receives the TR request).
+    [reset state = 0x0] */ 
+    typedef union 
+    { 
+        struct 
+        {    
+            /**  DMA queue number. Contains the event queue number to be used for the corresponding
+                 DMA channel. Programming DMAQNUM for an event queue number to a value more then the number of queues available in the EDMA3CC results
+                in undefined behavior. 
+            **/             
+            uint32_t    E0  :3;     // bit: 0..2     (RW) . On DMAQNUM[0], E[2] to E[0] is E0.
+                                    //                      On DMAQNUM[1], E[2] to E[0] is E8.
+                                    //                      On DMAQNUM[2], E[2] to E[0] is E16.
+                                    //                      On DMAQNUM[3], E[2] to E[0] is E24.
+                                    //                      On DMAQNUM[4], E[2] to E[0] is E32.
+                                    //                      On DMAQNUM[5], E[2] to E[0] is E40.
+                                    //                      On DMAQNUM[6], E[2] to E[0] is E48.
+                                    //                      On DMAQNUM[7], E[2] to E[0] is E56.  [see e_DMA_EVENT]
+            uint32_t        :1;     // bit: 3        Reserved.
+            uint32_t    E1  :3;     // bit: 4..6     (RW) . On DMAQNUM[0], E[6] to E[4] is E1.
+                                    //                      On DMAQNUM[1], E[6] to E[4] is E9.
+                                    //                      On DMAQNUM[2], E[6] to E[4] is E17.
+                                    //                      On DMAQNUM[3], E[6] to E[4] is E25.
+                                    //                      On DMAQNUM[4], E[6] to E[4] is E33.
+                                    //                      On DMAQNUM[5], E[6] to E[4] is E41.
+                                    //                      On DMAQNUM[6], E[6] to E[4] is E49.
+                                    //                      On DMAQNUM[7], E[6] to E[4] is E57.  [see e_DMA_EVENT]
+            uint32_t        :1;     // bit: 7        Reserved                        
+            uint32_t    E2  :3;     // bit: 8..10    (RW) . On DMAQNUM[0], E[10] to E[8] is E2.
+                                    //                      On DMAQNUM[1], E[10] to E[8] is E10.
+                                    //                      On DMAQNUM[2], E[10] to E[8] is E18.
+                                    //                      On DMAQNUM[3], E[10] to E[8] is E26.
+                                    //                      On DMAQNUM[4], E[10] to E[8] is E34.
+                                    //                      On DMAQNUM[5], E[10] to E[8] is E42.
+                                    //                      On DMAQNUM[6], E[10] to E[8] is E50.
+                                    //                      On DMAQNUM[7], E[10] to E[8] is E58.  [see e_DMA_EVENT]
+            uint32_t        :1;     // bit: 11       Reserved
+            uint32_t    E3  :3;     // bit: 12..14   (RW) . On DMAQNUM[0], E[14] to E[12] is E3.
+                                    //                      On DMAQNUM[1], E[14] to E[12] is E11.
+                                    //                      On DMAQNUM[2], E[14] to E[12] is E19.
+                                    //                      On DMAQNUM[3], E[14] to E[12] is E27.
+                                    //                      On DMAQNUM[4], E[14] to E[12] is E35.
+                                    //                      On DMAQNUM[5], E[14] to E[12] is E43.
+                                    //                      On DMAQNUM[6], E[14] to E[12] is E51.
+                                    //                      On DMAQNUM[7], E[14] to E[12] is E59.  [see e_DMA_EVENT]
+            uint32_t        :1;     // bit: 15       Reserved
+            uint32_t    E4  :3;     // bit: 16..18   (RW) . On DMAQNUM[0], E[18] to E[16] is E4.
+                                    //                      On DMAQNUM[1], E[18] to E[16] is E12.
+                                    //                      On DMAQNUM[2], E[18] to E[16] is E20.
+                                    //                      On DMAQNUM[3], E[18] to E[16] is E28.
+                                    //                      On DMAQNUM[4], E[18] to E[16] is E36.
+                                    //                      On DMAQNUM[5], E[18] to E[16] is E44.
+                                    //                      On DMAQNUM[6], E[18] to E[16] is E52.
+                                    //                      On DMAQNUM[7], E[18] to E[16] is E60.  [see e_DMA_EVENT]
+            uint32_t        :1;     // bit: 19       Reserved
+            uint32_t    E5  :3;     // bit: 20..21   (RW) . On DMAQNUM[0], E[22] to E[20] is E5.
+                                    //                      On DMAQNUM[1], E[22] to E[20] is E13.
+                                    //                      On DMAQNUM[2], E[22] to E[20] is E21.
+                                    //                      On DMAQNUM[3], E[22] to E[20] is E29.
+                                    //                      On DMAQNUM[4], E[22] to E[20] is E37.
+                                    //                      On DMAQNUM[5], E[22] to E[20] is E45.
+                                    //                      On DMAQNUM[6], E[22] to E[20] is E53.
+                                    //                      On DMAQNUM[7], E[22] to E[20] is E61.  [see e_DMA_EVENT]
+            uint32_t        :1;     // bit: 23       Reserved
+            uint32_t    E6  :3;     // bit: 24..26   (RW) . On DMAQNUM[0], E[26] to E[24] is E6.
+                                    //                      On DMAQNUM[1], E[26] to E[24] is E14.
+                                    //                      On DMAQNUM[2], E[26] to E[24] is E22.
+                                    //                      On DMAQNUM[3], E[26] to E[24] is E30.
+                                    //                      On DMAQNUM[4], E[26] to E[24] is E38.
+                                    //                      On DMAQNUM[5], E[26] to E[24] is E46.
+                                    //                      On DMAQNUM[6], E[26] to E[24] is E54.
+                                    //                      On DMAQNUM[7], E[26] to E[24] is E62.  [see e_DMA_EVENT]
+            uint32_t        :1;     // bit: 27       Reserved.
+            uint32_t    E7  :3;     // bit: 28..30   (RW) . On DMAQNUM[0], E[30] to E[28] is E7.
+                                    //                      On DMAQNUM[1], E[30] to E[28] is E15.
+                                    //                      On DMAQNUM[2], E[30] to E[28] is E23.
+                                    //                      On DMAQNUM[3], E[30] to E[28] is E39.
+                                    //                      On DMAQNUM[4], E[30] to E[28] is E47.
+                                    //                      On DMAQNUM[5], E[30] to E[28] is E45.
+                                    //                      On DMAQNUM[6], E[30] to E[28] is E55.
+                                    //                      On DMAQNUM[7], E[30] to E[28] is E63.  [see e_DMA_EVENT]
+            uint32_t        :1;     // bit: 31       Reserved        
+        } b;                        // Structure used for bit access 
+        uint32_t  reg;              // Type used for register access 
     } DMAQNUM_reg_t;
+    
+    enum e_DMA_QUEUE : uint32_t
+    {
+        EVENT_Q0 = 0x00,    // Event n is queued on Q0.
+        EVENT_Q1 = 0x01,    // Event n is queued on Q1.
+        EVENT_Q2 = 0x02     // Event n is queued on Q2.
+                            // 0x03 = Reserved, from 3h to 7h. Always write 0 to this bit; writes of 1
+                            // to this bit are not supported and attempts to do so may result in
+                            // undefined behavior.
+                            // 7h = Reserved. Always write 0 to this bit; writes of 1 to this bit are
+                            // not supported and attempts to do so may result in undefined
+                            // behavior.
+    };
     
     /*! @brief      __XXX__  
     *   @details    __XXX__
@@ -347,7 +426,7 @@ namespace n_EDMA
             uint32_t    En      :32;         // bit: 0..31       (RW) .          
         } b;                                 // Structure used for bit access 
         uint32_t  reg;                       // Type used for register access 
-    } DRAE0_reg_t;
+    } DRAE_reg_t;
     
     /*! @brief      __XXX__  
     *   @details    __XXX__
@@ -361,205 +440,9 @@ namespace n_EDMA
             uint32_t    En      :32;         // bit: 0..31       (RW) .          
         } b;                                 // Structure used for bit access 
         uint32_t  reg;                       // Type used for register access  
-    } DRAEH0_reg_t;
-    
+    } DRAEH_reg_t;
+       
     /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access  
-    } DRAE1_reg_t;
-    
-        /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access
-    } DRAEH1_reg_t;
-    
-     /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAE2_reg_t;
-    
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAEH2_reg_t;
-    
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAE3_reg_t;
-    
-/*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access
-    } DRAEH3_reg_t;
-    
-     /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAE4_reg_t;
-    
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAEH4_reg_t;
-    
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAE5_reg_t;
-    
-        /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register accesss 
-    } DRAEH5_reg_t;
-    
-     /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAE6_reg_t;
-    
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAEH6_reg_t;
-    
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access 
-    } DRAE7_reg_t;
-
-    /*! @brief      __XXX__  
-    *   @details    __XXX__
-    *               __XXX__
-    *               __XXX__
-    [reset state = 0x0] */ 
-    typedef union 
-    { 
-        struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/ 
-            uint32_t    En      :32;         // bit: 0..31       (RW) .          
-        } b;                                 // Structure used for bit access 
-        uint32_t  reg;                       // Type used for register access
-    } DRAEH7_reg_t;
-    
-     /*! @brief      __XXX__  
     *   @details    __XXX__
     *               __XXX__
     *               __XXX__
@@ -2024,238 +1907,154 @@ namespace n_EDMA
     
     struct AM335x_EDMA3CC_Type
     {                                                                                      
-        __R   PIDCC_reg_t       PID;            // (0x00)  Peripheral Identification Register
-        __R   CCCFG_reg_t       CCCFG;          // (0x04)  EDMA3CC Configuration Register
-        __R   uint32_t          RESERVED1[2];
-        __RW  SYSCONFIGCC_reg_t   SYSCONFIG;    // (0x10)  EDMA3CC System Configuration Register
-        __R   uint32_t          RESERVED2[59]; 
-        __RW  DCHMAP_reg_t      DCHMAP_0;       // (0x100) DMA Channel Mapping Register 0
-        __RW  DCHMAP_reg_t      DCHMAP_1;       // (0x104) DMA Channel Mapping Register 1
-        __RW  DCHMAP_reg_t      DCHMAP_2;       // (0x108) DMA Channel Mapping Register 2
-        __RW  DCHMAP_reg_t      DCHMAP_3;       // (0x10C) DMA Channel Mapping Register 3
-        __RW  DCHMAP_reg_t      DCHMAP_4;       // (0x110) DMA Channel Mapping Register 4
-        __RW  DCHMAP_reg_t      DCHMAP_5;       // (0x114) DMA Channel Mapping Register 5
-        __RW  DCHMAP_reg_t      DCHMAP_6;       // (0x118) DMA Channel Mapping Register 6
-        __RW  DCHMAP_reg_t      DCHMAP_7;       // (0x11C) DMA Channel Mapping Register 7
-        __RW  DCHMAP_reg_t      DCHMAP_8;       // (0x120) DMA Channel Mapping Register 8 
-        __RW  DCHMAP_reg_t      DCHMAP_9;       // (0x124) DMA Channel Mapping Register 9
-        __RW  DCHMAP_reg_t      DCHMAP_10;      // (0x128) DMA Channel Mapping Register 10
-        __RW  DCHMAP_reg_t      DCHMAP_11;      // (0x12C) DMA Channel Mapping Register 11
-        __RW  DCHMAP_reg_t      DCHMAP_12;      // (0x130) DMA Channel Mapping Register 12
-        __RW  DCHMAP_reg_t      DCHMAP_13;      // (0x134) DMA Channel Mapping Register 13
-        __RW  DCHMAP_reg_t      DCHMAP_14;      // (0x138) DMA Channel Mapping Register 14
-        __RW  DCHMAP_reg_t      DCHMAP_15;      // (0x13C) DMA Channel Mapping Register 15
-        __RW  DCHMAP_reg_t      DCHMAP_16;      // (0x140) DMA Channel Mapping Register 16 
-        __RW  DCHMAP_reg_t      DCHMAP_17;      // (0x144) DMA Channel Mapping Register 17
-        __RW  DCHMAP_reg_t      DCHMAP_18;      // (0x148) DMA Channel Mapping Register 18
-        __RW  DCHMAP_reg_t      DCHMAP_19;      // (0x14C) DMA Channel Mapping Register 19
-        __RW  DCHMAP_reg_t      DCHMAP_20;      // (0x150) DMA Channel Mapping Register 20
-        __RW  DCHMAP_reg_t      DCHMAP_21;      // (0x154) DMA Channel Mapping Register 21
-        __RW  DCHMAP_reg_t      DCHMAP_22;      // (0x158) DMA Channel Mapping Register 22
-        __RW  DCHMAP_reg_t      DCHMAP_23;      // (0x15C) DMA Channel Mapping Register 23
-        __RW  DCHMAP_reg_t      DCHMAP_24;      // (0x160) DMA Channel Mapping Register 24
-        __RW  DCHMAP_reg_t      DCHMAP_25;      // (0x164) DMA Channel Mapping Register 25
-        __RW  DCHMAP_reg_t      DCHMAP_26;      // (0x168) DMA Channel Mapping Register 26
-        __RW  DCHMAP_reg_t      DCHMAP_27;      // (0x16C) DMA Channel Mapping Register 27
-        __RW  DCHMAP_reg_t      DCHMAP_28;      // (0x170) DMA Channel Mapping Register 28
-        __RW  DCHMAP_reg_t      DCHMAP_29;      // (0x174) DMA Channel Mapping Register 29
-        __RW  DCHMAP_reg_t      DCHMAP_30;      // (0x178) DMA Channel Mapping Register 30
-        __RW  DCHMAP_reg_t      DCHMAP_31;      // (0x17C) DMA Channel Mapping Register 31
-        __RW  DCHMAP_reg_t      DCHMAP_32;      // (0x180) DMA Channel Mapping Register 32
-        __RW  DCHMAP_reg_t      DCHMAP_33;      // (0x184) DMA Channel Mapping Register 33
-        __RW  DCHMAP_reg_t      DCHMAP_34;      // (0x188) DMA Channel Mapping Register 34
-        __RW  DCHMAP_reg_t      DCHMAP_35;      // (0x18C) DMA Channel Mapping Register 35
-        __RW  DCHMAP_reg_t      DCHMAP_36;      // (0x190) DMA Channel Mapping Register 36
-        __RW  DCHMAP_reg_t      DCHMAP_37;      // (0x194) DMA Channel Mapping Register 37
-        __RW  DCHMAP_reg_t      DCHMAP_38;      // (0x198) DMA Channel Mapping Register 38
-        __RW  DCHMAP_reg_t      DCHMAP_39;      // (0x19C) DMA Channel Mapping Register 39
-        __RW  DCHMAP_reg_t      DCHMAP_40;      // (0x1A0) DMA Channel Mapping Register 40 
-        __RW  DCHMAP_reg_t      DCHMAP_41;      // (0x1A4) DMA Channel Mapping Register 41
-        __RW  DCHMAP_reg_t      DCHMAP_42;      // (0x1A8) DMA Channel Mapping Register 42
-        __RW  DCHMAP_reg_t      DCHMAP_43;      // (0x1AC) DMA Channel Mapping Register 43
-        __RW  DCHMAP_reg_t      DCHMAP_44;      // (0x1B0) DMA Channel Mapping Register 44
-        __RW  DCHMAP_reg_t      DCHMAP_45;      // (0x1B4) DMA Channel Mapping Register 45
-        __RW  DCHMAP_reg_t      DCHMAP_46;      // (0x1B8) DMA Channel Mapping Register 46
-        __RW  DCHMAP_reg_t      DCHMAP_47;      // (0x1BC) DMA Channel Mapping Register 47
-        __RW  DCHMAP_reg_t      DCHMAP_48;      // (0x1C0) DMA Channel Mapping Register 48 
-        __RW  DCHMAP_reg_t      DCHMAP_49;      // (0x1C4) DMA Channel Mapping Register 49
-        __RW  DCHMAP_reg_t      DCHMAP_50;      // (0x1C8) DMA Channel Mapping Register 50
-        __RW  DCHMAP_reg_t      DCHMAP_51;      // (0x1CC) DMA Channel Mapping Register 51
-        __RW  DCHMAP_reg_t      DCHMAP_52;      // (0x1D0) DMA Channel Mapping Register 52
-        __RW  DCHMAP_reg_t      DCHMAP_53;      // (0x1D4) DMA Channel Mapping Register 53
-        __RW  DCHMAP_reg_t      DCHMAP_54;      // (0x1D8) DMA Channel Mapping Register 54
-        __RW  DCHMAP_reg_t      DCHMAP_55;      // (0x1DC) DMA Channel Mapping Register 55
-        __RW  DCHMAP_reg_t      DCHMAP_56;      // (0x1E0) DMA Channel Mapping Register 56
-        __RW  DCHMAP_reg_t      DCHMAP_57;      // (0x1E4) DMA Channel Mapping Register 57
-        __RW  DCHMAP_reg_t      DCHMAP_58;      // (0x1E8) DMA Channel Mapping Register 58
-        __RW  DCHMAP_reg_t      DCHMAP_59;      // (0x1EC) DMA Channel Mapping Register 59
-        __RW  DCHMAP_reg_t      DCHMAP_60;      // (0x1F0) DMA Channel Mapping Register 60
-        __RW  DCHMAP_reg_t      DCHMAP_61;      // (0x1F4) DMA Channel Mapping Register 61
-        __RW  DCHMAP_reg_t      DCHMAP_62;      // (0x1F8) DMA Channel Mapping Register 62
-        __RW  DCHMAP_reg_t      DCHMAP_63;      // (0x1FC) DMA Channel Mapping Register 63
-        __RW  QCHMAP_reg_t      QCHMAP_0;       // (0x200) QDMA Channel Mapping Register 0
-        __RW  QCHMAP_reg_t      QCHMAP_1;       // (0x204) QDMA Channel Mapping Register 1
-        __RW  QCHMAP_reg_t      QCHMAP_2;       // (0x208) QDMA Channel Mapping Register 2
-        __RW  QCHMAP_reg_t      QCHMAP_3;       // (0x20C) QDMA Channel Mapping Register 3
-        __RW  QCHMAP_reg_t      QCHMAP_4;       // (0x210) QDMA Channel Mapping Register 4
-        __RW  QCHMAP_reg_t      QCHMAP_5;       // (0x214) QDMA Channel Mapping Register 5
-        __RW  QCHMAP_reg_t      QCHMAP_6;       // (0x218) QDMA Channel Mapping Register 6
-        __RW  QCHMAP_reg_t      QCHMAP_7;       // (0x21C) QDMA Channel Mapping Register 7
-        __R   uint32_t          RESERVED3[8]; 
-        __RW  DMAQNUM_reg_t     DMAQNUM_0;      // (0x240) DMA Queue Number Register 0
-        __RW  DMAQNUM_reg_t     DMAQNUM_1;      // (0x244) DMA Queue Number Register 1
-        __RW  DMAQNUM_reg_t     DMAQNUM_2;      // (0x248) DMA Queue Number Register 2
-        __RW  DMAQNUM_reg_t     DMAQNUM_3;      // (0x24C) DMA Queue Number Register 3
-        __RW  DMAQNUM_reg_t     DMAQNUM_4;      // (0x250) DMA Queue Number Register 4
-        __RW  DMAQNUM_reg_t     DMAQNUM_5;      // (0x254) DMA Queue Number Register 5
-        __RW  DMAQNUM_reg_t     DMAQNUM_6;      // (0x258) DMA Queue Number Register 6
-        __RW  DMAQNUM_reg_t     DMAQNUM_7;      // (0x25C) DMA Queue Number Register 7
-        __RW  QDMAQNUM_reg_t    QDMAQNUM;       // (0x260) QDMA Queue Number Register
-        __R   uint32_t          RESERVED4[8];  
-        __RW  QUEPRI_reg_t      QUEPRI;         // (0x284) Queue Priority Register
-        __R   uint32_t          RESERVED5[30]; 
-        __R   EMR_reg_t         EMR;            // (0x300) Event Missed Register
-        __R   EMRH_reg_t        EMRH;           // (0x304) Event Missed Register High 
-        __W   EMCR_reg_t        EMCR;           // (0x308) Event Missed Clear Register
-        __W   EMCRH_reg_t       EMCRH;          // (0x30C) Event Missed Clear Register High 
-        __R   QEMR_reg_t        QEMR;           // (0x310) QDMA Event Missed Register 
-        __W   QEMCR_reg_t       QEMCR;          // (0x314) QDMA Event Missed Clear Register 
-        __R   CCERR_reg_t       CCERR;          // (0x318) EDMA3CC Error Register 
-        __W   CCERRCLR_reg_t    CCERRCLR;       // (0x31C) EDMA3CC Error Clear Register 
-        __R   EEVAL_reg_t       EEVAL;          // (0x320) Error Evaluate Register
-        __R   uint32_t          RESERVED6[7]; 
-        __RW  DRAE0_reg_t       DRAE0;          // (0x340) DMA Region Access Enable Register for Region 0    
-        __RW  DRAEH0_reg_t      DRAEH0;         // (0x344) DMA Region Access Enable Register High for Region 0 
-        __RW  DRAE1_reg_t       DRAE1;          // (0x348) DMA Region Access Enable Register for Region 1 
-        __RW  DRAEH1_reg_t      DRAEH1;         // (0x34C) DMA Region Access Enable Register High for Region 1
-        __RW  DRAE2_reg_t       DRAE2;          // (0x350) DMA Region Access Enable Register for Region 2
-        __RW  DRAEH2_reg_t      DRAEH2;         // (0x354) DMA Region Access Enable Register High for Region 2  
-        __RW  DRAE3_reg_t       DRAE3;          // (0x358) DMA Region Access Enable Register for Region 3
-        __RW  DRAEH3_reg_t      DRAEH3;         // (0x35C) DMA Region Access Enable Register High for Region 3
-        __RW  DRAE4_reg_t       DRAE4;          // (0x360) DMA Region Access Enable Register for Region 4 
-        __RW  DRAEH4_reg_t      DRAEH4;         // (0x364) DMA Region Access Enable Register High for Region 4
-        __RW  DRAE5_reg_t       DRAE5;          // (0x368) DMA Region Access Enable Register for Region 5 
-        __RW  DRAEH5_reg_t      DRAEH5;         // (0x36C) DMA Region Access Enable Register High for Region 5 
-        __RW  DRAE6_reg_t       DRAE6;          // (0x370) DMA Region Access Enable Register for Region 6
-        __RW  DRAEH6_reg_t      DRAEH6;         // (0x374) DMA Region Access Enable Register High for Region 6
-        __RW  DRAE7_reg_t       DRAE7;          // (0x378) DMA Region Access Enable Register for Region 7
-        __RW  DRAEH7_reg_t      DRAEH7;         // (0x37C) DMA Region Access Enable Register High for Region 7
-        __RW  QRAE_reg_t        QRAE_0;         // (0x380) QDMA Region Access Enable Registers for Region 0
-        __RW  QRAE_reg_t        QRAE_1;         // (0x384) QDMA Region Access Enable Registers for Region 1 
-        __RW  QRAE_reg_t        QRAE_2;         // (0x388) QDMA Region Access Enable Registers for Region 2
-        __RW  QRAE_reg_t        QRAE_3;         // (0x38Ñ) QDMA Region Access Enable Registers for Region 3  
-        __RW  QRAE_reg_t        QRAE_4;         // (0x390) QDMA Region Access Enable Registers for Region 4
-        __RW  QRAE_reg_t        QRAE_5;         // (0x394) QDMA Region Access Enable Registers for Region 5
-        __RW  QRAE_reg_t        QRAE_6;         // (0x398) QDMA Region Access Enable Registers for Region 6
-        __RW  QRAE_reg_t        QRAE_7;         // (0x39Ñ) QDMA Region Access Enable Registers for Region 7
-        __R   uint32_t          RESERVED7[24];  
-        __R   QE_reg_t          Q0E0;           // (0x400) Event Queue 0 Entry 0 Register 
-        __R   QE_reg_t          Q0E1;           // (0x404) Event Queue 0 Entry 1 Register 
-        __R   QE_reg_t          Q0E2;           // (0x408) Event Queue 0 Entry 2 Register 
-        __R   QE_reg_t          Q0E3;           // (0x40C) Event Queue 0 Entry 3 Register 
-        __R   QE_reg_t          Q0E4;           // (0x410) Event Queue 0 Entry 4 Register 
-        __R   QE_reg_t          Q0E5;           // (0x414) Event Queue 0 Entry 5 Register 
-        __R   QE_reg_t          Q0E6;           // (0x418) Event Queue 0 Entry 6 Register
-        __R   QE_reg_t          Q0E7;           // (0x41C) Event Queue 0 Entry 7 Register 
-        __R   QE_reg_t          Q0E8;           // (0x420) Event Queue 0 Entry 8 Register 
-        __R   QE_reg_t          Q0E9;           // (0x424) Event Queue 0 Entry 9 Register 
-        __R   QE_reg_t          Q0E10;          // (0x428) Event Queue 0 Entry 10 Register 
-        __R   QE_reg_t          Q0E11;          // (0x42C) Event Queue 0 Entry 11 Register
-        __R   QE_reg_t          Q0E12;          // (0x430) Event Queue 0 Entry 12 Register 
-        __R   QE_reg_t          Q0E13;          // (0x434) Event Queue 0 Entry 13 Register
-        __R   QE_reg_t          Q0E14;          // (0x438) Event Queue 0 Entry 14 Register 
-        __R   QE_reg_t          Q0E15;          // (0x43C) Event Queue 0 Entry 15 Register 
-        __R   QE_reg_t          Q1E0;           // (0x440) Event Queue 1 Entry 0 Register   
-        __R   QE_reg_t          Q1E1;           // (0x444) Event Queue 1 Entry 1 Register   
-        __R   QE_reg_t          Q1E2;           // (0x448) Event Queue 1 Entry 2 Register   
-        __R   QE_reg_t          Q1E3;           // (0x44C) Event Queue 1 Entry 3 Register   
-        __R   QE_reg_t          Q1E4;           // (0x450) Event Queue 1 Entry 4 Register  
-        __R   QE_reg_t          Q1E5;           // (0x454) Event Queue 1 Entry 5 Register   
-        __R   QE_reg_t          Q1E6;           // (0x458) Event Queue 1 Entry 6 Register  
-        __R   QE_reg_t          Q1E7;           // (0x45C) Event Queue 1 Entry 7 Register   
-        __R   QE_reg_t          Q1E8;           // (0x460) Event Queue 1 Entry 8 Register   
-        __R   QE_reg_t          Q1E9;           // (0x464) Event Queue 1 Entry 9 Register   
-        __R   QE_reg_t          Q1E10;          // (0x468) Event Queue 1 Entry 10 Register  
-        __R   QE_reg_t          Q1E11;          // (0x46C) Event Queue 1 Entry 11 Register 
-        __R   QE_reg_t          Q1E12;          // (0x470) Event Queue 1 Entry 12 Register  
-        __R   QE_reg_t          Q1E13;          // (0x474) Event Queue 1 Entry 13 Register  
-        __R   QE_reg_t          Q1E14;          // (0x478) Event Queue 1 Entry 14 Register  
-        __R   QE_reg_t          Q1E15;          // (0x47C) Event Queue 1 Entry 15 Register  
-        __R   QE_reg_t          Q2E0;           // (0x480) Event Queue 2 Entry 0 Register   
-        __R   QE_reg_t          Q2E1;           // (0x484) Event Queue 2 Entry 1 Register   
-        __R   QE_reg_t          Q2E2;           // (0x488) Event Queue 2 Entry 2 Register  
-        __R   QE_reg_t          Q2E3;           // (0x48C) Event Queue 2 Entry 3 Register   
-        __R   QE_reg_t          Q2E4;           // (0x490) Event Queue 2 Entry 4 Register   
-        __R   QE_reg_t          Q2E5;           // (0x494) Event Queue 2 Entry 5 Register   
-        __R   QE_reg_t          Q2E6;           // (0x498) Event Queue 2 Entry 6 Register  
-        __R   QE_reg_t          Q2E7;           // (0x49C) Event Queue 2 Entry 7 Register   
-        __R   QE_reg_t          Q2E8;           // (0x4A0) Event Queue 2 Entry 8 Register   
-        __R   QE_reg_t          Q2E9;           // (0x4A4) Event Queue 2 Entry 9 Register  
-        __R   QE_reg_t          Q2E10;          // (0x4A8) Event Queue 2 Entry 10 Register  
-        __R   QE_reg_t          Q2E11;          // (0x4AC) Event Queue 2 Entry 11 Register  
-        __R   QE_reg_t          Q2E12;          // (0x4B0) Event Queue 2 Entry 12 Register 
-        __R   QE_reg_t          Q2E13;          // (0x4B4) Event Queue 2 Entry 13 Register  
-        __R   QE_reg_t          Q2E14;          // (0x4B8) Event Queue 2 Entry 14 Register  
-        __R   QE_reg_t          Q2E15;          // (0x4BC) Event Queue 2 Entry 15 Register 
-        __R   uint32_t          RESERVED8[80]; 
-        __R   QSTAT_reg_t       QSTAT_0;        // (0x600) Queue Status Registers 0
-        __R   QSTAT_reg_t       QSTAT_1;        // (0x604) Queue Status Registers 1 
-        __R   QSTAT_reg_t       QSTAT_2;        // (0x608) Queue Status Registers 2
-        __R   uint32_t          RESERVED9[5]; 
-        __RW  QWMTHRA_reg_t     QWMTHRA;        // (0x620) Queue Watermark Threshold A Register
-        __R   uint32_t          RESERVED10[7]; 
-        __R   CCSTAT_reg_t      CCSTAT;         // (0x640) EDMA3CC Status Register
-        __R   uint32_t          RESERVED11[111]; 
-        __R   MPFAR_reg_t       MPFAR;          // (0x800) Memory Protection Fault Address Register
-        __R   MPFSR_reg_t       MPFSR;          // (0x804) Memory Protection Fault Status Register
-        __W   MPFCR_reg_t       MPFCR;          // (0x808) Memory Protection Fault Command Register 
-        __RW  MPPAG_reg_t       MPPAG;          // (0x80C) Memory Protection Page Attribute Register Global 
-        __RW  MPPA_reg_t        MPPA_0;         // (0x810) Memory Protection Page Attribute Register 0
-        __RW  MPPA_reg_t        MPPA_1;         // (0x814) Memory Protection Page Attribute Register 1
-        __RW  MPPA_reg_t        MPPA_2;         // (0x818) Memory Protection Page Attribute Register 2 
-        __RW  MPPA_reg_t        MPPA_3;         // (0x81C) Memory Protection Page Attribute Register 3 
-        __RW  MPPA_reg_t        MPPA_4;         // (0x820) Memory Protection Page Attribute Register 4
-        __RW  MPPA_reg_t        MPPA_5;         // (0x824) Memory Protection Page Attribute Register 5 
-        __RW  MPPA_reg_t        MPPA_6;         // (0x828) Memory Protection Page Attribute Register 6
-        __RW  MPPA_reg_t        MPPA_7;         // (0x82C) Memory Protection Page Attribute Register 7
-        __R   uint32_t          RESERVED12[500]; 
-        __R   ER_reg_t          ER;             // (0x1000) Event Register  
-        __R   ERH_reg_t         ERH;            // (0x1004) Event Register High 
-        __W   ECR_reg_t         ECR;            // (0x1008) Event Clear Register 
-        __W   ECRH_reg_t        ECRH;           // (0x100C) Event Clear Register High 
-        __RW  ESR_reg_t         ESR;            // (0x1010) Event Set Register 
-        __RW  ESRH_reg_t        ESRH;           // (0x1014) Event Set Register High 
-        __R   CER_reg_t         CER;            // (0x1018) Chained Event Register  
-        __R   CERH_reg_t        CERH;           // (0x101C) Chained Event Register High 
-        __R   EER_reg_t         EER;            // (0x1020) Event Enable Register
-        __R   EERH_reg_t        EERH;           // (0x1024) Event Enable Register High 
-        __W   EECR_reg_t        EECR;           // (0x1028) Event Enable Clear Register  
-        __W   EECRH_reg_t       EECRH;          // (0x102C) Event Enable Clear Register High 
-        __W   EESR_reg_t        EESR;           // (0x1030) Event Enable Set Register 
-        __W   EESRH_reg_t       EESRH;          // (0x1034) Event Enable Set Register High
-        __R   SER_reg_t         SER;            // (0x1038) Secondary Event Register 
-        __R   SERH_reg_t        SERH;           // (0x103C) Secondary Event Register High 
-        __W   SECR_reg_t        SECR;           // (0x1040) Secondary Event Clear Register 
-        __W   SECRH_reg_t       SECRH;          // (0x1044) Secondary Event Clear Register High
-        __R   uint32_t          RESERVED13[2]; 
-        __R   IER_reg_t         IER;            // (0x1050) Interrupt Enable Register
-        __R   IERH_reg_t        IERH;           // (0x1054) Interrupt Enable Register High 
-        __W   IECR_reg_t        IECR;           // (0x1058) Interrupt Enable Clear Register
-        __W   IECRH_reg_t       IECRH;          // (0x105C) Interrupt Enable Clear Register High  
-        __W   IESR_reg_t        IESR;           // (0x1060) Interrupt Enable Set Register 
-        __W   IESRH_reg_t       IESRH;          // (0x1064) Interrupt Enable Set Register High 
-        __R   IPR_reg_t         IPR;            // (0x1068) Interrupt Pending Register 
-        __R   IPRH_reg_t        IPRH;           // (0x106C) Interrupt Pending Register High 
-        __W   ICR_reg_t         ICR;            // (0x1070) Interrupt Clear Register 
-        __W   ICRH_reg_t        ICRH;           // (0x1074) Interrupt Clear Register High
-        __W   IEVAL_reg_t       IEVAL;          // (0x1078) Interrupt Evaluate Register
-        __R   uint32_t          RESERVED14[1]; 
-        __R   QER_reg_t         QER;            // (0x1080) QDMA Event Register 
-        __R   QEER_reg_t        QEER;           // (0x1084) QDMA Event Enable Register
-        __W   QEECR_reg_t       QEECR;          // (0x1088) QDMA Event Enable Clear Register 
-        __W   QEESR_reg_t       QEESR;          // (0x108C) QDMA Event Enable Set Register  
-        __R   QSER_reg_t        QSER;           // (0x1090) QDMA Secondary Event Register 
-        __W   QSECR_reg_t       QSECR;          // (0x1094) QDMA Secondary Event Clear Register
+        __R   PIDCC_reg_t           PID;            // (0x00)  Peripheral Identification Register
+        __R   CCCFG_reg_t           CCCFG;          // (0x04)  EDMA3CC Configuration Register
+        __R   uint32_t              RESERVED1[2];
+        __RW  SYSCONFIGCC_reg_t     SYSCONFIG;      // (0x10)  EDMA3CC System Configuration Register
+        __R   uint32_t              RESERVED2[59]; 
+        __RW  DCHMAP_reg_t          DCHMAP[64];     // (0x100..0x1FC) DMA Channel Mapping Register 0..63
+        __RW  QCHMAP_reg_t          QCHMAP[8];      // (0x200..0x21C) QDMA Channel Mapping Register 0..7
+        __R   uint32_t              RESERVED3[8]; 
+        __RW  DMAQNUM_reg_t         DMAQNUM[8];     // (0x240..0x25C) DMA Queue Number Register 0..7
+        __RW  QDMAQNUM_reg_t        QDMAQNUM;       // (0x260) QDMA Queue Number Register
+        __R   uint32_t              RESERVED4[8];  
+        __RW  QUEPRI_reg_t          QUEPRI;         // (0x284) Queue Priority Register
+        __R   uint32_t              RESERVED5[30]; 
+        __R   EMR_reg_t             EMR;            // (0x300) Event Missed Register
+        __R   EMRH_reg_t            EMRH;           // (0x304) Event Missed Register High 
+        __W   EMCR_reg_t            EMCR;           // (0x308) Event Missed Clear Register
+        __W   EMCRH_reg_t           EMCRH;          // (0x30C) Event Missed Clear Register High 
+        __R   QEMR_reg_t            QEMR;           // (0x310) QDMA Event Missed Register 
+        __W   QEMCR_reg_t           QEMCR;          // (0x314) QDMA Event Missed Clear Register 
+        __R   CCERR_reg_t           CCERR;          // (0x318) EDMA3CC Error Register 
+        __W   CCERRCLR_reg_t        CCERRCLR;       // (0x31C) EDMA3CC Error Clear Register 
+        __R   EEVAL_reg_t           EEVAL;          // (0x320) Error Evaluate Register
+        __R   uint32_t              RESERVED6[7]; 
+        __RW  DRAE_reg_t            DRAE0;          // (0x340) DMA Region Access Enable Register for Region 0    
+        __RW  DRAEH_reg_t           DRAEH0;         // (0x344) DMA Region Access Enable Register High for Region 0 
+        __RW  DRAE_reg_t            DRAE1;          // (0x348) DMA Region Access Enable Register for Region 1 
+        __RW  DRAEH_reg_t           DRAEH1;         // (0x34C) DMA Region Access Enable Register High for Region 1
+        __RW  DRAE_reg_t            DRAE2;          // (0x350) DMA Region Access Enable Register for Region 2
+        __RW  DRAEH_reg_t           DRAEH2;         // (0x354) DMA Region Access Enable Register High for Region 2  
+        __RW  DRAE_reg_t            DRAE3;          // (0x358) DMA Region Access Enable Register for Region 3
+        __RW  DRAEH_reg_t           DRAEH3;         // (0x35C) DMA Region Access Enable Register High for Region 3
+        __RW  DRAE_reg_t            DRAE4;          // (0x360) DMA Region Access Enable Register for Region 4 
+        __RW  DRAEH_reg_t           DRAEH4;         // (0x364) DMA Region Access Enable Register High for Region 4
+        __RW  DRAE_reg_t            DRAE5;          // (0x368) DMA Region Access Enable Register for Region 5 
+        __RW  DRAEH_reg_t           DRAEH5;         // (0x36C) DMA Region Access Enable Register High for Region 5 
+        __RW  DRAE_reg_t            DRAE6;          // (0x370) DMA Region Access Enable Register for Region 6
+        __RW  DRAEH_reg_t           DRAEH6;         // (0x374) DMA Region Access Enable Register High for Region 6
+        __RW  DRAE_reg_t            DRAE7;          // (0x378) DMA Region Access Enable Register for Region 7
+        __RW  DRAEH_reg_t           DRAEH7;         // (0x37C) DMA Region Access Enable Register High for Region 7
+        __RW  QRAE_reg_t            QRAE[8];        // (0x380..0x39Ñ) QDMA Region Access Enable Registers for Region 0..7
+        __R   uint32_t              RESERVED7[24];  
+        __R   QE_reg_t              Q0E0;           // (0x400) Event Queue 0 Entry 0 Register 
+        __R   QE_reg_t              Q0E1;           // (0x404) Event Queue 0 Entry 1 Register 
+        __R   QE_reg_t              Q0E2;           // (0x408) Event Queue 0 Entry 2 Register 
+        __R   QE_reg_t              Q0E3;           // (0x40C) Event Queue 0 Entry 3 Register 
+        __R   QE_reg_t              Q0E4;           // (0x410) Event Queue 0 Entry 4 Register 
+        __R   QE_reg_t              Q0E5;           // (0x414) Event Queue 0 Entry 5 Register 
+        __R   QE_reg_t              Q0E6;           // (0x418) Event Queue 0 Entry 6 Register
+        __R   QE_reg_t              Q0E7;           // (0x41C) Event Queue 0 Entry 7 Register 
+        __R   QE_reg_t              Q0E8;           // (0x420) Event Queue 0 Entry 8 Register 
+        __R   QE_reg_t              Q0E9;           // (0x424) Event Queue 0 Entry 9 Register 
+        __R   QE_reg_t              Q0E10;          // (0x428) Event Queue 0 Entry 10 Register 
+        __R   QE_reg_t              Q0E11;          // (0x42C) Event Queue 0 Entry 11 Register
+        __R   QE_reg_t              Q0E12;          // (0x430) Event Queue 0 Entry 12 Register 
+        __R   QE_reg_t              Q0E13;          // (0x434) Event Queue 0 Entry 13 Register
+        __R   QE_reg_t              Q0E14;          // (0x438) Event Queue 0 Entry 14 Register 
+        __R   QE_reg_t              Q0E15;          // (0x43C) Event Queue 0 Entry 15 Register 
+        __R   QE_reg_t              Q1E0;           // (0x440) Event Queue 1 Entry 0 Register   
+        __R   QE_reg_t              Q1E1;           // (0x444) Event Queue 1 Entry 1 Register   
+        __R   QE_reg_t              Q1E2;           // (0x448) Event Queue 1 Entry 2 Register   
+        __R   QE_reg_t              Q1E3;           // (0x44C) Event Queue 1 Entry 3 Register   
+        __R   QE_reg_t              Q1E4;           // (0x450) Event Queue 1 Entry 4 Register  
+        __R   QE_reg_t              Q1E5;           // (0x454) Event Queue 1 Entry 5 Register   
+        __R   QE_reg_t              Q1E6;           // (0x458) Event Queue 1 Entry 6 Register  
+        __R   QE_reg_t              Q1E7;           // (0x45C) Event Queue 1 Entry 7 Register   
+        __R   QE_reg_t              Q1E8;           // (0x460) Event Queue 1 Entry 8 Register   
+        __R   QE_reg_t              Q1E9;           // (0x464) Event Queue 1 Entry 9 Register   
+        __R   QE_reg_t              Q1E10;          // (0x468) Event Queue 1 Entry 10 Register  
+        __R   QE_reg_t              Q1E11;          // (0x46C) Event Queue 1 Entry 11 Register 
+        __R   QE_reg_t              Q1E12;          // (0x470) Event Queue 1 Entry 12 Register  
+        __R   QE_reg_t              Q1E13;          // (0x474) Event Queue 1 Entry 13 Register  
+        __R   QE_reg_t              Q1E14;          // (0x478) Event Queue 1 Entry 14 Register  
+        __R   QE_reg_t              Q1E15;          // (0x47C) Event Queue 1 Entry 15 Register  
+        __R   QE_reg_t              Q2E0;           // (0x480) Event Queue 2 Entry 0 Register   
+        __R   QE_reg_t              Q2E1;           // (0x484) Event Queue 2 Entry 1 Register   
+        __R   QE_reg_t              Q2E2;           // (0x488) Event Queue 2 Entry 2 Register  
+        __R   QE_reg_t              Q2E3;           // (0x48C) Event Queue 2 Entry 3 Register   
+        __R   QE_reg_t              Q2E4;           // (0x490) Event Queue 2 Entry 4 Register   
+        __R   QE_reg_t              Q2E5;           // (0x494) Event Queue 2 Entry 5 Register   
+        __R   QE_reg_t              Q2E6;           // (0x498) Event Queue 2 Entry 6 Register  
+        __R   QE_reg_t              Q2E7;           // (0x49C) Event Queue 2 Entry 7 Register   
+        __R   QE_reg_t              Q2E8;           // (0x4A0) Event Queue 2 Entry 8 Register   
+        __R   QE_reg_t              Q2E9;           // (0x4A4) Event Queue 2 Entry 9 Register  
+        __R   QE_reg_t              Q2E10;          // (0x4A8) Event Queue 2 Entry 10 Register  
+        __R   QE_reg_t              Q2E11;          // (0x4AC) Event Queue 2 Entry 11 Register  
+        __R   QE_reg_t              Q2E12;          // (0x4B0) Event Queue 2 Entry 12 Register 
+        __R   QE_reg_t              Q2E13;          // (0x4B4) Event Queue 2 Entry 13 Register  
+        __R   QE_reg_t              Q2E14;          // (0x4B8) Event Queue 2 Entry 14 Register  
+        __R   QE_reg_t              Q2E15;          // (0x4BC) Event Queue 2 Entry 15 Register 
+        __R   uint32_t              RESERVED8[80]; 
+        __R   QSTAT_reg_t           QSTAT_0;        // (0x600) Queue Status Registers 0
+        __R   QSTAT_reg_t           QSTAT_1;        // (0x604) Queue Status Registers 1 
+        __R   QSTAT_reg_t           QSTAT_2;        // (0x608) Queue Status Registers 2
+        __R   uint32_t              RESERVED9[5]; 
+        __RW  QWMTHRA_reg_t         QWMTHRA;        // (0x620) Queue Watermark Threshold A Register
+        __R   uint32_t              RESERVED10[7]; 
+        __R   CCSTAT_reg_t          CCSTAT;         // (0x640) EDMA3CC Status Register
+        __R   uint32_t              RESERVED11[111]; 
+        __R   MPFAR_reg_t           MPFAR;          // (0x800) Memory Protection Fault Address Register
+        __R   MPFSR_reg_t           MPFSR;          // (0x804) Memory Protection Fault Status Register
+        __W   MPFCR_reg_t           MPFCR;          // (0x808) Memory Protection Fault Command Register 
+        __RW  MPPAG_reg_t           MPPAG;          // (0x80C) Memory Protection Page Attribute Register Global 
+        __RW  MPPA_reg_t            MPPA_0;         // (0x810) Memory Protection Page Attribute Register 0
+        __RW  MPPA_reg_t            MPPA_1;         // (0x814) Memory Protection Page Attribute Register 1
+        __RW  MPPA_reg_t            MPPA_2;         // (0x818) Memory Protection Page Attribute Register 2 
+        __RW  MPPA_reg_t            MPPA_3;         // (0x81C) Memory Protection Page Attribute Register 3 
+        __RW  MPPA_reg_t            MPPA_4;         // (0x820) Memory Protection Page Attribute Register 4
+        __RW  MPPA_reg_t            MPPA_5;         // (0x824) Memory Protection Page Attribute Register 5 
+        __RW  MPPA_reg_t            MPPA_6;         // (0x828) Memory Protection Page Attribute Register 6
+        __RW  MPPA_reg_t            MPPA_7;         // (0x82C) Memory Protection Page Attribute Register 7
+        __R   uint32_t              RESERVED12[500]; 
+        __R   ER_reg_t              ER;             // (0x1000) Event Register  
+        __R   ERH_reg_t             ERH;            // (0x1004) Event Register High 
+        __W   ECR_reg_t             ECR;            // (0x1008) Event Clear Register 
+        __W   ECRH_reg_t            ECRH;           // (0x100C) Event Clear Register High 
+        __RW  ESR_reg_t             ESR;            // (0x1010) Event Set Register 
+        __RW  ESRH_reg_t            ESRH;           // (0x1014) Event Set Register High 
+        __R   CER_reg_t             CER;            // (0x1018) Chained Event Register  
+        __R   CERH_reg_t            CERH;           // (0x101C) Chained Event Register High 
+        __R   EER_reg_t             EER;            // (0x1020) Event Enable Register
+        __R   EERH_reg_t            EERH;           // (0x1024) Event Enable Register High 
+        __W   EECR_reg_t            EECR;           // (0x1028) Event Enable Clear Register  
+        __W   EECRH_reg_t           EECRH;          // (0x102C) Event Enable Clear Register High 
+        __W   EESR_reg_t            EESR;           // (0x1030) Event Enable Set Register 
+        __W   EESRH_reg_t           EESRH;          // (0x1034) Event Enable Set Register High
+        __R   SER_reg_t             SER;            // (0x1038) Secondary Event Register 
+        __R   SERH_reg_t            SERH;           // (0x103C) Secondary Event Register High 
+        __W   SECR_reg_t            SECR;           // (0x1040) Secondary Event Clear Register 
+        __W   SECRH_reg_t           SECRH;          // (0x1044) Secondary Event Clear Register High
+        __R   uint32_t              RESERVED13[2]; 
+        __R   IER_reg_t             IER;            // (0x1050) Interrupt Enable Register
+        __R   IERH_reg_t            IERH;           // (0x1054) Interrupt Enable Register High 
+        __W   IECR_reg_t            IECR;           // (0x1058) Interrupt Enable Clear Register
+        __W   IECRH_reg_t           IECRH;          // (0x105C) Interrupt Enable Clear Register High  
+        __W   IESR_reg_t            IESR;           // (0x1060) Interrupt Enable Set Register 
+        __W   IESRH_reg_t           IESRH;          // (0x1064) Interrupt Enable Set Register High 
+        __R   IPR_reg_t             IPR;            // (0x1068) Interrupt Pending Register 
+        __R   IPRH_reg_t            IPRH;           // (0x106C) Interrupt Pending Register High 
+        __W   ICR_reg_t             ICR;            // (0x1070) Interrupt Clear Register 
+        __W   ICRH_reg_t            ICRH;           // (0x1074) Interrupt Clear Register High
+        __W   IEVAL_reg_t           IEVAL;          // (0x1078) Interrupt Evaluate Register
+        __R   uint32_t              RESERVED14[1]; 
+        __R   QER_reg_t             QER;            // (0x1080) QDMA Event Register 
+        __R   QEER_reg_t            QEER;           // (0x1084) QDMA Event Enable Register
+        __W   QEECR_reg_t           QEECR;          // (0x1088) QDMA Event Enable Clear Register 
+        __W   QEESR_reg_t           QEESR;          // (0x108C) QDMA Event Enable Set Register  
+        __R   QSER_reg_t            QSER;           // (0x1090) QDMA Secondary Event Register 
+        __W   QSECR_reg_t           QSECR;          // (0x1094) QDMA Secondary Event Clear Register
     };
 
     struct AM335x_EDMA3TC_Type
@@ -2327,6 +2126,66 @@ namespace n_EDMA
     constexpr AM335x_EDMA3TC_Type * AM335X_EDMA3TC0_regs = reinterpret_cast<AM335x_EDMA3TC_Type *>(AM335x_EDMA3TC0_BASE);
     constexpr AM335x_EDMA3TC_Type * AM335X_EDMA3TC1_regs = reinterpret_cast<AM335x_EDMA3TC_Type *>(AM335x_EDMA3TC1_BASE);
     constexpr AM335x_EDMA3TC_Type * AM335X_EDMA3TC2_regs = reinterpret_cast<AM335x_EDMA3TC_Type *>(AM335x_EDMA3TC2_BASE);
+
+    constexpr uint32_t SET_ALL_BITS = 0xFFFFFFFFu;
+    constexpr uint32_t CLR_ALL_BITS = 0x00000000u;
+    
+    enum e_REGION_ID : uint32_t
+    {
+        REGION_0 = 0x0,
+        REGION_1 = 0x1,
+        REGION_2 = 0x2,
+        REGION_3 = 0x3,
+        REGION_4 = 0x4,
+        REGION_5 = 0x5,
+        REGION_6 = 0x6,
+        REGION_7 = 0x7        
+    };
+
+    enum e_EDMA3_CH_TYPE : uint32_t
+    {
+        CHANNEL_TYPE_DMA  = 0u,
+        CHANNEL_TYPE_QDMA = 1u
+    };
+    
+   constexpr uint32_t  EDMA_REVID        = 0x02u;
+   constexpr uint32_t  AM335X_DMACH_MAX  = 64;
+   constexpr uint32_t  AM335X_QDMACH_MAX = 8;   
+
+     DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id);
+    DRAEH_reg_t*& get_DRAEH_reference(e_REGION_ID region_id);    
+        uint32_t  DMAQNUM_CLR(uint32_t count);
+        uint32_t  DMAQNUM_SET(uint32_t count, e_DMA_QUEUE que_num);
+        uint32_t  QDMAQNUM_CLR(uint32_t count);
+        uint32_t  QDMAQNUM_SET(uint32_t count, e_DMA_QUEUE que_num);
+
+    inline DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id) 
+    {
+        uint32_t    n = (uint32_t)region_id;
+        uint32_t DRAE = (AM335x_EDMA3CC_BASE + 0x340 + (n * 8));
+        
+        return (DRAE_reg_t*&)DRAE;
+    }
+    
+    inline DRAEH_reg_t*& get_DRAEH_reference(e_REGION_ID region_id) 
+    {
+        uint32_t     n = (uint32_t)region_id;
+        uint32_t DRAEH = (AM335x_EDMA3CC_BASE + 0x344 + (n * 8));
+        
+        return (DRAEH_reg_t*&)DRAEH;
+    }
+
+    inline uint32_t  DMAQNUM_CLR(uint32_t ch_num)
+    { return (~(0x7u << (((ch_num)%8u)*4u))); }
+
+    inline uint32_t  DMAQNUM_SET(uint32_t ch_num, e_DMA_QUEUE que_num)
+    { return ((0x7u & ((uint32_t)que_num)) << (((ch_num)%8u)*4u)); }
+
+    inline uint32_t  QDMAQNUM_CLR(uint32_t ch_num)
+    { return (~(0x7u << (ch_num*4u))); }
+
+    inline uint32_t  QDMAQNUM_SET(uint32_t ch_num, e_DMA_QUEUE que_num)
+    { return ((0x7u & ((uint32_t)que_num)) << (ch_num*4u)); }
 }
 
 /**
@@ -2335,7 +2194,8 @@ namespace n_EDMA
  * This is a mapping of the EDMA3 PaRAM set provided to the user
  * for ease of modification of the individual fields
  */
-typedef struct EDMA3CCPaRAMEntry {
+typedef struct EDMA3CCPaRAMEntry
+{
         /** OPT field of PaRAM Set */
         unsigned int opt;
 
@@ -2360,7 +2220,7 @@ typedef struct EDMA3CCPaRAMEntry {
          * For FIFO mode, destAddr must be a 256-bit aligned address.
          * i.e. 5 LSBs should be 0.
          */
-        unsigned int destAddr;
+        uint32_t destAddr;
 
         /**
          * \brief Index between consec. arrays of a Source Frame (SRCBIDX)
@@ -2405,91 +2265,93 @@ typedef struct EDMA3CCPaRAMEntry {
          */
         unsigned short rsvd;
 
-}EDMA3CCPaRAMEntry;
+} EDMA3CCPaRAMEntry;
 
 /*
 ** Structure to store the EDMA context
 */
-typedef struct edmaContext {
-    /* Channel mapping reg Val */
-    unsigned int dchMap[64];
-    /* DMA Queue Number Register Val */    
-    unsigned int dmaQNum[8];    
+typedef struct edma_context 
+{    
+    uint32_t  dchMap[64];            // Channel mapping reg Val      
+    uint32_t  dmaQNum[8];            // DMA Queue Number Register Val
     
-    /* DMA Region Access Enable Register val */    
-    unsigned int regAccEnableLow;    
-    unsigned int regAccEnableHigh;        
-
-    /* Event Set Register value */    
-    unsigned int eventSetRegLow;
-    unsigned int eventSetRegHigh;    
+    uint32_t  regAccEnableLow;       // DMA Region Access Enable Register val    
+    uint32_t  regAccEnableHigh;      // DMA Region Access Enable Register val 
+      
+    uint32_t  eventSetRegLow;        // Event Set Register value  
+    uint32_t  eventSetRegHigh;       // Event Set Register value 
+       
+    uint32_t  enableEvtSetRegLow;    // Enable Event Set Register value 
+    uint32_t  enableEvtSetRegHigh;   // Enable Event Set Register value 
+             
+    uint32_t  intEnableSetRegLow;    // Interrupt Enable Set Register value      
+    uint32_t  intEnableSetRegHigh;   // Interrupt Enable Set Register value   
     
-    /* Enable Event Set Register value */    
-    unsigned int enableEvtSetRegLow;
-    unsigned int enableEvtSetRegHigh;
+struct EDMA3CCPaRAMEntry dmaParEntry[512];    
     
-    /* Interrupt Enable Set Register value */            
-    unsigned int intEnableSetRegLow;        
-    unsigned int intEnableSetRegHigh;    
-    
-    struct EDMA3CCPaRAMEntry dmaParEntry[512];    
-    
-} EDMACONTEXT;
+} EDMACONTEXT_t;
 
 class AM335x_EDMA
 {
+             n_EDMA::e_REGION_ID region_id;
 public:
               AM335x_EDMA()
                 : m_EDMA3CC_regs(*(n_EDMA::AM335X_EDMA3CC_regs)),
                 m_EDMA3TC0_regs(*(n_EDMA::AM335X_EDMA3TC0_regs)),
                 m_EDMA3TC1_regs(*(n_EDMA::AM335X_EDMA3TC1_regs)),
                 m_EDMA3TC2_regs(*(n_EDMA::AM335X_EDMA3TC2_regs)) 
-              { }
+              { 
+                #ifdef _TMS320C6X        
+                    region_id = n_EDMA::REGION_1;   // For DSP, region_id is assigned here and used globally in the driver
+                #else   
+                    region_id = n_EDMA::REGION_0;   // FOR ARM, region_id is assigned here and used globally in the driver
+                #endif
+              }
              ~AM335x_EDMA() { }
 
-        void  init(uint32_t queNum);
-        void  enable_ch_in_shadow_reg(uint32_t chType, uint32_t chNum);
-        void  disable_ch_in_shadow_reg(uint32_t chType, uint32_t chNum);
-        void  map_ch_to_evtQ(uint32_t chType, uint32_t chNum, uint32_t evtQNum);
-        void  unmap_ch_to_evtQ(uint32_t chType, uint32_t chNum);
-        void  map_QDMA_ch_to_paRAM(uint32_t chNum, uint32_t *paRAMId);
-        void  set_QDMA_trig_word(uint32_t chNum, uint32_t trigWord);
-        void  clr_miss_evt(uint32_t chNum);
-        void  QDMA_clr_miss_evt(uint32_t chNum);
-        void  clr_CCERR(uint32_t Flags);
-        void  set_evt(uint32_t chNum);
-        void  clr_evt(uint32_t chNum);
-        void  enable_DMA_evt(uint32_t chNum);
-        void  disable_DMA_evt(uint32_t chNum);
-        void  enable_QDMA_evt(uint32_t chNum);
-        void  disable_QDMA_evt(uint32_t chNum);
+        void  init(n_EDMA::e_DMA_QUEUE que_num);
+        void  enable_ch_in_shadow_reg(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num);
+        void  disable_ch_in_shadow_reg(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num);
+        void  map_ch_to_evtQ(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
+        void  unmap_ch_to_evtQ(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num);
+        void  map_QDMA_ch_to_paRAM(uint32_t ch_num, uint32_t *paRAM_id);
+        void  set_QDMA_trig_word(uint32_t ch_num, uint8_t trig_word);
+        void  clr_miss_evt(uint32_t ch_num);
+        void  QDMA_clr_miss_evt(uint32_t ch_num);
+        void  clr_CCERR(uint32_t flags);
+        void  set_evt(uint32_t ch_num);
+        void  clr_evt(uint32_t ch_num);
+        void  enable_DMA_evt(uint32_t ch_num);
+        void  disable_DMA_evt(uint32_t ch_num);
+        void  enable_QDMA_evt(uint32_t ch_num);
+        void  disable_QDMA_evt(uint32_t ch_num);
     uint32_t  get_intr_status();
-        void  enable_evt_intr(uint32_t chNum);
-        void  disable_evt_intr(uint32_t chNum);
+        void  enable_evt_intr(uint32_t ch_num);
+        void  disable_evt_intr(uint32_t ch_num);
         void  clr_intr(uint32_t value);
-        void  get_paRAM(uint32_t chNum, EDMA3CCPaRAMEntry* currPaRAM);
-        void  QDMA_get_paRAM(uint32_t chNum, uint32_t paRAMId, EDMA3CCPaRAMEntry* currPaRAM);
-        void  set_paRAM(uint32_t chNum, EDMA3CCPaRAMEntry* newPaRAM);
-        void  QDMA_set_paRAM(uint32_t chNum, uint32_t paRAMId, EDMA3CCPaRAMEntry* newPaRAM);
-        void  QDMA_set_paRAM_entry(uint32_t paRAMId, uint32_t paRAMEntry, uint32_t newPaRAMEntryVal);
-    uint32_t  QDMA_get_paRAM_entry(uint32_t paRAMId, uint32_t paRAMEntry);
-    uint32_t  request_channel(uint32_t chType, uint32_t chNum, uint32_t tccNum, uint32_t evtQNum);
-    uint32_t  free_channel(uint32_t chType, uint32_t chNum, uint32_t trigMode, uint32_t tccNum, uint32_t evtQNum);
-    uint32_t  enable_transfer(uint32_t chNum, uint32_t trigMode);
-    uint32_t  disable_transfer(uint32_t chNum, uint32_t trigMode);
-        void  clear_error_bits(uint32_t chNum, uint32_t evtQNum);
+        void  get_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* curr_paRAM);
+        void  QDMA_get_paRAM(uint32_t ch_num, uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM);
+        void  set_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* new_paRAM);
+        void  QDMA_set_paRAM(uint32_t ch_num, uint32_t paRAM_id, EDMA3CCPaRAMEntry* new_paRAM);
+        void  QDMA_set_paRAM_entry(uint32_t paRAM_id, uint32_t paRAM_entry, uint32_t new_paRAM_entry_val);
+    uint32_t  QDMA_get_paRAM_entry(uint32_t paRAM_id, uint32_t paRAM_entry);
+    uint32_t  request_channel(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, uint32_t tcc_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
+    uint32_t  free_channel(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, uint32_t trig_mode, uint32_t tcc_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
+    uint32_t  enable_transfer(uint32_t ch_num, uint32_t trig_mode);
+    uint32_t  disable_transfer(uint32_t ch_num, uint32_t trig_mode);
+        void  clear_error_bits(uint32_t ch_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
     uint32_t  get_CCERR_status();
     uint32_t  get_ERR_intr_status();
     uint32_t  QDMA_get_ERR_intr_status();
         void  CCERR_evaluate();
-        void  deinit(uint32_t queNum);
-    uint32_t  version_get(void);
+        void  deinit(uint32_t que_num);
+    uint32_t  version_get(void) const { return 1; } // This returns a number '2' which is unique to EDMA IP in AM335x.
     uint32_t  peripheral_id_get();
     uint32_t  intr_status_high_get();
     uint32_t  ERR_intr_high_status_get();
-        void  channel_to_param_map(uint32_t channel, uint32_t paramSet);
-        void  context_save(EDMACONTEXT *edmaCntxPtr);
-        void  context_restore(EDMACONTEXT *edmaCntxPtr);
+        void  channel_to_param_map(uint32_t channel, uint32_t param_set);
+        void  context_save(EDMACONTEXT_t *p_edma_cntx);
+        void  context_restore(EDMACONTEXT_t *p_edma_cntx);
 private:
     n_EDMA::AM335x_EDMA3CC_Type &m_EDMA3CC_regs;
     n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC0_regs;

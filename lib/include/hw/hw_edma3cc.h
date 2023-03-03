@@ -108,38 +108,38 @@ extern "C" {
 #define EDMA3CC_QSER                 (0x1090)
 #define EDMA3CC_QSECR                (0x1094)
 #define EDMA3CC_S_ER(n)              (0x2000 + (0x200 * n))
-#define EDMA3CC_S_ECR(n)             (0x2008 + (0x200 * n))
-#define EDMA3CC_S_ECRH(n)            (0x200C + (0x200 * n))
-#define EDMA3CC_S_ESR(n)             (0x2010 + (0x200 * n))
-#define EDMA3CC_S_ESRH(n)            (0x2014+ (0x200 * n))
+#define EDMA3CC_S_ECR(n)             (0x2008 + (0x200 * n))     /**/
+#define EDMA3CC_S_ECRH(n)            (0x200C + (0x200 * n))     /**/
+#define EDMA3CC_S_ESR(n)             (0x2010 + (0x200 * n))     /**/
+#define EDMA3CC_S_ESRH(n)            (0x2014+ (0x200 * n))      /**/
 #define EDMA3CC_S_CER(n)             (0x2018 + (0x200 * n))
-#define EDMA3CC_S_EER(n)             (0x2020 + (0x200 * n))
-#define EDMA3CC_S_EERH(n)            (0x2024 + (0x200 * n))
-#define EDMA3CC_S_EECR(n)            (0x2028 + (0x200 * n))
-#define EDMA3CC_S_EECRH(n)           (0x202C + (0x200 * n))
-#define EDMA3CC_S_EESR(n)            (0x2030 + (0x200 * n))
-#define EDMA3CC_S_EESRH(n)           (0x2034 + (0x200 * n))
+#define EDMA3CC_S_EER(n)             (0x2020 + (0x200 * n))     /**/
+#define EDMA3CC_S_EERH(n)            (0x2024 + (0x200 * n))     /**/
+#define EDMA3CC_S_EECR(n)            (0x2028 + (0x200 * n))     /**/
+#define EDMA3CC_S_EECRH(n)           (0x202C + (0x200 * n))     /**/
+#define EDMA3CC_S_EESR(n)            (0x2030 + (0x200 * n))     /**/
+#define EDMA3CC_S_EESRH(n)           (0x2034 + (0x200 * n))     /**/
 #define EDMA3CC_S_SER(n)             (0x2038 + (0x200 * n))
 #define EDMA3CC_S_SERH(n)            (0x203C + (0x200 * n))
-#define EDMA3CC_S_SECR(n)            (0x2040 + (0x200 * n))
-#define EDMA3CC_S_SECRH(n)           (0x2044 + (0x200 * n))
-#define EDMA3CC_S_IER(n)             (0x2050 + (0x200 * n))
-#define EDMA3CC_S_IERH(n)            (0x2054 + (0x200 * n))
-#define EDMA3CC_S_IECR(n)            (0x2058 + (0x200 * n))
-#define EDMA3CC_S_IECRH(n)           (0x205C + (0x200 * n))
-#define EDMA3CC_S_IESR(n)            (0x2060 + (0x200 * n))
-#define EDMA3CC_S_IESRH(n)           (0x2064 + (0x200 * n))
-#define EDMA3CC_S_IPR(n)             (0x2068 + (0x200 * n))
-#define EDMA3CC_S_IPRH(n)            (0x206C + (0x200 * n))
-#define EDMA3CC_S_ICR(n)             (0x2070 + (0x200 * n))
-#define EDMA3CC_S_ICRH(n)            (0x2074 + (0x200 * n))
+#define EDMA3CC_S_SECR(n)            (0x2040 + (0x200 * n))     /**/
+#define EDMA3CC_S_SECRH(n)           (0x2044 + (0x200 * n))     /**/
+#define EDMA3CC_S_IER(n)             (0x2050 + (0x200 * n))     /**/
+#define EDMA3CC_S_IERH(n)            (0x2054 + (0x200 * n))     /**/
+#define EDMA3CC_S_IECR(n)            (0x2058 + (0x200 * n))     /**/
+#define EDMA3CC_S_IECRH(n)           (0x205C + (0x200 * n))     /**/
+#define EDMA3CC_S_IESR(n)            (0x2060 + (0x200 * n))     /**/
+#define EDMA3CC_S_IESRH(n)           (0x2064 + (0x200 * n))     /**/
+#define EDMA3CC_S_IPR(n)             (0x2068 + (0x200 * n))     /**/
+#define EDMA3CC_S_IPRH(n)            (0x206C + (0x200 * n))     /**/
+#define EDMA3CC_S_ICR(n)             (0x2070 + (0x200 * n))     /**/
+#define EDMA3CC_S_ICRH(n)            (0x2074 + (0x200 * n))     /**/
 #define EDMA3CC_S_IEVAL(n)           (0x2078 + (0x200 * n))
 #define EDMA3CC_S_QER(n)             (0x2080 + (0x200 * n))
 #define EDMA3CC_S_QEER(n)            (0x2084 + (0x200 * n))
-#define EDMA3CC_S_QEECR(n)           (0x2088 + (0x200 * n))
-#define EDMA3CC_S_QEESR(n)           (0x208C + (0x200 * n))
+#define EDMA3CC_S_QEECR(n)           (0x2088 + (0x200 * n))     /**/
+#define EDMA3CC_S_QEESR(n)           (0x208C + (0x200 * n))     /**/
 #define EDMA3CC_S_QSER(n)            (0x2090 + (0x200 * n))
-#define EDMA3CC_S_QSECR(n)           (0x2094 + (0x200 * n))
+#define EDMA3CC_S_QSECR(n)           (0x2094 + (0x200 * n))     /**/
 
 /**************************************************************************\
 * Field Definition Macros

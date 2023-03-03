@@ -2735,6 +2735,9 @@
                 <name>$PROJ_DIR$\src\periphery\INTC.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\src\periphery\n_EDMA.cpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\src\periphery\n_EDMA.h</name>
             </file>
             <file>
