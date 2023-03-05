@@ -321,13 +321,17 @@ void AM335x_EDMA::clr_miss_evt(uint32_t ch_num)
 {
     if(ch_num < 32)
     {         
-         HWREG(baseAdd + EDMA3CC_S_SECR(region_id)) = (0x01u << ch_num);    // clear SECR to clean any previous NULL request         
-         HWREG(baseAdd + EDMA3CC_EMCR) |= (0x01u <<  ch_num);               //clear EMCR to clean any previous NULL request
+         //HWREG(baseAdd + EDMA3CC_S_SECR(region_id)) = (0x01u << ch_num);    // clear SECR to clean any previous NULL request         
+         //HWREG(baseAdd + EDMA3CC_EMCR) |= (0x01u <<  ch_num);               //clear EMCR to clean any previous NULL request
+         n_EDMA::get_S_SECR_reference(region_id)->reg = (0x01u << ch_num);    // clear SECR to clean any previous NULL request         
+         m_EDMA3CC_regs.EMCR.reg |= (0x01u <<  ch_num);               //clear EMCR to clean any previous NULL request
     }
     else
     { 
-         HWREG(baseAdd + EDMA3CC_S_SECRH(region_id)) = (0x01u << (ch_num - 32));         
-         HWREG(baseAdd + EDMA3CC_EMCRH) |= (0x01u <<  (ch_num - 32));               //clear EMCRH to clean any previous NULL request
+         //HWREG(baseAdd + EDMA3CC_S_SECRH(region_id)) = (0x01u << (ch_num - 32));         
+         //HWREG(baseAdd + EDMA3CC_EMCRH) |= (0x01u <<  (ch_num - 32));         //clear EMCRH to clean any previous NULL request
+         n_EDMA::get_S_SECR_reference(region_id)->reg = (0x01u << (ch_num - 32));         
+         m_EDMA3CC_regs.EMCRH.reg |= (0x01u <<  (ch_num - 32));               //clear EMCRH to clean any previous NULL request
     }
 }
 
@@ -340,11 +344,13 @@ void AM335x_EDMA::clr_miss_evt(uint32_t ch_num)
  */
 void AM335x_EDMA::QDMA_clr_miss_evt(uint32_t ch_num)
 {
-    /*clear SECR to clean any previous NULL request                         */
-    HWREG(baseAdd + EDMA3CC_S_QSECR(region_id)) = (0x01u << ch_num);
+    // clear SECR to clean any previous NULL request                        
+    //HWREG(baseAdd + EDMA3CC_S_QSECR(region_id)) = (0x01u << ch_num);
+    n_EDMA::get_S_QSECR_reference(region_id)->reg = (0x01u << ch_num);
     
-    /*clear EMCR to clean any previous NULL request                         */
-    HWREG(baseAdd + EDMA3CC_QEMCR) |= (0x01u <<  ch_num);
+    // clear EMCR to clean any previous NULL request                       
+    //HWREG(baseAdd + EDMA3CC_QEMCR) |= (0x01u <<  ch_num);
+    m_EDMA3CC_regs.QEMCR.reg |= (0x01u <<  ch_num);
 }
 
 /**
@@ -361,10 +367,11 @@ void AM335x_EDMA::QDMA_clr_miss_evt(uint32_t ch_num)
  *
  *  \return  None
  */
-void AM335x_EDMA::clr_CCERR(uint32_t flags)
+void AM335x_EDMA::clr_CCERR(n_EDMA::CCERRCLR_reg_t flags)
 {
-    /* (CCERRCLR) - clear channel controller error register                 */
-    HWREG(baseAdd + EDMA3CC_CCERRCLR) = Flags;
+    // (CCERRCLR) - clear channel controller error register
+    //HWREG(baseAdd + EDMA3CC_CCERRCLR) = Flags;
+    m_EDMA3CC_regs.CCERRCLR.reg = flags.reg;
 }
 
 /**
@@ -381,13 +388,15 @@ void AM335x_EDMA::set_evt(uint32_t ch_num)
 {
     if(ch_num < 32)
     { 
-         /* (ESR) - set corresponding bit to set a event                         */
-         HWREG(baseAdd + EDMA3CC_S_ESR(region_id)) |= (0x01u <<  ch_num);
+         // (ESR) - set corresponding bit to set a event
+         //HWREG(baseAdd + EDMA3CC_S_ESR(region_id)) |= (0x01u <<  ch_num);
+         n_EDMA::get_S_ESR_reference(region_id)->reg |= (0x01u <<  ch_num);
     }
     else
     {
-         /* (ESRH) - set corresponding bit to set a event                         */
-         HWREG(baseAdd + EDMA3CC_S_ESRH(region_id)) |= (0x01u << (ch_num - 32));
+         // (ESRH) - set corresponding bit to set a event  
+         //HWREG(baseAdd + EDMA3CC_S_ESRH(region_id)) |= (0x01u << (ch_num - 32));
+         n_EDMA::get_S_ESRH_reference(region_id)->reg |= (0x01u << (ch_num - 32));
     }
 }
 
@@ -430,13 +439,15 @@ void AM335x_EDMA::enable_DMA_evt(uint32_t ch_num)
 {
     if(ch_num < 32)
     { 
-         /* (EESR) - set corresponding bit to enable DMA event                   */
-         HWREG(baseAdd + EDMA3CC_S_EESR(region_id)) |= (0x01u <<  ch_num);
+         // (EESR) - set corresponding bit to enable DMA event
+         //HWREG(baseAdd + EDMA3CC_S_EESR(region_id)) |= (0x01u <<  ch_num);
+        n_EDMA::get_S_EESR_reference(region_id)->reg |= (0x01u <<  ch_num);
     }
     else
     { 
-         /* (EESRH) - set corresponding bit to enable DMA event                   */
-         HWREG(baseAdd + EDMA3CC_S_EESRH(region_id)) |= (0x01u << (ch_num - 32));
+         // (EESRH) - set corresponding bit to enable DMA event
+         //HWREG(baseAdd + EDMA3CC_S_EESRH(region_id)) |= (0x01u << (ch_num - 32));
+        n_EDMA::get_S_EESRH_reference(region_id)->reg |= (0x01u << (ch_num - 32));
     }
 }
 
@@ -455,13 +466,15 @@ void AM335x_EDMA::disable_DMA_evt(uint32_t ch_num)
 {
     if(ch_num < 32)
     {
-         /* (EECR) - set corresponding bit to disable event                      */
-         HWREG(baseAdd + EDMA3CC_S_EECR(region_id)) |= (0x01u <<  ch_num);
+         // (EECR) - set corresponding bit to disable event
+         //HWREG(baseAdd + EDMA3CC_S_EECR(region_id)) |= (0x01u <<  ch_num);
+        n_EDMA::get_S_EECR_reference(region_id)->reg |= (0x01u <<  ch_num);
     }
     else
     {
-         /* (EECRH) - set corresponding bit to disable event                      */
-         HWREG(baseAdd + EDMA3CC_S_EECRH(region_id)) |= (0x01u <<  ch_num);
+         // (EECRH) - set corresponding bit to disable event
+         //HWREG(baseAdd + EDMA3CC_S_EECRH(region_id)) |= (0x01u <<  ch_num);
+        n_EDMA::get_S_EECRH_reference(region_id)->reg |= (0x01u <<  ch_num);
     }
 }
 
@@ -477,8 +490,9 @@ void AM335x_EDMA::disable_DMA_evt(uint32_t ch_num)
  */
 void AM335x_EDMA::enable_QDMA_evt(uint32_t ch_num)
 {
-    /* (QEESR) - set corresponding bit to enable QDMA event                 */
-    HWREG(baseAdd + EDMA3CC_S_QEESR(region_id)) = (0x01u << ch_num);
+    // (QEESR) - set corresponding bit to enable QDMA event 
+    //HWREG(baseAdd + EDMA3CC_S_QEESR(region_id)) = (0x01u << ch_num);
+    n_EDMA::get_S_QEESR_reference(region_id)->reg = (0x01u << ch_num);
 }
 
 /**
@@ -493,8 +507,9 @@ void AM335x_EDMA::enable_QDMA_evt(uint32_t ch_num)
  */
 void AM335x_EDMA::disable_QDMA_evt(uint32_t ch_num)
 {
-    /* (QEESR) - set corresponding bit to enable QDMA event                 */
-    HWREG(baseAdd + EDMA3CC_S_QEECR(region_id)) = (0x01u << ch_num);
+    // (QEESR) - set corresponding bit to enable QDMA event
+    //HWREG(baseAdd + EDMA3CC_S_QEECR(region_id)) = (0x01u << ch_num);
+    n_EDMA::get_S_QEECR_reference(region_id)->reg = (0x01u << ch_num);
 }
 
 /**
@@ -506,11 +521,12 @@ void AM335x_EDMA::disable_QDMA_evt(uint32_t ch_num)
  */
 uint32_t AM335x_EDMA::get_intr_status()
 {
-    uint32_t IntrStatusVal = 0;
+    uint32_t intr_sts= 0;
 
-    IntrStatusVal = (uint32_t)HWREG(baseAdd + EDMA3CC_S_IPR(region_id));
+    //intr_sts = (uint32_t)HWREG(baseAdd + EDMA3CC_S_IPR(region_id));
+    intr_sts = (uint32_t)n_EDMA::get_S_IPR_reference(region_id)->reg;
 
-    return IntrStatusVal;
+    return intr_sts;
 }
 
 
@@ -529,13 +545,15 @@ void AM335x_EDMA::enable_evt_intr(uint32_t ch_num)
 {
     if(ch_num < 32)
     {
-         /*  Interrupt Enable Set Register (IESR)                                */
-         HWREG(baseAdd + EDMA3CC_S_IESR(region_id)) |= (0x01u <<  ch_num);
+         //  Interrupt Enable Set Register (IESR)
+         // HWREG(baseAdd + EDMA3CC_S_IESR(region_id)) |= (0x01u <<  ch_num);
+         n_EDMA::get_S_IESR_reference(region_id)->reg |= (0x01u <<  ch_num);
     }
     else
     {
-         /*  Interrupt Enable Set Register (IESRH)                                */
-         HWREG(baseAdd + EDMA3CC_S_IESRH(region_id)) |= (0x01u << (ch_num - 32));
+         //  Interrupt Enable Set Register (IESRH)
+         // HWREG(baseAdd + EDMA3CC_S_IESRH(region_id)) |= (0x01u << (ch_num - 32));
+         n_EDMA::get_S_IESRH_reference(region_id)->reg |= (0x01u << (ch_num - 32));
     }
 }
 
@@ -554,13 +572,15 @@ void AM335x_EDMA::disable_evt_intr(uint32_t ch_num)
 {
     if(ch_num < 32)
     {
-         /* Interrupt Enable Clear Register (IECR)                               */
-         HWREG(baseAdd + EDMA3CC_S_IECR(region_id)) |= (0x01u <<  ch_num);
+         // Interrupt Enable Clear Register (IECR)
+         // HWREG(baseAdd + EDMA3CC_S_IECR(region_id)) |= (0x01u <<  ch_num);
+        n_EDMA::get_S_IECR_reference(region_id)->reg |= (0x01u <<  ch_num);
     }
     else
     {
-         /* Interrupt Enable Clear Register (IECRH)                               */
-         HWREG(baseAdd + EDMA3CC_S_IECRH(region_id)) |= (0x01u << (ch_num - 32));
+         // Interrupt Enable Clear Register (IECRH)
+         // HWREG(baseAdd + EDMA3CC_S_IECRH(region_id)) |= (0x01u << (ch_num - 32));
+        n_EDMA::get_S_IECRH_reference(region_id)->reg |= (0x01u << (ch_num - 32));
     }
 }
 
@@ -576,11 +596,13 @@ void AM335x_EDMA::clr_intr(uint32_t value)
 {
     if(value < 32)
     {
-         HWREG(baseAdd + EDMA3CC_S_ICR(region_id)) = (1u << value);
+         //HWREG(baseAdd + EDMA3CC_S_ICR(region_id)) = (1u << value);
+        n_EDMA::get_S_ICR_reference(region_id)->reg = (1u << value);
     }
     else
     {
-         HWREG(baseAdd + EDMA3CC_S_ICRH(region_id)) = (1u << (value - 32));
+         //HWREG(baseAdd + EDMA3CC_S_ICRH(region_id)) = (1u << (value - 32));
+         n_EDMA::get_S_ICRH_reference(region_id)->reg = (1u << (value - 32));
     }
 }
 
@@ -596,15 +618,12 @@ void AM335x_EDMA::clr_intr(uint32_t value)
  *  
  *  \return  None
  */
-void AM335x_EDMA::get_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* curr_paRAM)
+void AM335x_EDMA::get_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM)
 {
-    uint32_t i = 0;
-    uint32_t *sr;
-    uint32_t *ds = (uint32_t *)currPaRAM;
+    uint32_t *sr = n_EDMA::get_OPT_ptr(paRAM_id);
+    uint32_t *ds = (uint32_t *)curr_paRAM;
 
-    sr = (uint32_t *)(baseAdd + EDMA3CC_OPT(PaRAMId));
-
-    for(i=0;i<EDMA3CC_PARAM_ENTRY_FIELDS;i++)
+    for(uint32_t i = 0;i < n_EDMA::PARAM_ENTRY_FIELDS; i++)
     {
         *ds++ = *sr++;
     }
@@ -621,19 +640,16 @@ void AM335x_EDMA::get_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* curr_paRAM)
  * 
  * \return  None
  */
-void AM335x_EDMA::QDMA_get_paRAM(uint32_t ch_num, uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM)
+void AM335x_EDMA::QDMA_get_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM)
 {
-    uint32_t i = 0;
-    uint32_t *sr;
-    uint32_t *ds = (uint32_t *)currPaRAM;
+    uint32_t *sr = n_EDMA::get_OPT_ptr(paRAM_id);
+    uint32_t *ds = (uint32_t *)curr_paRAM;
 
-    sr = (uint32_t *)(baseAdd + EDMA3CC_OPT(paRAMId));
-
-    for(i=0;i<EDMA3CC_PARAM_ENTRY_FIELDS;i++)
+    for(uint32_t i = 0;i < n_EDMA::PARAM_ENTRY_FIELDS; i++)
     {
         *ds=*sr;
-        ds++;
-        sr++;
+         ds++;
+         sr++;
     }
 }
 
@@ -656,18 +672,17 @@ void AM335x_EDMA::QDMA_get_paRAM(uint32_t ch_num, uint32_t paRAM_id, EDMA3CCPaRA
  */
 void AM335x_EDMA::set_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* new_paRAM)
 {
-    uint32_t PaRAMId = ch_num; /* PaRAM mapped to channel Number         */
-    uint32_t i = 0;
-    uint32_t *sr = (uint32_t *)newPaRAM;
+    uint32_t paRAM_id = ch_num;     // PaRAM mapped to channel Number
+    uint32_t *sr = (uint32_t *)new_paRAM;
     volatile uint32_t *ds;
  
-    ds = (uint32_t *)(baseAdd + EDMA3CC_OPT(PaRAMId));
+    ds = n_EDMA::get_OPT_ptr(paRAM_id);
 
-    for(i=0; i < EDMA3CC_PARAM_ENTRY_FIELDS; i++)
+    for(uint32_t i = 0; i < n_EDMA::PARAM_ENTRY_FIELDS; i++)
     {
         *ds = *sr;
-        ds++;
-        sr++;
+         ds++;
+         sr++;
     }
 }
 
@@ -691,15 +706,12 @@ void AM335x_EDMA::set_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* new_paRAM)
  *
  * \return  None
  */
-void AM335x_EDMA::QDMA_set_paRAM(uint32_t ch_num, uint32_t paRAM_id, EDMA3CCPaRAMEntry* new_paRAM)
+void AM335x_EDMA::QDMA_set_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* new_paRAM)
 {
-    uint32_t i = 0;
-    uint32_t *sr = (uint32_t *)newPaRAM;
-    uint32_t *ds;
- 
-    ds = (uint32_t *)(baseAdd + EDMA3CC_OPT(paRAMId));
+    uint32_t *sr = (uint32_t *)new_paRAM;
+    uint32_t *ds = n_EDMA::get_OPT_ptr(paRAM_id);;
 
-    for(i=0;i<EDMA3CC_PARAM_ENTRY_FIELDS;i++)
+    for(uint32_t i = 0;i < n_EDMA::PARAM_ENTRY_FIELDS; i++)
     {
         *ds=*sr;
          ds++;
@@ -739,11 +751,10 @@ void AM335x_EDMA::QDMA_set_paRAM(uint32_t ch_num, uint32_t paRAM_id, EDMA3CCPaRA
  */
 void AM335x_EDMA::QDMA_set_paRAM_entry(uint32_t paRAM_id, uint32_t paRAM_entry, uint32_t new_paRAM_entry_val)
 {
-    if((paRAMEntry > EDMA3CC_PARAM_ENTRY_OPT) || 
-            (paRAMEntry < EDMA3CC_PARAM_ENTRY_CCNT))
+    if((paRAM_entry > EDMA3CC_PARAM_ENTRY_OPT) || 
+       (paRAM_entry < EDMA3CC_PARAM_ENTRY_CCNT))
     {
-        HWREG(baseAdd + EDMA3CC_OPT(paRAMId) + 
-                    (uint32_t)(paRAMEntry * 0x04)) = newPaRAMEntryVal;
+        HWREG(baseAdd + EDMA3CC_OPT(paRAMId) + (uint32_t)(paRAM_entry * 0x04)) = new_paRAM_entry_val;
     }
 }
 

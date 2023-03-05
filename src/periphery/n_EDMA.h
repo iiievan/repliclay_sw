@@ -980,7 +980,9 @@ namespace n_EDMA
     { 
         struct 
         {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    In      :32;         // bit: 0..31        (R) .           
+            uint32_t    In      :32;         // bit: 0..31        (R) Interrupt pending for TCC = 0 to 31.
+                                             //                      [0x0 = Interrupt transfer completion code is not detected or was cleared. 
+                                             //                       0x1 = Interrupt transfer completion code is detected (In = 1, n = EDMA3TC[2:0]).]           
         } b;                                 // Structure used for bit access 
         uint32_t  reg;                       // Type used for register access 
     } IPR_reg_t;
@@ -994,7 +996,9 @@ namespace n_EDMA
     { 
         struct 
         {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t    In      :32;         // bit: 0..31        (R) .           
+            uint32_t    In      :32;         // bit: 0..31        (R) Interrupt pending for TCC = 32 to 63.
+                                             //                      [0x0 = Interrupt transfer completion code is not detected or was cleared. 
+                                             //                       0x1 = Interrupt transfer completion code is detected (In = 1, n = EDMA3TC[2:0]).]         
         } b;                                 // Structure used for bit access 
         uint32_t  reg;                       // Type used for register access
     } IPRH_reg_t;
@@ -2121,6 +2125,7 @@ namespace n_EDMA
     constexpr uint32_t AM335x_EDMA3TC0_BASE    = 0x49800000;
     constexpr uint32_t AM335x_EDMA3TC1_BASE    = 0x49900000;
     constexpr uint32_t AM335x_EDMA3TC2_BASE    = 0x49A00000;
+    constexpr uint32_t PARAM_BASE              = 0x4000;
 
     constexpr AM335x_EDMA3CC_Type * AM335X_EDMA3CC_regs  = reinterpret_cast<AM335x_EDMA3CC_Type *>(AM335x_EDMA3CC_BASE);
     constexpr AM335x_EDMA3TC_Type * AM335X_EDMA3TC0_regs = reinterpret_cast<AM335x_EDMA3TC_Type *>(AM335x_EDMA3TC0_BASE);
@@ -2148,9 +2153,10 @@ namespace n_EDMA
         CHANNEL_TYPE_QDMA = 1u
     };
     
-   constexpr uint32_t  EDMA_REVID        = 0x02u;
-   constexpr uint32_t  AM335X_DMACH_MAX  = 64;
-   constexpr uint32_t  AM335X_QDMACH_MAX = 8;   
+   constexpr uint32_t  EDMA_REVID          = 0x02u;
+   constexpr uint32_t  AM335X_DMACH_MAX    = 64;
+   constexpr uint32_t  AM335X_QDMACH_MAX   = 8; 
+   constexpr uint32_t  PARAM_ENTRY_FIELDS  = 0x8u;
 
      DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id);
     DRAEH_reg_t*& get_DRAEH_reference(e_REGION_ID region_id);    
@@ -2193,8 +2199,16 @@ namespace n_EDMA
     QEECR_reg_t*& get_S_QEECR_reference(e_REGION_ID region_id); 
     QEESR_reg_t*& get_S_QEESR_reference(e_REGION_ID region_id); 
      QSER_reg_t*& get_S_QSER_reference(e_REGION_ID region_id);  
-    QSECR_reg_t*& get_S_QSECR_reference(e_REGION_ID region_id); 
+    QSECR_reg_t*& get_S_QSECR_reference(e_REGION_ID region_id);
 
+        uint32_t* get_OPT_ptr(uint32_t n);                
+        uint32_t* get_SRC_ptr(uint32_t n);                
+        uint32_t* get_A_B_CNT_ptr(uint32_t n);            
+        uint32_t* get_DST_ptr(uint32_t n);                
+        uint32_t* get_SRC_DST_BIDX_ptr(uint32_t n);       
+        uint32_t* get_LINK_BCNTRLD_ptr(uint32_t n);       
+        uint32_t* get_SRC_DST_CIDX_ptr(uint32_t n);       
+        uint32_t* get_CCNT_ptr(uint32_t n);               
 
     inline DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id) 
     {
@@ -2417,6 +2431,15 @@ namespace n_EDMA
         uint32_t QSECR = 0x2094 +  (0X200*region_id);        
         return (QSECR_reg_t*&)QSECR;
     }
+
+    inline uint32_t* get_OPT_ptr(uint32_t n)           { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x0 + (0x20 * n)); }
+    inline uint32_t* get_SRC_ptr(uint32_t n)           { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x4 + (0x20 * n)); }
+    inline uint32_t* get_A_B_CNT_ptr(uint32_t n)       { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x8 + (0x20 * n));}
+    inline uint32_t* get_DST_ptr(uint32_t n)           { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0xC + (0x20 * n)); }
+    inline uint32_t* get_SRC_DST_BIDX_ptr(uint32_t n)  { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x10 + (0x20 * n)); }
+    inline uint32_t* get_LINK_BCNTRLD_ptr(uint32_t n)  { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x14 + (0x20 * n)); }
+    inline uint32_t* get_SRC_DST_CIDX_ptr(uint32_t n)  { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x18 + (0x20 * n)); }
+    inline uint32_t* get_CCNT_ptr(uint32_t n)          { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x1C + (0x20 * n)); }
 }
 
 /**
@@ -2549,7 +2572,7 @@ public:
         void  set_QDMA_trig_word(uint32_t ch_num, uint8_t trig_word);
         void  clr_miss_evt(uint32_t ch_num);
         void  QDMA_clr_miss_evt(uint32_t ch_num);
-        void  clr_CCERR(uint32_t flags);
+        void  clr_CCERR(n_EDMA::CCERRCLR_reg_t flags);
         void  set_evt(uint32_t ch_num);
         void  clr_evt(uint32_t ch_num);
         void  enable_DMA_evt(uint32_t ch_num);
@@ -2560,10 +2583,10 @@ public:
         void  enable_evt_intr(uint32_t ch_num);
         void  disable_evt_intr(uint32_t ch_num);
         void  clr_intr(uint32_t value);
-        void  get_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* curr_paRAM);
-        void  QDMA_get_paRAM(uint32_t ch_num, uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM);
+        void  get_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM);
+        void  QDMA_get_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM);
         void  set_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* new_paRAM);
-        void  QDMA_set_paRAM(uint32_t ch_num, uint32_t paRAM_id, EDMA3CCPaRAMEntry* new_paRAM);
+        void  QDMA_set_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* new_paRAM);
         void  QDMA_set_paRAM_entry(uint32_t paRAM_id, uint32_t paRAM_entry, uint32_t new_paRAM_entry_val);
     uint32_t  QDMA_get_paRAM_entry(uint32_t paRAM_id, uint32_t paRAM_entry);
     uint32_t  request_channel(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, uint32_t tcc_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
