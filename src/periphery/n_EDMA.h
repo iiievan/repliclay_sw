@@ -2159,19 +2159,52 @@ namespace n_EDMA
         uint32_t  QDMAQNUM_CLR(uint32_t count);
         uint32_t  QDMAQNUM_SET(uint32_t count, e_DMA_QUEUE que_num);
 
+       ER_reg_t*& get_S_ER_reference(e_REGION_ID region_id);
+    //ERH_reg_t*& get_S_ERH_reference(e_REGION_ID region_id); 
+      ECR_reg_t*& get_S_ECR_reference(e_REGION_ID region_id); 
+     ECRH_reg_t*& get_S_ECRH_reference(e_REGION_ID region_id); 
+      ESR_reg_t*& get_S_ESR_reference(e_REGION_ID region_id);
+     ESRH_reg_t*& get_S_ESRH_reference(e_REGION_ID region_id); 
+      CER_reg_t*& get_S_CER_reference(e_REGION_ID region_id); 
+   //CERH_reg_t*& get_S_CERH_reference(e_REGION_ID region_id); 
+      EER_reg_t*& get_S_EER_reference(e_REGION_ID region_id);
+     EERH_reg_t*& get_S_EERH_reference(e_REGION_ID region_id); 
+     EECR_reg_t*& get_S_EECR_reference(e_REGION_ID region_id); 
+    EECRH_reg_t*& get_S_EECRH_reference(e_REGION_ID region_id); 
+     EESR_reg_t*& get_S_EESR_reference(e_REGION_ID region_id); 
+    EESRH_reg_t*& get_S_EESRH_reference(e_REGION_ID region_id);
+      SER_reg_t*& get_S_SER_reference(e_REGION_ID region_id); 
+     SERH_reg_t*& get_S_SERH_reference(e_REGION_ID region_id);
+     SECR_reg_t*& get_S_SECR_reference(e_REGION_ID region_id); 
+    SECRH_reg_t*& get_S_SECRH_reference(e_REGION_ID region_id);
+      IER_reg_t*& get_S_IER_reference(e_REGION_ID region_id);    
+     IERH_reg_t*& get_S_IERH_reference(e_REGION_ID region_id);   
+     IECR_reg_t*& get_S_IECR_reference(e_REGION_ID region_id);   
+    IECRH_reg_t*& get_S_IECRH_reference(e_REGION_ID region_id);  
+     IESR_reg_t*& get_S_IESR_reference(e_REGION_ID region_id);   
+    IESRH_reg_t*& get_S_IESRH_reference(e_REGION_ID region_id);  
+      IPR_reg_t*& get_S_IPR_reference(e_REGION_ID region_id);    
+     IPRH_reg_t*& get_S_IPRH_reference(e_REGION_ID region_id);   
+      ICR_reg_t*& get_S_ICR_reference(e_REGION_ID region_id);    
+     ICRH_reg_t*& get_S_ICRH_reference(e_REGION_ID region_id);   
+    IEVAL_reg_t*& get_S_IEVAL_reference(e_REGION_ID region_id);  
+      QER_reg_t*& get_S_QER_reference(e_REGION_ID region_id);   
+     QEER_reg_t*& get_S_QEER_reference(e_REGION_ID region_id);  
+    QEECR_reg_t*& get_S_QEECR_reference(e_REGION_ID region_id); 
+    QEESR_reg_t*& get_S_QEESR_reference(e_REGION_ID region_id); 
+     QSER_reg_t*& get_S_QSER_reference(e_REGION_ID region_id);  
+    QSECR_reg_t*& get_S_QSECR_reference(e_REGION_ID region_id); 
+
+
     inline DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id) 
     {
-        uint32_t    n = (uint32_t)region_id;
-        uint32_t DRAE = (AM335x_EDMA3CC_BASE + 0x340 + (n * 8));
-        
+        uint32_t DRAE = (AM335x_EDMA3CC_BASE + 0x340 + (region_id * 8));      
         return (DRAE_reg_t*&)DRAE;
     }
     
     inline DRAEH_reg_t*& get_DRAEH_reference(e_REGION_ID region_id) 
     {
-        uint32_t     n = (uint32_t)region_id;
-        uint32_t DRAEH = (AM335x_EDMA3CC_BASE + 0x344 + (n * 8));
-        
+        uint32_t DRAEH = (AM335x_EDMA3CC_BASE + 0x344 + (region_id * 8));        
         return (DRAEH_reg_t*&)DRAEH;
     }
 
@@ -2186,6 +2219,204 @@ namespace n_EDMA
 
     inline uint32_t  QDMAQNUM_SET(uint32_t ch_num, e_DMA_QUEUE que_num)
     { return ((0x7u & ((uint32_t)que_num)) << (ch_num*4u)); }
+
+    inline   ER_reg_t*& get_S_ER_reference(e_REGION_ID region_id)
+    {
+        uint32_t ER = 0x2000 +  (0X200*region_id);        
+        return (ER_reg_t*&)ER;
+    }
+
+    inline  ECR_reg_t*& get_S_ECR_reference(e_REGION_ID region_id) 
+    {
+        uint32_t ECR = 0x2008 +  (0X200*region_id);        
+        return (ECR_reg_t*&)ECR;
+    }
+
+    inline ECRH_reg_t*& get_S_ECRH_reference(e_REGION_ID region_id) 
+    {
+        uint32_t ECRH = 0x200C +  (0X200*region_id);        
+        return (ECRH_reg_t*&)ECRH;
+    }
+
+    inline  ESR_reg_t*& get_S_ESR_reference(e_REGION_ID region_id)
+    {
+        uint32_t ESR = 0x2010 +  (0X200*region_id);        
+        return (ESR_reg_t*&)ESR;
+    }
+
+    inline ESRH_reg_t*& get_S_ESRH_reference(e_REGION_ID region_id)
+    {
+        uint32_t ESRH = 0x2014 +  (0X200*region_id);        
+        return (ESRH_reg_t*&)ESRH;
+    }
+
+    inline  CER_reg_t*& get_S_CER_reference(e_REGION_ID region_id) 
+    {
+        uint32_t CER = 0x2018 +  (0X200*region_id);        
+        return (CER_reg_t*&)CER;
+    }
+
+    inline  EER_reg_t*& get_S_EER_reference(e_REGION_ID region_id)
+    {
+        uint32_t EER = 0x2020 +  (0X200*region_id);        
+        return (EER_reg_t*&)EER;
+    }
+
+    inline EERH_reg_t*& get_S_EERH_reference(e_REGION_ID region_id)
+    {
+        uint32_t EERH = 0x2024 +  (0X200*region_id);        
+        return (EERH_reg_t*&)EERH;
+    }
+
+    inline EECR_reg_t*& get_S_EECR_reference(e_REGION_ID region_id)
+    {
+        uint32_t EECR = 0x2028 +  (0X200*region_id);        
+        return (EECR_reg_t*&)EECR;
+    }
+
+    inline EECRH_reg_t*& get_S_EECRH_reference(e_REGION_ID region_id)
+    {
+        uint32_t EECRH = 0x202C +  (0X200*region_id);        
+        return (EECRH_reg_t*&)EECRH;
+    }
+
+    inline EESR_reg_t*& get_S_EESR_reference(e_REGION_ID region_id)
+    {
+        uint32_t EESR = 0x2030 +  (0X200*region_id);        
+        return (EESR_reg_t*&)EESR;
+    }
+
+    inline EESRH_reg_t*& get_S_EESRH_reference(e_REGION_ID region_id)
+    {
+        uint32_t EESRH = 0x2034 +  (0X200*region_id);        
+        return (EESRH_reg_t*&)EESRH;
+    }
+
+    inline  SER_reg_t*& get_S_SER_reference(e_REGION_ID region_id) 
+    {
+        uint32_t SER = 0x2038 +  (0X200*region_id);        
+        return (SER_reg_t*&)SER;
+    }
+
+    inline SERH_reg_t*& get_S_SERH_reference(e_REGION_ID region_id)
+    {
+        uint32_t SERH = 0x203C +  (0X200*region_id);        
+        return (SERH_reg_t*&)SERH;
+    }
+
+    inline SECR_reg_t*& get_S_SECR_reference(e_REGION_ID region_id)
+    {
+        uint32_t SECR = 0x2040 +  (0X200*region_id);        
+        return (SECR_reg_t*&)SECR;
+    }
+
+    inline SECRH_reg_t*& get_S_SECRH_reference(e_REGION_ID region_id)
+    {
+        uint32_t SECRH = 0x2044 +  (0X200*region_id);        
+        return (SECRH_reg_t*&)SECRH;
+    }
+
+    inline  IER_reg_t*& get_S_IER_reference(e_REGION_ID region_id)
+    {
+        uint32_t IER = 0x2050 +  (0X200*region_id);        
+        return (IER_reg_t*&)IER;
+    }
+
+    inline IERH_reg_t*& get_S_IERH_reference(e_REGION_ID region_id)
+    {
+        uint32_t IERH = 0x2054 +  (0X200*region_id);        
+        return (IERH_reg_t*&)IERH;
+    }
+
+    inline IECR_reg_t*& get_S_IECR_reference(e_REGION_ID region_id)
+    {
+        uint32_t IECR = 0x2058 +  (0X200*region_id);        
+        return (IECR_reg_t*&)IECR;
+    }
+
+    inline IECRH_reg_t*& get_S_IECRH_reference(e_REGION_ID region_id) 
+    {
+        uint32_t IECRH = 0x205C +  (0X200*region_id);        
+        return (IECRH_reg_t*&)IECRH;
+    }
+
+    inline IESR_reg_t*& get_S_IESR_reference(e_REGION_ID region_id)
+    {
+        uint32_t IESR = 0x2060 +  (0X200*region_id);        
+        return (IESR_reg_t*&)IESR;
+    }
+
+    inline IESRH_reg_t*& get_S_IESRH_reference(e_REGION_ID region_id)
+    {
+        uint32_t IESRH = 0x2064 +  (0X200*region_id);        
+        return (IESRH_reg_t*&)IESRH;
+    }
+
+    inline  IPR_reg_t*& get_S_IPR_reference(e_REGION_ID region_id)
+    {
+        uint32_t IPR = 0x2068 +  (0X200*region_id);        
+        return (IPR_reg_t*&)IPR;
+    }
+
+    inline IPRH_reg_t*& get_S_IPRH_reference(e_REGION_ID region_id)
+    {
+        uint32_t IPRH = 0x206C +  (0X200*region_id);        
+        return (IPRH_reg_t*&)IPRH;
+    }
+
+    inline  ICR_reg_t*& get_S_ICR_reference(e_REGION_ID region_id)
+    {
+        uint32_t ICR = 0x2070 +  (0X200*region_id);        
+        return (ICR_reg_t*&)ICR;
+    }
+
+    inline ICRH_reg_t*& get_S_ICRH_reference(e_REGION_ID region_id)
+    {
+        uint32_t ICRH = 0x2074 +  (0X200*region_id);        
+        return (ICRH_reg_t*&)ICRH;
+    }
+
+    inline IEVAL_reg_t*& get_S_IEVAL_reference(e_REGION_ID region_id)
+    {
+        uint32_t IEVAL = 0x2078 +  (0X200*region_id);        
+        return (IEVAL_reg_t*&)IEVAL;
+    }
+
+    inline  QER_reg_t*& get_S_QER_reference(e_REGION_ID region_id) 
+    {
+        uint32_t QER = 0x2080 +  (0X200*region_id);        
+        return (QER_reg_t*&)QER;
+    }
+
+    inline QEER_reg_t*& get_S_QEER_reference(e_REGION_ID region_id)
+    {
+        uint32_t QEER = 0x2084 +  (0X200*region_id);        
+        return (QEER_reg_t*&)QEER;
+    }
+
+    inline QEECR_reg_t*& get_S_QEECR_reference(e_REGION_ID region_id)
+    {
+        uint32_t QEECR = 0x2088 +  (0X200*region_id);        
+        return (QEECR_reg_t*&)QEECR;
+    }
+
+    inline QEESR_reg_t*& get_S_QEESR_reference(e_REGION_ID region_id)
+    {
+        uint32_t QEESR = 0x208C +  (0X200*region_id);        
+        return (QEESR_reg_t*&)QEESR;
+    }
+
+    inline QSER_reg_t*& get_S_QSER_reference(e_REGION_ID region_id)
+    {
+        uint32_t QSER = 0x2090 +  (0X200*region_id);        
+        return (QSER_reg_t*&)QSER;
+    }
+
+    inline QSECR_reg_t*& get_S_QSECR_reference(e_REGION_ID region_id)
+    {
+        uint32_t QSECR = 0x2094 +  (0X200*region_id);        
+        return (QSECR_reg_t*&)QSECR;
+    }
 }
 
 /**

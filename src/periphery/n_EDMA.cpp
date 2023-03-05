@@ -404,13 +404,15 @@ void AM335x_EDMA::clr_evt(uint32_t ch_num)
 {
     if(ch_num < 32)
     {
-         /* (ECR) - set corresponding bit to clear a event                       */
-         HWREG(baseAdd + EDMA3CC_S_ECR(region_id)) |= (0x01u <<  ch_num);
+         // (ECR) - set corresponding bit to clear a event 
+         //HWREG(baseAdd + EDMA3CC_S_ECR(region_id)) |= (0x01u <<  ch_num);
+         n_EDMA::get_S_ECR_reference(region_id)->reg |= (0x01u <<  ch_num);
     }
     else
     {
-         /* (ECRH) - set corresponding bit to clear a event                       */
-         HWREG(baseAdd + EDMA3CC_S_ECRH(region_id)) |= (0x01u << (ch_num - 32));
+         // (ECRH) - set corresponding bit to clear a event 
+         //HWREG(baseAdd + EDMA3CC_S_ECRH(region_id)) |= (0x01u << (ch_num - 32));
+         n_EDMA::get_S_ECRH_reference(region_id)->reg |= (0x01u << (ch_num - 32));
     }
 }
 
