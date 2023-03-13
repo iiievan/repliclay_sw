@@ -3175,6 +3175,7 @@ public:
                  void  run_I2C2_clk();
                  
                  void  run_clk_UART0();
+                 void  run_EDMA_clk(void* p_Obj);
     
 private:
     

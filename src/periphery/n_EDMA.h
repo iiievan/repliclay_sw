@@ -1184,14 +1184,30 @@ namespace n_EDMA
     typedef union 
     { 
         struct 
-        {   /**  Register not described!!! Describe yoursef using am335x_reference_manual **/
-            uint32_t                  :2;   // bit: 0,1      Reserved.   
-            uint32_t    IDLEMODE      :2;   // bit: 2,3      (RW) .
-            uint32_t    STANDBYMODE   :2;   // bit: 4,5      (RW) .
+        {   
+            uint32_t                  :1;   // bit: 0        Reserved. 
+            uint32_t    FREEEMU       :1;   // bit: 1        (RW) [0x0 = is sensitive to emulation suspend.; 
+                                            //                     0x1 = is not sensitive to emulation suspend event]  
+            uint32_t    IDLEMODE      :2;   // bit: 2,3      (RW) [ see e_SYSC_IDLEMODE ]
+            uint32_t    STANDBYMODE   :2;   // bit: 4,5      (RW) [ see e_SYSC_STANDBYMODE ]
             uint32_t                  :26;  // bit: 6..31    Reserved.          
         } b;                                // Structure used for bit access 
         uint32_t  reg;                      // Type used for register access
     } SYSCONFIGTC_reg_t;
+
+    enum e_SYSC_IDLEMODE : uint32_t
+    {
+        SYSC_FORCE_IDLE     = 0x0,  // Force-idle mode:
+        SYSC_NOIDLE         = 0x1,  // No-idle 
+        SYSC_SMARTIDLE      = 0x2,  // Smart-idle
+    };
+
+    enum e_SYSC_STANDBYMODE : uint32_t
+    {
+        SYSC_FORCE_STBY     = 0x0,  // Force-standby mode;
+        SYSC_NOSTBY         = 0x1,  // No-standby; 
+        SYSC_SMARTSTBY      = 0x2,  // Smart-standby;
+    };
     
     /*! @brief      __XXX__  
     *   @details    __XXX__
@@ -2300,7 +2316,28 @@ namespace n_EDMA
    constexpr uint32_t  PARAM_ENTRY_SRC_DST_CIDX   = 0x6u;       //The (SRCCIDX+DSTCIDX) field (Offset Address 0x18 Bytes)
    constexpr uint32_t  PARAM_ENTRY_CCNT           = 0x7u;       //The (CCNT+RSVD) field (Offset Address 0x1C Bytes)
    constexpr uint32_t  PARAM_FIELD_OFFSET         = 0x4u;       //The offset for each PaRAM Entry field
-
+    
+    // Structure to store the EDMA context
+    typedef struct edma_context 
+    {    
+         uint32_t  dch_map[AM335X_DMACH_MAX];       // Channel mapping reg Val      
+         uint32_t  dma_Qnum[AM335X_QDMACH_MAX];     // DMA Queue Number Register Val
+         
+         uint32_t  reg_acc_enable_low;       // DMA Region Access Enable Register val    
+         uint32_t  reg_acc_enable_high;      // DMA Region Access Enable Register val 
+           
+         uint32_t  event_set_reg_low;        // Event Set Register value  
+         uint32_t  event_set_reg_high;       // Event Set Register value 
+            
+         uint32_t  enable_evt_set_reg_low;    // Enable Event Set Register value 
+         uint32_t  enable_evt_set_reg_high;   // Enable Event Set Register value 
+                  
+         uint32_t  int_enable_set_reg_low;    // Interrupt Enable Set Register value      
+         uint32_t  int_enable_set_reg_high;   // Interrupt Enable Set Register value   
+        
+    paRAM_entry_t  dma_par_entry[256];    
+        
+    } EDMACONTEXT_t;
 
      DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id);
     DRAEH_reg_t*& get_DRAEH_reference(e_REGION_ID region_id);    
@@ -2587,30 +2624,6 @@ namespace n_EDMA
 }
 
 
-/*
-** Structure to store the EDMA context
-*/
-typedef struct edma_context 
-{    
-    uint32_t  dchMap[64];            // Channel mapping reg Val      
-    uint32_t  dmaQNum[8];            // DMA Queue Number Register Val
-    
-    uint32_t  regAccEnableLow;       // DMA Region Access Enable Register val    
-    uint32_t  regAccEnableHigh;      // DMA Region Access Enable Register val 
-      
-    uint32_t  eventSetRegLow;        // Event Set Register value  
-    uint32_t  eventSetRegHigh;       // Event Set Register value 
-       
-    uint32_t  enableEvtSetRegLow;    // Enable Event Set Register value 
-    uint32_t  enableEvtSetRegHigh;   // Enable Event Set Register value 
-             
-    uint32_t  intEnableSetRegLow;    // Interrupt Enable Set Register value      
-    uint32_t  intEnableSetRegHigh;   // Interrupt Enable Set Register value   
-    
-struct paRAM_entry_t dmaParEntry[512];    
-    
-} EDMACONTEXT_t;
-
 class AM335x_EDMA
 {
              n_EDMA::e_REGION_ID region_id;
@@ -2630,6 +2643,7 @@ public:
              ~AM335x_EDMA() { }
 
         void  init(n_EDMA::e_DMA_QUEUE que_num);
+        void  set_non_idle_mode();
         void  enable_ch_in_shadow_reg(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num);
         void  disable_ch_in_shadow_reg(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num);
         void  map_ch_to_evtQ(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
@@ -2670,8 +2684,8 @@ n_EDMA::CCERR_reg_t  get_CCERR_status();
     uint32_t  intr_status_high_get();
     uint32_t  ERR_intr_high_status_get();
         void  channel_to_param_map(uint32_t channel, uint32_t param_set);
-        void  context_save(EDMACONTEXT_t *p_edma_cntx);
-        void  context_restore(EDMACONTEXT_t *p_edma_cntx);
+        void  context_save(n_EDMA::EDMACONTEXT_t *p_edma_cntx);
+        void  context_restore(n_EDMA::EDMACONTEXT_t *p_edma_cntx);
 private:
     n_EDMA::AM335x_EDMA3CC_Type &m_EDMA3CC_regs;
     n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC0_regs;

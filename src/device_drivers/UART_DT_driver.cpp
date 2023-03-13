@@ -110,10 +110,28 @@ void UART_DT_Driver::set_Client_ops(void *p_owner, Client_ops *p_ops)
 }
  
 int  UART_DT_Driver::init(void)
-{    
-    /// Initialize the UART console /// 
+{   
+    //EDMAModuleClkConfig();      // Configuring the system clocks for EDMA    
+    //UART0ModuleClkConfig();     // Configuring the system clocks for UART0 instance.    
+    //UARTPinMuxSetup(0);         // Performing Pin Multiplexing for UART0 instance.
+    //
+    //IntMasterIRQEnable();       // Enabling IRQ in CPSR of ARM processor.
+    //IntAINTCInit();             // Initializing the ARM Interrupt Controller.
+  
+    m_int_controller.master_IRQ_disable();   // Disable IRQ in CPSR   
+    
+    /// Initialize the UART console ///
+    m_prcm_module.run_EDMA_clk((void *)&m_EDMA);  
     m_prcm_module.run_clk_UART0();                                 // Configuring the system clocks for UART0 instance.
-    m_pinmux_ctrl.UART0_pin_mux_setup();                           // Performing the Pin Multiplexing for UART0 instance.                            
+    m_pinmux_ctrl.UART0_pin_mux_setup();                           // Performing the Pin Multiplexing for UART0 instance. 
+    
+    m_int_controller.master_IRQ_enable();   // Enable IRQ in CPSR    
+        
+    //EDMA3Init(SOC_EDMA30CC_0_REGS, EVT_QUEUE_NUM);  // Initialization of EDMA3    
+    //EDMA3INTCConfigure();   // Configuring the AINTC to receive EDMA3 interrupts 
+    m_EDMA.init(n_EDMA::EVENT_Q0);
+    EDMA_INTC_configure();
+    
     m_UART_device.module_reset();                                  // Performing a module reset.        
     m_UART_device.FIFO_configure_no_DMA(1, 1);                     // Performing FIFO configurations.
     
@@ -129,6 +147,22 @@ int  UART_DT_Driver::init(void)
     m_UART_device.divisor_latch_disable();                         // Disabling write access to Divisor Latches.        
     m_UART_device.break_ctl(false);                                // Disabling Break Control.
     m_UART_device.operating_mode_select(n_UART::MODE_UART_13x);    // Switching to UART16x operating mode.     
+    
+    UARTInitialize();           // Initializing the UART0 instance for use.
+
+
+    ///Configuring the EDMA.///
+    // Request DMA Channel and TCC for UART Transmit
+    EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA, EDMA3_UART_TX_CHA_NUM, EDMA3_UART_TX_CHA_NUM, EVT_QUEUE_NUM);
+
+    // Registering Callback Function for TX
+    cb_Fxn[EDMA3_UART_TX_CHA_NUM] = &callback;
+
+    // Request DMA Channel and TCC for UART Receive
+    EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA, EDMA3_UART_RX_CHA_NUM, EDMA3_UART_RX_CHA_NUM, EVT_QUEUE_NUM);
+
+    // Registering Callback Function for RX
+    cb_Fxn[EDMA3_UART_RX_CHA_NUM] = &callback;
     
     return 0;
 }
@@ -164,9 +198,20 @@ int  UART_DT_Driver::exit(void)
 
 void  UART_DT_Driver::AINTC_configure(void)
 {
-    m_int_controller.register_handler(m_UART_sys_interrupt, UART_ops.isr);      // Registering I2C_irqhandler         
+    m_int_controller.register_handler(m_UART_sys_interrupt, UART_ops.isr);             // Registering I2C_irqhandler         
     m_int_controller.priority_set(m_UART_sys_interrupt,5, INTC::HOSTINT_ROUTE_IRQ);    // Set the highest priority
     sys_interrupt_enable();
+}
+
+void  UART_DT_Driver::EDMA_INTC_configure(void)
+{      
+    IntAINTCInit();                                                     // Initializing the ARM Interrupt Controller.   
+    IntRegister(SYS_INT_EDMACOMPINT, Edma3CompletionIsr);               // Registering EDMA3 Channel Controller 0 transfer completion interrupt.    
+    IntPrioritySet(SYS_INT_EDMACOMPINT, 0, AINTC_HOSTINT_ROUTE_IRQ);    // Setting the priority for EDMA3CC0 completion interrupt in AINTC.    
+    IntRegister(SYS_INT_EDMAERRINT, Edma3CCErrorIsr);                   // Registering EDMA3 Channel Controller 0 Error Interrupt.    
+    IntPrioritySet(SYS_INT_EDMAERRINT, 0, AINTC_HOSTINT_ROUTE_IRQ);     // Setting the priority for EDMA3CC0 Error interrupt in AINTC.    
+    IntSystemEnable(SYS_INT_EDMACOMPINT);                               // Enabling the EDMA3CC0 completion interrupt in AINTC.    
+    IntSystemEnable(SYS_INT_EDMAERRINT);                                // Enabling the EDMA3CC0 Error interrupt in AINTC.
 }
 
 UART_DT_Driver uart_driver(uart_0);

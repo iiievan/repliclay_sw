@@ -41,7 +41,7 @@ void AM335x_EDMA::init(n_EDMA::e_DMA_QUEUE que_num)
     
      if(n_EDMA::EDMA_REVID == version_get())
     {           
-        for(uint32_t i = 0; i < 64; i++)
+        for(uint32_t i = 0; i < n_EDMA::AM335X_DMACH_MAX; i++)
         {             
             //HWREG(baseAdd + EDMA3CC_DCHMAP(i)) = i << 5;  // All events are one to one mapped with the channels 
             m_EDMA3CC_regs.DCHMAP[i].reg = i << 5;
@@ -70,6 +70,16 @@ void AM335x_EDMA::init(n_EDMA::e_DMA_QUEUE que_num)
         m_EDMA3CC_regs.QDMAQNUM.reg &= n_EDMA::QDMAQNUM_CLR(count);
         m_EDMA3CC_regs.QDMAQNUM.reg |= n_EDMA::QDMAQNUM_SET(count, que_num);
     }
+}
+
+void  AM335x_EDMA::set_non_idle_mode()
+{      
+    m_EDMA3TC0_regs.SYSCONFIG.b.IDLEMODE = n_EDMA::SYSC_NOIDLE;
+    m_EDMA3TC0_regs.SYSCONFIG.b.STANDBYMODE = n_EDMA::SYSC_NOSTBY;
+    m_EDMA3TC1_regs.SYSCONFIG.b.IDLEMODE = n_EDMA::SYSC_NOIDLE;
+    m_EDMA3TC1_regs.SYSCONFIG.b.STANDBYMODE = n_EDMA::SYSC_NOSTBY;
+    m_EDMA3TC2_regs.SYSCONFIG.b.IDLEMODE = n_EDMA::SYSC_NOIDLE;
+    m_EDMA3TC2_regs.SYSCONFIG.b.STANDBYMODE = n_EDMA::SYSC_NOSTBY;
 }
 
 /**
@@ -1255,29 +1265,37 @@ void AM335x_EDMA::CCERR_evaluate()
 void AM335x_EDMA::deinit(uint32_t que_num)
 {
     uint32_t count = 0;
-
-    // Disable the DMA (0 - 62) channels in the DRAE register
-    HWREG(baseAdd + EDMA3CC_DRAE(region_id)) = EDMA3_CLR_ALL_BITS;
-    HWREG(baseAdd + EDMA3CC_DRAEH(region_id)) = EDMA3_CLR_ALL_BITS;
+    n_EDMA::CCERRCLR_reg_t ccerr = { .reg = 0 };
     
-    EDMA3ClrCCErr(baseAdd, EDMA3CC_CLR_TCCERR);
+    ccerr.b.TCCERR = HIGH;
+    
+    // Disable the DMA (0 - 62) channels in the DRAE register
+    //HWREG(baseAdd + EDMA3CC_DRAE(region_id)) = EDMA3_CLR_ALL_BITS;
+    //HWREG(baseAdd + EDMA3CC_DRAEH(region_id)) = EDMA3_CLR_ALL_BITS;
+    get_DRAE_reference(region_id)->reg = n_EDMA::CLR_ALL_BITS;
+    get_DRAEH_reference(region_id)->reg = n_EDMA::CLR_ALL_BITS;
+    
+    clr_CCERR(ccerr);
     
     // Clear the Event miss Registers
-    HWREG(baseAdd + EDMA3CC_EMCR)  = EDMA3_SET_ALL_BITS;
-    HWREG(baseAdd + EDMA3CC_EMCRH) = EDMA3_SET_ALL_BITS;
-
+    //HWREG(baseAdd + EDMA3CC_EMCR)  = EDMA3_SET_ALL_BITS;
+    //HWREG(baseAdd + EDMA3CC_EMCRH) = EDMA3_SET_ALL_BITS;
+    m_EDMA3CC_regs.EMCR.reg = n_EDMA::CLR_ALL_BITS;
+    m_EDMA3CC_regs.EMCRH.reg = n_EDMA::CLR_ALL_BITS;
     // Clear CCERR register
-    HWREG(baseAdd + EDMA3CC_CCERRCLR) = EDMA3_SET_ALL_BITS;
-
+    //HWREG(baseAdd + EDMA3CC_CCERRCLR) = EDMA3_SET_ALL_BITS;
+    m_EDMA3CC_regs.CCERRCLR.reg = n_EDMA::SET_ALL_BITS;
+      
     // Deinitialize the Queue Number Registers
     for (count = 0;count < n_EDMA::AM335X_DMACH_MAX; count++)
     {
-        HWREG(baseAdd + EDMA3CC_DMAQNUM(count >> 3u)) &= EDMA3CC_DMAQNUM_CLR(count);
+        //HWREG(baseAdd + EDMA3CC_DMAQNUM(count >> 3u)) &= EDMA3CC_DMAQNUM_CLR(count);
+        m_EDMA3CC_regs.DMAQNUM[count >> 3u].reg &= n_EDMA::DMAQNUM_CLR(count);
     }
 
-    for (count = 0;count < SOC_EDMA3_NUM_QDMACH; count++)
+    for (count = 0;count < n_EDMA::AM335X_QDMACH_MAX; count++)
     {
-        HWREG(baseAdd + EDMA3CC_QDMAQNUM) &= EDMA3CC_QDMAQNUM_CLR(count);
+        m_EDMA3CC_regs.QDMAQNUM.reg &= n_EDMA::QDMAQNUM_CLR(count);
     }
 }
 
@@ -1288,7 +1306,8 @@ void AM335x_EDMA::deinit(uint32_t que_num)
  */
 uint32_t AM335x_EDMA::peripheral_id_get()
 {
-    return (HWREG(baseAdd + EDMA3CC_REVID));
+    //return (HWREG(baseAdd + EDMA3CC_REVID));
+    return m_EDMA3CC_regs.PID.reg;
 }
 
 /**
@@ -1300,11 +1319,12 @@ uint32_t AM335x_EDMA::peripheral_id_get()
  */
 uint32_t AM335x_EDMA::intr_status_high_get()
 {
-    uint32_t IntrStatusVal = 0;
+    uint32_t intr_sts_val = 0;
 
-    IntrStatusVal = (uint32_t)HWREG(baseAdd + EDMA3CC_S_IPRH(region_id));
+    //intr_sts_val = (uint32_t)HWREG(baseAdd + EDMA3CC_S_IPRH(region_id));
+    intr_sts_val = get_S_IPRH_reference(region_id)->reg;
 
-    return IntrStatusVal;
+    return intr_sts_val;
 }
 
 
@@ -1317,11 +1337,12 @@ uint32_t AM335x_EDMA::intr_status_high_get()
  */
 uint32_t AM335x_EDMA::ERR_intr_high_status_get()
 {
-    uint32_t IntrStatusVal = 0;
+    uint32_t intr_sts_val = 0;
 
-    IntrStatusVal = (uint32_t)HWREG(baseAdd + EDMA3CC_EMRH);
+    //intr_sts_val = (uint32_t)HWREG(baseAdd + EDMA3CC_EMRH);
+    intr_sts_val = m_EDMA3CC_regs.EMRH.reg;
 
-    return IntrStatusVal;
+    return intr_sts_val;
 }
 
 
@@ -1338,7 +1359,8 @@ uint32_t AM335x_EDMA::ERR_intr_high_status_get()
  */
 void AM335x_EDMA::channel_to_param_map(uint32_t channel, uint32_t param_set)
 {
-    HWREG(baseAdd + EDMA3CC_DCHMAP(channel)) = paramSet << 5;
+    //HWREG(baseAdd + EDMA3CC_DCHMAP(channel)) = paramSet << 5;
+    m_EDMA3CC_regs.DCHMAP[channel].b.PAENTRY = param_set;
 } 
 /**
  *  \brief   This API can be used to save the register context for EDMA
@@ -1348,57 +1370,58 @@ void AM335x_EDMA::channel_to_param_map(uint32_t channel, uint32_t param_set)
  *
  *  \return  None
  */
-void AM335x_EDMA::context_save(EDMACONTEXT_t *p_edma_cntx)
+void AM335x_EDMA::context_save(n_EDMA::EDMACONTEXT_t *p_edma_cntx)
 {
     uint32_t i;
-    uint32_t maxPar;
+    uint32_t max_par = 128;
 
-    /* Get the Channel mapping reg Val */
-    
-    for(i = 0; i < 64; i++)
+    // Get the Channel mapping reg Val    
+    for(i = 0; i < n_EDMA::AM335X_DMACH_MAX; i++)
     {
-         /* All events are one to one mapped with the channels */        
-         edmaCntxPtr->dchMap[i] = HWREG(baseAddr + EDMA3CC_DCHMAP(i));
+         // All events are one to one mapped with the channels         
+         //p_edma_cntx->dch_map[i] = HWREG(baseAddr + EDMA3CC_DCHMAP(i));
+         p_edma_cntx->dch_map[i] = m_EDMA3CC_regs.DCHMAP[i].b.PAENTRY;
     }
       
-    /* Get DMA Queue Number Register Val */
-    for(i=0; i < 8; i++)
+    // Get DMA Queue Number Register Val
+    for(i = 0; i < n_EDMA::AM335X_QDMACH_MAX; i++)
     {    
-        edmaCntxPtr->dmaQNum[i] = HWREG(baseAddr + EDMA3CC_DMAQNUM((i)));    
+        //p_edma_cntx->dma_Qnum[i] = HWREG(baseAddr + EDMA3CC_DMAQNUM((i)));
+        p_edma_cntx->dma_Qnum[i] = m_EDMA3CC_regs.DMAQNUM[i].reg;    
     }         
 
-    /* Get the DMA Region Access Enable Register val */
-               
-    edmaCntxPtr->regAccEnableLow = HWREG(baseAddr + EDMA3CC_DRAE(0));            
-    edmaCntxPtr->regAccEnableHigh = HWREG(baseAddr + EDMA3CC_DRAEH(0));            
+    // Get the DMA Region Access Enable Register val               
+    //p_edma_cntx->reg_acc_enable_low = HWREG(baseAddr + EDMA3CC_DRAE(0));            
+    //p_edma_cntx->reg_acc_enable_high = HWREG(baseAddr + EDMA3CC_DRAEH(0));            
+    p_edma_cntx->reg_acc_enable_low = n_EDMA::get_DRAE_reference(region_id)->reg;            
+    p_edma_cntx->reg_acc_enable_high = n_EDMA::get_DRAEH_reference(region_id)->reg;
     
-    /* Get Event Set Register value */
-        
-    edmaCntxPtr->eventSetRegLow  = HWREG(baseAddr + EDMA3CC_S_ESR(0));                
-    edmaCntxPtr->eventSetRegHigh = HWREG(baseAddr + EDMA3CC_S_ESRH(0));                    
-                  
-    /* Get Event Enable Set Register value */
-      
-    edmaCntxPtr->enableEvtSetRegLow = HWREG(baseAddr + EDMA3CC_S_EER(0));                   
-    edmaCntxPtr->enableEvtSetRegHigh = HWREG(baseAddr + EDMA3CC_S_EERH(0));                       
+    // Get Event Set Register value        
+    //p_edma_cntx->event_set_reg_low  = HWREG(baseAddr + EDMA3CC_S_ESR(0));                
+    //p_edma_cntx->event_set_reg_high = HWREG(baseAddr + EDMA3CC_S_ESRH(0));                    
+    p_edma_cntx->event_set_reg_low  = n_EDMA::get_S_ESR_reference(region_id)->reg;                
+    p_edma_cntx->event_set_reg_high = n_EDMA::get_S_ESRH_reference(region_id)->reg;
+    
+    // Get Event Enable Set Register value      
+    //p_edma_cntx->enable_evt_set_reg_low = HWREG(baseAddr + EDMA3CC_S_EER(0));                   
+    //p_edma_cntx->enable_evt_set_reg_high = HWREG(baseAddr + EDMA3CC_S_EERH(0)); 
+    p_edma_cntx->enable_evt_set_reg_low =  n_EDMA::get_S_EER_reference(region_id)->reg;                   
+    p_edma_cntx->enable_evt_set_reg_high = n_EDMA::get_S_EERH_reference(region_id)->reg;   
           
-    /* Get Interrupt Enable Set Register value */
-           
-    edmaCntxPtr->intEnableSetRegLow =  HWREG(baseAddr + EDMA3CC_S_IER(0));                    
-    edmaCntxPtr->intEnableSetRegHigh =  HWREG(baseAddr + EDMA3CC_S_IERH(0));                        
+    // Get Interrupt Enable Set Register value           
+    p_edma_cntx->int_enable_set_reg_low  =  n_EDMA::get_S_IER_reference(region_id)->reg;                     
+    p_edma_cntx->int_enable_set_reg_high =  n_EDMA::get_S_IERH_reference(region_id)->reg;                        
 
-    maxPar = 128;
 
-    if((EDMA_REVID_AM335X == EDMAVersionGet()))
+    if(n_EDMA::EDMA_REVID == version_get())
     {
-        maxPar = 256;
+        max_par = 256;
     }
 
-    for(i = 0; i < maxPar; i++)
+    for(i = 0; i < max_par; i++)
     {
-        /* Get the  PaRAM  values */            
-        EDMA3GetPaRAM(baseAddr, i, 
-                      (struct EDMA3CCPaRAMEntry *)(&(edmaCntxPtr->dmaParEntry[i])));
+        // Get the  PaRAM  values           
+        p_edma_cntx->dma_par_entry[i] = *get_paRAM(i);
     }                         
 }
 
@@ -1410,50 +1433,58 @@ void AM335x_EDMA::context_save(EDMACONTEXT_t *p_edma_cntx)
  *
  *  \return  None
  */
-void AM335x_EDMA::context_restore(EDMACONTEXT_t *p_edma_cntx)
+void AM335x_EDMA::context_restore(n_EDMA::EDMACONTEXT_t *p_edma_cntx)
 {
     uint32_t i;
-    uint32_t maxPar = 128;
-    
-    /* set the Channel mapping reg Val */
-    for(i = 0; i < 64; i++)
+    uint32_t max_par = 128;
+  
+    // set the Channel mapping reg Val
+    for(i = 0; i < n_EDMA::AM335X_DMACH_MAX; i++)
     {
-         /* All events are one to one mapped with the channels */        
-         HWREG(baseAddr + EDMA3CC_DCHMAP(i)) = edmaCntxPtr->dchMap[i] ;
+         // All events are one to one mapped with the channels       
+         //HWREG(baseAddr + EDMA3CC_DCHMAP(i)) = p_edma_cntx->dch_map[i];
+         m_EDMA3CC_regs.DCHMAP[i].b.PAENTRY = p_edma_cntx->dch_map[i];
     }
       
-    /* set DMA Queue Number Register Val */
-    for(i  =0; i < 8; i++)
+    // set DMA Queue Number Register Val
+    for(i  =0; i < n_EDMA::AM335X_QDMACH_MAX; i++)
     {    
-    HWREG(baseAddr + EDMA3CC_DMAQNUM((i))) = edmaCntxPtr->dmaQNum[i];    
+        //HWREG(baseAddr + EDMA3CC_DMAQNUM((i))) = p_edma_cntx->dma_Qnum[i];
+        m_EDMA3CC_regs.DMAQNUM[i].reg = p_edma_cntx->dma_Qnum[i]; 
     }         
 
-    /* set the DMA Region Access Enable Register val */
-               
-    HWREG(baseAddr + EDMA3CC_DRAE(0)) = edmaCntxPtr->regAccEnableLow;
-    HWREG(baseAddr + EDMA3CC_DRAEH(0)) = edmaCntxPtr->regAccEnableHigh;            
+    // set the DMA Region Access Enable Register val               
+    //HWREG(baseAddr + EDMA3CC_DRAE(0)) = p_edma_cntx->reg_acc_enable_low;
+    //HWREG(baseAddr + EDMA3CC_DRAEH(0)) = p_edma_cntx->reg_acc_enable_high; 
+    n_EDMA::get_DRAE_reference(region_id)->reg = p_edma_cntx->reg_acc_enable_low;
+    n_EDMA::get_DRAEH_reference(region_id)->reg = p_edma_cntx->reg_acc_enable_high;
     
-    /* set Event Set Register value */
-    HWREG(baseAddr + EDMA3CC_S_ESR(0)) = edmaCntxPtr->eventSetRegLow;                
-    HWREG(baseAddr + EDMA3CC_S_ESRH(0)) = edmaCntxPtr->eventSetRegHigh;                    
+    // set Event Set Register value 
+    //HWREG(baseAddr + EDMA3CC_S_ESR(0)) = p_edma_cntx->event_set_reg_low;                
+    //HWREG(baseAddr + EDMA3CC_S_ESRH(0)) = p_edma_cntx->event_set_reg_high;
+    n_EDMA::get_S_ESR_reference(region_id)->reg = p_edma_cntx->event_set_reg_low;                
+    n_EDMA::get_S_ESRH_reference(region_id)->reg = p_edma_cntx->event_set_reg_high;
                   
-    /* set Event Enable Set Register value */
-    HWREG(baseAddr + EDMA3CC_S_EESR(0)) = edmaCntxPtr->enableEvtSetRegLow;                   
-    HWREG(baseAddr + EDMA3CC_S_EESRH(0)) = edmaCntxPtr->enableEvtSetRegHigh;                       
+    // set Event Enable Set Register value
+    //HWREG(baseAddr + EDMA3CC_S_EESR(0)) = p_edma_cntx->enable_evt_set_reg_low;                   
+    //HWREG(baseAddr + EDMA3CC_S_EESRH(0)) = p_edma_cntx->enable_evt_set_reg_high; 
+    n_EDMA::get_S_EER_reference(region_id)->reg = p_edma_cntx->enable_evt_set_reg_low;                   
+    n_EDMA::get_S_EERH_reference(region_id)->reg = p_edma_cntx->enable_evt_set_reg_high;
           
-    /* set Interrupt Enable Set Register value */
-    HWREG(baseAddr + EDMA3CC_S_IESR(0)) = edmaCntxPtr->intEnableSetRegLow;                    
-    HWREG(baseAddr + EDMA3CC_S_IESRH(0)) = edmaCntxPtr->intEnableSetRegHigh;                        
+    // set Interrupt Enable Set Register value
+    //HWREG(baseAddr + EDMA3CC_S_IESR(0)) = p_edma_cntx->int_enable_set_reg_low;                    
+    //HWREG(baseAddr + EDMA3CC_S_IESRH(0)) = p_edma_cntx->int_enable_set_reg_high;  
+    n_EDMA::get_S_IER_reference(region_id)->reg = p_edma_cntx->int_enable_set_reg_low;                    
+    n_EDMA::get_S_IERH_reference(region_id)->reg = p_edma_cntx->int_enable_set_reg_high;  
 
-    if((EDMA_REVID_AM335X == EDMAVersionGet()))
+    if(n_EDMA::EDMA_REVID == version_get())
     {
-        maxPar = 256;
+        max_par = 256;
     }
 
-    for(i = 0; i < maxPar; i++)
+    for(i = 0; i < max_par; i++)
     {
-        /* Get the  PaRAM  values */            
-        EDMA3SetPaRAM(baseAddr, i, 
-             (struct EDMA3CCPaRAMEntry *)(&(edmaCntxPtr->dmaParEntry[i])));
+        // Set the  PaRAM  values          
+        set_paRAM(i,(n_EDMA::paRAM_entry_t*)(&(p_edma_cntx->dma_par_entry[i])));
     }                      
 }

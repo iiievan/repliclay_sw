@@ -7,6 +7,7 @@
 #include "INTC.h"
 #include "CONTROL_MODULE.h"
 #include "n_UART.h"
+#include "n_EDMA.h"
 
 struct UART_client_ops : public Client_ops
 {
@@ -77,6 +78,7 @@ private:
     power_reset_clock_control &m_prcm_module;           // for clock contrlol setup and management
          Interrupt_controller &m_int_controller;        // for interrupt setup and management
              x_CONTROL_MODULE &m_pinmux_ctrl;           // for PINMUX
+                  AM335x_EDMA &m_EDMA;                  // for EDMA transfer
 };
 
 extern UART_DT_Driver uart_driver;
