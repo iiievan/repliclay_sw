@@ -1932,7 +1932,7 @@ namespace n_EDMA
         __W   QEMCR_reg_t           QEMCR;          // (0x314) QDMA Event Missed Clear Register 
         __R   CCERR_reg_t           CCERR;          // (0x318) EDMA3CC Error Register 
         __W   CCERRCLR_reg_t        CCERRCLR;       // (0x31C) EDMA3CC Error Clear Register 
-        __R   EEVAL_reg_t           EEVAL;          // (0x320) Error Evaluate Register
+        __W   EEVAL_reg_t           EEVAL;          // (0x320) Error Evaluate Register
         __R   uint32_t              RESERVED6[7]; 
         __RW  DRAE_reg_t            DRAE0;          // (0x340) DMA Region Access Enable Register for Region 0    
         __RW  DRAEH_reg_t           DRAEH0;         // (0x344) DMA Region Access Enable Register High for Region 0 
@@ -2120,6 +2120,133 @@ namespace n_EDMA
         __R   DFBIDX3_reg_t       DFBIDX3;            // (0x3D0)  Destination FIFO BIDX Register 3
         __R   DFMPPRXY3_reg_t     DFMPPRXY3;          // (0x3D4)  Destination FIFO Memory Protection Proxy Register 3 
     };
+        
+    constexpr uint32_t PARAM_ENTRY_FIELDS = 0x8u;
+
+    struct paRAM_entry_t
+    {
+        // Transfer configuration options
+        union 
+        {
+            struct 
+            {  
+                uint32_t    SAM       :1;   // bit: 0          (RW) Source address mode. [0x0 = Increment (INCR) mode; 0x1 = Constant addressing (CONST) mode.]
+                                            //                      Increment (INCR) mode. Source addressing within an array increments. Source is not a FIFO.
+                                            //                      Constant addressing (CONST) mode. Source addressing within an array wraps around upon reaching FIFO width.
+                uint32_t    DAM       :1;   // bit: 1          (RW) Destination address mode. [ 0x0 = Increment (INCR) mode; 0x1 = Constant addressing (CONST) mode. ]
+                                            //                      Increment (INCR) mode. Destination addressing within an array increments. Destination is not a FIFO.
+                                            //                      Constant addressing (CONST) mode. Destination addressing within an array wraps around upon reaching FIFO width.
+                uint32_t    SYNCDIM   :1;   // bit: 2          (RW) Transfer synchronization dimension. [ 0x0 = A-synchronized; 0x1 = AB-synchronized. ]
+                uint32_t    STATIC    :1;   // bit: 3          (RW) Static set. [0x0 = Set is not static; 0x1 = Set is static. ]
+                                            //                      Set is not static. The PaRAM set is updated or linked after a TR is submitted. A value of 0 should be
+                                            //                      used for DMA channels and for non-final transfers in a linked list of QDMA transfers.
+                                            //                      1 Set is static. The PaRAM set is not updated or linked after a TR is submitted. A value of 1 should be
+                                            //                      used for isolated QDMA transfers or for the final transfer in a linked list of QDMA transfers.
+                uint32_t              :4;   // bit: 4..7       Reserved 
+                uint32_t    FWID      :3;   // bit: 8..10      (RW) FIFO Width. Applies if either SAM or DAM is set to constant addressing mode. [ see e_paRAM_FIFO_MODE ]
+                uint32_t    TCCMODE   :1;   // bit: 11         (RW) Transfer complete code mode. Indicates the point at which a transfer is considered completed for
+                                            //                      chaining and interrupt generation.
+                                            //                      [0x0 = Normal completion; 0x1 = Early completion]
+                uint32_t    TCC       :6;   // bit: 12..17     (RW) Transfer complete code. This 6-bit code sets the relevant bit in the chaining enable register (CER [TCC]
+                                            //                      CERH [TCC]) for chaining or in the interrupt pending register (IPR [TCC] / IPRH [TCC]) for interrupts.
+                                            //                      [ 0-3Fh]
+                uint32_t              :2;   // bit: 18,19      Reserved          
+                uint32_t    TCINTEN   :1;   // bit: 20         (RW) Transfer complete interrupt enable. [ 0x0 = disabled; 0x1 = enabled ] 
+                uint32_t    ITCINTEN  :1;   // bit: 21         (RW) Intermediate transfer completion interrupt enable. [ 0x0 = disabled; 0x1 = enabled ] 
+                uint32_t    TCCHEN    :1;   // bit: 22         (RW) Transfer complete chaining enable. [ 0x0 = disabled; 0x1 = enabled ]
+                uint32_t    ITCCHEN   :1;   // bit: 23         (RW) Intermediate transfer completion chaining enable. [ 0x0 = disabled; 0x1 = enabled ]
+                uint32_t    PRIVID    :4;   // bit: 24..27     (R) Privilege identification for the external host/CPU/DMA that programmed this PaRAM set. This value is
+                                            //                     set with the EDMA3 master’s privilege identification value when any part of the PaRAM set is written.
+                uint32_t              :3;   // bit: 28..30     Reserved
+                uint32_t    PRIV      :1;   // bit: 31         (R) Privilege level (supervisor versus user) for the host/CPU/DMA that programmed this PaRAM set. This
+                                            //                     value is set with the EDMA3 master’s privilege value when any part of the PaRAM set is written.
+                                            //                     [ 0x0 = User level privilege.; 0x1 = Supervisor level privilege. ] 
+            } b;                            // Structure used for bit access 
+            uint32_t  reg;                  // Type used for register access
+        } OPT;
+
+        uint32_t  SRC;          // The byte address from which data is transferred 
+        
+        uint16_t  ACNT;         // Unsigned value specifying the number of contiguous bytes
+                                // within an array (first dimension of the transfer). Valid values
+                                // range from 1 to 65 535.
+        
+        uint16_t  BCNT;         // Unsigned value specifying the number of arrays in a frame,
+                                // where an array is ACNT bytes. Valid values range from 1 to 65 535.
+        
+        uint32_t  DST;          // The byte address to which data is transferred
+        
+         int16_t  SRCBIDX;      // Signed value specifying the byte address offset between
+                                // source arrays within a frame (2nd dimension). Valid values range from –32 768 and 32 767.
+         
+         int16_t  DSTBIDX;      // Signed value specifying the byte address offset between
+                                // destination arrays within a frame (2nd dimension). Valid
+                                // values range from –32 768 and 32 767.
+         
+        uint16_t  LINK;         // The PaRAM address containing the PaRAM set to be linked
+                                // (copied from) when the current PaRAM set is exhausted. A
+                                // value of FFFFh specifies a null link.
+        
+        uint16_t  BCNTRLD;      // The count value used to reload BCNT when BCNT
+                                // decrements to 0 (TR is submitted for the last array in 2nd
+                                // dimension). Only relevant in A-synchronized transfers.
+        
+         int16_t  SRCCIDX;      // Signed value specifying the byte address offset between
+                                // frames within a block (3rd dimension). Valid values range
+                                // from –32 768 and 32 767.
+                                // A-synchronized transfers: The byte address offset from the
+                                // beginning of the last source array in a frame to the
+                                // beginning of the first source array in the next frame.
+                                // AB-synchronized transfers: The byte address offset from the
+                                // beginning of the first source array in a frame to the
+                                // beginning of the first source array in the next frame.
+         
+         int16_t  DSTCIDX;      // Signed value specifying the byte address offset between
+                                // frames within a block (3rd dimension). Valid values range
+                                // from –32 768 and 32 767.
+                                // A-synchronized transfers: The byte address offset from the
+                                // beginning of the last destination array in a frame to the
+                                // beginning of the first destination array in the next frame.
+                                // AB-synchronized transfers: The byte address offset from the
+                                // beginning of the first destination array in a frame to the
+                                // beginning of the first destination array in the next frame.
+         
+        uint16_t  CCNT;         // Unsigned value specifying the number of frames in a block,
+                                // where a frame is BCNT arrays of ACNT bytes. Valid values range from 1 to 65 535.
+        
+        uint16_t  RESERVED;     // Reserved. Always write 0 to this bit; writes of 1 to this bit are
+                                // not supported and attempts to do so may result in undefined behavior.
+
+        paRAM_entry_t() { }
+
+        paRAM_entry_t& operator =(const paRAM_entry_t &right)
+        {
+            OPT.reg  = right.OPT.reg;
+                SRC  = right.SRC;
+               ACNT  = right.ACNT;
+               BCNT  = right.BCNT;
+                DST  = right.DST;
+            SRCBIDX  = right.SRCBIDX;
+            DSTBIDX  = right.DSTBIDX;
+               LINK  = right.LINK;
+            BCNTRLD  = right.BCNTRLD;
+            SRCCIDX  = right.SRCCIDX;
+            DSTCIDX  = right.DSTCIDX;
+               CCNT  = right.CCNT;
+        
+           return *this;
+        }
+    };
+
+    enum e_paRAM_FIFO_WIDTH : uint32_t
+    {
+        FIFO_WIDTH_8BIT     = 0x0,
+        FIFO_WIDTH_16BIT    = 0x1,
+        FIFO_WIDTH_32BIT    = 0x2,
+        FIFO_WIDTH_64BIT    = 0x3,
+        FIFO_WIDTH_128BIT   = 0x4,
+        FIFO_WIDTH_256BIT   = 0x5
+    };
 
     constexpr uint32_t AM335x_EDMA3CC_BASE     = 0x49000000;   
     constexpr uint32_t AM335x_EDMA3TC0_BASE    = 0x49800000;
@@ -2152,11 +2279,28 @@ namespace n_EDMA
         CHANNEL_TYPE_DMA  = 0u,
         CHANNEL_TYPE_QDMA = 1u
     };
+
+    enum e_EDMA3_TRIG_MODE_TYPE : uint32_t
+    {
+        TRIG_MODE_MANUAL = 0x0,
+        TRIG_MODE_QDMA   = 0x1,
+        TRIG_MODE_EVENT  = 0x2
+    };
     
-   constexpr uint32_t  EDMA_REVID          = 0x02u;
-   constexpr uint32_t  AM335X_DMACH_MAX    = 64;
-   constexpr uint32_t  AM335X_QDMACH_MAX   = 8; 
-   constexpr uint32_t  PARAM_ENTRY_FIELDS  = 0x8u;
+   constexpr uint32_t  EDMA_REVID                = 0x02u;
+   constexpr uint32_t  AM335X_DMACH_MAX          = 64;
+   constexpr uint32_t  AM335X_QDMACH_MAX         = 8; 
+
+   constexpr uint32_t  PARAM_ENTRY_OPT            = 0x0u;       //The OPT field (Offset Address 0x0 Bytes)
+   constexpr uint32_t  PARAM_ENTRY_SRC            = 0x1u;       //The SRC field (Offset Address 0x4 Bytes)
+   constexpr uint32_t  PARAM_ENTRY_ACNT_BCNT      = 0x2u;       //The (ACNT+BCNT) field (Offset Address 0x8 Bytes)
+   constexpr uint32_t  PARAM_ENTRY_DST            = 0x3u;       //The DST field (Offset Address 0xC Bytes)
+   constexpr uint32_t  PARAM_ENTRY_SRC_DST_BIDX   = 0x4u;       //The (SRCBIDX+DSTBIDX) field (Offset Address 0x10 Bytes)
+   constexpr uint32_t  PARAM_ENTRY_LINK_BCNTRLD   = 0x5u;       //The (LINK+BCNTRLD) field (Offset Address 0x14 Bytes)
+   constexpr uint32_t  PARAM_ENTRY_SRC_DST_CIDX   = 0x6u;       //The (SRCCIDX+DSTCIDX) field (Offset Address 0x18 Bytes)
+   constexpr uint32_t  PARAM_ENTRY_CCNT           = 0x7u;       //The (CCNT+RSVD) field (Offset Address 0x1C Bytes)
+   constexpr uint32_t  PARAM_FIELD_OFFSET         = 0x4u;       //The offset for each PaRAM Entry field
+
 
      DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id);
     DRAEH_reg_t*& get_DRAEH_reference(e_REGION_ID region_id);    
@@ -2201,7 +2345,7 @@ namespace n_EDMA
      QSER_reg_t*& get_S_QSER_reference(e_REGION_ID region_id);  
     QSECR_reg_t*& get_S_QSECR_reference(e_REGION_ID region_id);
 
-        uint32_t* get_OPT_ptr(uint32_t n);                
+        uint32_t* get_paRAM_ptr(uint32_t n);                
         uint32_t* get_SRC_ptr(uint32_t n);                
         uint32_t* get_A_B_CNT_ptr(uint32_t n);            
         uint32_t* get_DST_ptr(uint32_t n);                
@@ -2432,9 +2576,9 @@ namespace n_EDMA
         return (QSECR_reg_t*&)QSECR;
     }
 
-    inline uint32_t* get_OPT_ptr(uint32_t n)           { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x0 + (0x20 * n)); }
+    inline uint32_t* get_paRAM_ptr(uint32_t n)         { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + (0x20 * n)); }
     inline uint32_t* get_SRC_ptr(uint32_t n)           { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x4 + (0x20 * n)); }
-    inline uint32_t* get_A_B_CNT_ptr(uint32_t n)       { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x8 + (0x20 * n));}
+    inline uint32_t* get_A_B_CNT_ptr(uint32_t n)       { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x8 + (0x20 * n)); }
     inline uint32_t* get_DST_ptr(uint32_t n)           { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0xC + (0x20 * n)); }
     inline uint32_t* get_SRC_DST_BIDX_ptr(uint32_t n)  { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x10 + (0x20 * n)); }
     inline uint32_t* get_LINK_BCNTRLD_ptr(uint32_t n)  { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x14 + (0x20 * n)); }
@@ -2442,84 +2586,6 @@ namespace n_EDMA
     inline uint32_t* get_CCNT_ptr(uint32_t n)          { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x1C + (0x20 * n)); }
 }
 
-/**
- * \brief EDMA3 Parameter RAM Set in User Configurable format
- *
- * This is a mapping of the EDMA3 PaRAM set provided to the user
- * for ease of modification of the individual fields
- */
-typedef struct EDMA3CCPaRAMEntry
-{
-        /** OPT field of PaRAM Set */
-        unsigned int opt;
-
-        /**
-         * \brief Starting byte address of Source
-         * For FIFO mode, srcAddr must be a 256-bit aligned address.
-         */
-        unsigned int srcAddr;
-
-        /**
-         * \brief Number of bytes in each Array (ACNT)
-         */
-        unsigned short aCnt;
-
-        /**
-         * \brief Number of Arrays in each Frame (BCNT)
-         */
-        unsigned short bCnt;
-
-        /**
-         * \brief Starting byte address of destination
-         * For FIFO mode, destAddr must be a 256-bit aligned address.
-         * i.e. 5 LSBs should be 0.
-         */
-        uint32_t destAddr;
-
-        /**
-         * \brief Index between consec. arrays of a Source Frame (SRCBIDX)
-         */
-        short  srcBIdx;
-
-        /**
-         * \brief Index between consec. arrays of a Destination Frame (DSTBIDX)
-         */
-        short  destBIdx;
-
-        /**
-         * \brief Address for linking (AutoReloading of a PaRAM Set)
-         * This must point to a valid aligned 32-byte PaRAM set
-         * A value of 0xFFFF means no linking
-         */
-        unsigned short linkAddr;
-
-        /**
-         * \brief Reload value of the numArrInFrame (BCNT)
-         * Relevant only for A-sync transfers
-         */
-        unsigned short bCntReload;
-
-        /**
-         * \brief Index between consecutive frames of a Source Block (SRCCIDX)
-         */
-        short  srcCIdx;
-
-        /**
-         * \brief Index between consecutive frames of a Dest Block (DSTCIDX)
-         */
-        short  destCIdx;
-
-        /**
-         * \brief Number of Frames in a block (CCNT)
-         */
-        unsigned short cCnt;
-
-        /**
-         * \brief  This field is Reserved. Write zero to this field.
-         */
-        unsigned short rsvd;
-
-} EDMA3CCPaRAMEntry;
 
 /*
 ** Structure to store the EDMA context
@@ -2541,7 +2607,7 @@ typedef struct edma_context
     uint32_t  intEnableSetRegLow;    // Interrupt Enable Set Register value      
     uint32_t  intEnableSetRegHigh;   // Interrupt Enable Set Register value   
     
-struct EDMA3CCPaRAMEntry dmaParEntry[512];    
+struct paRAM_entry_t dmaParEntry[512];    
     
 } EDMACONTEXT_t;
 
@@ -2583,20 +2649,20 @@ public:
         void  enable_evt_intr(uint32_t ch_num);
         void  disable_evt_intr(uint32_t ch_num);
         void  clr_intr(uint32_t value);
-        void  get_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM);
-        void  QDMA_get_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* curr_paRAM);
-        void  set_paRAM(uint32_t ch_num, EDMA3CCPaRAMEntry* new_paRAM);
-        void  QDMA_set_paRAM(uint32_t paRAM_id, EDMA3CCPaRAMEntry* new_paRAM);
+n_EDMA::paRAM_entry_t* get_paRAM(uint32_t paRAM_id);
+n_EDMA::paRAM_entry_t* QDMA_get_paRAM(uint32_t paRAM_id);
+        void  set_paRAM(uint32_t ch_num, n_EDMA::paRAM_entry_t* new_paRAM);
+        void  QDMA_set_paRAM(uint32_t paRAM_id, n_EDMA::paRAM_entry_t* new_paRAM);
         void  QDMA_set_paRAM_entry(uint32_t paRAM_id, uint32_t paRAM_entry, uint32_t new_paRAM_entry_val);
     uint32_t  QDMA_get_paRAM_entry(uint32_t paRAM_id, uint32_t paRAM_entry);
-    uint32_t  request_channel(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, uint32_t tcc_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
-    uint32_t  free_channel(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, uint32_t trig_mode, uint32_t tcc_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
-    uint32_t  enable_transfer(uint32_t ch_num, uint32_t trig_mode);
-    uint32_t  disable_transfer(uint32_t ch_num, uint32_t trig_mode);
+        bool  request_channel(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, uint32_t tcc_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
+        bool  free_channel(n_EDMA::e_EDMA3_CH_TYPE ch_type, uint32_t ch_num, uint32_t trig_mode, uint32_t tcc_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
+        bool  enable_transfer(uint32_t ch_num, uint32_t trig_mode);
+        bool  disable_transfer(uint32_t ch_num, uint32_t trig_mode);
         void  clear_error_bits(uint32_t ch_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
-    uint32_t  get_CCERR_status();
-    uint32_t  get_ERR_intr_status();
-    uint32_t  QDMA_get_ERR_intr_status();
+n_EDMA::CCERR_reg_t  get_CCERR_status();
+  n_EDMA::EMR_reg_t  get_ERR_intr_status();
+ n_EDMA::QEMR_reg_t  QDMA_get_ERR_intr_status();
         void  CCERR_evaluate();
         void  deinit(uint32_t que_num);
     uint32_t  version_get(void) const { return 1; } // This returns a number '2' which is unique to EDMA IP in AM335x.
