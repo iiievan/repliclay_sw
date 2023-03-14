@@ -35,9 +35,9 @@ void  AM335x_UART::module_reset()
                           
 void AM335x_UART::FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl)
 {    
-    n_UART::SCR_reg_t  cfg_scr = {.reg = 0x0 };
+    n_UART::SCR_reg_t  cfg_scr         = {.reg = 0x0 };
     n_UART::TLR_reg_t  trigger_lvl_cfg = {.reg = 0x0 };
-    n_UART::FCR_reg_t  cfg_fcr = {.reg = 0x0 }; 
+    n_UART::FCR_reg_t  cfg_fcr         = {.reg = 0x0 }; 
     
     cfg_scr.b.TXTRIGGRANU1 = 0x1;
     cfg_scr.b.RXTRIGGRANU1 = 0x1;

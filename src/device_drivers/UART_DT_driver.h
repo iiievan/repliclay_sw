@@ -65,6 +65,7 @@ class UART_DT_Driver : public Device_driver
 AM335x_UART* get_instance(void) { return &m_UART_device; }
 
        void  AINTC_configure(void);
+       void  EDMA_INTC_configure(void);
        void  sys_interrupt_enable()  { m_int_controller.system_enable(m_UART_sys_interrupt);  }
        void  sys_interrupt_disable() { m_int_controller.system_disable(m_UART_sys_interrupt); }
 private:

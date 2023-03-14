@@ -499,8 +499,7 @@ void UARTStdioInitExpClk(unsigned int baudRate,
 ** A wrapper function performing FIFO configurations.
 */
 
-void UartFIFOConfigure(unsigned int txTrigLevel,
-                              unsigned int rxTrigLevel)
+void UartFIFOConfigure(unsigned int txTrigLevel, unsigned int rxTrigLevel)
 {
     unsigned int fifoConfig = 0;
 
