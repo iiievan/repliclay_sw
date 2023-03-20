@@ -63,6 +63,11 @@ static void EDMA3_error_isr(void *p_Obj)
     
 }
 
+void EDMA3_end_transaction_clb(uint32_t tcc_num)
+{
+  
+}
+
     
 static int console_pollrx(void *p_Obj)
 {
@@ -123,15 +128,10 @@ void UART_DT_Driver::set_Client_ops(void *p_owner, Client_ops *p_ops)
     } 
 }
  
+#define TX_DMA_THRESHOLD          (5)
+
 int  UART_DT_Driver::init(void)
-{   
-    //EDMAModuleClkConfig();      // Configuring the system clocks for EDMA    
-    //UART0ModuleClkConfig();     // Configuring the system clocks for UART0 instance.    
-    //UARTPinMuxSetup(0);         // Performing Pin Multiplexing for UART0 instance.
-    //
-    //IntMasterIRQEnable();       // Enabling IRQ in CPSR of ARM processor.
-    //IntAINTCInit();             // Initializing the ARM Interrupt Controller.
-  
+{     
     m_int_controller.master_IRQ_disable();   // Disable IRQ in CPSR   
     
     /// Initialize the UART console ///
@@ -140,23 +140,17 @@ int  UART_DT_Driver::init(void)
     m_pinmux_ctrl.UART0_pin_mux_setup();        // Performing the Pin Multiplexing for UART0 instance. 
     
     m_int_controller.master_IRQ_enable();       // Enable IRQ in CPSR    
-        
-    //EDMA3Init(SOC_EDMA30CC_0_REGS, EVT_QUEUE_NUM);  // Initialization of EDMA3    
-    //EDMA3INTCConfigure();   // Configuring the AINTC to receive EDMA3 interrupts 
+         
     m_EDMA.init(n_EDMA::EVENT_Q0);
     EDMA_INTC_configure();
     
     m_UART_device.module_reset();                                   // Performing a module reset.        
-    m_UART_device.FIFO_configure_no_DMA(1, 1);                      // Performing FIFO configurations.    
-  //UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE);  // Enabling DMA Mode 1.
-  //m_UART_device.DMA_enable(n_UART::SCR_DMA_MODE_1);
-
-#if (defined UART_ENABLE_FIFO) && (defined DIRECT_TX_DMA_THRESH_MODE)    
-    UARTTxDMAThresholdControl(UART_INSTANCE_BASE_ADD, UART_TX_DMA_THRESHOLD_REG);   // Selecting the method of setting the Transmit DMA Threshold value
-    UARTTxDMAThresholdValConfig(UART_INSTANCE_BASE_ADD, txThreshLevel);             // Configuring the Transmit DMA Threshold value.
-#endif
+    m_UART_device.FIFO_configure_no_DMA(1, 1);                      // Performing FIFO configurations.
+       
+    m_UART_device.TX_DMA_threshold_control(true);
+    m_UART_device.TX_DMA_threshold_val_config(TX_DMA_THRESHOLD);
     
-    m_UART_device.BAUD_set(921600);                                // Performing Baud Rate settings.
+    m_UART_device.BAUD_set(115200);                                // Performing Baud Rate settings.
     m_UART_device.reg_config_mode_enable(n_UART::CONFIG_MODE_B);   // Switching to Configuration Mode B. 
     
     // Programming the Line Characteristics. 
@@ -166,23 +160,13 @@ int  UART_DT_Driver::init(void)
              
     m_UART_device.divisor_latch_disable();                         // Disabling write access to Divisor Latches.        
     m_UART_device.break_ctl(false);                                // Disabling Break Control.
-    m_UART_device.operating_mode_select(n_UART::MODE_UART_13x);    // Switching to UART16x operating mode.     
-    
-    //UARTInitialize();           // Initializing the UART0 instance for use.
-
+    m_UART_device.operating_mode_select(n_UART::MODE_UART_16x);    // Switching to UART16x operating mode.     
 
     ///Configuring the EDMA.///
-    // Request DMA Channel and TCC for UART Transmit
-    EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA, EDMA3_UART_TX_CHA_NUM, EDMA3_UART_TX_CHA_NUM, EVT_QUEUE_NUM);
-
-    // Registering Callback Function for TX
-    cb_Fxn[EDMA3_UART_TX_CHA_NUM] = &callback;
-
-    // Request DMA Channel and TCC for UART Receive
-    EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA, EDMA3_UART_RX_CHA_NUM, EDMA3_UART_RX_CHA_NUM, EVT_QUEUE_NUM);
-
-    // Registering Callback Function for RX
-    cb_Fxn[EDMA3_UART_RX_CHA_NUM] = &callback;
+    m_EDMA.request_channel(n_EDMA::CHANNEL_TYPE_DMA, n_EDMA::CH_UART0_TX, n_EDMA::CH_UART0_TX, n_EDMA::EVENT_Q0);   // Registering Callback Function for TX    
+    cb_fx[n_EDMA::CH_UART0_TX] = &EDMA3_end_transaction_clb;            // Registering Callback Function for TX
+    m_EDMA.request_channel(n_EDMA::CHANNEL_TYPE_DMA, n_EDMA::CH_UART0_RX, n_EDMA::CH_UART0_RX, n_EDMA::EVENT_Q0);   // Registering Callback Function for RX     
+    cb_fx[n_EDMA::CH_UART0_RX] = &EDMA3_end_transaction_clb;            // Registering Callback Function for RX
     
     return 0;
 }

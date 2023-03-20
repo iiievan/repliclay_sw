@@ -36,16 +36,20 @@ struct UART_client_ops : public Client_ops
 
 extern      UART_client_ops  UART_ops;
 extern const DT_device_id_t  AM335x_UART_ids;
+extern void EDMA3_end_transaction_clb(uint32_t tcc_num);
 
 class UART_DT_Driver : public Device_driver
 {
+           void (*cb_fx[n_EDMA::AM335X_DMACH_MAX]) (uint32_t tcc);  // function callbacks for n_EDMA
+                 
     public:
             UART_DT_Driver(AM335x_UART &uart_instance)
             : Device_driver("AM335x_serial_driver", &AM335x_UART_ids),
               m_UART_device(uart_instance),
               m_prcm_module(prcm_module),
               m_int_controller(intc),
-              m_pinmux_ctrl(ctrl_module)
+              m_pinmux_ctrl(ctrl_module),
+              m_EDMA(dma)
              { 
                  m_UART_instance_num  = m_UART_device.get_UART_inst_number();
                  m_UART_sys_interrupt = m_UART_device.get_UART_sys_interrupt();

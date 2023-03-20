@@ -1627,7 +1627,7 @@ n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr,
       void  scratchpad_reg_write(uint32_t scratch_value);
   uint32_t  scratchpad_reg_read();
   uint32_t  module_version_number_get();
-      void  TX_DMA_threshold_control(uint32_t thrs_ctrl_flag);
+      void  TX_DMA_threshold_control(bool thrs_ctrl_flag);
       void  TX_DMA_threshold_val_config(uint32_t thrs_value);
       
        bool  is_RX_data_rdy(ring_buffer<n_UART::RX_FIFO_MAX*4>* p_Data); 

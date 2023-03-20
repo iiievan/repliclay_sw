@@ -344,8 +344,7 @@ void  I2C_EEPROM <EEPROM_SIZE, PAGE_SIZE>::irq_handler()
     }
 }
 
-/** I2C Interrupt Service Routine. This function will read and write data through I2C bus. 
-This function is a friend of class I2C_EEPROM **/
+/** I2C Interrupt Service Routine. **/
 void  BRDINFO_24LC32A_irqhandler(void *p_obj)
 {  
     I2C_EEPROM<(32*1024),32> &s_I2C = *((I2C_EEPROM<(32*1024),32> *)p_obj);

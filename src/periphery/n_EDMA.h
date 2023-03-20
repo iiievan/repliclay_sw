@@ -2302,6 +2302,32 @@ namespace n_EDMA
         TRIG_MODE_QDMA   = 0x1,
         TRIG_MODE_EVENT  = 0x2
     };
+
+    enum e_EDMA3_CHANNEL_MAP : uint32_t
+    {        
+        CH_MCASP1_TX             = 10, // Events for McASP 1
+        CH_MCASP1_RX             = 11, // Events for McASP 1
+        CH_MCSPI0_CH0_TX  = 16, // MCSPI0 Channel 0 transmit event 
+        CH_MCSPI0_CH0_RX  = 17, // MCSPI0 Channel 0 receive event 
+        CH_MCSPI0_CH1_TX  = 18, // MCSPI0 Channel 1 transmit event 
+        CH_MCSPI0_CH1_RX  = 19, // MCSPI0 Channel 1 receive event 
+        CH_MMCSD0_TX      = 24, // MMCSD0 transmit event. 
+        CH_MMCSD0_RX      = 25, // MMCSD0 receive event.
+        CH_UART0_TX       = 26, // UART0 Transmit Event.
+        CH_UART0_RX       = 27, // UART0 Receive Event. 
+        CH_UART1_TX       = 28, // UART1 Transmit Event.
+        CH_UART1_RX       = 29, // UART1 Receive Event.
+        CH_UART2_TX       = 30, // UART2 Transmit Event.
+        CH_UART2_RX       = 31, // UART2 Receive Event.
+        CH_MCSPI1_CH0_TX  = 42, // MCSPI1 Channel 0 transmit event  
+        CH_MCSPI1_CH0_RX  = 43, // MCSPI1 Channel 0 receive event
+        CH_MCSPI1_CH1_TX  = 44, // MCSPI1 Channel 1 transmit event
+        CH_MCSPI1_CH1_RX  = 45, // MCSPI1 Channel 1 receive event 
+        CH_I2C0_TX        = 58, // I2C0 Transmit Event 
+        CH_I2C0_RX        = 59, // I2C0 Receive Event 
+        CH_I2C1_TX        = 60, // I2C1 Receive Event
+        CH_I2C1_RX        = 61  // I2C1 Transmit Event 
+    };
     
    constexpr uint32_t  EDMA_REVID                = 0x02u;
    constexpr uint32_t  AM335X_DMACH_MAX          = 64;
@@ -2626,7 +2652,8 @@ namespace n_EDMA
 
 class AM335x_EDMA
 {
-             n_EDMA::e_REGION_ID region_id;
+n_EDMA::e_REGION_ID  region_id;
+             
 public:
               AM335x_EDMA()
                 : m_EDMA3CC_regs(*(n_EDMA::AM335X_EDMA3CC_regs)),
@@ -2692,5 +2719,7 @@ private:
     n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC1_regs;
     n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC2_regs;
 };
+
+extern AM335x_EDMA dma;
 
 #endif //__N_EDMA_H

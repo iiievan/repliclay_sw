@@ -1488,3 +1488,5 @@ void AM335x_EDMA::context_restore(n_EDMA::EDMACONTEXT_t *p_edma_cntx)
         set_paRAM(i,(n_EDMA::paRAM_entry_t*)(&(p_edma_cntx->dma_par_entry[i])));
     }                      
 }
+
+AM335x_EDMA dma;

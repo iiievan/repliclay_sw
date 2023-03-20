@@ -66,11 +66,11 @@
 #define CPSW_MDIO_SEL_MODE                    (0x00u)
 #define LEN_MAC_ADDR                          (0x06u)
 #define OFFSET_MAC_ADDR                       (0x30u)
-#define CTRL_IOPAD_OFFSET                 (0x800)
-#define CTRL_IOPAD_REG_BASE               (SOC_CONTROL_REGS + CTRL_IOPAD_OFFSET)
-#define UART_CONSOLE_BASE                    (SOC_UART_0_REGS)
-#define BAUD_RATE_115200                     (115200)
-#define UART_MODULE_INPUT_CLK                (48000000)
+#define CTRL_IOPAD_OFFSET                     (0x800)
+#define CTRL_IOPAD_REG_BASE                   (SOC_CONTROL_REGS + CTRL_IOPAD_OFFSET)
+#define UART_CONSOLE_BASE                     (SOC_UART_0_REGS)
+#define BAUD_RATE_115200                      (115200)
+#define UART_MODULE_INPUT_CLK                 (48000000)
 
 /******************************************************************************
 **              INTERNAL FUNCTION DECLARATIONS
@@ -618,32 +618,25 @@ void UART0ModuleClkConfig(void)
     while(CM_WKUP_UART0_CLKCTRL_MODULEMODE_ENABLE != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_UART0_CLKCTRL) & CM_WKUP_UART0_CLKCTRL_MODULEMODE));
 
     /** Verifying if the other bits are set to required settings. **/
-    // Waiting for IDLEST field in CM_WKUP_CONTROL_CLKCTRL register to attain
-    // desired value.
+    // Waiting for IDLEST field in CM_WKUP_CONTROL_CLKCTRL register to attain desired value.
     while((CM_WKUP_CONTROL_CLKCTRL_IDLEST_FUNC << CM_WKUP_CONTROL_CLKCTRL_IDLEST_SHIFT) != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CONTROL_CLKCTRL) & CM_WKUP_CONTROL_CLKCTRL_IDLEST));
 
-    // Waiting for CLKACTIVITY_L3_AON_GCLK field in CM_L3_AON_CLKSTCTRL
-    // register to attain desired value.
+    // Waiting for CLKACTIVITY_L3_AON_GCLK field in CM_L3_AON_CLKSTCTRL register to attain desired value.
     while(CM_WKUP_CM_L3_AON_CLKSTCTRL_CLKACTIVITY_L3_AON_GCLK != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CM_L3_AON_CLKSTCTRL) & CM_WKUP_CM_L3_AON_CLKSTCTRL_CLKACTIVITY_L3_AON_GCLK));
 
-    // Waiting for IDLEST field in CM_WKUP_L4WKUP_CLKCTRL register to attain
-    // desired value.
+    // Waiting for IDLEST field in CM_WKUP_L4WKUP_CLKCTRL register to attain desired value.
     while((CM_WKUP_L4WKUP_CLKCTRL_IDLEST_FUNC << CM_WKUP_L4WKUP_CLKCTRL_IDLEST_SHIFT) != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_L4WKUP_CLKCTRL) & CM_WKUP_L4WKUP_CLKCTRL_IDLEST));
 
-    // Waiting for CLKACTIVITY_L4_WKUP_GCLK field in CM_WKUP_CLKSTCTRL register
-    // to attain desired value.
+    // Waiting for CLKACTIVITY_L4_WKUP_GCLK field in CM_WKUP_CLKSTCTRL register to attain desired value.
     while(CM_WKUP_CLKSTCTRL_CLKACTIVITY_L4_WKUP_GCLK != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CLKSTCTRL) & CM_WKUP_CLKSTCTRL_CLKACTIVITY_L4_WKUP_GCLK));
 
-    // Waiting for CLKACTIVITY_L4_WKUP_AON_GCLK field in CM_L4_WKUP_AON_CLKSTCTRL
-    // register to attain desired value.
+    // Waiting for CLKACTIVITY_L4_WKUP_AON_GCLK field in CM_L4_WKUP_AON_CLKSTCTRL register to attain desired value.
     while(CM_WKUP_CM_L4_WKUP_AON_CLKSTCTRL_CLKACTIVITY_L4_WKUP_AON_GCLK != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CM_L4_WKUP_AON_CLKSTCTRL) & CM_WKUP_CM_L4_WKUP_AON_CLKSTCTRL_CLKACTIVITY_L4_WKUP_AON_GCLK));
 
-    // Waiting for CLKACTIVITY_UART0_GFCLK field in CM_WKUP_CLKSTCTRL
-    // register to attain desired value.
+    // Waiting for CLKACTIVITY_UART0_GFCLK field in CM_WKUP_CLKSTCTRL register to attain desired value.
     while(CM_WKUP_CLKSTCTRL_CLKACTIVITY_UART0_GFCLK != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CLKSTCTRL) & CM_WKUP_CLKSTCTRL_CLKACTIVITY_UART0_GFCLK));
 
-    // Waiting for IDLEST field in CM_WKUP_UART0_CLKCTRL register to attain
-    // desired value.
+    // Waiting for IDLEST field in CM_WKUP_UART0_CLKCTRL register to attain desired value.
     while((CM_WKUP_UART0_CLKCTRL_IDLEST_FUNC << CM_WKUP_UART0_CLKCTRL_IDLEST_SHIFT) != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_UART0_CLKCTRL) &CM_WKUP_UART0_CLKCTRL_IDLEST));
 }
 

@@ -1426,6 +1426,11 @@ void EDMA3Deinit(unsigned int baseAdd,
     }
 }
 
+unsigned int EDMAVersionGet(void)
+{
+    return 1;
+}
+
 /**
  * \brief   This API return the revision Id of the peripheral.
  *

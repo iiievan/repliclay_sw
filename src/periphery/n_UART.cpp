@@ -238,7 +238,7 @@ void  AM335x_UART::BAUD_set(unsigned int baud_rate)
     // Computing the Divisor Value.
     divisor_value = divisor_val_compute(UART_MODULE_INPUT_CLK,
                                         baud_rate,
-                                        n_UART::MODE_UART_13x,
+                                        n_UART::MODE_UART_16x,
                                         UART_MIR_OVERSAMPLING_RATE_42);
 
 
@@ -2714,7 +2714,7 @@ uint32_t  AM335x_UART::module_version_number_get()
  * \return  None
  *
  */
-void  AM335x_UART::TX_DMA_threshold_control(uint32_t thrs_ctrl_flag)
+void  AM335x_UART::TX_DMA_threshold_control(bool thrs_ctrl_flag)
 {
     // Clearing the SET_TX_DMA_THRESHOLD bit in MDR3 register.
     //HWREG(baseAdd + UART_MDR3) &= ~(UART_MDR3_SET_DMA_TX_THRESHOLD);
