@@ -42,7 +42,32 @@ void AM335x_UART::FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl
     cfg_scr.b.TXTRIGGRANU1 = 0x1;
     cfg_scr.b.RXTRIGGRANU1 = 0x1;
     cfg_scr.b.DMAMODECTL   = 0x1;
-    cfg_scr.b.DMAMODE2     = 0x0;
+    cfg_scr.b.DMAMODE2     = n_UART::SCR_DMA_MODE_0;    // no dma
+
+    tx_trig_lvl &= 0x003F;                                             // 'tx_trig_lvl' now has the 6-bit TX Trigger level value.
+    trigger_lvl_cfg.b.TX_FIFO_TRIG_DMA  = (tx_trig_lvl & 0x003C) >> 2; // Collecting the bits tx_trig_lvl[5:2].        
+    cfg_fcr.b.TX_FIFO_TRIG |= (tx_trig_lvl & 0x0003);                  // Collecting the bits tx_trig_lvl[1:0] and writing to 'fcr_value'.
+    
+    rx_trig_lvl &= 0x003F;                                             // 'rx_trig_lvl' now has the 6-bit RX Trigger level value.
+    trigger_lvl_cfg.b.RX_FIFO_TRIG_DMA = (rx_trig_lvl & 0x003C) >> 2;  // Collecting the bits rx_trig_lvl[5:2]. 
+    cfg_fcr.b.RX_FIFO_TRIG = (rx_trig_lvl & 0x0003);                   // Collecting the bits rx_trig_lvl[1:0] and writing to 'fcr_value'.   
+    
+    cfg_fcr.b.TX_FIFO_CLEAR = 1;
+    cfg_fcr.b.RX_FIFO_CLEAR = 1;
+    
+    FIFO_config(cfg_scr, trigger_lvl_cfg, cfg_fcr);
+}
+
+void  FIFO_configure_DMA_RxTx(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl)
+{
+    n_UART::SCR_reg_t  cfg_scr         = {.reg = 0x0 };
+    n_UART::TLR_reg_t  trigger_lvl_cfg = {.reg = 0x0 };
+    n_UART::FCR_reg_t  cfg_fcr         = {.reg = 0x0 }; 
+    
+    cfg_scr.b.TXTRIGGRANU1 = 0x1;
+    cfg_scr.b.RXTRIGGRANU1 = 0x1;
+    cfg_scr.b.DMAMODECTL   = 0x1;
+    cfg_scr.b.DMAMODE2     = n_UART::SCR_DMA_MODE_0;    // no dma
 
     tx_trig_lvl &= 0x003F;                                             // 'tx_trig_lvl' now has the 6-bit TX Trigger level value.
     trigger_lvl_cfg.b.TX_FIFO_TRIG_DMA  = (tx_trig_lvl & 0x003C) >> 2; // Collecting the bits tx_trig_lvl[5:2].        
@@ -67,7 +92,6 @@ void AM335x_UART::FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl
  *         3> Configures the bits which clear/not clear the TX and RX FIFOs\n
  *         4> Configures the DMA mode of operation\n
  * 
- * \param  baseAdd       Memory address of the UART instance being used.
  * \param  fifo_config    This specifies the desired FIFO configurations.
  *                       Use the macro UART_FIFO_CONFIG to pass the required
  *                       FIFO settings.
@@ -139,8 +163,8 @@ void AM335x_UART::FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl
 
 
 n_UART::FCR_reg_t AM335x_UART::FIFO_config(n_UART::SCR_reg_t  cfg_scr, 
-                                   n_UART::TLR_reg_t  fifo_trigger_lvl, 
-                                   n_UART::FCR_reg_t  cfg_fcr)
+                                           n_UART::TLR_reg_t  fifo_trigger_lvl, 
+                                           n_UART::FCR_reg_t  cfg_fcr)
 {
     uint32_t  enhan_fn_bit_val = 0;
     uint32_t  tcr_tlr_bit_val = 0;

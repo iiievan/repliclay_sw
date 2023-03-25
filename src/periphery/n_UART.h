@@ -1538,6 +1538,7 @@ public:
      
       void  module_reset();
       void  FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl);
+      void  FIFO_configure_DMA_RxTx(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl);
       
 n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr, 
                                n_UART::TLR_reg_t  fifo_trigger_lvl, 
