@@ -71,29 +71,20 @@ I2C_EEPROM<(32*1024),64> CAT24C256WI(I2C::AM335X_I2C_2, SLAVE_ADDR_CAT24C256, CA
 #define UART_INT_NUM              (SYS_INT_UART0INT)
 
 /* Enable FIFO mode of operation. */
-#define UART_ENABLE_FIFO
+//#define UART_ENABLE_FIFO
 
-static void UARTTxEDMAPaRAMSetConfig(unsigned char *txBuffer,
-                                     unsigned int length,
-                                     unsigned int tccNum,
-                                     unsigned short linkAddr,
-                                     unsigned int chNum);
-static void UARTRxEDMAPaRAMSetConfig(unsigned char *rxBuffer,
-                                     unsigned int length,
-                                     unsigned int tccNum,
-                                     unsigned short linkAddr,
-                                     unsigned int chNum);
+static void UART_TX_eDMA_paRAM_set(uint8_t *tx_buffer, size_t len, uint32_t tcc_num, uint16_t param_num, uint32_t ch_num);
+static void UART_RX_eDMA_paRAM_set(uint8_t *rx_buffer, size_t len, uint32_t tcc_num, uint16_t param_num, uint32_t ch_num);
 
 #ifdef UART_ENABLE_FIFO
 static void UartFIFOConfigure(void);
 #endif
 
 static void callback(unsigned int tccNum);
-static void TxDummyPaRAMConfEnable(void);
-static void EDMA3INTCConfigure(void);
-static void Edma3CompletionIsr(void);
+static void Tx_dummy_paRAM_config_enable(void);
+static void EDMA3_completion_isr(void *p_Obj);
+static void EDMA3_error_isr(void *p_Obj);
 static void UartBaudRateSet(void);
-static void Edma3CCErrorIsr(void);
 static void EDMA3Initialize(void);
 static void UARTInitialize(void);
 
@@ -138,7 +129,7 @@ static void UARTInitialize(void);
 /* Number of bytes to be received from the user. */
 #define NUM_RX_BYTES              (8)
 
-static void (*cb_Fxn[EDMA3_NUM_TCC]) (unsigned int tcc);
+static void (*cb_Fxn[n_EDMA::AM335X_DMACH_MAX]) (unsigned int tcc);
 unsigned char intent[] = "The application echoes the characters that you type on the console.\r\n";
 unsigned char welcome[] = "StarterWare AM335X UART DMA application.\r\n";
 unsigned char enter[] = "Please Enter 08 bytes from keyboard.\r\n";
@@ -194,79 +185,82 @@ void init_board(void)
     
     //uart_driver.init(); 
 
-  ///************************** UART0_EDMA_INIT **************************
+  ///************************** UART0_EDMA_INIT **************************    
     
-    // Configuring the system clocks for EDMA.
-    EDMAModuleClkConfig();
-
-    // Configuring the system clocks for UART0 instance.
-    UART0ModuleClkConfig();
-
-    // Performing Pin Multiplexing for UART0 instance.
-    UARTPinMuxSetup(0);
+    //EDMAModuleClkConfig();    // Configuring the system clocks for EDMA. 
+    //UART0ModuleClkConfig();   // Configuring the system clocks for UART0 instance.    
+    //UARTPinMuxSetup(0);       // Performing Pin Multiplexing for UART0 instance.
+    prcm_module.run_EDMA_clk((void *)&dma);
+    prcm_module.run_clk_UART0();
     
     //IntMasterIRQEnable();     // Enabling IRQ in CPSR of ARM processor.    
-    //IntAINTCInit(); // Initializing the ARM Interrupt Controller.
-    
-    EDMA3Init(SOC_EDMA30CC_0_REGS, EVT_QUEUE_NUM); // Initialization of EDMA3    
+    //IntAINTCInit(); // Initializing the ARM Interrupt Controller.    
+    //EDMA3Init(SOC_EDMA30CC_0_REGS, EVT_QUEUE_NUM); // Initialization of EDMA3    
     //IntAINTCInit();       // Initializing the ARM Interrupt Controller.
-    
-    IntRegister(SYS_INT_EDMACOMPINT, Edma3CompletionIsr);   // Registering EDMA3 Channel Controller 0 transfer completion interrupt.
-    
-    IntPrioritySet(SYS_INT_EDMACOMPINT, 0, AINTC_HOSTINT_ROUTE_IRQ);    // Setting the priority for EDMA3CC0 completion interrupt in AINTC.
-    
-    IntRegister(SYS_INT_EDMAERRINT, Edma3CCErrorIsr);   // Registering EDMA3 Channel Controller 0 Error Interrupt.
-    
-    IntPrioritySet(SYS_INT_EDMAERRINT, 0, AINTC_HOSTINT_ROUTE_IRQ); // Setting the priority for EDMA3CC0 Error interrupt in AINTC.
-    
-    IntSystemEnable(SYS_INT_EDMACOMPINT);   // Enabling the EDMA3CC0 completion interrupt in AINTC.    
-    
-    IntSystemEnable(SYS_INT_EDMAERRINT);    // Enabling the EDMA3CC0 Error interrupt in AINTC.
-    
-    UARTModuleReset(UART_INSTANCE_BASE_ADD); // Performing a module reset.
+    dma.init(n_EDMA::EVENT_Q0);
 
+    //IntRegister(SYS_INT_EDMACOMPINT, EDMA3_completion_isr);   // Registering EDMA3 Channel Controller 0 transfer completion interrupt.    
+    //IntPrioritySet(SYS_INT_EDMACOMPINT, 0, AINTC_HOSTINT_ROUTE_IRQ);    // Setting the priority for EDMA3CC0 completion interrupt in AINTC.    
+    //IntRegister(SYS_INT_EDMAERRINT, Edma3CCErrorIsr);   // Registering EDMA3 Channel Controller 0 Error Interrupt.    
+    //IntPrioritySet(SYS_INT_EDMAERRINT, 0, AINTC_HOSTINT_ROUTE_IRQ); // Setting the priority for EDMA3CC0 Error interrupt in AINTC.    
+    //IntSystemEnable(SYS_INT_EDMACOMPINT);   // Enabling the EDMA3CC0 completion interrupt in AINTC.  
+    //IntSystemEnable(SYS_INT_EDMAERRINT);    // Enabling the EDMA3CC0 Error interrupt in AINTC. 
+    
+    intc.register_handler(INTC::EDMACOMPINT, EDMA3_completion_isr);     // Registering EDMA3 Channel Controller 0 transfer completion interrupt.    
+    intc.priority_set(INTC::EDMACOMPINT, 0, INTC::HOSTINT_ROUTE_IRQ);   // Setting the priority for EDMA3CC0 completion interrupt in AINTC.    
+    intc.register_handler(INTC::EDMAERRINT, EDMA3_error_isr);           // Registering EDMA3 Channel Controller 0 Error Interrupt.    
+    intc.priority_set(INTC::EDMAERRINT, 0, INTC::HOSTINT_ROUTE_IRQ);    // Setting the priority for EDMA3CC0 Error interrupt in AINTC.    
+    intc.system_enable(INTC::EDMACOMPINT);                              // Enabling the EDMA3CC0 completion interrupt in AINTC.    
+    intc.system_enable(INTC::EDMAERRINT);                               // Enabling the EDMA3CC0 Error interrupt in AINTC.   
+    
+    //UARTModuleReset(UART_INSTANCE_BASE_ADD); // Performing a module reset.
+    uart_0.module_reset();
+    
 #ifdef UART_ENABLE_FIFO    
-    UartFIFOConfigure();    // Performing FIFO configurations.
+    //UartFIFOConfigure();    // Performing FIFO configurations.
+    uart_0.FIFO_configure_DMA_RxTx(TX_TRIGGER_SPACE_GRAN_1, RX_DMA_THRESHOLD);  // 8, 8
 #else    
-    UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE); // Enabling DMA Mode 1.
+    //UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE); // Enabling DMA Mode 1.
+    uart_0.DMA_enable(n_UART::SCR_DMA_MODE_1);
 #endif
 
 #if (defined UART_ENABLE_FIFO) && (defined DIRECT_TX_DMA_THRESH_MODE)
-    // Selecting the method of setting the Transmit DMA Threshold value.
-    UARTTxDMAThresholdControl(UART_INSTANCE_BASE_ADD, UART_TX_DMA_THRESHOLD_REG);
-
-    // Configuring the Transmit DMA Threshold value. 
-    UARTTxDMAThresholdValConfig(UART_INSTANCE_BASE_ADD, txThreshLevel);
+    //UARTTxDMAThresholdControl(UART_INSTANCE_BASE_ADD, UART_TX_DMA_THRESHOLD_REG);      // Selecting the method of setting the Transmit DMA Threshold value.
+    uart_0.TX_DMA_threshold_control(true);
+     
+    //UARTTxDMAThresholdValConfig(UART_INSTANCE_BASE_ADD, txThreshLevel);  // Configuring the Transmit DMA Threshold value.
+    uart_0.TX_DMA_threshold_val_config(TX_DMA_THRESHOLD);
 #endif
-    // Performing Baud Rate settings.
-    UartBaudRateSet();
     
-    // Switching to Configuration Mode B.
-    UARTRegConfigModeEnable(UART_INSTANCE_BASE_ADD, UART_REG_CONFIG_MODE_B);
-
-    // Programming the Line Characteristics.
-    UARTLineCharacConfig(UART_INSTANCE_BASE_ADD, (UART_FRAME_WORD_LENGTH_8 | UART_FRAME_NUM_STB_1), 
-                         UART_PARITY_NONE);
+    //UartBaudRateSet(); // Performing Baud Rate settings. 
+    //UARTRegConfigModeEnable(UART_INSTANCE_BASE_ADD, UART_REG_CONFIG_MODE_B); // Switching to Configuration Mode B.    
+    //UARTLineCharacConfig(UART_INSTANCE_BASE_ADD, (UART_FRAME_WORD_LENGTH_8 | UART_FRAME_NUM_STB_1), UART_PARITY_NONE); // Programming the Line Characteristics.    
+    //UARTDivisorLatchDisable(UART_INSTANCE_BASE_ADD);                    // Disabling write access to Divisor Latches.    
+    //UARTBreakCtl(UART_INSTANCE_BASE_ADD, UART_BREAK_COND_DISABLE);      // Disabling Break Control.    
+    //UARTOperatingModeSelect(UART_INSTANCE_BASE_ADD, UART16x_OPER_MODE); // Switching to UART16x operating mode.
     
-    UARTDivisorLatchDisable(UART_INSTANCE_BASE_ADD); // Disabling write access to Divisor Latches.
+    uart_0.BAUD_set(BAUD_RATE_115200);                                // Performing Baud Rate settings.
+    uart_0.reg_config_mode_enable(n_UART::CONFIG_MODE_B);   // Switching to Configuration Mode B. 
     
-    UARTBreakCtl(UART_INSTANCE_BASE_ADD, UART_BREAK_COND_DISABLE); // Disabling Break Control.
-    
-    UARTOperatingModeSelect(UART_INSTANCE_BASE_ADD, UART16x_OPER_MODE); // Switching to UART16x operating mode.
+    // Programming the Line Characteristics. 
+    uart_0.char_len_config(n_UART::CHL_8_BITS);
+    uart_0.stop_bit_config(n_UART::STOP_1);
+    uart_0.parity_config(n_UART::PARITY_NONE);
+             
+    uart_0.divisor_latch_disable();                         // Disabling write access to Divisor Latches.        
+    uart_0.break_ctl(false);                                // Disabling Break Control.
+    uart_0.operating_mode_select(n_UART::MODE_UART_16x);    // Switching to UART16x operating mode. 
 
     // Configuring the EDMA.
-
     // Request DMA Channel and TCC for UART Transmit
-    EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA,
-                        EDMA3_UART_TX_CHA_NUM, EDMA3_UART_TX_CHA_NUM,
-                        EVT_QUEUE_NUM);    
-    cb_Fxn[EDMA3_UART_TX_CHA_NUM] = &callback; // Registering Callback Function for TX
+    // EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA, EDMA3_UART_TX_CHA_NUM, EDMA3_UART_TX_CHA_NUM, EVT_QUEUE_NUM);
+    dma.request_channel(n_EDMA::CHANNEL_TYPE_DMA, n_EDMA::CH_UART0_TX, n_EDMA::CH_UART0_TX, n_EDMA::EVENT_Q0);    
+    cb_Fxn[n_EDMA::CH_UART0_TX] = &callback; // Registering Callback Function for TX
 
     // Request DMA Channel and TCC for UART Receive 
-    EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA,
-                        EDMA3_UART_RX_CHA_NUM, EDMA3_UART_RX_CHA_NUM,
-                        EVT_QUEUE_NUM);    
-    cb_Fxn[EDMA3_UART_RX_CHA_NUM] = &callback;  // Registering Callback Function for RX
+    //EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA, EDMA3_UART_RX_CHA_NUM, EDMA3_UART_RX_CHA_NUM, EVT_QUEUE_NUM);    
+    dma.request_channel(n_EDMA::CHANNEL_TYPE_DMA, n_EDMA::CH_UART0_RX, n_EDMA::CH_UART0_RX, n_EDMA::EVENT_Q0);
+    cb_Fxn[n_EDMA::CH_UART0_RX] = &callback;  // Registering Callback Function for RX
     
   ///************************* UART0_EDMA_INIT *************************** ///
   ///******************** Transmission of a string **************************///
@@ -274,28 +268,30 @@ void init_board(void)
     numByteChunks = (sizeof(intent) - 1) / txBytesPerEvent;
     remainBytes = (sizeof(intent) - 1) % txBytesPerEvent;
     
-    UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE);  // Enabling DMA Mode 1.
+    //UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE);  // Enabling DMA Mode 1.
+    uart_0.DMA_enable(n_UART::SCR_DMA_MODE_1);
 
     // Configuring EDMA PaRAM sets to transmit data.
-    UARTTxEDMAPaRAMSetConfig(intent,
+    UART_TX_eDMA_paRAM_set((uint8_t *)intent,
                              numByteChunks * txBytesPerEvent,
-                             EDMA3_UART_TX_CHA_NUM,
-                             EDMA3CC_OPT(DUMMY_CH_NUM),
-                             EDMA3_UART_TX_CHA_NUM);
+                             n_EDMA::CH_UART0_TX,
+                             DUMMY_CH_NUM,
+                             n_EDMA::CH_UART0_TX);
     
-    TxDummyPaRAMConfEnable();       // Configuring the PaRAM set for Dummy Transfer.    
-    EDMA3EnableTransfer(SOC_EDMA30CC_0_REGS, EDMA3_UART_TX_CHA_NUM, EDMA3_TRIG_MODE_EVENT);  // Enable EDMA Transfer
-
+    Tx_dummy_paRAM_config_enable();       // Configuring the PaRAM set for Dummy Transfer.    
+    //EDMA3EnableTransfer(SOC_EDMA30CC_0_REGS, EDMA3_UART_TX_CHA_NUM, EDMA3_TRIG_MODE_EVENT);  // Enable EDMA Transfer
+    dma.enable_transfer(n_EDMA::CH_UART0_TX, n_EDMA::TRIG_MODE_EVENT);
+                        
     // Wait for return from callback
     while(0 == clBackFlag);
     clBackFlag = 0;
 
     // Remaining bytes are transferred through polling method.
-    if(0 != remainBytes)
-    {
-        pBuffer = intent + (sizeof(intent) - 1) - remainBytes;
-        UARTPuts((char*)pBuffer, remainBytes);
-    }
+    //if(0 != remainBytes)
+    //{
+    //    pBuffer = intent + (sizeof(intent) - 1) - remainBytes;
+    //    UARTPuts((char*)pBuffer, remainBytes);
+    //}
     
     ///******************** Transmission of a string **************************///
 
@@ -359,8 +355,10 @@ static void UartBaudRateSet(void)
 /*
 ** EDMA Completion Interrupt Service Routine(ISR).
 */
-static void Edma3CompletionIsr(void)
+static void EDMA3_completion_isr(void *p_Obj)
 {
+    AM335x_EDMA &s_EDMA = *reinterpret_cast<AM335x_EDMA *>(p_Obj);
+    
     volatile unsigned int pendingIrqs;
     unsigned int index = 1;
     unsigned int count = 0;
@@ -411,9 +409,10 @@ static void callback(unsigned int tccNum)
 /*
 ** EDMA Error Interrupt Service Routine(ISR).
 */
-
-static void Edma3CCErrorIsr(void)
+static void EDMA3_error_isr(void *p_Obj)
 {
+    AM335x_EDMA &s_EDMA = *reinterpret_cast<AM335x_EDMA *>(p_Obj);
+
     volatile unsigned int pendingIrqs = 0;
     unsigned int evtqueNum = 0;
     unsigned int index = 1;
@@ -478,117 +477,85 @@ static void Edma3CCErrorIsr(void)
 ** This function configures and sets the EDMA PaRAM set values for
 ** transferring data to UART TX FIFO.
 */
-static void UARTTxEDMAPaRAMSetConfig(unsigned char *txBuffer,
-                                     unsigned int length,
-                                     unsigned int tccNum,
-                                     unsigned short linkAddr,
-                                     unsigned int chNum)
+static void UART_TX_eDMA_paRAM_set(uint8_t *tx_buffer, size_t len, uint32_t tcc_num, uint16_t param_num, uint32_t ch_num)
 {
-    EDMA3CCPaRAMEntry paramSet;
+    n_EDMA::paRAM_entry_t param_set;
 
-    /* Fill the PaRAM Set with transfer specific information */
-    paramSet.srcAddr = (unsigned int) txBuffer;
-    paramSet.destAddr = (unsigned int)UART_THR_RHR_REG;
+    /// Fill the PaRAM Set with transfer specific information ///
+    param_set.SRC = (uint32_t)tx_buffer;
+    param_set.DST = (uint32_t)UART_THR_RHR_REG;
 
-    paramSet.aCnt = (unsigned short)1;
-    paramSet.bCnt = (unsigned short)txBytesPerEvent;
-    paramSet.cCnt = (unsigned short)(length / txBytesPerEvent);
-    paramSet.srcBIdx = (short)1;
-    paramSet.srcCIdx = (short)txBytesPerEvent;
+    param_set.ACNT = (uint16_t)1;
+    param_set.BCNT = (uint16_t)txBytesPerEvent;
+    param_set.CCNT = (uint16_t)(len / txBytesPerEvent);
+    param_set.SRCBIDX = (int16_t)1;
+    param_set.SRCCIDX = (int16_t)txBytesPerEvent;
 
-    /* The destination indexes should not increment since it is a h/w register. */
-    paramSet.destBIdx = (short)0;
-    paramSet.destCIdx = (short)0;
+    /// The destination indexes should not increment since it is a h/w register. ///
+    param_set.DSTBIDX = (int16_t)0;
+    param_set.DSTCIDX = (int16_t)0;
 
-    paramSet.linkAddr = (unsigned short)linkAddr;
-    paramSet.bCntReload = (unsigned short)0;
+    param_set.LINK = (uint16_t)*n_EDMA::get_paRAM_ptr(param_num);
+    param_set.BCNTRLD = (uint16_t)0;
 
-    /* OPT PaRAM entries. */
-    paramSet.opt = (unsigned int)0x0;
-
-    /* Source and Destination addressing modes are Incremental. */
-
-    /* AB Synchronized Transfer. */
-    paramSet.opt |= (1 << EDMA3CC_OPT_SYNCDIM_SHIFT);
-
-    /* Setting the Transfer Complete Code(TCC). */
-    paramSet.opt |= ((tccNum << EDMA3CC_OPT_TCC_SHIFT) & EDMA3CC_OPT_TCC);
-
-    /* Enabling the Completion Interrupt. */
-    paramSet.opt |= (1 << EDMA3CC_OPT_TCINTEN_SHIFT);
-
-    /* Now write the PaRAM Set */
-    EDMA3SetPaRAM(SOC_EDMA30CC_0_REGS, chNum, &paramSet);
+    /// OPT PaRAM Entries. ///
+    ///Source and Destination addressing modes are Incremental.//
+    param_set.OPT.b.SYNCDIM = HIGH;     // AB_sync
+    param_set.OPT.b.TCC = tcc_num;      // Setting the Transfer Complete Code(TCC).
+    param_set.OPT.b.TCINTEN = HIGH;     // Enabling the Completion Interrupt.
+    
+    dma.set_paRAM(ch_num, &param_set);  //Now write the PaRAM set
 }
 
-/*
-** This function configures and sets the EDMA PaRAM set values for
-** receiving data from UART RX FIFO.
-*/
-static void UARTRxEDMAPaRAMSetConfig(unsigned char *rxBuffer,
-                                     unsigned int length,
-                                     unsigned int tccNum,
-                                     unsigned short linkAddr,
-                                     unsigned int chNum)
+
+static void UART_RX_eDMA_paRAM_set(uint8_t *rx_buffer, size_t len, uint32_t tcc_num, uint16_t param_num, uint32_t ch_num)
 {
-    EDMA3CCPaRAMEntry paramSet;
+    n_EDMA::paRAM_entry_t param_set;
 
-    /* Fill the PaRAM Set with transfer specific information */
-    paramSet.srcAddr = (unsigned int)UART_THR_RHR_REG;
-    paramSet.destAddr = (unsigned int)rxBuffer;
+    /// Fill the PaRAM Set with transfer specific information ///
+    param_set.SRC = (uint32_t)UART_THR_RHR_REG;
+    param_set.DST = (uint32_t)rx_buffer;
 
-    paramSet.aCnt = (unsigned short)1;
-    paramSet.bCnt = (unsigned short)(rxTrigLevel);
-    paramSet.cCnt = (unsigned short)(length / rxTrigLevel);
-    paramSet.destBIdx = (short)1;
-    paramSet.destCIdx = (short)rxTrigLevel;
+    param_set.ACNT = (uint16_t)1;
+    param_set.BCNT = (uint16_t)(rxTrigLevel);
+    param_set.CCNT = (uint16_t)(len / rxTrigLevel);
+    param_set.DSTBIDX = (int16_t)1;
+    param_set.DSTCIDX = (int16_t)rxTrigLevel;
 
-    paramSet.srcBIdx = (short)0;
-    paramSet.srcCIdx = (short)0;
+    param_set.SRCBIDX = (int16_t)0;
+    param_set.SRCCIDX = (int16_t)0;
 
-    paramSet.linkAddr = (unsigned short)linkAddr;
-    paramSet.bCntReload = (unsigned short)0;
+    param_set.LINK = (uint16_t)*n_EDMA::get_paRAM_ptr(param_num);
+    param_set.BCNTRLD = (uint16_t)0;
 
-    /* OPT PaRAM Entries. */
-    paramSet.opt = (unsigned int)0x0;
-
-    /* Source and Destination addressing modes are Incremental. */
-
-    /* Enable AB Synchronized Transfer. */
-    paramSet.opt |= (1 << EDMA3CC_OPT_SYNCDIM_SHIFT);
-
-    /* Setting the Transfer Complete Code(TCC). */
-    paramSet.opt |= ((tccNum << EDMA3CC_OPT_TCC_SHIFT) & EDMA3CC_OPT_TCC);
-
-    /* Enabling the Completion Interrupt. */
-    paramSet.opt |= (1 << EDMA3CC_OPT_TCINTEN_SHIFT);
-
-    /* Now write the PaRAM Set */
-    EDMA3SetPaRAM(SOC_EDMA30CC_0_REGS, chNum, &paramSet);
+    /// OPT PaRAM Entries. ///
+    ///Source and Destination addressing modes are Incremental.//
+    param_set.OPT.b.SYNCDIM = HIGH;     // AB_sync
+    param_set.OPT.b.TCC = tcc_num;      // Setting the Transfer Complete Code(TCC).
+    param_set.OPT.b.TCINTEN = HIGH;     // Enabling the Completion Interrupt.
+    
+    dma.set_paRAM(ch_num, &param_set);  //Now write the PaRAM set
 }
 
-/*
-** This configures the PaRAM set for the Dummy Transfer.
-*/
 
-static void TxDummyPaRAMConfEnable(void)
+//This configures the PaRAM set for the Dummy Transfer.
+static void Tx_dummy_paRAM_config_enable(void)
 {
-    EDMA3CCPaRAMEntry dummyPaRAMSet;
+    n_EDMA::paRAM_entry_t dummy_param_set;
 
-    dummyPaRAMSet.aCnt = 1;
-    dummyPaRAMSet.bCnt = 0;
-    dummyPaRAMSet.cCnt = 0;
-    dummyPaRAMSet.srcAddr = 0;
-    dummyPaRAMSet.destAddr = 0;
-    dummyPaRAMSet.srcBIdx = 0;
-    dummyPaRAMSet.destBIdx = 0;
-    dummyPaRAMSet.srcCIdx = 0;
-    dummyPaRAMSet.destCIdx = 0; 
-    dummyPaRAMSet.linkAddr = 0xFFFF;
-    dummyPaRAMSet.bCntReload = 0;
-    dummyPaRAMSet.opt = 0;
+    dummy_param_set.ACNT = 1;
+    dummy_param_set.BCNT = 0;
+    dummy_param_set.CCNT = 0;
+    dummy_param_set.SRC = 0;
+    dummy_param_set.DST = 0;
+    dummy_param_set.SRCBIDX = 0;
+    dummy_param_set.DSTBIDX = 0;
+    dummy_param_set.SRCCIDX = 0;
+    dummy_param_set.DSTCIDX = 0; 
+    dummy_param_set.LINK = 0xFFFF;
+    dummy_param_set.BCNTRLD = 0;
 
-    EDMA3SetPaRAM(SOC_EDMA30CC_0_REGS, DUMMY_CH_NUM, &dummyPaRAMSet);
+    dma.set_paRAM(DUMMY_CH_NUM, &dummy_param_set);
 }
 
 void GPIOModuleClkConfig(CPU_INT32U x)

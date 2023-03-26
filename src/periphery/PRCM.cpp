@@ -501,8 +501,8 @@ void  power_reset_clock_control::run_EDMA_clk(void* p_Obj)
     // Writing to MODULEMODE field of CM_PER_TPTC2_CLKCTRL register.
     //HWREG(SOC_CM_PER_REGS + CM_PER_TPTC2_CLKCTRL) |= CM_PER_TPTC2_CLKCTRL_MODULEMODE_ENABLE;
     //while(CM_PER_TPTC2_CLKCTRL_MODULEMODE_ENABLE != (HWREG(SOC_CM_PER_REGS + CM_PER_TPTC2_CLKCTRL) & CM_PER_TPTC2_CLKCTRL_MODULEMODE));
-    m_CM_PER_regs.TPTC1_CLKCTRL.b.MODULEMODE = PRCM::MODULEMODE_ENABLE;         // Writing to MODULEMODE field of CM_PER_TPTC1_CLKCTRL register.
-    while(m_CM_PER_regs.TPTC1_CLKCTRL.b.MODULEMODE != PRCM::MODULEMODE_ENABLE); // Waiting for MODULEMODE field to reflect the written value.
+    m_CM_PER_regs.TPTC2_CLKCTRL.b.MODULEMODE = PRCM::MODULEMODE_ENABLE;         // Writing to MODULEMODE field of CM_PER_TPTC1_CLKCTRL register.
+    while(m_CM_PER_regs.TPTC2_CLKCTRL.b.MODULEMODE != PRCM::MODULEMODE_ENABLE); // Waiting for MODULEMODE field to reflect the written value.
 
 	//	DMA in non-idle mode
 	//HWREG(0x49800010) = 0x00000028;
@@ -521,11 +521,11 @@ void  power_reset_clock_control::run_EDMA_clk(void* p_Obj)
     while(m_CM_PER_regs.TPCC_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);            // Waiting for IDLEST field in CM_PER_TPCC_CLKCTRL register to attain the desired value.
     
     while(m_CM_PER_regs.TPTC0_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);           // Waiting for IDLEST field in CM_PER_TPTC0_CLKCTRL register to attain the desired value.
-    while(m_CM_PER_regs.TPTC0_CLKCTRL.b.STBYST != PRCM::STBYST_STNDBY);         // Waiting for STBYST field in CM_PER_TPTC0_CLKCTRL register to attain the desired value.
+    while(m_CM_PER_regs.TPTC0_CLKCTRL.b.STBYST != PRCM::STBYST_FUNC);         // Waiting for STBYST field in CM_PER_TPTC0_CLKCTRL register to attain the desired value.
     
     while(m_CM_PER_regs.TPTC1_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);           // Waiting for IDLEST field in CM_PER_TPTC1_CLKCTRL register to attain the desired value.
-    while(m_CM_PER_regs.TPTC1_CLKCTRL.b.STBYST != PRCM::STBYST_STNDBY);         // Waiting for STBYST field in CM_PER_TPTC1_CLKCTRL register to attain the desired value.
+    while(m_CM_PER_regs.TPTC1_CLKCTRL.b.STBYST != PRCM::STBYST_FUNC);         // Waiting for STBYST field in CM_PER_TPTC1_CLKCTRL register to attain the desired value.
     
     while(m_CM_PER_regs.TPTC2_CLKCTRL.b.IDLEST != PRCM::IDLEST_FUNC);           // Waiting for IDLEST field in CM_PER_TPTC2_CLKCTRL register to attain the desired value..
-    while(m_CM_PER_regs.TPTC2_CLKCTRL.b.STBYST != PRCM::STBYST_STNDBY);         // Waiting for STBYST field in CM_PER_TPTC2_CLKCTRL register to attain the desired value..    
+    while(m_CM_PER_regs.TPTC2_CLKCTRL.b.STBYST != PRCM::STBYST_FUNC);         // Waiting for STBYST field in CM_PER_TPTC2_CLKCTRL register to attain the desired value..    
 }

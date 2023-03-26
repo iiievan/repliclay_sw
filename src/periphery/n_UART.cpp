@@ -58,7 +58,7 @@ void AM335x_UART::FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl
     FIFO_config(cfg_scr, trigger_lvl_cfg, cfg_fcr);
 }
 
-void  FIFO_configure_DMA_RxTx(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl)
+void  AM335x_UART::FIFO_configure_DMA_RxTx(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl)
 {
     n_UART::SCR_reg_t  cfg_scr         = {.reg = 0x0 };
     n_UART::TLR_reg_t  trigger_lvl_cfg = {.reg = 0x0 };
@@ -66,8 +66,8 @@ void  FIFO_configure_DMA_RxTx(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl)
     
     cfg_scr.b.TXTRIGGRANU1 = 0x1;
     cfg_scr.b.RXTRIGGRANU1 = 0x1;
-    cfg_scr.b.DMAMODECTL   = 0x1;
-    cfg_scr.b.DMAMODE2     = n_UART::SCR_DMA_MODE_0;    // no dma
+    cfg_scr.b.DMAMODECTL   = 0x0;
+    cfg_fcr.b.DMA_MODE     = HIGH;  // n_UART::SCR_DMA_MODE_1
 
     tx_trig_lvl &= 0x003F;                                             // 'tx_trig_lvl' now has the 6-bit TX Trigger level value.
     trigger_lvl_cfg.b.TX_FIFO_TRIG_DMA  = (tx_trig_lvl & 0x003C) >> 2; // Collecting the bits tx_trig_lvl[5:2].        
@@ -171,7 +171,7 @@ n_UART::FCR_reg_t AM335x_UART::FIFO_config(n_UART::SCR_reg_t  cfg_scr,
         
     // Setting the EFR[4] bit to 1. 
     enhan_fn_bit_val = enhan_func_enable();
-     tcr_tlr_bit_val = sub_config_TCRTLR_mode_en();
+     tcr_tlr_bit_val = sub_config_TCRTLR_mode_en();  // enable access to tcr or tlr registers
      
      cfg_fcr.b.FIFO_EN = HIGH;
            
@@ -773,7 +773,7 @@ n_UART::e_UART_INSTANCE_NUM  AM335x_UART::get_UART_inst_number()
  *         of the four available DMA modes while FCR[3] allows the program to
  *         use either DMA Mode 0 or DMA Mode 1.\n
  */
-void  AM335x_UART::DMA_enable(uint32_t dma_mode_flag)
+void  AM335x_UART::DMA_enable(n_UART::e_SCR_DMA_MODE dma_mode_flag)
 {
     //HWREG(baseAdd + UART_SCR) |= (UART_SCR_DMA_MODE_CTL);   // Setting the DMAMODECTL bit in SCR to 1.    
     //HWREG(baseAdd + UART_SCR) &= ~(UART_SCR_DMA_MODE_2);    // Clearing the DMAMODE2 field in SCR.    

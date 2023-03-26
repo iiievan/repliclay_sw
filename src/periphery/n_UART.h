@@ -1568,7 +1568,7 @@ n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr,
  n_UART::e_UART_INSTANCE_NUM  get_UART_inst_number();
        INTC::e_SYS_INTERRUPT  get_UART_sys_interrupt();
 
-      void  DMA_enable(uint32_t dma_mode_flag);
+      void  DMA_enable(n_UART::e_SCR_DMA_MODE dma_mode_flag);
       void  DMA_disable();
       void  FIFO_register_write(n_UART::FCR_reg_t  cfg_fcr);
   uint32_t  enhan_func_enable();

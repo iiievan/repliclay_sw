@@ -1185,9 +1185,7 @@ namespace n_EDMA
     { 
         struct 
         {   
-            uint32_t                  :1;   // bit: 0        Reserved. 
-            uint32_t    FREEEMU       :1;   // bit: 1        (RW) [0x0 = is sensitive to emulation suspend.; 
-                                            //                     0x1 = is not sensitive to emulation suspend event]  
+            uint32_t                  :2;   // bit: 0,1       Reserved. 
             uint32_t    IDLEMODE      :2;   // bit: 2,3      (RW) [ see e_SYSC_IDLEMODE ]
             uint32_t    STANDBYMODE   :2;   // bit: 4,5      (RW) [ see e_SYSC_STANDBYMODE ]
             uint32_t                  :26;  // bit: 6..31    Reserved.          
@@ -2181,33 +2179,33 @@ namespace n_EDMA
             uint32_t  reg;                  // Type used for register access
         } OPT;
 
-        uint32_t  SRC;          // The byte address from which data is transferred 
+        uint32_t  SRC { 0 };          // The byte address from which data is transferred 
         
-        uint16_t  ACNT;         // Unsigned value specifying the number of contiguous bytes
+        uint16_t  ACNT { 0 };         // Unsigned value specifying the number of contiguous bytes
                                 // within an array (first dimension of the transfer). Valid values
                                 // range from 1 to 65 535.
         
-        uint16_t  BCNT;         // Unsigned value specifying the number of arrays in a frame,
+        uint16_t  BCNT { 0 };         // Unsigned value specifying the number of arrays in a frame,
                                 // where an array is ACNT bytes. Valid values range from 1 to 65 535.
         
-        uint32_t  DST;          // The byte address to which data is transferred
+        uint32_t  DST { 0 };          // The byte address to which data is transferred
         
-         int16_t  SRCBIDX;      // Signed value specifying the byte address offset between
+         int16_t  SRCBIDX { 0 };      // Signed value specifying the byte address offset between
                                 // source arrays within a frame (2nd dimension). Valid values range from –32 768 and 32 767.
          
-         int16_t  DSTBIDX;      // Signed value specifying the byte address offset between
+         int16_t  DSTBIDX { 0 };      // Signed value specifying the byte address offset between
                                 // destination arrays within a frame (2nd dimension). Valid
                                 // values range from –32 768 and 32 767.
          
-        uint16_t  LINK;         // The PaRAM address containing the PaRAM set to be linked
+        uint16_t  LINK { 0 };         // The PaRAM address containing the PaRAM set to be linked
                                 // (copied from) when the current PaRAM set is exhausted. A
                                 // value of FFFFh specifies a null link.
         
-        uint16_t  BCNTRLD;      // The count value used to reload BCNT when BCNT
+        uint16_t  BCNTRLD { 0 };      // The count value used to reload BCNT when BCNT
                                 // decrements to 0 (TR is submitted for the last array in 2nd
                                 // dimension). Only relevant in A-synchronized transfers.
         
-         int16_t  SRCCIDX;      // Signed value specifying the byte address offset between
+         int16_t  SRCCIDX { 0 };      // Signed value specifying the byte address offset between
                                 // frames within a block (3rd dimension). Valid values range
                                 // from –32 768 and 32 767.
                                 // A-synchronized transfers: The byte address offset from the
@@ -2217,7 +2215,7 @@ namespace n_EDMA
                                 // beginning of the first source array in a frame to the
                                 // beginning of the first source array in the next frame.
          
-         int16_t  DSTCIDX;      // Signed value specifying the byte address offset between
+         int16_t  DSTCIDX { 0 };      // Signed value specifying the byte address offset between
                                 // frames within a block (3rd dimension). Valid values range
                                 // from –32 768 and 32 767.
                                 // A-synchronized transfers: The byte address offset from the
@@ -2227,13 +2225,13 @@ namespace n_EDMA
                                 // beginning of the first destination array in a frame to the
                                 // beginning of the first destination array in the next frame.
          
-        uint16_t  CCNT;         // Unsigned value specifying the number of frames in a block,
+        uint16_t  CCNT { 0 };         // Unsigned value specifying the number of frames in a block,
                                 // where a frame is BCNT arrays of ACNT bytes. Valid values range from 1 to 65 535.
         
         uint16_t  RESERVED;     // Reserved. Always write 0 to this bit; writes of 1 to this bit are
                                 // not supported and attempts to do so may result in undefined behavior.
 
-        paRAM_entry_t() { }
+        paRAM_entry_t() { OPT.reg = 0; }
 
         paRAM_entry_t& operator =(const paRAM_entry_t &right)
         {
@@ -2365,48 +2363,48 @@ namespace n_EDMA
         
     } EDMACONTEXT_t;
 
-     DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id);
-    DRAEH_reg_t*& get_DRAEH_reference(e_REGION_ID region_id);    
+     DRAE_reg_t*& get_DRAE_ptr(e_REGION_ID region_id);
+    DRAEH_reg_t*& get_DRAEH_ptr(e_REGION_ID region_id);    
         uint32_t  DMAQNUM_CLR(uint32_t count);
         uint32_t  DMAQNUM_SET(uint32_t count, e_DMA_QUEUE que_num);
         uint32_t  QDMAQNUM_CLR(uint32_t count);
         uint32_t  QDMAQNUM_SET(uint32_t count, e_DMA_QUEUE que_num);
 
-       ER_reg_t*& get_S_ER_reference(e_REGION_ID region_id);
-    //ERH_reg_t*& get_S_ERH_reference(e_REGION_ID region_id); 
-      ECR_reg_t*& get_S_ECR_reference(e_REGION_ID region_id); 
-     ECRH_reg_t*& get_S_ECRH_reference(e_REGION_ID region_id); 
-      ESR_reg_t*& get_S_ESR_reference(e_REGION_ID region_id);
-     ESRH_reg_t*& get_S_ESRH_reference(e_REGION_ID region_id); 
-      CER_reg_t*& get_S_CER_reference(e_REGION_ID region_id); 
-   //CERH_reg_t*& get_S_CERH_reference(e_REGION_ID region_id); 
-      EER_reg_t*& get_S_EER_reference(e_REGION_ID region_id);
-     EERH_reg_t*& get_S_EERH_reference(e_REGION_ID region_id); 
-     EECR_reg_t*& get_S_EECR_reference(e_REGION_ID region_id); 
-    EECRH_reg_t*& get_S_EECRH_reference(e_REGION_ID region_id); 
-     EESR_reg_t*& get_S_EESR_reference(e_REGION_ID region_id); 
-    EESRH_reg_t*& get_S_EESRH_reference(e_REGION_ID region_id);
-      SER_reg_t*& get_S_SER_reference(e_REGION_ID region_id); 
-     SERH_reg_t*& get_S_SERH_reference(e_REGION_ID region_id);
-     SECR_reg_t*& get_S_SECR_reference(e_REGION_ID region_id); 
-    SECRH_reg_t*& get_S_SECRH_reference(e_REGION_ID region_id);
-      IER_reg_t*& get_S_IER_reference(e_REGION_ID region_id);    
-     IERH_reg_t*& get_S_IERH_reference(e_REGION_ID region_id);   
-     IECR_reg_t*& get_S_IECR_reference(e_REGION_ID region_id);   
-    IECRH_reg_t*& get_S_IECRH_reference(e_REGION_ID region_id);  
-     IESR_reg_t*& get_S_IESR_reference(e_REGION_ID region_id);   
-    IESRH_reg_t*& get_S_IESRH_reference(e_REGION_ID region_id);  
-      IPR_reg_t*& get_S_IPR_reference(e_REGION_ID region_id);    
-     IPRH_reg_t*& get_S_IPRH_reference(e_REGION_ID region_id);   
-      ICR_reg_t*& get_S_ICR_reference(e_REGION_ID region_id);    
-     ICRH_reg_t*& get_S_ICRH_reference(e_REGION_ID region_id);   
-    IEVAL_reg_t*& get_S_IEVAL_reference(e_REGION_ID region_id);  
-      QER_reg_t*& get_S_QER_reference(e_REGION_ID region_id);   
-     QEER_reg_t*& get_S_QEER_reference(e_REGION_ID region_id);  
-    QEECR_reg_t*& get_S_QEECR_reference(e_REGION_ID region_id); 
-    QEESR_reg_t*& get_S_QEESR_reference(e_REGION_ID region_id); 
-     QSER_reg_t*& get_S_QSER_reference(e_REGION_ID region_id);  
-    QSECR_reg_t*& get_S_QSECR_reference(e_REGION_ID region_id);
+       ER_reg_t*& get_S_ER_ptr(e_REGION_ID region_id);
+    //ERH_reg_t*& get_S_ERH_ptr(e_REGION_ID region_id); 
+      ECR_reg_t*& get_S_ECR_ptr(e_REGION_ID region_id); 
+     ECRH_reg_t*& get_S_ECRH_ptr(e_REGION_ID region_id); 
+      ESR_reg_t*& get_S_ESR_ptr(e_REGION_ID region_id);
+     ESRH_reg_t*& get_S_ESRH_ptr(e_REGION_ID region_id); 
+      CER_reg_t*& get_S_CER_ptr(e_REGION_ID region_id); 
+   //CERH_reg_t*& get_S_CERH_ptr(e_REGION_ID region_id); 
+      EER_reg_t*& get_S_EER_ptr(e_REGION_ID region_id);
+     EERH_reg_t*& get_S_EERH_ptr(e_REGION_ID region_id); 
+     EECR_reg_t*& get_S_EECR_ptr(e_REGION_ID region_id); 
+    EECRH_reg_t*& get_S_EECRH_ptr(e_REGION_ID region_id); 
+     EESR_reg_t*& get_S_EESR_ptr(e_REGION_ID region_id); 
+    EESRH_reg_t*& get_S_EESRH_ptr(e_REGION_ID region_id);
+      SER_reg_t*& get_S_SER_ptr(e_REGION_ID region_id); 
+     SERH_reg_t*& get_S_SERH_ptr(e_REGION_ID region_id);
+     SECR_reg_t*& get_S_SECR_ptr(e_REGION_ID region_id); 
+    SECRH_reg_t*& get_S_SECRH_ptr(e_REGION_ID region_id);
+      IER_reg_t*& get_S_IER_ptr(e_REGION_ID region_id);    
+     IERH_reg_t*& get_S_IERH_ptr(e_REGION_ID region_id);   
+     IECR_reg_t*& get_S_IECR_ptr(e_REGION_ID region_id);   
+    IECRH_reg_t*& get_S_IECRH_ptr(e_REGION_ID region_id);  
+     IESR_reg_t*& get_S_IESR_ptr(e_REGION_ID region_id);   
+    IESRH_reg_t*& get_S_IESRH_ptr(e_REGION_ID region_id);  
+      IPR_reg_t*& get_S_IPR_ptr(e_REGION_ID region_id);    
+     IPRH_reg_t*& get_S_IPRH_ptr(e_REGION_ID region_id);   
+      ICR_reg_t*& get_S_ICR_ptr(e_REGION_ID region_id);    
+     ICRH_reg_t*& get_S_ICRH_ptr(e_REGION_ID region_id);   
+    IEVAL_reg_t*& get_S_IEVAL_ptr(e_REGION_ID region_id);  
+      QER_reg_t*& get_S_QER_ptr(e_REGION_ID region_id);   
+     QEER_reg_t*& get_S_QEER_ptr(e_REGION_ID region_id);  
+    QEECR_reg_t*& get_S_QEECR_ptr(e_REGION_ID region_id); 
+    QEESR_reg_t*& get_S_QEESR_ptr(e_REGION_ID region_id); 
+     QSER_reg_t*& get_S_QSER_ptr(e_REGION_ID region_id);  
+    QSECR_reg_t*& get_S_QSECR_ptr(e_REGION_ID region_id);
 
         uint32_t* get_paRAM_ptr(uint32_t n);                
         uint32_t* get_SRC_ptr(uint32_t n);                
@@ -2417,13 +2415,13 @@ namespace n_EDMA
         uint32_t* get_SRC_DST_CIDX_ptr(uint32_t n);       
         uint32_t* get_CCNT_ptr(uint32_t n);               
 
-    inline DRAE_reg_t*& get_DRAE_reference(e_REGION_ID region_id) 
+    inline DRAE_reg_t*& get_DRAE_ptr(e_REGION_ID region_id) 
     {
         uint32_t DRAE = (AM335x_EDMA3CC_BASE + 0x340 + (region_id * 8));      
         return (DRAE_reg_t*&)DRAE;
     }
     
-    inline DRAEH_reg_t*& get_DRAEH_reference(e_REGION_ID region_id) 
+    inline DRAEH_reg_t*& get_DRAEH_ptr(e_REGION_ID region_id) 
     {
         uint32_t DRAEH = (AM335x_EDMA3CC_BASE + 0x344 + (region_id * 8));        
         return (DRAEH_reg_t*&)DRAEH;
@@ -2441,201 +2439,201 @@ namespace n_EDMA
     inline uint32_t  QDMAQNUM_SET(uint32_t ch_num, e_DMA_QUEUE que_num)
     { return ((0x7u & ((uint32_t)que_num)) << (ch_num*4u)); }
 
-    inline   ER_reg_t*& get_S_ER_reference(e_REGION_ID region_id)
+    inline   ER_reg_t*& get_S_ER_ptr(e_REGION_ID region_id)
     {
-        uint32_t ER = 0x2000 +  (0X200*region_id);        
+        uint32_t ER = AM335x_EDMA3CC_BASE + 0x2000 +  (0X200*region_id);        
         return (ER_reg_t*&)ER;
     }
 
-    inline  ECR_reg_t*& get_S_ECR_reference(e_REGION_ID region_id) 
+    inline  ECR_reg_t*& get_S_ECR_ptr(e_REGION_ID region_id) 
     {
-        uint32_t ECR = 0x2008 +  (0X200*region_id);        
+        uint32_t ECR = AM335x_EDMA3CC_BASE + 0x2008 +  (0X200*region_id);        
         return (ECR_reg_t*&)ECR;
     }
 
-    inline ECRH_reg_t*& get_S_ECRH_reference(e_REGION_ID region_id) 
+    inline ECRH_reg_t*& get_S_ECRH_ptr(e_REGION_ID region_id) 
     {
-        uint32_t ECRH = 0x200C +  (0X200*region_id);        
+        uint32_t ECRH = AM335x_EDMA3CC_BASE + 0x200C +  (0X200*region_id);        
         return (ECRH_reg_t*&)ECRH;
     }
 
-    inline  ESR_reg_t*& get_S_ESR_reference(e_REGION_ID region_id)
+    inline  ESR_reg_t*& get_S_ESR_ptr(e_REGION_ID region_id)
     {
-        uint32_t ESR = 0x2010 +  (0X200*region_id);        
+        uint32_t ESR = AM335x_EDMA3CC_BASE + 0x2010 +  (0X200*region_id);        
         return (ESR_reg_t*&)ESR;
     }
 
-    inline ESRH_reg_t*& get_S_ESRH_reference(e_REGION_ID region_id)
+    inline ESRH_reg_t*& get_S_ESRH_ptr(e_REGION_ID region_id)
     {
-        uint32_t ESRH = 0x2014 +  (0X200*region_id);        
+        uint32_t ESRH = AM335x_EDMA3CC_BASE + 0x2014 +  (0X200*region_id);        
         return (ESRH_reg_t*&)ESRH;
     }
 
-    inline  CER_reg_t*& get_S_CER_reference(e_REGION_ID region_id) 
+    inline  CER_reg_t*& get_S_CER_ptr(e_REGION_ID region_id) 
     {
-        uint32_t CER = 0x2018 +  (0X200*region_id);        
+        uint32_t CER = AM335x_EDMA3CC_BASE + 0x2018 +  (0X200*region_id);        
         return (CER_reg_t*&)CER;
     }
 
-    inline  EER_reg_t*& get_S_EER_reference(e_REGION_ID region_id)
+    inline  EER_reg_t*& get_S_EER_ptr(e_REGION_ID region_id)
     {
-        uint32_t EER = 0x2020 +  (0X200*region_id);        
+        uint32_t EER = AM335x_EDMA3CC_BASE + 0x2020 +  (0X200*region_id);        
         return (EER_reg_t*&)EER;
     }
 
-    inline EERH_reg_t*& get_S_EERH_reference(e_REGION_ID region_id)
+    inline EERH_reg_t*& get_S_EERH_ptr(e_REGION_ID region_id)
     {
-        uint32_t EERH = 0x2024 +  (0X200*region_id);        
+        uint32_t EERH = AM335x_EDMA3CC_BASE + 0x2024 +  (0X200*region_id);        
         return (EERH_reg_t*&)EERH;
     }
 
-    inline EECR_reg_t*& get_S_EECR_reference(e_REGION_ID region_id)
+    inline EECR_reg_t*& get_S_EECR_ptr(e_REGION_ID region_id)
     {
-        uint32_t EECR = 0x2028 +  (0X200*region_id);        
+        uint32_t EECR = AM335x_EDMA3CC_BASE + 0x2028 +  (0X200*region_id);        
         return (EECR_reg_t*&)EECR;
     }
 
-    inline EECRH_reg_t*& get_S_EECRH_reference(e_REGION_ID region_id)
+    inline EECRH_reg_t*& get_S_EECRH_ptr(e_REGION_ID region_id)
     {
-        uint32_t EECRH = 0x202C +  (0X200*region_id);        
+        uint32_t EECRH = AM335x_EDMA3CC_BASE + 0x202C +  (0X200*region_id);        
         return (EECRH_reg_t*&)EECRH;
     }
 
-    inline EESR_reg_t*& get_S_EESR_reference(e_REGION_ID region_id)
+    inline EESR_reg_t*& get_S_EESR_ptr(e_REGION_ID region_id)
     {
-        uint32_t EESR = 0x2030 +  (0X200*region_id);        
+        uint32_t EESR = AM335x_EDMA3CC_BASE + 0x2030 +  (0X200*region_id);        
         return (EESR_reg_t*&)EESR;
     }
 
-    inline EESRH_reg_t*& get_S_EESRH_reference(e_REGION_ID region_id)
+    inline EESRH_reg_t*& get_S_EESRH_ptr(e_REGION_ID region_id)
     {
-        uint32_t EESRH = 0x2034 +  (0X200*region_id);        
+        uint32_t EESRH = AM335x_EDMA3CC_BASE + 0x2034 +  (0X200*region_id);        
         return (EESRH_reg_t*&)EESRH;
     }
 
-    inline  SER_reg_t*& get_S_SER_reference(e_REGION_ID region_id) 
+    inline  SER_reg_t*& get_S_SER_ptr(e_REGION_ID region_id) 
     {
-        uint32_t SER = 0x2038 +  (0X200*region_id);        
+        uint32_t SER = AM335x_EDMA3CC_BASE + 0x2038 +  (0X200*region_id);        
         return (SER_reg_t*&)SER;
     }
 
-    inline SERH_reg_t*& get_S_SERH_reference(e_REGION_ID region_id)
+    inline SERH_reg_t*& get_S_SERH_ptr(e_REGION_ID region_id)
     {
-        uint32_t SERH = 0x203C +  (0X200*region_id);        
+        uint32_t SERH = AM335x_EDMA3CC_BASE + 0x203C +  (0X200*region_id);        
         return (SERH_reg_t*&)SERH;
     }
 
-    inline SECR_reg_t*& get_S_SECR_reference(e_REGION_ID region_id)
+    inline SECR_reg_t*& get_S_SECR_ptr(e_REGION_ID region_id)
     {
-        uint32_t SECR = 0x2040 +  (0X200*region_id);        
+        uint32_t SECR = AM335x_EDMA3CC_BASE + 0x2040 +  (0X200*region_id);        
         return (SECR_reg_t*&)SECR;
     }
 
-    inline SECRH_reg_t*& get_S_SECRH_reference(e_REGION_ID region_id)
+    inline SECRH_reg_t*& get_S_SECRH_ptr(e_REGION_ID region_id)
     {
-        uint32_t SECRH = 0x2044 +  (0X200*region_id);        
+        uint32_t SECRH = AM335x_EDMA3CC_BASE + 0x2044 +  (0X200*region_id);        
         return (SECRH_reg_t*&)SECRH;
     }
 
-    inline  IER_reg_t*& get_S_IER_reference(e_REGION_ID region_id)
+    inline  IER_reg_t*& get_S_IER_ptr(e_REGION_ID region_id)
     {
-        uint32_t IER = 0x2050 +  (0X200*region_id);        
+        uint32_t IER = AM335x_EDMA3CC_BASE + 0x2050 +  (0X200*region_id);        
         return (IER_reg_t*&)IER;
     }
 
-    inline IERH_reg_t*& get_S_IERH_reference(e_REGION_ID region_id)
+    inline IERH_reg_t*& get_S_IERH_ptr(e_REGION_ID region_id)
     {
-        uint32_t IERH = 0x2054 +  (0X200*region_id);        
+        uint32_t IERH = AM335x_EDMA3CC_BASE + 0x2054 +  (0X200*region_id);        
         return (IERH_reg_t*&)IERH;
     }
 
-    inline IECR_reg_t*& get_S_IECR_reference(e_REGION_ID region_id)
+    inline IECR_reg_t*& get_S_IECR_ptr(e_REGION_ID region_id)
     {
-        uint32_t IECR = 0x2058 +  (0X200*region_id);        
+        uint32_t IECR = AM335x_EDMA3CC_BASE + 0x2058 +  (0X200*region_id);        
         return (IECR_reg_t*&)IECR;
     }
 
-    inline IECRH_reg_t*& get_S_IECRH_reference(e_REGION_ID region_id) 
+    inline IECRH_reg_t*& get_S_IECRH_ptr(e_REGION_ID region_id) 
     {
-        uint32_t IECRH = 0x205C +  (0X200*region_id);        
+        uint32_t IECRH = AM335x_EDMA3CC_BASE + 0x205C +  (0X200*region_id);        
         return (IECRH_reg_t*&)IECRH;
     }
 
-    inline IESR_reg_t*& get_S_IESR_reference(e_REGION_ID region_id)
+    inline IESR_reg_t*& get_S_IESR_ptr(e_REGION_ID region_id)
     {
-        uint32_t IESR = 0x2060 +  (0X200*region_id);        
+        uint32_t IESR = AM335x_EDMA3CC_BASE + 0x2060 +  (0X200*region_id);        
         return (IESR_reg_t*&)IESR;
     }
 
-    inline IESRH_reg_t*& get_S_IESRH_reference(e_REGION_ID region_id)
+    inline IESRH_reg_t*& get_S_IESRH_ptr(e_REGION_ID region_id)
     {
-        uint32_t IESRH = 0x2064 +  (0X200*region_id);        
+        uint32_t IESRH = AM335x_EDMA3CC_BASE + 0x2064 +  (0X200*region_id);        
         return (IESRH_reg_t*&)IESRH;
     }
 
-    inline  IPR_reg_t*& get_S_IPR_reference(e_REGION_ID region_id)
+    inline  IPR_reg_t*& get_S_IPR_ptr(e_REGION_ID region_id)
     {
-        uint32_t IPR = 0x2068 +  (0X200*region_id);        
+        uint32_t IPR = AM335x_EDMA3CC_BASE + 0x2068 +  (0X200*region_id);        
         return (IPR_reg_t*&)IPR;
     }
 
-    inline IPRH_reg_t*& get_S_IPRH_reference(e_REGION_ID region_id)
+    inline IPRH_reg_t*& get_S_IPRH_ptr(e_REGION_ID region_id)
     {
-        uint32_t IPRH = 0x206C +  (0X200*region_id);        
+        uint32_t IPRH = AM335x_EDMA3CC_BASE + 0x206C +  (0X200*region_id);        
         return (IPRH_reg_t*&)IPRH;
     }
 
-    inline  ICR_reg_t*& get_S_ICR_reference(e_REGION_ID region_id)
+    inline  ICR_reg_t*& get_S_ICR_ptr(e_REGION_ID region_id)
     {
-        uint32_t ICR = 0x2070 +  (0X200*region_id);        
+        uint32_t ICR = AM335x_EDMA3CC_BASE + 0x2070 +  (0X200*region_id);        
         return (ICR_reg_t*&)ICR;
     }
 
-    inline ICRH_reg_t*& get_S_ICRH_reference(e_REGION_ID region_id)
+    inline ICRH_reg_t*& get_S_ICRH_ptr(e_REGION_ID region_id)
     {
-        uint32_t ICRH = 0x2074 +  (0X200*region_id);        
+        uint32_t ICRH = AM335x_EDMA3CC_BASE + 0x2074 +  (0X200*region_id);        
         return (ICRH_reg_t*&)ICRH;
     }
 
-    inline IEVAL_reg_t*& get_S_IEVAL_reference(e_REGION_ID region_id)
+    inline IEVAL_reg_t*& get_S_IEVAL_ptr(e_REGION_ID region_id)
     {
-        uint32_t IEVAL = 0x2078 +  (0X200*region_id);        
+        uint32_t IEVAL = AM335x_EDMA3CC_BASE + 0x2078 +  (0X200*region_id);        
         return (IEVAL_reg_t*&)IEVAL;
     }
 
-    inline  QER_reg_t*& get_S_QER_reference(e_REGION_ID region_id) 
+    inline  QER_reg_t*& get_S_QER_ptr(e_REGION_ID region_id) 
     {
-        uint32_t QER = 0x2080 +  (0X200*region_id);        
+        uint32_t QER = AM335x_EDMA3CC_BASE + 0x2080 +  (0X200*region_id);        
         return (QER_reg_t*&)QER;
     }
 
-    inline QEER_reg_t*& get_S_QEER_reference(e_REGION_ID region_id)
+    inline QEER_reg_t*& get_S_QEER_ptr(e_REGION_ID region_id)
     {
-        uint32_t QEER = 0x2084 +  (0X200*region_id);        
+        uint32_t QEER = AM335x_EDMA3CC_BASE + 0x2084 +  (0X200*region_id);        
         return (QEER_reg_t*&)QEER;
     }
 
-    inline QEECR_reg_t*& get_S_QEECR_reference(e_REGION_ID region_id)
+    inline QEECR_reg_t*& get_S_QEECR_ptr(e_REGION_ID region_id)
     {
-        uint32_t QEECR = 0x2088 +  (0X200*region_id);        
+        uint32_t QEECR = AM335x_EDMA3CC_BASE + 0x2088 +  (0X200*region_id);        
         return (QEECR_reg_t*&)QEECR;
     }
 
-    inline QEESR_reg_t*& get_S_QEESR_reference(e_REGION_ID region_id)
+    inline QEESR_reg_t*& get_S_QEESR_ptr(e_REGION_ID region_id)
     {
-        uint32_t QEESR = 0x208C +  (0X200*region_id);        
+        uint32_t QEESR = AM335x_EDMA3CC_BASE + 0x208C +  (0X200*region_id);        
         return (QEESR_reg_t*&)QEESR;
     }
 
-    inline QSER_reg_t*& get_S_QSER_reference(e_REGION_ID region_id)
+    inline QSER_reg_t*& get_S_QSER_ptr(e_REGION_ID region_id)
     {
-        uint32_t QSER = 0x2090 +  (0X200*region_id);        
+        uint32_t QSER = AM335x_EDMA3CC_BASE + 0x2090 +  (0X200*region_id);        
         return (QSER_reg_t*&)QSER;
     }
 
-    inline QSECR_reg_t*& get_S_QSECR_reference(e_REGION_ID region_id)
+    inline QSECR_reg_t*& get_S_QSECR_ptr(e_REGION_ID region_id)
     {
-        uint32_t QSECR = 0x2094 +  (0X200*region_id);        
+        uint32_t QSECR = AM335x_EDMA3CC_BASE + 0x2094 +  (0X200*region_id);        
         return (QSECR_reg_t*&)QSECR;
     }
 
