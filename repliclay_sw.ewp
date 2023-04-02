@@ -220,6 +220,7 @@
                     <name>CCDefines</name>
                     <state>am335x</state>
                     <state>beaglebone_black</state>
+                    <state>uC_OSII</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -810,11 +811,11 @@
                 </option>
                 <option>
                     <name>IlinkUseExtraOptions</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IlinkExtraOptions</name>
-                    <state></state>
+                    <state>--skip_dynamic_initialization</state>
                 </option>
                 <option>
                     <name>IlinkLowLevelInterfaceSlave</name>

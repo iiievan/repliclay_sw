@@ -2327,7 +2327,7 @@ namespace n_EDMA
         CH_I2C1_RX        = 61  // I2C1 Transmit Event 
     };
     
-   constexpr uint32_t  EDMA_REVID                = 0x02u;
+   constexpr uint32_t  EDMA_REVID                = 0x01u;
    constexpr uint32_t  AM335X_DMACH_MAX          = 64;
    constexpr uint32_t  AM335X_QDMACH_MAX         = 8; 
 
@@ -2637,8 +2637,15 @@ namespace n_EDMA
         return (QSECR_reg_t*&)QSECR;
     }
 
-    inline uint32_t* get_paRAM_ptr(uint32_t n)         { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + (0x20 * n)); }
-    inline uint32_t* get_SRC_ptr(uint32_t n)           { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x4 + (0x20 * n)); }
+    inline uint32_t* get_paRAM_ptr(uint32_t n)         
+    { 
+        return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + (0x20 * n)); 
+    }
+    
+    inline uint32_t* get_SRC_ptr(uint32_t n)           
+    { 
+      return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x4 + (0x20 * n)); 
+    }
     inline uint32_t* get_A_B_CNT_ptr(uint32_t n)       { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x8 + (0x20 * n)); }
     inline uint32_t* get_DST_ptr(uint32_t n)           { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0xC + (0x20 * n)); }
     inline uint32_t* get_SRC_DST_BIDX_ptr(uint32_t n)  { return (uint32_t*)(AM335x_EDMA3CC_BASE + PARAM_BASE + 0x10 + (0x20 * n)); }

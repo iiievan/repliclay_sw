@@ -2,7 +2,7 @@
 #define _N_UART_H_
 
 #include <stdint.h>
-#include "utils.h"
+#include "utils/utils.h"
 #include "INTC.h"
 #include "utils/ring_buffer.h"
 #include "utils/frame_buffer.h"
@@ -1534,7 +1534,7 @@ class AM335x_UART
     
 public:
             AM335x_UART(n_UART::AM335x_UART_Type *p_uart_regs);
-            ~AM335x_UART() {}
+           ~AM335x_UART() {}
      
       void  module_reset();
       void  FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl);

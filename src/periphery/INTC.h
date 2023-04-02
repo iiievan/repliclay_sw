@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include  <cpu_core.h>
 #include  <os.h>
-#include "utils.h"
+#include "utils/utils.h"
+
 
 //This is interrupt controller class and his namespace
 namespace INTC
@@ -719,8 +720,11 @@ private:
 };
 
 static void interrupt_default_handler(void);
-extern void OS_CPU_ExceptHndlr   (CPU_INT32U  src_id);
-extern void interrupt_handler (uint32_t  src_nbr);
+    
+#if defined(uC_OSII)
+    extern void OS_CPU_ExceptHndlr   (CPU_INT32U  src_id);
+    extern void interrupt_handler (uint32_t  src_nbr);
+#endif  // uC_OSII
 extern Interrupt_controller intc;
 
 #endif //_INTC_H_

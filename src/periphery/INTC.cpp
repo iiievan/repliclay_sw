@@ -16,6 +16,7 @@ static void interrupt_default_handler(void)
     return;
 }
 
+#if defined(uC_OSII)
 static  void  OS_exept_handler (uint8_t  except_type)
 {
     switch (except_type) 
@@ -113,6 +114,7 @@ void  interrupt_handler(uint32_t  src_nbr)
              break;
     }
 }
+#endif  //uC_OSII
 
 /**
  * \brief   This API is used to initialize the interrupt controller. This API  
@@ -163,7 +165,9 @@ void  Interrupt_controller::init (void)
  **/
 void  Interrupt_controller::register_handler(INTC::e_SYS_INTERRUPT  int_id, INTC::isr_handler_t isr_fnct)
 {
+#if defined(uC_OSII)
     CPU_SR_ALLOC();
+#endif
 
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
@@ -171,9 +175,13 @@ void  Interrupt_controller::register_handler(INTC::e_SYS_INTERRUPT  int_id, INTC
 
     if (int_id < INTC::INTERRUPTS_NUM_MAX) 
     {
+#if defined(uC_OSII)
         CPU_CRITICAL_ENTER();
         interrupt_vector_table[int_id] = isr_fnct;
         CPU_CRITICAL_EXIT();
+#else
+        interrupt_vector_table[int_id] = isr_fnct;
+#endif
     }
 }
 
@@ -189,17 +197,23 @@ void  Interrupt_controller::register_handler(INTC::e_SYS_INTERRUPT  int_id, INTC
  **/
 void  Interrupt_controller::unregister_handler(INTC::e_SYS_INTERRUPT int_id)
 {
+#if defined(uC_OSII) 
     CPU_SR_ALLOC();
-
+#endif
+    
     if (int_id > INTC::INTERRUPTS_NUM_MAX) 
         return;
 
     if (int_id < INTC::INTERRUPTS_NUM_MAX) 
     {
+#if defined(uC_OSII)
         CPU_CRITICAL_ENTER();
-        /* Assign default ISR */
+        /// Assign default ISR ///
         interrupt_vector_table[int_id] = (INTC::isr_handler_t)interrupt_default_handler; 
         CPU_CRITICAL_EXIT();
+#else
+        interrupt_vector_table[int_id] = (INTC::isr_handler_t)interrupt_default_handler; 
+#endif
     }
 }
 

@@ -1,7 +1,10 @@
 #ifndef __OS_TIMER_H
 #define __OS_TIMER_H
 
+#include <cstddef>
+#include "utils/utils.h"
 #include "DM_Timer.h"
+
 
 //#define TIMER_INITIAL_COUNT             (0xffffa261) // 1ms approximate
 #define OS_TIMER_RLD_COUNT                (0xffffa261) // 1ms approximate
@@ -83,7 +86,9 @@ inline void DM_Timer_irqhandler(void *p_obj)
     s_Timer.IRQ_disable(DMTIMER::IRQ_OVF); // Disable the DMTimer interrupts    
     s_Timer.IRQ_clear(DMTIMER::IRQ_OVF);   // Clear the status of the interrupt flags 
 
+#if defined(uC_OSII)
     OSTimeTick();
+#endif
     s_Timer.increment_time_from_boot();
     
     s_Timer.IRQ_enable(DMTIMER::IRQ_OVF);  // Enable the DM_Timer interrupts

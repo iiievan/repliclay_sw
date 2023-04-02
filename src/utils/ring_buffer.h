@@ -1,6 +1,9 @@
 #ifndef _RINGBUFFER_H
 #define _RINGBUFFER_H
 
+#include <cstddef>
+#include "utils/utils.h"
+
 template <size_t BUF_SIZE = 16>
 class ring_buffer
 {
@@ -20,7 +23,7 @@ public:
  
                 size_t  add(char* data, size_t len)
                 {
-                        __disable_interrupt();
+                        ISRDISABLE;
                         
                         uint32_t i;                      
                     
@@ -32,14 +35,14 @@ public:
                             push(data[i]);
                         }
                     
-                        __enable_interrupt();
+                        ISRENABLE;
                     
                         return i;
                 }
 
                 size_t  get(char* data, size_t len)
                 {
-                      __disable_interrupt();
+                      ISRDISABLE;
 
                       volatile uint32_t bytes_avail = get_avail();
                       
@@ -51,14 +54,14 @@ public:
                           { data[idx] = get_tail(); }
                       }
                   
-                      __enable_interrupt();
+                      ISRENABLE;
                   
                       return len;                  
                 }
 
                 char  add_one(char& c)
                 {
-                    __disable_interrupt();
+                    ISRDISABLE;
                 
                     char result = -1;
                 
@@ -67,31 +70,31 @@ public:
 
                     push(c); 
                 
-                    __enable_interrupt();  
+                    ISRENABLE;  
                 
                     return result;
                 }
 
                 char  get_one()
                 {
-                      __disable_interrupt();
+                      ISRDISABLE;
 
                       char result = -1;
 
                       if (!is_empty()) { result = get_tail(); }
 
-                      __enable_interrupt();
+                      ISRENABLE;
 
                       return result;
                 }
 
                 char  peek_one() // Look what is putted in buffer, without take element
                 {
-                      __disable_interrupt();
+                      ISRDISABLE;
 
                       char result = *curr_data();
                   
-                      __enable_interrupt();
+                      ISRENABLE;
                       
                       return result;                  
                 }                           

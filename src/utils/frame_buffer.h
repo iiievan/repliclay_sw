@@ -179,7 +179,7 @@ public:
                 // for hearing it is not heard, but the sound is smooth.
                 void sync(void)
                 {
-                    __disable_interrupt();
+                    ISRDISABLE;
 
                     if (subframe_counter < RECEIVER_SUB_FRAME_MAX - 2) 
                     {
@@ -189,7 +189,7 @@ public:
                     else
                         m_Sync_cnt[0]++; 
 		      	
-                    __enable_interrupt();
+                    ISRENABLE;
                 }      
           
                 void upsample(i2s_sample_t *out_buf, uint16_t len)

@@ -17,6 +17,16 @@ extern "C" {
 #define MY_RAND_MIN        (-32768)
   
 #define M_PI 			   (3.141592653589f)
+
+#if defined(NRF52)
+    #define ISRENABLE  __enable_interrupt()
+    #define ISRDISABLE __disable_interrupt()
+#else
+extern void  ienable();
+extern void  idisable();
+    #define ISRENABLE  ienable()
+    #define ISRDISABLE idisable()
+#endif
   
 #define ASSERT(expr)                                                          \
 if (expr)                                                                     \

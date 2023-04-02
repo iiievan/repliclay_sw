@@ -2,7 +2,7 @@
 #define _CONTROL_MODULE_H_
 
 #include <stdint.h>
-#include "utils.h"
+#include "utils/utils.h"
 
 //This control module namespace
 namespace CONTROL_MODULE

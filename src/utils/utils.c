@@ -84,3 +84,6 @@ void delay_10us(uint32_t delay)
         }
     }
 }
+
+void  ienable() {}
+void  idisable() {}
