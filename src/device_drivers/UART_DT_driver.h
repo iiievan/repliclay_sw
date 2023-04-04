@@ -9,6 +9,11 @@
 #include "n_UART.h"
 #include "n_EDMA.h"
 
+#define RX_CHUNK_SIZE          (64UL)
+#define TX_CHUNK_SIZE          (64UL)
+constexpr uint32_t  TX_BYTES_PER_EVENT = 8u;
+constexpr uint32_t  RX_TRIG_LEVEL = 8u;
+
 struct UART_client_ops : public Client_ops
 {
     std::string  compatible;
@@ -36,12 +41,14 @@ struct UART_client_ops : public Client_ops
 
 extern      UART_client_ops  UART_ops;
 extern const DT_device_id_t  AM335x_UART_ids;
-extern void EDMA3_end_transaction_clb(uint32_t tcc_num);
+static void  RXTX_end_callback(uint32_t tcc_num);
+static  int  UART_DMA_write(void *p_Obj, const char *buffer, size_t len);
 
 class UART_DT_Driver : public Device_driver
-{
-           void (*cb_fx[n_EDMA::AM335X_DMACH_MAX]) (uint32_t tcc);  // function callbacks for n_EDMA
-                 
+{        
+    friend void  RXTX_end_callback(uint32_t tcc_num);
+    friend  int  UART_DMA_write(void *p_Obj, const char *buffer, size_t len);
+    
     public:
             UART_DT_Driver(AM335x_UART &uart_instance)
             : Device_driver("AM335x_serial_driver", &AM335x_UART_ids),
@@ -49,7 +56,7 @@ class UART_DT_Driver : public Device_driver
               m_prcm_module(prcm_module),
               m_int_controller(intc),
               m_pinmux_ctrl(ctrl_module),
-              m_EDMA(dma)
+              m_EDMA(eDMA)
              { 
                  m_UART_instance_num  = m_UART_device.get_UART_inst_number();
                  m_UART_sys_interrupt = m_UART_device.get_UART_sys_interrupt();
@@ -72,12 +79,17 @@ AM335x_UART* get_instance(void) { return &m_UART_device; }
        void  EDMA_INTC_configure(void);
        void  sys_interrupt_enable()  { m_int_controller.system_enable(m_UART_sys_interrupt);  }
        void  sys_interrupt_disable() { m_int_controller.system_disable(m_UART_sys_interrupt); }
+       
+          bool  m_TX_busy { false };
+
 private:
                          void  set_Client_ops(void *p_owner, Client_ops *p_ops);
-                         
+
           INTC::isr_handler_t  m_isr_handler;
   n_UART::e_UART_INSTANCE_NUM  m_UART_instance_num;     // UART instance index number
         INTC::e_SYS_INTERRUPT  m_UART_sys_interrupt;
+        
+                         
 
                   AM335x_UART &m_UART_device;           // UART instance reference.
     power_reset_clock_control &m_prcm_module;           // for clock contrlol setup and management
@@ -85,6 +97,10 @@ private:
              x_CONTROL_MODULE &m_pinmux_ctrl;           // for PINMUX
                   AM335x_EDMA &m_EDMA;                  // for EDMA transfer
 };
+
+void  UART_TX_eDMA_paRAM_set(uint8_t *tx_buffer, size_t len, uint32_t tcc_num, uint16_t param_num, uint32_t ch_num);
+void  UART_RX_eDMA_paRAM_set(uint8_t *rx_buffer, size_t len, uint32_t tcc_num, uint16_t param_num, uint32_t ch_num);
+void  Tx_dummy_paRAM_config_enable(void);
 
 extern UART_DT_Driver uart_driver;
 

@@ -58,8 +58,10 @@ extern I2C_EEPROM<(32*1024),64> CAT24C256WI;
 
 class OS_Timer;
 class AM335x_UART;
+class AM335x_EDMA;
 extern OS_Timer os_timer;
 extern AM335x_UART uart_0;
+extern AM335x_EDMA eDMA;
 
 void  interrupt_handler(uint32_t  src_nbr)
 {
@@ -87,6 +89,10 @@ void  interrupt_handler(uint32_t  src_nbr)
                         break;
                     case INTC::UART0INT:
                         isr((void *)&uart_0);
+                        break;
+                    case INTC::EDMACOMPINT:
+                    case INTC::EDMAERRINT:
+                        isr((void *)&eDMA);
                         break;
                     default:
                         isr((void *)int_nbr);

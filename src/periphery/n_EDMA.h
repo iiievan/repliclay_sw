@@ -378,6 +378,14 @@ namespace n_EDMA
         } b;                                      // Structure used for bit access 
         uint32_t  reg;                            // Type used for register access 
     } CCERR_reg_t;
+
+    enum e_CCERR_flags: uint32_t
+    {       
+        F_QTHRXCD0 = BIT(0),
+        F_QTHRXCD1 = BIT(1),
+        F_QTHRXCD2 = BIT(2),
+        F_TCCERR   = BIT(16)
+    };
     
     /*! @brief      __XXX__  
     *   @details    __XXX__
@@ -2267,6 +2275,10 @@ namespace n_EDMA
     constexpr uint32_t AM335x_EDMA3TC1_BASE    = 0x49900000;
     constexpr uint32_t AM335x_EDMA3TC2_BASE    = 0x49A00000;
     constexpr uint32_t PARAM_BASE              = 0x4000;
+    constexpr uint32_t COMPL_HANDLER_RETRY_COUNT = 10u;
+    constexpr uint32_t ERR_HANDLER_RETRY_COUNT   = 10u;
+    
+    constexpr uint32_t EVTQUE_AVAIL  = 2u;  // Number of Event Queues available 
 
     constexpr AM335x_EDMA3CC_Type * AM335X_EDMA3CC_regs  = reinterpret_cast<AM335x_EDMA3CC_Type *>(AM335x_EDMA3CC_BASE);
     constexpr AM335x_EDMA3TC_Type * AM335X_EDMA3TC0_regs = reinterpret_cast<AM335x_EDMA3TC_Type *>(AM335x_EDMA3TC0_BASE);
@@ -2657,7 +2669,9 @@ namespace n_EDMA
 
 class AM335x_EDMA
 {
-n_EDMA::e_REGION_ID  region_id;
+public:
+    n_EDMA::e_REGION_ID  region_id;
+void (*cb_fx[n_EDMA::AM335X_DMACH_MAX]) (uint32_t tcc);  // function callbacks for n_EDMA channels and events
              
 public:
               AM335x_EDMA()
@@ -2684,7 +2698,7 @@ public:
         void  set_QDMA_trig_word(uint32_t ch_num, uint8_t trig_word);
         void  clr_miss_evt(uint32_t ch_num);
         void  QDMA_clr_miss_evt(uint32_t ch_num);
-        void  clr_CCERR(n_EDMA::CCERRCLR_reg_t flags);
+        void  clr_CCERR(uint32_t flags);
         void  set_evt(uint32_t ch_num);
         void  clr_evt(uint32_t ch_num);
         void  enable_DMA_evt(uint32_t ch_num);
@@ -2706,8 +2720,8 @@ n_EDMA::paRAM_entry_t* QDMA_get_paRAM(uint32_t paRAM_id);
         bool  enable_transfer(uint32_t ch_num, uint32_t trig_mode);
         bool  disable_transfer(uint32_t ch_num, uint32_t trig_mode);
         void  clear_error_bits(uint32_t ch_num, n_EDMA::e_DMA_QUEUE evt_Qnum);
-n_EDMA::CCERR_reg_t  get_CCERR_status();
-  n_EDMA::EMR_reg_t  get_ERR_intr_status();
+    uint32_t  get_CCERR_status();
+    uint32_t  get_ERR_intr_status();
  n_EDMA::QEMR_reg_t  QDMA_get_ERR_intr_status();
         void  CCERR_evaluate();
         void  deinit(uint32_t que_num);
@@ -2718,6 +2732,8 @@ n_EDMA::CCERR_reg_t  get_CCERR_status();
         void  channel_to_param_map(uint32_t channel, uint32_t param_set);
         void  context_save(n_EDMA::EDMACONTEXT_t *p_edma_cntx);
         void  context_restore(n_EDMA::EDMACONTEXT_t *p_edma_cntx);
+        
+        
 private:
     n_EDMA::AM335x_EDMA3CC_Type &m_EDMA3CC_regs;
     n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC0_regs;
@@ -2725,6 +2741,6 @@ private:
     n_EDMA::AM335x_EDMA3TC_Type &m_EDMA3TC2_regs;
 };
 
-extern AM335x_EDMA dma;
+extern AM335x_EDMA eDMA;
 
 #endif //__N_EDMA_H

@@ -67,7 +67,7 @@ void  AM335x_UART::FIFO_configure_DMA_RxTx(uint8_t tx_trig_lvl, uint8_t rx_trig_
     cfg_scr.b.TXTRIGGRANU1 = 0x1;
     cfg_scr.b.RXTRIGGRANU1 = 0x1;
     cfg_scr.b.DMAMODECTL   = 0x1;   // control trough SCR
-    cfg_scr.b.DMAMODE2     = n_UART::SCR_DMA_MODE_1;   
+    cfg_scr.b.DMAMODE2     = n_UART::SCR_DMA_MODE_1;   // DMA mode 0 or 1 available for UART0
 
     tx_trig_lvl &= 0x003F;                                             // 'tx_trig_lvl' now has the 6-bit TX Trigger level value.
     trigger_lvl_cfg.b.TX_FIFO_TRIG_DMA  = (tx_trig_lvl & 0x003C) >> 2; // Collecting the bits tx_trig_lvl[5:2].        

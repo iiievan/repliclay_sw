@@ -1638,11 +1638,13 @@ n_UART::FCR_reg_t  FIFO_config(n_UART::SCR_reg_t  cfg_scr,
        
        void  write(const char *data, size_t len);
        
+paired_buffer<char, n_UART::RX_FIFO_MAX>  m_RX_data;   // cumulative received data buffer
+paired_buffer<char, n_UART::TX_FIFO_MAX>  m_TX_data;   // storage data buffer for sending
+       
 private:
         n_UART::AM335x_UART_Type &m_UART_regs;
         
-paired_buffer<char, n_UART::RX_FIFO_MAX>  m_RX_data;   // cumulative received data buffer
-paired_buffer<char, n_UART::TX_FIFO_MAX>  m_TX_data;   // storage data buffer for sending
+
 
                             void  m_Start_TX(size_t amount);
                             void  m_Start_RX(size_t amount);

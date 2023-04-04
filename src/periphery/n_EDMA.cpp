@@ -382,11 +382,11 @@ void AM335x_EDMA::QDMA_clr_miss_evt(uint32_t ch_num)
  *
  *  \return  None
  */
-void AM335x_EDMA::clr_CCERR(n_EDMA::CCERRCLR_reg_t flags)
+void AM335x_EDMA::clr_CCERR(uint32_t flags)
 {
     // (CCERRCLR) - clear channel controller error register
     //HWREG(baseAdd + EDMA3CC_CCERRCLR) = Flags;
-    m_EDMA3CC_regs.CCERRCLR.reg = flags.reg;
+    m_EDMA3CC_regs.CCERRCLR.reg = flags;
 }
 
 /**
@@ -536,7 +536,7 @@ void AM335x_EDMA::disable_QDMA_evt(uint32_t ch_num)
  */
 uint32_t AM335x_EDMA::get_intr_status()
 {
-    uint32_t intr_sts= 0;
+    uint32_t intr_sts = 0;
 
     //intr_sts = (uint32_t)HWREG(baseAdd + EDMA3CC_S_IPR(region_id));
     intr_sts = (uint32_t)n_EDMA::get_S_IPR_ptr(region_id)->reg;
@@ -1193,12 +1193,12 @@ void AM335x_EDMA::clear_error_bits(uint32_t ch_num, n_EDMA::e_DMA_QUEUE evt_Qnum
  *  \return  value                  Status of the Interrupt Pending Register
  *
  */
-n_EDMA::CCERR_reg_t AM335x_EDMA::get_CCERR_status()
+uint32_t AM335x_EDMA::get_CCERR_status()
 {
-    n_EDMA::CCERR_reg_t intr_status_val = {.reg = 0};
+    uint32_t intr_status_val = 0;
   
     //intr_status_val = (uint32_t)HWREG(baseAdd + EDMA3CC_CCERR);
-    intr_status_val.reg = m_EDMA3CC_regs.CCERR.reg;
+    intr_status_val = m_EDMA3CC_regs.CCERR.reg;
 
     return intr_status_val;
 }
@@ -1210,12 +1210,12 @@ n_EDMA::CCERR_reg_t AM335x_EDMA::get_CCERR_status()
  *  \return  value                  Status of the Interrupt Pending Register
  *
  */
-n_EDMA::EMR_reg_t AM335x_EDMA::get_ERR_intr_status()
+uint32_t AM335x_EDMA::get_ERR_intr_status()
 {
-    n_EDMA::EMR_reg_t intr_status_val = {.reg = 0};
+    uint32_t intr_status_val = 0;
 
     //intr_status_val = (uint32_t)HWREG(baseAdd + EDMA3CC_EMR);
-    intr_status_val.reg = m_EDMA3CC_regs.EMR.reg;
+    intr_status_val = m_EDMA3CC_regs.EMR.reg;
 
     return intr_status_val;
 }
@@ -1280,7 +1280,7 @@ void AM335x_EDMA::deinit(uint32_t que_num)
     get_DRAE_ptr(region_id)->reg = n_EDMA::CLR_ALL_BITS;
     get_DRAEH_ptr(region_id)->reg = n_EDMA::CLR_ALL_BITS;
     
-    clr_CCERR(ccerr);
+    clr_CCERR(ccerr.reg);
     
     // Clear the Event miss Registers
     //HWREG(baseAdd + EDMA3CC_EMCR)  = EDMA3_SET_ALL_BITS;
@@ -1494,4 +1494,4 @@ void AM335x_EDMA::context_restore(n_EDMA::EDMACONTEXT_t *p_edma_cntx)
     }                      
 }
 
-AM335x_EDMA dma;
+AM335x_EDMA eDMA;
