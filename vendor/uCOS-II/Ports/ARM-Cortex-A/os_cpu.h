@@ -156,14 +156,14 @@
 #define  OS_CPU_ARM_BIT_CPSR_I                     (1u << 7u)
 #define  OS_CPU_ARM_BIT_CPSR_F                     (1u << 6u)
 #define  OS_CPU_ARM_BIT_CPSR_T                     (1u << 5u)
-#define  OS_CPU_ARM_MSK_CPSR_MODE                         0x1Fu
-#define  OS_CPU_ARM_BIT_CPSR_MODE_USER                    0x10u
-#define  OS_CPU_ARM_BIT_CPSR_MODE_FIQ                     0x11u
-#define  OS_CPU_ARM_BIT_CPSR_MODE_IRQ                     0x12u
-#define  OS_CPU_ARM_BIT_CPSR_MODE_SUPERVISOR              0x13u
-#define  OS_CPU_ARM_BIT_CPSR_MODE_ABORT                   0x17u
-#define  OS_CPU_ARM_BIT_CPSR_MODE_UNDEFINED               0x1Bu
-#define  OS_CPU_ARM_BIT_CPSR_MODE_SYSTEM                  0x1Fu
+#define  OS_CPU_ARM_MSK_CPSR_MODE                   0x1Fu
+#define  OS_CPU_ARM_BIT_CPSR_MODE_USER              0x10u
+#define  OS_CPU_ARM_BIT_CPSR_MODE_FIQ               0x11u
+#define  OS_CPU_ARM_BIT_CPSR_MODE_IRQ               0x12u
+#define  OS_CPU_ARM_BIT_CPSR_MODE_SUPERVISOR        0x13u
+#define  OS_CPU_ARM_BIT_CPSR_MODE_ABORT             0x17u
+#define  OS_CPU_ARM_BIT_CPSR_MODE_UNDEFINED         0x1Bu
+#define  OS_CPU_ARM_BIT_CPSR_MODE_SYSTEM            0x1Fu
 
 #define  OS_CPU_ARM_BIT_FPEXC_EN                   (1u << 30u)
 

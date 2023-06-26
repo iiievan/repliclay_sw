@@ -3,6 +3,12 @@
 sw_Timer RX_end_timer(3, os_timer, RX_end_callback);
 ring_buffer<n_UART::RX_FIFO_MAX*4> Terminal_buffer; 
 
+static void  UART_TX_eDMA_paRAM_set(uint8_t *tx_buffer, size_t len, uint32_t tcc_num, uint16_t param_num, uint32_t ch_num);
+static void  UART_RX_eDMA_paRAM_set(uint8_t *rx_buffer, size_t len, uint32_t tcc_num, uint16_t param_num, uint32_t ch_num);
+static void  Tx_dummy_paRAM_config_enable(void);
+
+static bool m_TX_busy = false;
+
 // @brief This Callback is called when charater is receive
 static char UART_read(void *p_Obj)
 {    
@@ -43,7 +49,6 @@ static char UART_DMA_read(void *p_Obj)
 }
 
 // @brief This Callback is called to write buffer to UART
-#define DUMMY_CH_NUM              (5)
 static int UART_DMA_write(void *p_Obj, const char *buffer, size_t len)
 {
     static unsigned int num_byte_chunks = 0;
@@ -52,7 +57,7 @@ static int UART_DMA_write(void *p_Obj, const char *buffer, size_t len)
 
     num_byte_chunks = (len - 1) / TX_BYTES_PER_EVENT;
     
-    uart_0.DMA_enable(n_UART::SCR_DMA_MODE_1);
+    s_UART.DMA_enable(n_UART::SCR_DMA_MODE_1);
 
     // Configuring EDMA PaRAM sets to transmit data.
     UART_TX_eDMA_paRAM_set((uint8_t *)buffer,
@@ -63,19 +68,13 @@ static int UART_DMA_write(void *p_Obj, const char *buffer, size_t len)
     
     Tx_dummy_paRAM_config_enable();       // Configuring the PaRAM set for Dummy Transfer.    
     
-    uart_driver.m_TX_busy = true;
+    m_TX_busy = true;
     eDMA.enable_transfer(n_EDMA::CH_UART0_TX, n_EDMA::TRIG_MODE_EVENT);
                         
     // Wait for return from callback
-    while(uart_driver.m_TX_busy);
-}
-
-// @brief This Callback is called to write buffer to UART
-static int UART_write_isr(void *p_Obj, const char *buffer, size_t len)
-{
-    AM335x_UART &s_UART = *reinterpret_cast<AM335x_UART *>(p_Obj);
+    while(m_TX_busy);
     
-    s_UART.write(buffer, len);
+    return 0;
 }
 
 static void  UART_0_irqhandler(void *p_Obj)
@@ -205,7 +204,7 @@ static void RXTX_end_callback(uint32_t tcc_num)
     // Disabling DMA transfer on the specified channel.
     eDMA.disable_transfer(tcc_num, n_EDMA::TRIG_MODE_EVENT);
 
-    uart_driver.m_TX_busy = 0;
+    m_TX_busy = 0;
 }
 
     
@@ -346,7 +345,7 @@ int  UART_DT_Driver::init(void)
 
     EDMA_INTC_configure();
     
-    m_UART_device.module_reset();                                   // Performing a module reset. 
+    m_UART_device.module_reset();             // Performing a module reset. 
 
 #ifdef UART_ENABLE_FIFO    
     m_UART_device.FIFO_configure_DMA_RxTx(TX_TRIGGER_SPACE_GRAN_1, RX_DMA_THRESHOLD);  // 8, 8

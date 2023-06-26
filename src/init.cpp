@@ -60,8 +60,8 @@ I2C_EEPROM<(32*1024),64> CAT24C256WI(I2C::AM335X_I2C_2, SLAVE_ADDR_CAT24C256, CA
 /* EDMA3 Event queue number. */
 #define EVT_QUEUE_NUM             (0)
 
-/* PaRAM Set number for Dummy Transfer. */
-#define DUMMY_CH_NUM              (5)
+/// PaRAM Set number for Dummy Transfer. ///
+//#define DUMMY_CH_NUM              (5)
 
 /* Wrapper Definitions. */
 #define UART_INSTANCE_BASE_ADD    (SOC_UART_0_REGS)
@@ -172,7 +172,8 @@ void init_board(void)
     // setup them before the interrupt controller (INTC) is initiated
     uart_driver.probe((void *)&print);  // set read and write methods to "print" obj    
     uart_driver.init();    
-
+    const char start_app_str[] = "UART EDMA application started!\r\n";
+    print.f("%s", start_app_str);
     
   ///************************* UART0_EDMA_INIT *************************** ///
   ///******************** Transmission of a string **************************///
@@ -291,7 +292,6 @@ void init_board(void)
 
     numByteChunks = (NUM_RX_BYTES) / txBytesPerEvent;
     remainBytes = (NUM_RX_BYTES) % txBytesPerEvent;
-
     
     uart_0.DMA_enable(n_UART::SCR_DMA_MODE_1);  // Enabling DMA Mode 1.
     

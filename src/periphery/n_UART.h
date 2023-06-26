@@ -1642,10 +1642,8 @@ paired_buffer<char, n_UART::RX_FIFO_MAX>  m_RX_data;   // cumulative received da
 paired_buffer<char, n_UART::TX_FIFO_MAX>  m_TX_data;   // storage data buffer for sending
        
 private:
-        n_UART::AM335x_UART_Type &m_UART_regs;
+        n_UART::AM335x_UART_Type &m_UART_regs; 
         
-
-
                             void  m_Start_TX(size_t amount);
                             void  m_Start_RX(size_t amount);
                             bool  m_TX_busy;
