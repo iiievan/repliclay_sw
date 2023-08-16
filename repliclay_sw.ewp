@@ -348,6 +348,7 @@
                     <state>$PROJ_DIR$\mmcsdlib\include</state>
                     <state>$PROJ_DIR$\grlib</state>
                     <state>$PROJ_DIR$\usblib\include</state>
+                    <state>$PROJ_DIR$\app</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -669,7 +670,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>128</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -2568,6 +2569,9 @@
             </file>
         </group>
     </group>
+    <file>
+        <name>$PROJ_DIR$\init.cpp</name>
+    </file>
     <file>
         <name>$PROJ_DIR$\main.cpp</name>
     </file>
