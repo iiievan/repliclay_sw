@@ -11,9 +11,17 @@
             <name>General</name>
             <archiveVersion>3</archiveVersion>
             <data>
-                <version>31</version>
+                <version>34</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
+                <option>
+                    <name>BrowseInfoPath</name>
+                    <state>Debug\BrowseInfo</state>
+                </option>
+                <option>
+                    <name>OGProductVersion</name>
+                    <state>9.20.1.43525</state>
+                </option>
                 <option>
                     <name>ExePath</name>
                     <state>Debug\Exe</state>
@@ -61,20 +69,8 @@
                     <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
                 </option>
                 <option>
-                    <name>OGProductVersion</name>
-                    <state>5.10.0.159</state>
-                </option>
-                <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.50.6.28950</state>
-                </option>
-                <option>
-                    <name>GeneralEnableMisra</name>
-                    <state>0</state>
-                </option>
-                <option>
-                    <name>GeneralMisraVerbose</name>
-                    <state>0</state>
+                    <state>9.20.1.43525</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -97,26 +93,12 @@
                     <state>0</state>
                 </option>
                 <option>
-                    <name>GeneralMisraRules98</name>
-                    <version>0</version>
-                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
-                </option>
-                <option>
-                    <name>GeneralMisraVer</name>
-                    <state>0</state>
-                </option>
-                <option>
-                    <name>GeneralMisraRules04</name>
-                    <version>0</version>
-                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
-                </option>
-                <option>
                     <name>RTConfigPath2</name>
                     <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</state>
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>28</version>
+                    <version>31</version>
                     <state>53</state>
                 </option>
                 <option>
@@ -133,7 +115,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>28</version>
+                    <version>31</version>
                     <state>53</state>
                 </option>
                 <option>
@@ -156,7 +138,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>28</version>
+                    <version>31</version>
                     <state>53</state>
                 </option>
                 <option>
@@ -209,13 +191,25 @@
                     <version>0</version>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>OGAarch64Abi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OG_32_64Device</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>BuildFilesPath</name>
+                    <state>Debug</state>
+                </option>
             </data>
         </settings>
         <settings>
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>36</version>
+                <version>37</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -226,6 +220,7 @@
                     <name>CCDefines</name>
                     <state>am335x</state>
                     <state>beaglebone_black</state>
+                    <state>beaglebone</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -265,7 +260,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state></state>
+                    <state>Pa050, Pe1750, Pa082</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -314,7 +309,7 @@
                 </option>
                 <option>
                     <name>CCSignedPlainChar</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCRequirePrototypes</name>
@@ -345,31 +340,14 @@
                     <state></state>
                 </option>
                 <option>
-                    <name>CompilerMisraOverride</name>
-                    <state>0</state>
-                </option>
-                <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$\src</state>
-                    <state>$PROJ_DIR$\src\app</state>
-                    <state>$PROJ_DIR$\lib\include</state>
-                    <state>$PROJ_DIR$\lib</state>
-                    <state>$PROJ_DIR$\lib\include\hw</state>
-                    <state>$PROJ_DIR$\lib\include\armv7a</state>
-                    <state>$PROJ_DIR$\lib\include\armv7a\am335x</state>
-                    <state>$PROJ_DIR$\lib\include\usblib</state>
-                    <state>$PROJ_DIR$\lib\drivers</state>
-                    <state>$PROJ_DIR$\lib\platform</state>
-                    <state>$PROJ_DIR$\lib\system_config</state>
-                    <state>$PROJ_DIR$\lib\system_config\am335x</state>
-                    <state>$PROJ_DIR$\lib\utils</state>
-                    <state>$PROJ_DIR$\lib\uC-LIB</state>
-                    <state>$PROJ_DIR$\lib\uC-LIB\Ports\ARM</state>
-                    <state>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A</state>
-                    <state>$PROJ_DIR$\vendor\uCOS-II\Source</state>
-                    <state>$PROJ_DIR$\vendor\uC-CPU</state>
-                    <state>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A</state>
-                    <state>$PROJ_DIR$\src\cppdrivers</state>
+                    <state>$PROJ_DIR$\include\</state>
+                    <state>$PROJ_DIR$\include\hw</state>
+                    <state>$PROJ_DIR$\include\armv7a</state>
+                    <state>$PROJ_DIR$\include\armv7a\am335x</state>
+                    <state>$PROJ_DIR$\mmcsdlib\include</state>
+                    <state>$PROJ_DIR$\grlib</state>
+                    <state>$PROJ_DIR$\usblib\include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -395,16 +373,6 @@
                 <option>
                     <name>CCOptLevelSlave</name>
                     <state>0</state>
-                </option>
-                <option>
-                    <name>CompilerMisraRules98</name>
-                    <version>0</version>
-                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
-                </option>
-                <option>
-                    <name>CompilerMisraRules04</name>
-                    <version>0</version>
-                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
                 </option>
                 <option>
                     <name>CCPosIndRopi</name>
@@ -497,7 +465,7 @@
             <name>AARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>10</version>
+                <version>11</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -639,14 +607,13 @@
                 </option>
                 <option>
                     <name>AUserIncludes</name>
-                    <state>$PROJ_DIR$\lib</state>
-                    <state>$PROJ_DIR$\lib\include</state>
-                    <state>$PROJ_DIR$\src</state>
-                    <state>$PROJ_DIR$\lib\include</state>
-                    <state>$PROJ_DIR$\lib\include\armv7a</state>
-                    <state>$PROJ_DIR$\lib\include\armv7a\am335x</state>
-                    <state>$PROJ_DIR$\lib\include\hw</state>
-                    <state>$PROJ_DIR$\lib\include\usblib</state>
+                    <state>$PROJ_DIR$\include</state>
+                    <state>$PROJ_DIR$\include\hw</state>
+                    <state>$PROJ_DIR$\include\armv7a</state>
+                    <state>$PROJ_DIR$\include\armv7a\am335x</state>
+                    <state>$PROJ_DIR$\mmcsdlib\include</state>
+                    <state>$PROJ_DIR$\grlib</state>
+                    <state>$PROJ_DIR$\usblib\include</state>
                 </option>
                 <option>
                     <name>AExtraOptionsCheckV2</name>
@@ -659,6 +626,10 @@
                 <option>
                     <name>AsmNoLiteralPool</name>
                     <state>0</state>
+                </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
                 </option>
             </data>
         </settings>
@@ -676,7 +647,7 @@
                 </option>
                 <option>
                     <name>OCOutputOverride</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
@@ -698,27 +669,23 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>0</hasPrio>
+                <hasPrio>128</hasPrio>
+                <buildSequence>inputOutputBased</buildSequence>
             </data>
-        </settings>
-        <settings>
-            <name>BICOMP</name>
-            <archiveVersion>0</archiveVersion>
-            <data />
         </settings>
         <settings>
             <name>BUILDACTION</name>
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild></prebuild>
-                <postbuild></postbuild>
+                <postbuild>"$PROJ_DIR$\ti_image\tiimage.exe" "0x80000000" "NONE" "$TARGET_BPATH$.bin" "$TARGET_BPATH$_ti.bin"</postbuild>
             </data>
         </settings>
         <settings>
             <name>ILINK</name>
             <archiveVersion>0</archiveVersion>
             <data>
-                <version>23</version>
+                <version>26</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -728,10 +695,6 @@
                 <option>
                     <name>IlinkLibIOConfig</name>
                     <state>1</state>
-                </option>
-                <option>
-                    <name>XLinkMisraHandler</name>
-                    <state>0</state>
                 </option>
                 <option>
                     <name>IlinkInputFileSlave</name>
@@ -851,7 +814,7 @@
                 </option>
                 <option>
                     <name>IlinkOverrideProgramEntryLabel</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabelSelect</name>
@@ -859,7 +822,7 @@
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabel</name>
-                    <state>__iar_program_start</state>
+                    <state>Entry</state>
                 </option>
                 <option>
                     <name>DoFill</name>
@@ -1054,6 +1017,34 @@
                     <name>IlinkRawBinaryAlign2</name>
                     <state></state>
                 </option>
+                <option>
+                    <name>IlinkLogCrtRoutineSelection</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogFragmentInfo</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogInlining</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogMerging</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkDemangle</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFileEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFile</name>
+                    <state></state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -1077,11 +1068,6 @@
                 </option>
             </data>
         </settings>
-        <settings>
-            <name>BILINK</name>
-            <archiveVersion>0</archiveVersion>
-            <data />
-        </settings>
     </configuration>
     <configuration>
         <name>Release</name>
@@ -1093,9 +1079,17 @@
             <name>General</name>
             <archiveVersion>3</archiveVersion>
             <data>
-                <version>31</version>
+                <version>34</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
+                <option>
+                    <name>BrowseInfoPath</name>
+                    <state>Release\BrowseInfo</state>
+                </option>
+                <option>
+                    <name>OGProductVersion</name>
+                    <state>9.20.1.43525</state>
+                </option>
                 <option>
                     <name>ExePath</name>
                     <state>Release\Exe</state>
@@ -1143,20 +1137,8 @@
                     <state></state>
                 </option>
                 <option>
-                    <name>OGProductVersion</name>
-                    <state>5.10.0.159</state>
-                </option>
-                <option>
                     <name>OGLastSavedByProductVersion</name>
                     <state>7.50.2.0</state>
-                </option>
-                <option>
-                    <name>GeneralEnableMisra</name>
-                    <state>0</state>
-                </option>
-                <option>
-                    <name>GeneralMisraVerbose</name>
-                    <state>0</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -1179,26 +1161,12 @@
                     <state>0</state>
                 </option>
                 <option>
-                    <name>GeneralMisraRules98</name>
-                    <version>0</version>
-                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
-                </option>
-                <option>
-                    <name>GeneralMisraVer</name>
-                    <state>0</state>
-                </option>
-                <option>
-                    <name>GeneralMisraRules04</name>
-                    <version>0</version>
-                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
-                </option>
-                <option>
                     <name>RTConfigPath2</name>
                     <state></state>
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>28</version>
+                    <version>31</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -1215,7 +1183,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>28</version>
+                    <version>31</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -1238,7 +1206,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>28</version>
+                    <version>31</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -1291,13 +1259,25 @@
                     <version>0</version>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>OGAarch64Abi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OG_32_64Device</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>BuildFilesPath</name>
+                    <state>Release</state>
+                </option>
             </data>
         </settings>
         <settings>
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>36</version>
+                <version>37</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
                 <option>
@@ -1426,10 +1406,6 @@
                     <state></state>
                 </option>
                 <option>
-                    <name>CompilerMisraOverride</name>
-                    <state>0</state>
-                </option>
-                <option>
                     <name>CCIncludePath2</name>
                     <state></state>
                 </option>
@@ -1457,16 +1433,6 @@
                 <option>
                     <name>CCOptLevelSlave</name>
                     <state>3</state>
-                </option>
-                <option>
-                    <name>CompilerMisraRules98</name>
-                    <version>0</version>
-                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
-                </option>
-                <option>
-                    <name>CompilerMisraRules04</name>
-                    <version>0</version>
-                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
                 </option>
                 <option>
                     <name>CCPosIndRopi</name>
@@ -1559,7 +1525,7 @@
             <name>AARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>10</version>
+                <version>11</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
                 <option>
@@ -1715,6 +1681,10 @@
                     <name>AsmNoLiteralPool</name>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -1754,12 +1724,8 @@
                 <extensions></extensions>
                 <cmdline></cmdline>
                 <hasPrio>0</hasPrio>
+                <buildSequence>inputOutputBased</buildSequence>
             </data>
-        </settings>
-        <settings>
-            <name>BICOMP</name>
-            <archiveVersion>0</archiveVersion>
-            <data />
         </settings>
         <settings>
             <name>BUILDACTION</name>
@@ -1773,7 +1739,7 @@
             <name>ILINK</name>
             <archiveVersion>0</archiveVersion>
             <data>
-                <version>23</version>
+                <version>26</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
                 <option>
@@ -1783,10 +1749,6 @@
                 <option>
                     <name>IlinkLibIOConfig</name>
                     <state>1</state>
-                </option>
-                <option>
-                    <name>XLinkMisraHandler</name>
-                    <state>0</state>
                 </option>
                 <option>
                     <name>IlinkInputFileSlave</name>
@@ -2109,6 +2071,34 @@
                     <name>IlinkRawBinaryAlign2</name>
                     <state></state>
                 </option>
+                <option>
+                    <name>IlinkLogCrtRoutineSelection</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogFragmentInfo</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogInlining</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogMerging</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkDemangle</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFileEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFile</name>
+                    <state></state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -2131,11 +2121,6 @@
                     <state>###Unitialized###</state>
                 </option>
             </data>
-        </settings>
-        <settings>
-            <name>BILINK</name>
-            <archiveVersion>0</archiveVersion>
-            <data />
         </settings>
     </configuration>
     <group>
@@ -2216,420 +2201,340 @@
             </file>
         </group>
         <group>
-            <name>include</name>
-            <group>
-                <name>armv7a</name>
-                <group>
-                    <name>am335x</name>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\am335.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\beaglebone.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\clock.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\device.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\edma_event.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\evmAM335x.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\evmskAM335x.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\interrupt.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\lib\include\armv7a\am335x\pin_mux.h</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\armv7a\cache.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\armv7a\cp15.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\armv7a\cpu.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\armv7a\mmu.h</name>
-                </file>
-            </group>
-            <group>
-                <name>hw</name>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cm_cefuse.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cm_device.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cm_dpll.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cm_gfx.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cm_mpu.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cm_per.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cm_rtc.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cm_wkup.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_control_AM335x.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cpsw_ale.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cpsw_cpdma.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cpsw_cpts.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cpsw_port.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cpsw_sl.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cpsw_ss.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_cpsw_wr.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_dcan.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_ddr2_mddr.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_dmtimer.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_dmtimer_1ms.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_ecap.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_edma3cc.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_edma3tc.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_ehrpwm.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_elm.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_emif4d.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_emifa2.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_gpio_v2.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_gpmc.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_hs_mmcsd.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_hsi2c.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_intc.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_lcdc.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_mailbox.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_mcasp.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_mcspi.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_mdio.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_prm_cefuse.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_prm_gfx.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_prm_mpu.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_prm_per.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_prm_wkup.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_pwmss.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_rtc.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_tps65217.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_tps65910.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_tsc_adc_ss.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_types.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_uart_irda_cir.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_usb.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_usbOtg_AM335x.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_usbphyGS70.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\hw_watchdog.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\include\hw\soc_AM335x.h</name>
-                </file>
-            </group>
-            <file>
-                <name>$PROJ_DIR$\lib\include\ascii.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\board.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\cmdline.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\consoleUtils.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\cppi41dma.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\cpsw.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\dcan.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\debug.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\delay.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\dmtimer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\ecap.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\edma.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\ehrpwm.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\elm.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\epwm.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\error.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\gpio.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\gpio_v2.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\gpmc.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\hs_mmcsd.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\hsi2c.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\mailbox.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\mcasp.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\mcspi.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\mdio.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\misc.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\perf.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\phy.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\pruss.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\raster.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\rtc.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\systick.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\tsc_adc.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\uart_irda_cir.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\uartStdio.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\usb.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\vpif.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\include\watchdog.h</name>
-            </file>
-        </group>
-        <group>
             <name>platform</name>
             <file>
-                <name>$PROJ_DIR$\lib\beaglebone.c</name>
+                <name>$PROJ_DIR$\lib\platform\board.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\cpsw.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\ctlregcontext.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\dmtimer.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\edma.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\eeprom.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\gpio.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\hs_mmcsd.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\hsi2c.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\rtc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\sysdelay.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\sysperf.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\timertick.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\uart.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\uartConsole.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\usb.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\lib\platform\watchdog.c</name>
             </file>
         </group>
         <group>
-            <name>system_config</name>
-            <group>
-                <name>am335x</name>
-                <file>
-                    <name>$PROJ_DIR$\lib\system_config\am335x\clock.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\system_config\am335x\device.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\system_config\am335x\exceptionhandler.S</name>
-                    <excluded>
-                        <configuration>Debug</configuration>
-                    </excluded>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\system_config\am335x\interrupt.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\lib\system_config\am335x\startup.c</name>
-                    <excluded>
-                        <configuration>Debug</configuration>
-                    </excluded>
-                </file>
-            </group>
+            <name>system</name>
             <file>
-                <name>$PROJ_DIR$\lib\system_config\cache.c</name>
+                <name>$PROJ_DIR$\lib\system\cache.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\system_config\cp15.S</name>
+                <name>$PROJ_DIR$\lib\system\clock.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\system_config\cpu.S</name>
+                <name>$PROJ_DIR$\lib\system\cp15.S</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\system_config\init.S</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
+                <name>$PROJ_DIR$\lib\system\cpu.S</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\system_config\mmu.c</name>
-            </file>
-        </group>
-        <group>
-            <name>uC-LIB</name>
-            <group>
-                <name>Ports</name>
-                <group>
-                    <name>ARM</name>
-                    <file>
-                        <name>$PROJ_DIR$\lib\uC-LIB\Ports\ARM\lib_mem_a.asm</name>
-                    </file>
-                </group>
-            </group>
-            <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_ascii.c</name>
+                <name>$PROJ_DIR$\lib\system\device.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_ascii.h</name>
+                <name>$PROJ_DIR$\lib\system\exceptionhandler.S</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_def.h</name>
+                <name>$PROJ_DIR$\lib\system\init.S</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_math.c</name>
+                <name>$PROJ_DIR$\lib\system\interrupt.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_math.h</name>
+                <name>$PROJ_DIR$\lib\system\mmu.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_mem.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_mem.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_str.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\lib\uC-LIB\lib_str.h</name>
+                <name>$PROJ_DIR$\lib\system\startup.c</name>
+                <configuration>
+                    <name>Debug</name>
+                    <settings>
+                        <name>ICCARM</name>
+                        <data>
+                            <version>37</version>
+                            <wantNonLocal>0</wantNonLocal>
+                            <debug>1</debug>
+                            <option>
+                                <name>CCOptimizationNoSizeConstraints</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCDefines</name>
+                                <state>am335x</state>
+                                <state>beaglebone_black</state>
+                                <state>beaglebone</state>
+                            </option>
+                            <option>
+                                <name>CCPreprocFile</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCPreprocComments</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCPreprocLine</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCListCFile</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCListCMnemonics</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCListCMessages</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCListAssFile</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCListAssSource</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCEnableRemarks</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCDiagSuppress</name>
+                                <state>Pa050, Pe1750, Pa082</state>
+                            </option>
+                            <option>
+                                <name>CCDiagRemark</name>
+                                <state></state>
+                            </option>
+                            <option>
+                                <name>CCDiagWarning</name>
+                                <state></state>
+                            </option>
+                            <option>
+                                <name>CCDiagError</name>
+                                <state></state>
+                            </option>
+                            <option>
+                                <name>CCObjPrefix</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>CCAllowList</name>
+                                <version>1</version>
+                                <state>00000000</state>
+                            </option>
+                            <option>
+                                <name>CCDebugInfo</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>IEndianMode</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>IProcessor</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>IExtraOptionsCheck</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>IExtraOptions</name>
+                                <state></state>
+                            </option>
+                            <option>
+                                <name>CCLangConformance</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCSignedPlainChar</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>CCRequirePrototypes</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCDiagWarnAreErr</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCCompilerRuntimeInfo</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>IFpuProcessor</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>OutputFile</name>
+                                <state>$FILE_BNAME$.o</state>
+                            </option>
+                            <option>
+                                <name>CCLibConfigHeader</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>PreInclude</name>
+                                <state></state>
+                            </option>
+                            <option>
+                                <name>CCIncludePath2</name>
+                                <state>$PROJ_DIR$\include\</state>
+                                <state>$PROJ_DIR$\include\hw</state>
+                                <state>$PROJ_DIR$\include\armv7a</state>
+                                <state>$PROJ_DIR$\include\armv7a\am335x</state>
+                                <state>$PROJ_DIR$\mmcsdlib\include</state>
+                                <state>$PROJ_DIR$\grlib</state>
+                                <state>$PROJ_DIR$\usblib\include</state>
+                            </option>
+                            <option>
+                                <name>CCStdIncCheck</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCCodeSection</name>
+                                <state>.text</state>
+                            </option>
+                            <option>
+                                <name>IProcessorMode2</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCOptLevel</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCOptStrategy</name>
+                                <version>0</version>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCOptLevelSlave</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCPosIndRopi</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCPosIndRwpi</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCPosIndNoDynInit</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>IccLang</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>IccCDialect</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>IccAllowVLA</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>IccStaticDestr</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>IccCppInlineSemantics</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>IccCmsis</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>IccFloatSemantics</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCNoLiteralPool</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCOptStrategySlave</name>
+                                <version>0</version>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCEncSource</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCEncOutput</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCEncOutputBom</name>
+                                <state>1</state>
+                            </option>
+                            <option>
+                                <name>CCEncInput</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>IccExceptions2</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>IccRTTI2</name>
+                                <state>0</state>
+                            </option>
+                            <option>
+                                <name>CCStackProtection</name>
+                                <state>0</state>
+                            </option>
+                        </data>
+                    </settings>
+                </configuration>
             </file>
         </group>
         <group>
@@ -2663,187 +2568,7 @@
             </file>
         </group>
     </group>
-    <group>
-        <name>src</name>
-        <group>
-            <name>app</name>
-            <file>
-                <name>$PROJ_DIR$\src\app\app_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\app_hooks.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\app_utils.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\app_utils.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\cpu_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\lib_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\app\os_cfg.h</name>
-            </file>
-        </group>
-        <group>
-            <name>cppdrivers</name>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.CPP</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\CONTROL_MODULE.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\DM_Timer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\HS_I2C.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.CPP</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\I2C_EEPROM.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\INTC.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\INTC.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\OS_Timer.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\PRCM.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\src\cppdrivers\PRCM.h</name>
-            </file>
-        </group>
-        <file>
-            <name>$PROJ_DIR$\src\hal_mmu.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\src\init.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\src\main.cpp</name>
-        </file>
-    </group>
-    <group>
-        <name>startup</name>
-        <file>
-            <name>$PROJ_DIR$\startup\amm335x_init.S</name>
-        </file>
-    </group>
-    <group>
-        <name>uC-CPU</name>
-        <group>
-            <name>ARM-Cortex-A</name>
-            <file>
-                <name>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A\cpu_a.asm</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uC-CPU\ARM-Cortex-A\uC_cpu.h</name>
-            </file>
-        </group>
-        <file>
-            <name>$PROJ_DIR$\vendor\uC-CPU\cpu_cache.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\vendor\uC-CPU\cpu_core.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\vendor\uC-CPU\cpu_core.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\vendor\uC-CPU\cpu_def.h</name>
-        </file>
-    </group>
-    <group>
-        <name>uCOS-II</name>
-        <group>
-            <name>Ports</name>
-            <group>
-                <name>ARM-Cortex-A</name>
-                <file>
-                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-d16.asm</name>
-                    <excluded>
-                        <configuration>Debug</configuration>
-                    </excluded>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-d32.asm</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_a_vfp-none.asm</name>
-                    <excluded>
-                        <configuration>Debug</configuration>
-                    </excluded>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\vendor\uCOS-II\Ports\ARM-Cortex-A\os_cpu_c.c</name>
-                </file>
-            </group>
-        </group>
-        <group>
-            <name>Source</name>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_core.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_dbg_r.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_flag.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_mbox.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_mem.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_mutex.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_q.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_sem.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_task.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_time.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\os_tmr.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\vendor\uCOS-II\Source\ucos_ii.h</name>
-            </file>
-        </group>
-    </group>
     <file>
-        <name>$PROJ_DIR$\repliclay_sw.icf</name>
+        <name>$PROJ_DIR$\main.cpp</name>
     </file>
 </project>

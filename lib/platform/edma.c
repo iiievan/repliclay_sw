@@ -43,6 +43,8 @@
 #include "soc_AM335x.h"
 #include "hw_cm_per.h"
 #include "hw_types.h"
+#include "beaglebone.h"
+#include "edma.h"
 
 
 /**

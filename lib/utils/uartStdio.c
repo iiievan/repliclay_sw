@@ -43,7 +43,6 @@
 
 #include "uartStdio.h"
 #include "ascii.h"
-#include "beaglebone.h"
 
 
 /*****************************************************************************
@@ -85,6 +84,13 @@
  * equivalent. */
 static const char * const g_pcHex = "0123456789abcdef";
 
+
+/****************************************************************************
+**                    EXTERNAL FUNCTION DECLARATIONS
+****************************************************************************/
+extern void UARTConsolePutc(unsigned char data);
+extern unsigned char UARTConsoleGetc(void);
+extern void UARTConsoleInit(void);
 
 /*****************************************************************************
 **                    FUNCTION DEFINITIONS
@@ -1305,7 +1311,7 @@ int UARTScanf(const char *format, va_list vaArg)
                 break;
 
                 default:
-                    UARTPuts((char *)"Format specifier is not supported\r\n", -1);
+                    UARTPuts("Format specifier is not supported\r\n", -1);
                     inputMatch = -1;
                 break;
             }
@@ -1314,7 +1320,7 @@ int UARTScanf(const char *format, va_list vaArg)
     /* Check for invalid format specifiers */
     if(0 == inputMatch)
     {
-        UARTPuts((char *)"Invalid format specifiers\r\n", -1);
+        UARTPuts("Invalid format specifiers\r\n", -1);
         inputMatch = -1;
     }
 

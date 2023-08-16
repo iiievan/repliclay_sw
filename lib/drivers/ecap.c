@@ -658,8 +658,8 @@ void EcapContextSave(unsigned int ecapBase, unsigned int pwmssBase,
  * \return  None
  *
  **/
-
-void EcapContextRestore(unsigned int ecapBase, unsigned int pwmssBase, ECAPCONTEXT *contextPtr)
+void EcapContextRestore(unsigned int ecapBase, unsigned int pwmssBase,
+                        ECAPCONTEXT *contextPtr)
 {
     HWREG(pwmssBase + PWMSS_CLOCK_CONFIG) = contextPtr->pwm0ssclkconfig;
     HWREG(ecapBase + ECAP_TSCTR) = contextPtr->tsctr;

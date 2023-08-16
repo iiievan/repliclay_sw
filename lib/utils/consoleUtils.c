@@ -89,7 +89,7 @@ void ConsoleUtilsSetType(enum consoleUtilsType consoleFlag)
     }
     else
     {
-        UARTPuts((char *)"Error! Invalid Console selection\r\n", -1);
+        UARTPuts("Error! Invalid Console selection\r\n", -1);
     }
 }
 
@@ -128,7 +128,7 @@ void ConsoleUtilsPrintf(const char *string, ...)
         */
         fflush(stdout);
         #else
-        UARTPuts((char *)"Error! SemiHosting Support is not enabled\r\n", -1);
+        UARTPuts("Error! SemiHosting Support is not enabled\r\n", -1);
         #endif
     }
     else
@@ -173,7 +173,7 @@ int ConsoleUtilsScanf(const char *format, ...)
         */
         fflush(stdin);
         #else
-        UARTPuts((char *)"Error! SemiHosting Support is not enabled\r\n", -1);
+        UARTPuts("Error! SemiHosting Support is not enabled\r\n", -1);
         #endif
     }
     else
@@ -213,7 +213,7 @@ char* ConsoleUtilsGets(char *rxBuffer, int size)
         */
         fflush(stdin);
         #else
-        UARTPuts((char *)"Error! SemiHosting Support is not enabled\r\n", -1);
+        UARTPuts("Error! SemiHosting Support is not enabled\r\n", -1);
         #endif
     }
     else
@@ -249,7 +249,7 @@ void ConsoleUtilsPuts(char *string, int size)
         */
         fflush(stdout);
         #else
-        UARTPuts((char *)"Error! SemiHosting Support is not enabled\r\n", -1);
+        UARTPuts("Error! SemiHosting Support is not enabled\r\n", -1);
         #endif
     }
     else
@@ -282,7 +282,7 @@ unsigned char ConsoleUtilsGetChar(void)
         */
         fflush(stdin);
         #else
-        UARTPuts((char *)"Error! SemiHosting Support is not enabled\r\n", -1);
+        UARTPuts("Error! SemiHosting Support is not enabled\r\n", -1);
         #endif
     }
     else
@@ -324,7 +324,7 @@ void ConsoleUtilsPutChar(unsigned char byte)
         */
         fflush(stdout);
         #else
-        UARTPuts((char *)"Error! SemiHosting Support is not enabled\r\n", -1);
+        UARTPuts("Error! SemiHosting Support is not enabled\r\n", -1);
         #endif
     }
     else

@@ -184,8 +184,8 @@ void Cppi41DmaInit(unsigned short usbDevInst, endpointInfo *epInfo,
     usbInstance = &(cppiInfo.usbInst[usbDevInst]);
 
     /*Populate the CPPI info structure */
-    cppiInfo.head_bd = (hostPacketDesc*)NULL;
-    cppiInfo.tail_bd = (hostPacketDesc*)NULL;
+    cppiInfo.head_bd = (hostPacketDesc *)NULL;
+    cppiInfo.tail_bd =  (hostPacketDesc *)NULL;
 
 #if defined (am335x_15x15) || defined(am335x) || defined(c6a811x)
     for(i =0; i < MAX_NUM_EP; i++)
@@ -704,7 +704,7 @@ void Cppi41DmaConfigTxCompletionQueue(unsigned short usbDevInst,
 **/
 void Cppi41DmaInitBdPool()
 {
-    hostPacketDesc *temp_bd = (hostPacketDesc*)NULL;
+    hostPacketDesc *temp_bd = (hostPacketDesc *)NULL;
     unsigned int i;
 
     temp_bd = (hostPacketDesc *)cppiInfo.region0DescriptorAddress;
@@ -714,16 +714,16 @@ void Cppi41DmaInitBdPool()
         {
             cppiInfo.head_bd = temp_bd;
             cppiInfo.tail_bd = temp_bd;
-            temp_bd->nextHBDptr = (hostPacketDesc*)NULL;
+            temp_bd->nextHBDptr = (hostPacketDesc *)NULL;
         }
         else
         {
             cppiInfo.tail_bd->nextHBDptr = temp_bd;
             cppiInfo.tail_bd = cppiInfo.tail_bd->nextHBDptr;
-            temp_bd->nextHBDptr = (hostPacketDesc*)NULL;
+            temp_bd->nextHBDptr = (hostPacketDesc *)NULL;
         }
     }
-    temp_bd = (hostPacketDesc*)NULL;
+    temp_bd = (hostPacketDesc *)NULL;
 }
 
 
@@ -739,13 +739,13 @@ hostPacketDesc * getFreeBd()
 {
     hostPacketDesc *free_bd;
 
-    free_bd = (hostPacketDesc*)NULL;
+    free_bd = (hostPacketDesc *)NULL;
 
     if(cppiInfo.head_bd)
     {
         free_bd = cppiInfo.head_bd;
         cppiInfo.head_bd = cppiInfo.head_bd->nextHBDptr;
-        free_bd->nextHBDptr = (hostPacketDesc*)NULL;
+        free_bd->nextHBDptr = (hostPacketDesc *)NULL;
     }
 
     return free_bd;
@@ -769,7 +769,7 @@ void putFreeBd(hostPacketDesc *free_bd)
     else
     {
         cppiInfo.head_bd = free_bd;
-        cppiInfo.head_bd->nextHBDptr = (hostPacketDesc*)NULL;
+        cppiInfo.head_bd->nextHBDptr = (hostPacketDesc *)NULL;
     }
 }
 
@@ -949,7 +949,7 @@ void doDmaTxTransfer(unsigned short usbDevInst, unsigned char *buff,
 void doDmaTxTransfer(unsigned short usbDevInst, unsigned char *buff,
                                 unsigned int length, unsigned int endPoint)
 {
-    hostPacketDesc *current_bd = (hostPacketDesc*)NULL;
+    hostPacketDesc *current_bd = (hostPacketDesc *)NULL;
 
     unsigned int numOfBlocks =0;
     unsigned int residue;
@@ -1116,7 +1116,7 @@ void doDmaRxTransfer(unsigned short usbDevInst, unsigned int length,
 void doDmaRxTransfer(unsigned short usbDevInst, unsigned int length,
                                 unsigned char *buff, unsigned int endPoint)
 {
-    hostPacketDesc *current_bd = (hostPacketDesc*)NULL;
+    hostPacketDesc *current_bd = (hostPacketDesc *)NULL;
     usbInstance *usbInstance;
 
     ASSERT(buff != NULL);
@@ -1293,7 +1293,7 @@ unsigned int dmaRxCompletion(unsigned short usbDevInst, unsigned int ulEndpoint 
     unsigned int bufferAdd;
     usbInstance *usbInstance;
 
-    hostPacketDesc *rx_bd = (hostPacketDesc*)NULL;
+    hostPacketDesc *rx_bd = (hostPacketDesc *)NULL;
 
     usbInstance = &(cppiInfo.usbInst[usbDevInst]);
 
@@ -1567,7 +1567,7 @@ unsigned int * cppiDmaAllocnBuffer(unsigned int numOfBlocks)
         return dmaBuffer[j+1].dataBuffer;
     }
     else
-        return (unsigned int *)NULL;
+        return (unsigned int*)NULL;
 
 }
 
@@ -1648,7 +1648,7 @@ int Cppi41DmaRxChTeardown(unsigned short usbDevInst, unsigned int ulEndpoint )
     volatile int TimeOut = 0xffff;
     unsigned int ulEndPointIndex = USB_EP_TO_INDEX(ulEndpoint);
     unsigned short ulRxChan = usbInstance->rxEndPoint[ulEndPointIndex].channel;
-    hostPacketDesc* completed_bd = (hostPacketDesc*)NULL;
+    hostPacketDesc* completed_bd = (hostPacketDesc *)NULL;
     hPDWord0* DescHeaderPtr = (hPDWord0*)NULL;
     int GlobalConfigReg =
     HWREG(usbInstance->usbSubSysBaseAddress + (CPDMA_RX_CHANNEL_CONFIG_REG +
@@ -1755,7 +1755,7 @@ int Cppi41DmaTxChTeardown(unsigned short usbDevInst, unsigned int ulEndpoint )
     int GlobalConfigReg =
     HWREG(usbInstance->usbSubSysBaseAddress + (CPDMA_TX_CHANNEL_CONFIG_REG +
      CHANNEL_OFFSET(ulTxChan)));
-    hostPacketDesc* completed_bd = (hostPacketDesc*)NULL;
+    hostPacketDesc* completed_bd = (hostPacketDesc *)NULL;
     hPDWord0* DescHeaderPtr = (hPDWord0*)NULL;
     /* Set Completion Q related info - Default Q manager (0)and Default Completion Q
     Note that we have alerady done this for this endpoint ,but  these fields
