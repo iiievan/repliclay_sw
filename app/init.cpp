@@ -1,56 +1,7 @@
 #include "init.h"
 
-unsigned char intent[] = "The application echoes the characters that you type on the console.\r\n";
-unsigned char welcome[] = "StarterWare AM335X UART DMA application.\r\n";
-unsigned char enter[] = "Please Enter 08 bytes from keyboard.\r\n";
-volatile unsigned int clBackFlag = 0;
-
-unsigned char rxBuffer[RX_BUFFER_SIZE];
-/*
-** Transmit Trigger Space value. This is applicable only when UART FIFO mode
-** is used. Refer to the comments of the API UARTFIFOConfig() to find the
-** possible values of TX Trigger Space.
-*/
-unsigned int txTrigSpace = TX_TRIGGER_SPACE_GRAN_1;
-
-/*
-** Number of bytes transmitted by EDMA per TX event sent by UART.
-** In UART FIFO mode, this should be equal to the TX Trigger Space value.
-*/
-unsigned int txBytesPerEvent = TX_BYTES_PER_EVENT;
-
-/*
-** Receive DMA Thresold Level. This applies to both UART FIFO and Non-FIFO
-** modes of operation. For FIFO mode, refer to the comments of the API
-** UARTFIFOConfig() to find the possible values of RX Trigger Level.
-** For Non-FIFO mode, this value is 1.
-*/
-unsigned int rxTrigLevel = RX_DMA_THRESHOLD;
-
-/* Transmit DMA Threshold Level. This is set in TX_DMA_THRESHOLD register. */
-unsigned int txThreshLevel = TX_DMA_THRESHOLD;
-
-/****************************************************************************/
-/*                      NOTE TO THE USER                                    */
-/****************************************************************************/
-/*
-** 1) The application can be used with or without Transmit and Receive
-**    UART FIFOs being enabled. The macro UART_ENABLE_FIFO should be defined
-**    if UART FIFOs have to used.
-** 2) The number of bytes transferred by EDMA to the TX FIFO per TX event
-**    sent by UART should be equal to the TX Trigger Space setting in TLR
-**    and/or FCR.
-** 3) This application uses Direct TX DMA Threshold Programming method
-**    to program the TX DMA Threshold level. Here the TX DMA Threshold level
-**    is programmed in TX_DMA_THRESHOLD register of UART.
-** 4) If Direct TX DMA Threshold Programming is used, the TX Trigger Space
-**    setting should be greater than TX Threshold Level.
-*/
-
-/****************************************************************************/
-/*                   LOCAL FUNCTION DEFINITIONS                             */
-/****************************************************************************/
-
+void (*cb_Fxn[EDMA3_NUM_TCC]) (unsigned int tcc);
+unsigned int clBackFlag = 0;
 
 void init_board(void)
 {    
@@ -63,7 +14,6 @@ void init_board(void)
     UARTInitialize();       // Initializing the UART0 instance for use. 
 
     /******************** Configuring the EDMA **************************/
-
     // Request DMA Channel and TCC for UART Transmit
     EDMA3RequestChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA,
                         EDMA3_UART_TX_CHA_NUM, EDMA3_UART_TX_CHA_NUM,
@@ -79,17 +29,15 @@ void init_board(void)
 
     // Registering Callback Function for RX
     cb_Fxn[EDMA3_UART_RX_CHA_NUM] = &callback;
-}  
-
-
+}
+   
 // This function configures and sets the EDMA PaRAM set values for
 // transferring data to UART TX FIFO.
-
-static void UARTTxEDMAPaRAMSetConfig(unsigned char *txBuffer,
-                                     unsigned int length,
-                                     unsigned int tccNum,
-                                     unsigned short linkAddr,
-                                     unsigned int chNum)
+void UARTTxEDMAPaRAMSetConfig(unsigned char *txBuffer,
+                              unsigned int length,
+                              unsigned int tccNum,
+                              unsigned short linkAddr,
+                              unsigned int chNum)
 {
     EDMA3CCPaRAMEntry paramSet;
 
@@ -128,15 +76,13 @@ static void UARTTxEDMAPaRAMSetConfig(unsigned char *txBuffer,
     EDMA3SetPaRAM(SOC_EDMA30CC_0_REGS, chNum, &paramSet);
 }
 
-/*
-** This function configures and sets the EDMA PaRAM set values for
-** receiving data from UART RX FIFO.
-*/
-static void UARTRxEDMAPaRAMSetConfig(unsigned char *rxBuffer,
-                                     unsigned int length,
-                                     unsigned int tccNum,
-                                     unsigned short linkAddr,
-                                     unsigned int chNum)
+// This function configures and sets the EDMA PaRAM set values for
+// receiving data from UART RX FIFO.
+void UARTRxEDMAPaRAMSetConfig(unsigned char *rxBuffer,
+                              unsigned int length,
+                              unsigned int tccNum,
+                              unsigned short linkAddr,
+                              unsigned int chNum)
 {
     EDMA3CCPaRAMEntry paramSet;
 
@@ -174,11 +120,9 @@ static void UARTRxEDMAPaRAMSetConfig(unsigned char *rxBuffer,
     EDMA3SetPaRAM(SOC_EDMA30CC_0_REGS, chNum, &paramSet);
 }
 
-/*
-** This configures the PaRAM set for the Dummy Transfer.
-*/
 
-static void TxDummyPaRAMConfEnable(void)
+// This configures the PaRAM set for the Dummy Transfer.
+void TxDummyPaRAMConfEnable(void)
 {
     EDMA3CCPaRAMEntry dummyPaRAMSet;
 
@@ -198,10 +142,9 @@ static void TxDummyPaRAMConfEnable(void)
     EDMA3SetPaRAM(SOC_EDMA30CC_0_REGS, DUMMY_CH_NUM, &dummyPaRAMSet);
 }
 
-/*
-** EDMA Completion Interrupt Service Routine(ISR).
-*/
-static void Edma3CompletionIsr(void)
+
+// EDMA Completion Interrupt Service Routine(ISR).
+void Edma3CompletionIsr(void)
 {
     volatile unsigned int pendingIrqs;
     unsigned int index = 1;
@@ -236,10 +179,9 @@ static void Edma3CompletionIsr(void)
     }
 }
 
-/*
-** This function is used as a callback from EDMA3 Completion Handler.
-*/
-static void callback(unsigned int tccNum)
+
+// This function is used as a callback from EDMA3 Completion Handler.
+void callback(unsigned int tccNum)
 {
     /* Disabling DMA Mode of operation in UART. */
     UARTDMADisable(UART_INSTANCE_BASE_ADD);
@@ -250,11 +192,8 @@ static void callback(unsigned int tccNum)
     clBackFlag = 1;
 }
 
-/*
-** EDMA Error Interrupt Service Routine(ISR).
-*/
-
-static void Edma3CCErrorIsr(void)
+// EDMA Error Interrupt Service Routine(ISR).
+void Edma3CCErrorIsr(void)
 {
     volatile unsigned int pendingIrqs = 0;
     unsigned int evtqueNum = 0;
@@ -316,11 +255,9 @@ static void Edma3CCErrorIsr(void)
     }
 }
 
-/* 
-** Powering up, initializing and registering interrupts for EDMA.
-*/
-
-static void EDMA3Initialize(void)
+ 
+// Powering up, initializing and registering interrupts for EDMA.
+void EDMA3Initialize(void)
 {
     /* Initialization of EDMA3 */
     EDMA3Init(SOC_EDMA30CC_0_REGS, EVT_QUEUE_NUM);
@@ -329,11 +266,9 @@ static void EDMA3Initialize(void)
     EDMA3INTCConfigure();
 }
 
-/*
-** This function initializes the UART instance for use.
-*/
 
-static void UARTInitialize(void)
+// This function initializes the UART instance for use.
+void UARTInitialize(void)
 {
     /* Performing a module reset. */
     UARTModuleReset(UART_INSTANCE_BASE_ADD);
@@ -377,10 +312,8 @@ static void UARTInitialize(void)
 
 
 #ifdef UART_ENABLE_FIFO
-/*
-** A wrapper function performing FIFO configurations.
-*/
-static void UartFIFOConfigure(void)
+// A wrapper function performing FIFO configurations.
+void UartFIFOConfigure(void)
 {
     unsigned int fifoConfig = 0;
 
@@ -406,13 +339,11 @@ static void UartFIFOConfigure(void)
     /* Configuring the FIFO settings. */
     UARTFIFOConfig(UART_INSTANCE_BASE_ADD, fifoConfig);
 }
-#endif
+#endif  //UART_ENABLE_FIFO
 
-/*
-** A wrapper function performing Baud Rate settings.
-*/
 
-static void UartBaudRateSet(void)
+// A wrapper function performing Baud Rate settings.
+void UartBaudRateSet(void)
 {
     unsigned int divisorValue = 0;
 
@@ -427,11 +358,9 @@ static void UartBaudRateSet(void)
 
 }
 
-/*
-** This function configures the AINTC to receive EDMA3 interrupts.
-*/
 
-static void EDMA3INTCConfigure(void)
+// This function configures the AINTC to receive EDMA3 interrupts.
+void EDMA3INTCConfigure(void)
 {
     /* Initializing the ARM Interrupt Controller. */
     //IntAINTCInit();
@@ -454,9 +383,64 @@ static void EDMA3INTCConfigure(void)
     /* Enabling the EDMA3CC0 Error interrupt in AINTC. */
     IntSystemEnable(SYS_INT_EDMAERRINT);
 }
-#ifdef __cplusplus
+
+void UART_send(unsigned char * s, size_t len)
+{
+    unsigned int numByteChunks = 0;
+    unsigned char *pBuffer = nullptr;
+    unsigned int remainBytes = 0;
+
+    numByteChunks = (len - 1) / txBytesPerEvent;
+    remainBytes = (len - 1) % txBytesPerEvent;    
+     
+    UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE); // Enabling DMA Mode 1.
+
+    // Configuring EDMA PaRAM sets to transmit  message. 
+    UARTTxEDMAPaRAMSetConfig(s,
+                             numByteChunks * txBytesPerEvent,
+                             EDMA3_UART_TX_CHA_NUM,
+                             EDMA3CC_OPT(DUMMY_CH_NUM),
+                             EDMA3_UART_TX_CHA_NUM);
+
+    // Configuring the PaRAM set for Dummy Transfer.
+    TxDummyPaRAMConfEnable();
+
+    // Enable EDMA Transfer
+    EDMA3EnableTransfer(SOC_EDMA30CC_0_REGS, EDMA3_UART_TX_CHA_NUM,
+                        EDMA3_TRIG_MODE_EVENT);
+
+    // Wait for return from callback 
+    while(0 == clBackFlag);
+    clBackFlag = 0;
+
+    // Remaining bytes are transferred through polling method. 
+    if(0 != remainBytes)
+    {
+        pBuffer = s + (len - 1) - remainBytes;
+        UARTPuts((char*)pBuffer, remainBytes);
+    } 
 }
-#endif
+
+void UART_rcv(unsigned char * buff, size_t len)
+{
+    // Enabling DMA Mode 1.
+    UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE);
+
+    // Configuring the PaRAM set for reception. */
+    UARTRxEDMAPaRAMSetConfig(buff,
+                             len,
+                             EDMA3_UART_RX_CHA_NUM,
+                             0xFFFF,
+                             EDMA3_UART_RX_CHA_NUM);
+
+    // Enable EDMA Transfer
+    EDMA3EnableTransfer(SOC_EDMA30CC_0_REGS, EDMA3_UART_RX_CHA_NUM,
+                        EDMA3_TRIG_MODE_EVENT);
+
+    // Wait for return from callback 
+    while(0 == clBackFlag);
+    clBackFlag = 0; 
+}
 
 /******************************** End of file *******************************/
 

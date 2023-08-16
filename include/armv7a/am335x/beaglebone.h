@@ -67,7 +67,8 @@ extern "C" {
 /*
 ** Structure to map selection of IO Pad for power down configuration
 */
-typedef struct ioPadMap {
+typedef struct ioPadMap
+{
     unsigned int ioPad;
     unsigned int sel;
 }tIOPadMap;

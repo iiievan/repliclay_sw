@@ -2125,6 +2125,18 @@
         </settings>
     </configuration>
     <group>
+        <name>app</name>
+        <file>
+            <name>$PROJ_DIR$\app\init.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\app\init.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\app\main.cpp</name>
+        </file>
+    </group>
+    <group>
         <name>lib</name>
         <group>
             <name>drivers</name>
@@ -2569,10 +2581,4 @@
             </file>
         </group>
     </group>
-    <file>
-        <name>$PROJ_DIR$\init.cpp</name>
-    </file>
-    <file>
-        <name>$PROJ_DIR$\main.cpp</name>
-    </file>
 </project>
