@@ -48,7 +48,7 @@
                 </option>
                 <option>
                     <name>RunToEnable</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>RunToName</name>
@@ -92,7 +92,7 @@
                 </option>
                 <option>
                     <name>UseFlashLoader</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CLowLevel</name>
@@ -1418,7 +1418,7 @@
                 <option>
                     <name>CCXds100ResetList</name>
                     <version>0</version>
-                    <state>0</state>
+                    <state>6</state>
                 </option>
                 <option>
                     <name>CCXds100UsbSerialNo</name>
@@ -1431,7 +1431,7 @@
                 <option>
                     <name>CCXds100JtagSpeedList</name>
                     <version>0</version>
-                    <state>0</state>
+                    <state>7</state>
                 </option>
                 <option>
                     <name>CCXds100InterfaceRadio</name>

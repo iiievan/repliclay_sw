@@ -50,8 +50,11 @@
         SECTION ABT_STACK:DATA:NOROOT(3)
         SECTION UND_STACK:DATA:NOROOT(3)
         SECTION CSTACK:DATA:NOROOT(3)
+        //EXTWEAK __iar_init_core
+        //EXTWEAK __iar_init_vfp
  
         SECTION .bss:CODE:NOROOT(3)
+        SECTION text:CODE:NOROOT(2)
         SECTION SYSTEMSTART:CODE (4)
 ;************************ Internal Definitions ********************************
 
@@ -133,6 +136,12 @@ Entry:
           MCR p15, #0, r1, c7, c5, #4           ; flush prefetch buffer
           MOV r0,#0x40000000
           FMXR FPEXC, r0                        ; Set VFP/Neon enable bit
+
+          
+          //BL      __iar_init_core   ; Turn on core features assumed to be enabled.
+
+          
+          //BL      __iar_init_vfp    ; Initialize VFP (if needed).
 
 ;
 ; Clear the BSS section here. 

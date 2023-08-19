@@ -44,13 +44,13 @@ define symbol __ICFEDIT_region_ROM_end__   = 0x00000000;
 define symbol __ICFEDIT_region_RAM_start__ = 0x80000000;
 define symbol __ICFEDIT_region_RAM_end__   = 0x87FFFFF8;
 /*-Sizes-*/
-define symbol __ICFEDIT_size_cstack__   = 0x5000;
-define symbol __ICFEDIT_size_svcstack__ = 0x8;
-define symbol __ICFEDIT_size_irqstack__ = 0x1000;
-define symbol __ICFEDIT_size_fiqstack__ = 0x8;
-define symbol __ICFEDIT_size_undstack__ = 0x8;
-define symbol __ICFEDIT_size_abtstack__ = 0x8;
-define symbol __ICFEDIT_size_heap__     = 0x0;
+define symbol __ICFEDIT_size_cstack__   = 0x1000;	// 4096
+define symbol __ICFEDIT_size_svcstack__ = 0x100;
+define symbol __ICFEDIT_size_irqstack__ = 0x100;
+define symbol __ICFEDIT_size_fiqstack__ = 0x100;
+define symbol __ICFEDIT_size_undstack__ = 0x100;
+define symbol __ICFEDIT_size_abtstack__ = 0x100;
+define symbol __ICFEDIT_size_heap__     = 0x1000;	// 4096
 /**** End of ICF editor section. ###ICF###*/
 
 
@@ -68,11 +68,18 @@ define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };
 do not initialize  { readwrite };
 do not initialize  { section .noinit };
 
+//keep { section .intvec };
+
 place in RAM_region   { section SYSTEMSTART };
 place in RAM_region   { readonly };
 place in RAM_region   { readwrite};
 place in RAM_region   { zi };
-place in RAM_region   { block CSTACK, block SVC_STACK, block IRQ_STACK, block FIQ_STACK,
-                        block UND_STACK, block ABT_STACK, block HEAP };
+place in RAM_region   { block CSTACK, 
+                        block SVC_STACK, 
+                        block IRQ_STACK, 
+                        block FIQ_STACK,
+                        block UND_STACK, 
+                        block ABT_STACK, 
+                        block HEAP };
 
 define exported symbol __intvec_start = __ICFEDIT_intvec_start__;
