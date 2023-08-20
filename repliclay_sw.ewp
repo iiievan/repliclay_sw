@@ -350,6 +350,7 @@
                     <state>$PROJ_DIR$\usblib\include</state>
                     <state>$PROJ_DIR$\app</state>
                     <state>$PROJ_DIR$\periphery</state>
+                    <state>$PROJ_DIR$\drivers</state>
                     <state>$PROJ_DIR$\utils</state>
                 </option>
                 <option>
@@ -619,6 +620,7 @@
                     <state>$PROJ_DIR$\usblib\include</state>
                     <state>$PROJ_DIR$\app</state>
                     <state>$PROJ_DIR$\periphery</state>
+                    <state>$PROJ_DIR$\drivers</state>
                     <state>$PROJ_DIR$\utils</state>
                 </option>
                 <option>
@@ -2142,6 +2144,15 @@
         </file>
     </group>
     <group>
+        <name>drivers</name>
+        <file>
+            <name>$PROJ_DIR$\drivers\UART_Driver.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\drivers\UART_Driver.h</name>
+        </file>
+    </group>
+    <group>
         <name>lib</name>
         <group>
             <name>drivers</name>
@@ -2449,6 +2460,7 @@
                                 <state>$PROJ_DIR$\usblib\include</state>
                                 <state>$PROJ_DIR$\app</state>
                                 <state>$PROJ_DIR$\periphery</state>
+                                <state>$PROJ_DIR$\drivers</state>
                                 <state>$PROJ_DIR$\utils</state>
                             </option>
                             <option>
@@ -2751,6 +2763,7 @@
                             <state>$PROJ_DIR$\usblib\include</state>
                             <state>$PROJ_DIR$\app</state>
                             <state>$PROJ_DIR$\periphery</state>
+                            <state>$PROJ_DIR$\drivers</state>
                             <state>$PROJ_DIR$\utils</state>
                         </option>
                         <option>

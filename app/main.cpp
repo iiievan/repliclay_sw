@@ -99,17 +99,19 @@ unsigned int rxTrigLevel = RX_DMA_THRESHOLD;
 /* Transmit DMA Threshold Level. This is set in TX_DMA_THRESHOLD register. */
 unsigned int txThreshLevel = TX_DMA_THRESHOLD;
 
+UART_Driver UART_0;
+
 int main(void)
 {
     init_board();
     
     // Transmit welcone string
-    UART_send(welcome, sizeof(welcome));
-    UART_send(intent, sizeof(intent));
-    UART_send(enter, sizeof(enter));
+    UART_0.send(welcome, sizeof(welcome));
+    UART_0.send(intent, sizeof(intent));
+    UART_0.send(enter, sizeof(enter));
     
-    UART_rcv(rxBuffer, NUM_RX_BYTES);        // Receiving Data from User    
-    UART_send(rxBuffer, NUM_RX_BYTES + 1);    // Echoing received bytes
+    UART_0.recieve(NUM_RX_BYTES);        // Receiving Data from User    
+    UART_0.flush();                      // Echoing received bytes
     
 
     // Free EDMA3 Channels for TX and RX */
