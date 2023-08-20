@@ -95,7 +95,7 @@ public:
    void flush();      // flush rx buffer to tx
 
 private:
-  unsigned int  m_isr_flag {0};
+          bool  m_TX_busy {false};
 
           void  (*m_cb_Fxn[EDMA3_NUM_TCC]) (unsigned int tcc);
 

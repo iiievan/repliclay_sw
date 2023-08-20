@@ -14,6 +14,8 @@ UART_Driver::~UART_Driver()
 
 void  UART_Driver::setup()
 {
+    m_TX_busy = false;
+    
     m_tx_trig_space = TX_TRIGGER_SPACE_GRAN_1;
     m_tx_bytes_per_event = TX_BYTES_PER_EVENT;
     m_rx_trig_level = RX_DMA_THRESHOLD;
@@ -234,12 +236,12 @@ void UART_Driver::send(unsigned char * s, size_t len)
     TX_dummy_paRAM_conf_enable();
 
     // Enable EDMA Transfer
+    m_TX_busy = true;
     EDMA3EnableTransfer(SOC_EDMA30CC_0_REGS, EDMA3_UART_TX_CHA_NUM,
                         EDMA3_TRIG_MODE_EVENT);
 
     // Wait for return from callback 
-    while(0 == m_isr_flag);
-    m_isr_flag = 0;
+    while(m_TX_busy);
 
     // Remaining bytes are transferred through polling method. 
     if(0 != remainBytes)
@@ -261,13 +263,13 @@ void UART_Driver::recieve(size_t len)
                              0xFFFF,
                              EDMA3_UART_RX_CHA_NUM);
 
-    // Enable EDMA Transfer
+    // Enable EDMA Transfe
+    m_TX_busy = true;
     EDMA3EnableTransfer(SOC_EDMA30CC_0_REGS, EDMA3_UART_RX_CHA_NUM,
                         EDMA3_TRIG_MODE_EVENT);
 
     // Wait for return from callback 
-    while(0 == m_isr_flag);
-    m_isr_flag = 0; 
+    while(m_TX_busy);
 }
 
 // flush rx buffer to tx
@@ -303,12 +305,12 @@ void UART_Driver::flush()
     TX_dummy_paRAM_conf_enable();
 
     // Enable EDMA Transfer
+    m_TX_busy = true;
     EDMA3EnableTransfer(SOC_EDMA30CC_0_REGS, EDMA3_UART_TX_CHA_NUM,
                         EDMA3_TRIG_MODE_EVENT);
 
     // Wait for return from callback 
-    while(0 == m_isr_flag);
-    m_isr_flag = 0;
+    while(m_TX_busy);
 
     // Remaining bytes are transferred through polling method. 
     if(0 != remainBytes)
@@ -325,7 +327,7 @@ void  EDMA_Completion_Isr(void)
 {
     UART_Driver *s_UART = &UART_0;
 
-    volatile unsigned int pendingIrqs;
+    volatile unsigned int pendingIrqs = 0;
     unsigned int index = 1;
     unsigned int count = 0;
 
@@ -334,10 +336,28 @@ void  EDMA_Completion_Isr(void)
         // Wait for a finite time to monitor the EDMA Completion Interrupt
         // status.
         while ((count < EDMA3CC_COMPL_HANDLER_RETRY_COUNT) && (index != 0u))
-        {
+        {      
             index = 0;
+            pendingIrqs = EDMA3GetIntrStatus(SOC_EDMA30CC_0_REGS);  // Get the Interrupt status.
             
-            pendingIrqs = EDMA3GetIntrStatus(SOC_EDMA30CC_0_REGS);  // Get the Interrupt status. 
+            // calculate event number in EDMA interrupt complition
+            if(pendingIrqs)
+            {
+                do
+                {                    
+                    pendingIrqs >>= 1u;
+                    if(pendingIrqs)
+                      ++index;
+                }
+                while(pendingIrqs);
+                
+                // tx complition status
+                if(index == EDMA3_CHA_UART0_TX)
+                    s_UART->m_TX_busy = false;
+            }
+            
+            index = 0;
+            pendingIrqs = EDMA3GetIntrStatus(SOC_EDMA30CC_0_REGS);  // Get the Interrupt status.
             
             while(pendingIrqs)
             {
@@ -362,7 +382,7 @@ void  RXTX_end_clbck(unsigned int tccNum)
     UARTDMADisable(UART_INSTANCE_BASE_ADD); // Disabling DMA Mode of operation in UART.     
     EDMA3DisableTransfer(SOC_EDMA30CC_0_REGS, tccNum, EDMA3_TRIG_MODE_EVENT);   // Disabling DMA transfer on the specified channel.
 
-    s_UART->m_isr_flag = 1;
+    s_UART->m_TX_busy = false;
 }
 
 void  EDMA_CC_error_isr(void)
@@ -396,8 +416,8 @@ void  EDMA_CC_error_isr(void)
             }
             
             index = 0u;
-
             pendingIrqs = EDMA3GetCCErrStatus(SOC_EDMA30CC_0_REGS);
+            
             if (pendingIrqs != 0u)
             {
                 // Process all the pending CC error interrupts. 
