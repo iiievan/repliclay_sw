@@ -8,6 +8,8 @@
 #include "interrupt.h"
 #include "edma.h"
 #include "n_EDMA.h"
+#include "n_UART.h"
+#include "paired_buffer.h"
 
 #define UART_ENABLE_FIFO    // Enable FIFO mode of operation.
 
@@ -59,6 +61,9 @@
 
 #define NUM_RX_BYTES              (8)   // Number of bytes to be received from the user.
 
+#define RX_CHUNK_SIZE          (64UL)
+#define TX_CHUNK_SIZE          (8UL)
+
 // ISR and other callbacks
 extern void  EDMA_Completion_Isr(void);
 extern void  RXTX_end_clbck(unsigned int tccNum);
@@ -77,20 +82,20 @@ public:
    void  FIFO_configure(void);
    void  Baud_set(void);
 
-   void  TX_EDMA_paRAM_set_config(unsigned char *txBuffer,
-                                   unsigned int  length,
-                                   unsigned int  tccNum,
-                                 unsigned short  linkAddr,
-                                   unsigned int  chNum);
+   void  TX_EDMA_paRAM_set_config(unsigned char *tx_buffer,
+                                   unsigned int  len,
+                                   unsigned int  tcc_num,
+                                 unsigned short  linkaddr,
+                                   unsigned int  ch_num);
 
-   void RX_EDMA_paRAM_set_config(unsigned char *rxBuffer,
-                                  unsigned int  length,
-                                  unsigned int  tccNum,
-                                unsigned short  linkAddr,
-                                  unsigned int  chNum);
+   void RX_EDMA_paRAM_set_config( unsigned int  len,
+                                  unsigned int  tcc_num,
+                                unsigned short  linkaddr,
+                                  unsigned int  ch_num);
    void TX_dummy_paRAM_conf_enable(void);
 
    void send(unsigned char * s, size_t len);
+   void write(const uint8_t *string, size_t len);
    void recieve( size_t len);
    void flush();      // flush rx buffer to tx
 
@@ -100,6 +105,7 @@ private:
           void  (*m_cb_Fxn[EDMA3_NUM_TCC]) (unsigned int tcc);
 
  unsigned char  m_rxBuffer[RX_BUFFER_SIZE];
+ paired_buffer<uint8_t, TX_CHUNK_SIZE>  m_TX_data;        // storage data buffer for sending
   unsigned int  m_tx_trig_space;
   unsigned int  m_tx_bytes_per_event;
   unsigned int  m_rx_trig_level;

@@ -2,7 +2,7 @@
 #define _RINGBUFFER_H
 
 #include <cstddef>
-#include "utils/utils.h"
+#include "utils.h"
 
 template <size_t BUF_SIZE = 16>
 class ring_buffer

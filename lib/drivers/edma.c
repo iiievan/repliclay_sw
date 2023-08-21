@@ -1109,7 +1109,7 @@ unsigned int EDMA3RequestChannel(unsigned int baseAdd,
             /* Interrupt channel nums are < 32 */
             if (tccNum < SOC_EDMA3_NUM_DMACH)
             {
-            /* Enable the Event Interrupt                             */
+                /* Enable the Event Interrupt                             */
                 EDMA3EnableEvtIntr(baseAdd, chNum);
                 retVal = TRUE;
             }

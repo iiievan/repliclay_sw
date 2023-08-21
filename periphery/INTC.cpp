@@ -5,124 +5,6 @@ Interrupt_controller intc;
 INTC::isr_handler_t interrupt_vector_table[INTC::INTERRUPTS_NUM_MAX];
 
 /**
- * The Default Interrupt Handler.
- *
- * This is the default interrupt handler for all interrupts. It simply returns
- * without performing any operation.
- **/
-static void interrupt_default_handler(void)
-{
-    /* Go Back. Nothing to be done */
-    return;
-}
-
-#if defined(uC_OSII)
-static  void  OS_exept_handler (uint8_t  except_type)
-{
-    switch (except_type) 
-    {
-        case OS_CPU_ARM_EXCEPT_RESET:
-        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
-        case OS_CPU_ARM_EXCEPT_SWI:
-        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
-        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
-             while (true); 
-    }
-}
-
-void OS_CPU_ExceptHndlr (CPU_INT32U  src_id)
-{
-    switch (src_id) 
-    {
-        case OS_CPU_ARM_EXCEPT_IRQ:
-        case OS_CPU_ARM_EXCEPT_FIQ:
-             interrupt_handler((uint32_t)src_id);
-             break;
-
-        case OS_CPU_ARM_EXCEPT_RESET:
-        case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
-        case OS_CPU_ARM_EXCEPT_SWI:
-        case OS_CPU_ARM_EXCEPT_DATA_ABORT:
-        case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
-        case OS_CPU_ARM_EXCEPT_ADDR_ABORT:
-        default:
-             OS_exept_handler((uint8_t)src_id);
-             break;
-    }
-}
-
-template <auto EEPROM_SIZE = (32*1024), auto PAGE_SIZE = 32> 
-class I2C_EEPROM;
-extern I2C_EEPROM<(32*1024),32> BRDINFO_24LC32A;
-extern I2C_EEPROM<(32*1024),64> CAT24C256WI;
-
-class OS_Timer;
-class AM335x_UART;
-class AM335x_EDMA;
-extern OS_Timer os_timer;
-extern AM335x_UART uart_0;
-extern AM335x_EDMA eDMA;
-
-void  interrupt_handler(uint32_t  src_nbr)
-{
- INTC::e_SYS_INTERRUPT  int_nbr;
-    INTC::isr_handler_t  isr;
-
-    switch (src_nbr) 
-    {
-        case OS_CPU_ARM_EXCEPT_IRQ:
-             int_nbr = (INTC::e_SYS_INTERRUPT)INTC::AM335x_INTC->SIR_IRQ.b.ActiveIRQ;
-
-             isr = interrupt_vector_table[int_nbr];
-             if (isr != nullptr) 
-             {
-                switch(int_nbr)
-                {
-                    case INTC::I2C0INT:
-                        isr((void *)&BRDINFO_24LC32A);
-                        break;
-                    case INTC::I2C2INT:
-                        isr((void *)&CAT24C256WI);
-                        break;
-                    case INTC::TINT2:
-                        isr((void *)&os_timer);
-                        break;
-                    case INTC::UART0INT:
-                        isr((void *)&uart_0);
-                        break;
-                    case INTC::EDMACOMPINT:
-                    case INTC::EDMAERRINT:
-                        isr((void *)&eDMA);
-                        break;
-                    default:
-                        isr((void *)int_nbr);
-                        break;
-                }                    
-             }
-             
-			 intc.software_int_clear(int_nbr);              // Clear interrupt
-             INTC::AM335x_INTC->CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
-             break;
-
-        case OS_CPU_ARM_EXCEPT_FIQ:
-             int_nbr =  (INTC::e_SYS_INTERRUPT)INTC::AM335x_INTC->SIR_FIQ.b.ActiveFIQ;
-
-             isr = interrupt_vector_table[int_nbr];
-             if (isr != nullptr) 
-                 isr((void *)int_nbr);
-             
-			 intc.software_int_clear(int_nbr);              // Clear interrupt
-
-             INTC::AM335x_INTC->CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
-             break;
-
-        default:
-             break;
-    }
-}
-#endif  //uC_OSII
-
-/**
  * \brief   This API is used to initialize the interrupt controller. This API  
  *          shall be called before using the interrupt controller. 
  *
@@ -147,12 +29,12 @@ void  Interrupt_controller::init (void)
     m_INTC_regs.ISR_CLEAR1.reg = 0xFF;
     m_INTC_regs.ISR_CLEAR2.reg = 0xFF;
     m_INTC_regs.ISR_CLEAR3.reg = 0xFF;
-
+/*
     for (uint32_t int_id = 0; int_id < INTC::INTERRUPTS_NUM_MAX; int_id++) 
     {
         register_handler((INTC::e_SYS_INTERRUPT)int_id,(INTC::isr_handler_t)interrupt_default_handler);
     }
-    
+*/    
     m_INTC_regs.CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
     m_INTC_regs.CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
 }
@@ -218,7 +100,7 @@ void  Interrupt_controller::unregister_handler(INTC::e_SYS_INTERRUPT int_id)
         interrupt_vector_table[int_id] = (INTC::isr_handler_t)interrupt_default_handler; 
         CPU_CRITICAL_EXIT();
 #else
-        interrupt_vector_table[int_id] = (INTC::isr_handler_t)interrupt_default_handler; 
+        //interrupt_vector_table[int_id] = (INTC::isr_handler_t)interrupt_default_handler; 
 #endif
     }
 }

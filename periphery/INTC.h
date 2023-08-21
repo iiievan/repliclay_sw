@@ -2,10 +2,9 @@
 #define _INTC_H_
 
 #include <stdint.h>
-#include  <cpu_core.h>
-#include  <os.h>
-#include "utils/utils.h"
-
+//#include  <cpu_core.h>
+//#include  <os.h>
+#include "utils.h"
 
 //This is interrupt controller class and his namespace
 namespace INTC
@@ -719,12 +718,6 @@ private:
     INTC::AM335x_INTC_Type &m_INTC_regs;
 };
 
-static void interrupt_default_handler(void);
-    
-#if defined(uC_OSII)
-    extern void OS_CPU_ExceptHndlr   (CPU_INT32U  src_id);
-    extern void interrupt_handler (uint32_t  src_nbr);
-#endif  // uC_OSII
 extern Interrupt_controller intc;
 
 #endif //_INTC_H_

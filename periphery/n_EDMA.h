@@ -2142,9 +2142,10 @@ namespace n_EDMA
         __R   DFBIDX3_reg_t       DFBIDX3;            // (0x3D0)  Destination FIFO BIDX Register 3
         __R   DFMPPRXY3_reg_t     DFMPPRXY3;          // (0x3D4)  Destination FIFO Memory Protection Proxy Register 3 
     };
-        
+    
     constexpr uint32_t PARAM_ENTRY_FIELDS = 0x8u;
-
+              uint32_t* get_paRAM_ptr(uint32_t n);
+        
     struct paRAM_entry_t
     {
         // Transfer configuration options
@@ -2187,33 +2188,33 @@ namespace n_EDMA
             uint32_t  reg;                  // Type used for register access
         } OPT;
 
-        uint32_t  SRC { 0 };          // The byte address from which data is transferred 
+        uint32_t  SRC { 0 };    // The byte address from which data is transferred 
         
-        uint16_t  ACNT { 0 };         // Unsigned value specifying the number of contiguous bytes
+        uint16_t  ACNT { 0 };   // Unsigned value specifying the number of contiguous bytes
                                 // within an array (first dimension of the transfer). Valid values
                                 // range from 1 to 65 535.
         
-        uint16_t  BCNT { 0 };         // Unsigned value specifying the number of arrays in a frame,
+        uint16_t  BCNT { 0 };   // Unsigned value specifying the number of arrays in a frame,
                                 // where an array is ACNT bytes. Valid values range from 1 to 65 535.
         
-        uint32_t  DST { 0 };          // The byte address to which data is transferred
+        uint32_t  DST { 0 };    // The byte address to which data is transferred
         
-         int16_t  SRCBIDX { 0 };      // Signed value specifying the byte address offset between
+         int16_t  SRCBIDX { 0 };// Signed value specifying the byte address offset between
                                 // source arrays within a frame (2nd dimension). Valid values range from –32 768 and 32 767.
          
-         int16_t  DSTBIDX { 0 };      // Signed value specifying the byte address offset between
+         int16_t  DSTBIDX { 0 };// Signed value specifying the byte address offset between
                                 // destination arrays within a frame (2nd dimension). Valid
                                 // values range from –32 768 and 32 767.
          
-        uint16_t  LINK { 0 };         // The PaRAM address containing the PaRAM set to be linked
+        uint16_t  LINK { 0 };   // The PaRAM address containing the PaRAM set to be linked
                                 // (copied from) when the current PaRAM set is exhausted. A
                                 // value of FFFFh specifies a null link.
         
-        uint16_t  BCNTRLD { 0 };      // The count value used to reload BCNT when BCNT
+        uint16_t  BCNTRLD { 0 };// The count value used to reload BCNT when BCNT
                                 // decrements to 0 (TR is submitted for the last array in 2nd
                                 // dimension). Only relevant in A-synchronized transfers.
         
-         int16_t  SRCCIDX { 0 };      // Signed value specifying the byte address offset between
+         int16_t  SRCCIDX { 0 };// Signed value specifying the byte address offset between
                                 // frames within a block (3rd dimension). Valid values range
                                 // from –32 768 and 32 767.
                                 // A-synchronized transfers: The byte address offset from the
@@ -2223,7 +2224,7 @@ namespace n_EDMA
                                 // beginning of the first source array in a frame to the
                                 // beginning of the first source array in the next frame.
          
-         int16_t  DSTCIDX { 0 };      // Signed value specifying the byte address offset between
+         int16_t  DSTCIDX { 0 };// Signed value specifying the byte address offset between
                                 // frames within a block (3rd dimension). Valid values range
                                 // from –32 768 and 32 767.
                                 // A-synchronized transfers: The byte address offset from the
@@ -2233,7 +2234,7 @@ namespace n_EDMA
                                 // beginning of the first destination array in a frame to the
                                 // beginning of the first destination array in the next frame.
          
-        uint16_t  CCNT { 0 };         // Unsigned value specifying the number of frames in a block,
+        uint16_t  CCNT { 0 };   // Unsigned value specifying the number of frames in a block,
                                 // where a frame is BCNT arrays of ACNT bytes. Valid values range from 1 to 65 535.
         
         uint16_t  RESERVED;     // Reserved. Always write 0 to this bit; writes of 1 to this bit are
@@ -2417,7 +2418,7 @@ namespace n_EDMA
     QEESR_reg_t*& get_S_QEESR_ptr(e_REGION_ID region_id); 
      QSER_reg_t*& get_S_QSER_ptr(e_REGION_ID region_id);  
     QSECR_reg_t*& get_S_QSECR_ptr(e_REGION_ID region_id);
-
+    
         uint32_t* get_paRAM_ptr(uint32_t n);                
         uint32_t* get_SRC_ptr(uint32_t n);                
         uint32_t* get_A_B_CNT_ptr(uint32_t n);            
@@ -2425,7 +2426,7 @@ namespace n_EDMA
         uint32_t* get_SRC_DST_BIDX_ptr(uint32_t n);       
         uint32_t* get_LINK_BCNTRLD_ptr(uint32_t n);       
         uint32_t* get_SRC_DST_CIDX_ptr(uint32_t n);       
-        uint32_t* get_CCNT_ptr(uint32_t n);               
+        uint32_t* get_CCNT_ptr(uint32_t n);
 
     inline DRAE_reg_t*& get_DRAE_ptr(e_REGION_ID region_id) 
     {

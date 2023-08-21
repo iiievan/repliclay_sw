@@ -2,12 +2,12 @@
 #define _N_UART_H_
 
 #include <stdint.h>
-#include "utils/utils.h"
+#include "utils.h"
 #include "INTC.h"
-#include "utils/ring_buffer.h"
-#include "utils/frame_buffer.h"
-#include "utils/Paired_buffer.h"
-#include "utils/sw_Timer.h"
+#include "ring_buffer.h"
+#include "frame_buffer.h"
+#include "Paired_buffer.h"
+#include "sw_Timer.h"
 
 //This is UART class and his namespace
 namespace n_UART

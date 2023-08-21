@@ -2,7 +2,7 @@
 #define __OS_TIMER_H
 
 #include <cstddef>
-#include "utils/utils.h"
+#include "utils.h"
 #include "DM_Timer.h"
 
 
