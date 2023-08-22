@@ -746,6 +746,10 @@ constexpr uint32_t TCR_RX_FIFO_TRIG_START_SHIFT = 0x00000004;
     [reset state = 0x7] */ 
     typedef union 
     { 
+        // !!!!!! ERRATA Advisory 1.0.35 UART: Transactions to MDR1 Register May Cause Undesired Effect on UART Operation
+        // ! The UART logic may generate an internal glitch when accessing the MDR1 registers that
+        // ! causes a dummy under-run condition that will freeze the UART in IrDA transmission. In
+        // ! UART mode, this may corrupt the transferred data (received or transmitted).
         struct 
         {             
             uint32_t    MODESELECT              :3;             // bit: 0..2    (RW) UART/IrDA/CIR mode selection. [ see e_MODESELECT ]

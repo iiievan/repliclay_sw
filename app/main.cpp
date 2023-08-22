@@ -48,6 +48,10 @@
  */
 
 #include "init.h"
+#include "soc_AM335x.h"
+#include "cp15.h"
+#include "hw_types.h"
+
 
 /****************************************************************************/
 /*                      NOTE TO THE USER                                    */
@@ -69,44 +73,61 @@
 /****************************************************************************/
 /*                   LOCAL FUNCTION DEFINITIONS                             */
 /****************************************************************************/
-extern unsigned int clBackFlag;
 unsigned char intent[] = "The application echoes the characters that you type on the console.\r\n";
 unsigned char welcome[] = "StarterWare AM335X UART DMA application.\r\n";
 unsigned char enter[] = "Please Enter 08 bytes from keyboard.\r\n";
 
-unsigned char rxBuffer[RX_BUFFER_SIZE];
-/*
-** Transmit Trigger Space value. This is applicable only when UART FIFO mode
-** is used. Refer to the comments of the API UARTFIFOConfig() to find the
-** possible values of TX Trigger Space.
-*/
-unsigned int txTrigSpace = TX_TRIGGER_SPACE_GRAN_1;
-
-/*
-** Number of bytes transmitted by EDMA per TX event sent by UART.
-** In UART FIFO mode, this should be equal to the TX Trigger Space value.
-*/
-unsigned int txBytesPerEvent = TX_BYTES_PER_EVENT;
-
-/*
-** Receive DMA Thresold Level. This applies to both UART FIFO and Non-FIFO
-** modes of operation. For FIFO mode, refer to the comments of the API
-** UARTFIFOConfig() to find the possible values of RX Trigger Level.
-** For Non-FIFO mode, this value is 1.
-*/
-unsigned int rxTrigLevel = RX_DMA_THRESHOLD;
-
-/* Transmit DMA Threshold Level. This is set in TX_DMA_THRESHOLD register. */
-unsigned int txThreshLevel = TX_DMA_THRESHOLD;
-
 UART_Driver UART_0;
+
+extern "C" void Entry(void);
+extern "C" void UndefInstHandler(void);
+extern "C" void SVC_Handler(void);
+extern "C" void AbortHandler(void);
+extern "C" void IRQHandler(void);
+extern "C" void FIQHandler(void);
+
+static unsigned int const vecTbl[14]=
+{
+    0xE59FF018,    /* Opcode for loading PC with the contents of [PC + 0x18] */
+    0xE59FF018,    /* Opcode for loading PC with the contents of [PC + 0x18] */
+    0xE59FF018,    /* Opcode for loading PC with the contents of [PC + 0x18] */
+    0xE59FF018,    /* Opcode for loading PC with the contents of [PC + 0x18] */
+    0xE59FF014,    /* Opcode for loading PC with the contents of [PC + 0x14] */
+    0xE24FF008,    /* Opcode for loading PC with (PC - 8) (eq. to while(1)) */
+    0xE59FF010,    /* Opcode for loading PC with the contents of [PC + 0x10] */
+    0xE59FF010,    /* Opcode for loading PC with the contents of [PC + 0x10] */
+    (unsigned int)Entry,
+    (unsigned int)UndefInstHandler,
+    (unsigned int)SVC_Handler,
+    (unsigned int)AbortHandler,
+    (unsigned int)IRQHandler,
+    (unsigned int)FIQHandler
+};
+
+const unsigned int AM335X_VECTOR_BASE = 0x4030FC00;
+
+static void CopyVectorTable(void)
+{
+    unsigned int *dest = (unsigned int *)AM335X_VECTOR_BASE;
+    unsigned int *src =  (unsigned int *)vecTbl;
+    unsigned int count;
+  
+    CP15VectorBaseAddrSet(AM335X_VECTOR_BASE);
+
+    for(count = 0; count < sizeof(vecTbl)/sizeof(vecTbl[0]); count++)
+    {
+        dest[count] = src[count];
+    }
+}
 
 int main(void)
 {
+    CopyVectorTable();    
+  
     init_board();
     const char str[] = "Fear and loathing in Las-Vegas";
     // Transmit welcone string
-    UART_0.write((const uint8_t *)str,sizeof(str));
+    //UART_0.write((const uint8_t *)str,sizeof(str));
     UART_0.send(welcome, sizeof(welcome));
     UART_0.send(intent, sizeof(intent));
     UART_0.send(enter, sizeof(enter));

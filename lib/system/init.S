@@ -41,7 +41,7 @@
 	MODULE INIT
 ;****************************** Global Symbols*********************************
         PUBLIC Entry
-        IMPORT start_boot   
+        //IMPORT start_boot   
 
         ;; Forward declaration of sections.
         SECTION IRQ_STACK:DATA:NOROOT(3)
@@ -50,8 +50,9 @@
         SECTION ABT_STACK:DATA:NOROOT(3)
         SECTION UND_STACK:DATA:NOROOT(3)
         SECTION CSTACK:DATA:NOROOT(3)
-        //EXTWEAK __iar_init_core
-        //EXTWEAK __iar_init_vfp
+        EXTWEAK __iar_init_core
+        EXTWEAK __iar_init_vfp
+        EXTERN  __cmain
  
         SECTION .bss:CODE:NOROOT(3)
         SECTION text:CODE:NOROOT(2)
@@ -70,7 +71,8 @@ MODE_ABT DEFINE 0x17
 MODE_UND DEFINE 0x1B
 MODE_SYS DEFINE 0x1F            
 
-I_F_BIT DEFINE 0xC0               
+I_F_BIT DEFINE 0xC0     
+CP_DIS_MASK DEFINE  0xFFFFEFFA
 
 ;******************************************************************************
 ; This source file is assembled for ARM instructions
@@ -84,6 +86,15 @@ I_F_BIT DEFINE 0xC0
 ; switch to the function calling the main() function.
 ;
 Entry:
+                                                ; Add initialization needed before ...
+                                                ; ... setup of stack pointers here.
+                                                ; Disable Addr translation, D cache ...
+                                                ; ... and enable I cache
+        ;MRC         p15,0,R1,C1,C0,0	 ; Read System Control Register (SCTLR)
+        ;LDR         R0,=CP_DIS_MASK      ; 0xFFFFEFFA
+        ;AND         R1,R1,R0
+        ;ORR         R1,R1,#(1<<12)
+        ;MCR         p15,0,R1,C1,C0,0	 ; Write System Control Register (SCTLR)
 ;
 ; Set up the Stack for Supervisor mode
 ;
@@ -118,34 +129,47 @@ Entry:
          msr     cpsr_c,r0                     ; Change the mode
          ldr     sp,=SFE(CSTACK)               ; End of CSTACK
 
-; Invalidate and Enable Branch Prediction
-         MOV     r0, #0
+         ; Invalidate Branch Prediction
+         MOV     r0, #0                    
          MCR     p15, #0, r0, c7, c5, #6
          ISB
-         MRC     p15, #0, r0, c1, c0, #0
-         ORR     r0, r0, #0x00000800
-         MCR     p15, #0, r0, c1, c0, #0
+         ; Enable branch predictor
+         ;MRC     p15, #0, r0, c1, c0, #0
+         ;ORR     r0, r0, #0x00000800
+         ;MCR     p15, #0, r0, c1, c0, #0
+     
+         ;MOV     r0, #0x0
+         ;MCR     p15, 0, r0, c8, c7, 0                               ; Invalidate TLB
+     
+         MOV     r0, #0
+         MCR     p15, 0, r0, c7, c5, 0                               ; Invalidate instruction cache
+         
+         BL      BSP_DCacheInvalidateAll
+         
+         ; Set domain access
+         MRC     p15, 0, r0, c3, c0, 0								; Read Domain Access Control Register
+         LDR     r0, =0x55555555								    ; Set all Domains to Client
+         MCR     p15, 0, r0, c3, c0, 0								; Write Domain Access Control Register
+     
+     
+         ; Turn on core features assumed to be enabled.
+         BL      __iar_init_core
+     
+         ; Initialize VFP (if needed).
+         BL      __iar_init_vfp
+    
 
-;
-; Enable Neon/VFP Co-Processor
-;
-          MRC p15, #0, r1, c1, c0, #2           ; r1 = Access Control Register
-          ORR r1, r1, #(0xf << 20)              ; enable full access for p10,11
-          MCR p15, #0, r1, c1, c0, #2           ; Access Control Register = r1
-          MOV r1, #0
-          MCR p15, #0, r1, c7, c5, #4           ; flush prefetch buffer
-          MOV r0,#0x40000000
-          FMXR FPEXC, r0                        ; Set VFP/Neon enable bit
+          ; Enable Neon/VFP Co-Processor
+          ;MRC p15, #0, r1, c1, c0, #2           ; r1 = Access Control Register
+          ;ORR r1, r1, #(0xf << 20)              ; enable full access for p10,11
+          ;MCR p15, #0, r1, c1, c0, #2           ; Access Control Register = r1
+          ;MOV r1, #0
+          ;MCR p15, #0, r1, c7, c5, #4           ; flush prefetch buffer
+          ;MOV r0,#0x40000000
+          ;FMXR FPEXC, r0                        ; Set VFP/Neon enable bit
+     
 
-          
-          //BL      __iar_init_core   ; Turn on core features assumed to be enabled.
-
-          
-          //BL      __iar_init_vfp    ; Initialize VFP (if needed).
-
-;
-; Clear the BSS section here. 
-;
+         ;Clear the BSS section here. 
          LDR   r0, =SFB(.bss)                  ; Start address of BSS
          LDR   r1, =SFE(.bss)                  ; End address of BSS
          MOV   r2, #0
@@ -154,17 +178,35 @@ loop_zi_copy:
          CMP   r0, r1
          BLE   loop_zi_copy                    ; Clear till BSS end
 
-;
-; Enter the start_boot function. The execution still happens in system mode.
-;
-         LDR   r10,=start_boot
-         MOV   lr,pc                           ; Dummy return from start_boot
-         BLX   r10                             ; Branch to start_boot
-         SUB   pc, pc, #0x08                   ; looping   
 
-;
-; End of the file
-;
+         ;Enter the start_boot function. The execution still happens in system mode.
+         ;LDR   r10,=start_boot
+         ;MOV   lr,pc                           ; Dummy return from start_boot
+         ;BLX   r10                             ; Branch to start_boot
+         ;SUB   pc, pc, #0x08                   ; looping   
+
+; Add more initialization here
+
+; Continue to ?main for more IAR specific system startup
+        B       __cmain
+
+BSP_DCacheInvalidateAll:
+        ; Invalidate L1 data cache
+        MOV32     r0, #0x1FF            ; Load set index
+BSP_DCacheInvalidateAll_loop_1:
+        MOV     r1, #0x00000003         ; Load number of ways
+BSP_DCacheInvalidateAll_loop_2:
+        MOV     r2, r1, LSL #30
+        ADD     r2, r2, r0, LSL #5
+        MCR     p15, 0, r2, c7, c6, 2
+        SUBS    r1, r1, #1
+        BGE     BSP_DCacheInvalidateAll_loop_2
+        SUBS    r0, r0, #1
+        BGE     BSP_DCacheInvalidateAll_loop_1
+        DSB
+
+        BX      lr
+        
          END    
     
 

@@ -65,7 +65,7 @@ define block UND_STACK with alignment = 8, size = __ICFEDIT_size_undstack__ { };
 define block ABT_STACK with alignment = 8, size = __ICFEDIT_size_abtstack__ { };
 define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };
 
-do not initialize  { readwrite };
+initialize by copy {  readwrite };
 do not initialize  { section .noinit };
 
 //keep { section .intvec };

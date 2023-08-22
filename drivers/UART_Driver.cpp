@@ -1,4 +1,6 @@
 #include "UART_Driver.h"
+#include "cache.h"
+#include "cp15.h"
 #include <cstring>
 
 
@@ -309,7 +311,8 @@ void UART_Driver::write(const uint8_t *string, size_t len)
 void UART_Driver::recieve(size_t len)
 {
     // Enabling DMA Mode 1.
-    UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE);
+    UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE);    
+    CP15DCacheFlushBuff((unsigned int)m_rxBuffer, sizeof(m_rxBuffer));
 
     // Configuring the PaRAM set for reception. */
     RX_EDMA_paRAM_set_config(len,
@@ -321,6 +324,8 @@ void UART_Driver::recieve(size_t len)
     m_TX_busy = true;
     EDMA3EnableTransfer(SOC_EDMA30CC_0_REGS, EDMA3_UART_RX_CHA_NUM,
                         EDMA3_TRIG_MODE_EVENT);
+    
+    
 
     // Wait for return from callback 
     while(m_TX_busy);
@@ -347,7 +352,8 @@ void UART_Driver::flush()
     remainBytes = (len - 1) % m_tx_bytes_per_event;    
      
     UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE); // Enabling DMA Mode 1.
-
+    //CP15DCacheFlushBuff((unsigned int)m_rxBuffer, sizeof(m_rxBuffer));
+    
     // Configuring EDMA PaRAM sets to transmit  message. 
     TX_EDMA_paRAM_set_config(m_rxBuffer,
                              numByteChunks * m_tx_bytes_per_event,
