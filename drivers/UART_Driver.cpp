@@ -129,30 +129,44 @@ void  UART_Driver::TX_EDMA_paRAM_set_config(unsigned char *tx_buffer,
                                              unsigned int  len,
                                              unsigned int  tcc_num,
                                            unsigned short  linkaddr,
-                                             unsigned int  ch_num)
+                                             unsigned int  ch_num,
+                              n_EDMA::e_OPT_TRANSFER_TYPE  A_AB)
 {    
     n_EDMA::paRAM_entry_t param_set;
 
     /// Fill the PaRAM Set with transfer specific information ///
     param_set.SRC = (uint32_t)tx_buffer;
-    param_set.DST = n_UART::AM335x_UART_0_BASE;
-
-    param_set.ACNT = (uint16_t)1;
-    param_set.BCNT = (uint16_t)m_tx_bytes_per_event;
-    param_set.CCNT = (uint16_t)(len / m_tx_bytes_per_event);
-    param_set.SRCBIDX = (int16_t)1;
-    param_set.SRCCIDX = (int16_t)m_tx_bytes_per_event;
+    param_set.DST = n_UART::AM335x_UART_0_BASE;    
+    
+    if(A_AB == n_EDMA::AB_SYNC)
+    {
+        //AB-Transfer: CCNT transfers for ACNT x BCNT bytes each
+        param_set.ACNT = (uint16_t)1u;
+        param_set.BCNT = (uint16_t)m_tx_bytes_per_event;
+        param_set.CCNT = (uint16_t)(len / m_tx_bytes_per_event);
+        param_set.SRCBIDX = (int16_t)1u;
+        param_set.SRCCIDX = (int16_t)m_tx_bytes_per_event;
+    }
+    else
+    {
+        // A-Transfer: (BCNT x CCNT ) transfers of ACNT bytes each
+        param_set.ACNT = (uint16_t)1u;
+        param_set.BCNT = (uint16_t)len;
+        param_set.CCNT = (uint16_t)1u;
+        param_set.SRCBIDX = (int16_t)1u;
+        param_set.SRCCIDX = (int16_t)0u;
+    }
 
     /// The destination indexes should not increment since it is a h/w register. ///
-    param_set.DSTBIDX = (int16_t)0;
-    param_set.DSTCIDX = (int16_t)0;
+    param_set.DSTBIDX = (int16_t)0u;
+    param_set.DSTCIDX = (int16_t)0u;
 
     param_set.LINK = (uint16_t)*n_EDMA::get_paRAM_ptr(linkaddr);
-    param_set.BCNTRLD = (uint16_t)0;
+    param_set.BCNTRLD = (uint16_t)0u;
 
     /// OPT PaRAM Entries. ///
     ///Source and Destination addressing modes are Incremental.//
-    param_set.OPT.b.SYNCDIM = HIGH;     // AB_sync
+    param_set.OPT.b.SYNCDIM = A_AB;     // A or AB_sync
     param_set.OPT.b.TCC = tcc_num;      // Setting the Transfer Complete Code(TCC).
     param_set.OPT.b.TCINTEN = HIGH;     // Enabling the Completion Interrupt.
                                             
@@ -162,19 +176,33 @@ void  UART_Driver::TX_EDMA_paRAM_set_config(unsigned char *tx_buffer,
 void UART_Driver::RX_EDMA_paRAM_set_config( unsigned int  len,
                                             unsigned int  tcc_num,
                                           unsigned short  linkaddr,
-                                            unsigned int  ch_num)
+                                            unsigned int  ch_num,
+                             n_EDMA::e_OPT_TRANSFER_TYPE  A_AB)
 {
     n_EDMA::paRAM_entry_t param_set;
 
     /// Fill the PaRAM Set with transfer specific information ///
     param_set.SRC = (uint32_t)n_UART::AM335x_UART_0_BASE;
     param_set.DST = (uint32_t)m_rxBuffer;
-
-    param_set.ACNT = (uint16_t)1;
-    param_set.BCNT = (uint16_t)(m_rx_trig_level);
-    param_set.CCNT = (uint16_t)(len / m_rx_trig_level);
-    param_set.DSTBIDX = (int16_t)1;
-    param_set.DSTCIDX = (int16_t)m_rx_trig_level;
+   
+    if(A_AB == n_EDMA::AB_SYNC)
+    {
+        //AB-Transfer: CCNT transfers for ACNT x BCNT bytes each
+        param_set.ACNT = (uint16_t)1;
+        param_set.BCNT = (uint16_t)(m_rx_trig_level);
+        param_set.CCNT = (uint16_t)(len / m_rx_trig_level);
+        param_set.DSTBIDX = (int16_t)1;
+        param_set.DSTCIDX = (int16_t)m_rx_trig_level;
+    }
+    else
+    {
+        // A-Transfer: (BCNT x CCNT ) transfers of ACNT bytes each
+        param_set.ACNT = (uint16_t)1;
+        param_set.BCNT = (uint16_t)len;
+        param_set.CCNT = (uint16_t)1;
+        param_set.DSTBIDX = (int16_t)1;
+        param_set.DSTCIDX = (int16_t)0;
+    }
 
     param_set.SRCBIDX = (int16_t)0;
     param_set.SRCCIDX = (int16_t)0;
@@ -188,7 +216,7 @@ void UART_Driver::RX_EDMA_paRAM_set_config( unsigned int  len,
 
     /// OPT PaRAM Entries. ///
     ///Source and Destination addressing modes are Incremental.//
-    param_set.OPT.b.SYNCDIM = HIGH;     // AB_sync
+    param_set.OPT.b.SYNCDIM = A_AB;     // AB_sync
     param_set.OPT.b.TCC = tcc_num;      // Setting the Transfer Complete Code(TCC).
     param_set.OPT.b.TCINTEN = HIGH;     // Enabling the Completion Interrupt.
 
@@ -257,22 +285,21 @@ void UART_Driver::write(const uint8_t *string, size_t len)
 {
     auto already_sent = 0;
     auto left_to_send = 0;
-    unsigned int numByteChunks = 0;
-    unsigned char *pBuffer = nullptr;
-    unsigned int remainBytes = 0;
     
     //while(m_RX_data.get_avail()); 
     
     do
     {
-        UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE); // Enabling DMA Mode 1.
+        UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE); // Enabling DMA Mode 1.        
       
         left_to_send = len - already_sent;
+        
         if(left_to_send > TX_CHUNK_SIZE)
         {
             left_to_send = TX_CHUNK_SIZE;
             
-            memcpy(m_TX_data.get_empty_buf(), string + already_sent, left_to_send);
+            memcpy(m_TX_data.get_empty_buf(), string + already_sent, left_to_send);            
+            CP15DCacheFlushBuff((uint32_t)m_TX_data.get_complete_buf(), m_TX_data.get_one_size());
             
             // Configuring EDMA PaRAM sets to transmit  message. 
             TX_EDMA_paRAM_set_config((unsigned char*)m_TX_data.switch_buffers(),
@@ -283,17 +310,21 @@ void UART_Driver::write(const uint8_t *string, size_t len)
         }
         else
         {
-            left_to_send = TX_CHUNK_SIZE;
+            left_to_send = left_to_send;
             
-            memcpy(m_TX_data.get_empty_buf(), string + already_sent, left_to_send);
+            memcpy(m_TX_data.get_empty_buf(), string + already_sent, left_to_send);            
+            CP15DCacheFlushBuff((uint32_t)m_TX_data.get_complete_buf(), m_TX_data.get_one_size());
             
             // Configuring EDMA PaRAM sets to transmit  message. 
             TX_EDMA_paRAM_set_config((unsigned char*)m_TX_data.switch_buffers(),
                                      left_to_send,
                                      EDMA3_UART_TX_CHA_NUM,
                                      EDMA3CC_OPT(DUMMY_CH_NUM),
-                                     EDMA3_UART_TX_CHA_NUM);
+                                     EDMA3_UART_TX_CHA_NUM,
+                                     n_EDMA::A_SYNC);
         }
+        
+        //CP15DCacheFlushBuff((uint32_t)m_TX_data.get_complete_buf(), m_TX_data.get_one_size());
         
         // Configuring the PaRAM set for Dummy Transfer.
         TX_dummy_paRAM_conf_enable();

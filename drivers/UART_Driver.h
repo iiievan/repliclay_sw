@@ -86,12 +86,14 @@ public:
                                    unsigned int  len,
                                    unsigned int  tcc_num,
                                  unsigned short  linkaddr,
-                                   unsigned int  ch_num);
+                                   unsigned int  ch_num,
+                    n_EDMA::e_OPT_TRANSFER_TYPE  A_AB = n_EDMA::AB_SYNC);
 
    void RX_EDMA_paRAM_set_config( unsigned int  len,
                                   unsigned int  tcc_num,
                                 unsigned short  linkaddr,
-                                  unsigned int  ch_num);
+                                  unsigned int  ch_num,
+                   n_EDMA::e_OPT_TRANSFER_TYPE  A_AB = n_EDMA::AB_SYNC);
    void TX_dummy_paRAM_conf_enable(void);
 
    void send(unsigned char * s, size_t len);

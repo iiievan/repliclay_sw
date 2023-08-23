@@ -127,7 +127,7 @@ int main(void)
     init_board();
     const char str[] = "Fear and loathing in Las-Vegas";
     // Transmit welcone string
-    //UART_0.write((const uint8_t *)str,sizeof(str));
+    UART_0.write((const uint8_t *)str,sizeof(str));
     UART_0.send(welcome, sizeof(welcome));
     UART_0.send(intent, sizeof(intent));
     UART_0.send(enter, sizeof(enter));

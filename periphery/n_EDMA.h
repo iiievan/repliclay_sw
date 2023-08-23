@@ -1972,7 +1972,7 @@ namespace n_EDMA
         __RW  DRAEH_reg_t           DRAEH6;         // (0x374) DMA Region Access Enable Register High for Region 6
         __RW  DRAE_reg_t            DRAE7;          // (0x378) DMA Region Access Enable Register for Region 7
         __RW  DRAEH_reg_t           DRAEH7;         // (0x37C) DMA Region Access Enable Register High for Region 7
-        __RW  QRAE_reg_t            QRAE[8];        // (0x380..0x39Ñ) QDMA Region Access Enable Registers for Region 0..7
+        __RW  QRAE_reg_t            QRAE[8];        // (0x380..0x39Ð¡) QDMA Region Access Enable Registers for Region 0..7
         __R   uint32_t              RESERVED7[24];  
         __R   QE_reg_t              Q0E0;           // (0x400) Event Queue 0 Entry 0 Register 
         __R   QE_reg_t              Q0E1;           // (0x404) Event Queue 0 Entry 1 Register 
@@ -2159,7 +2159,7 @@ namespace n_EDMA
                 uint32_t    DAM       :1;   // bit: 1          (RW) Destination address mode. [ 0x0 = Increment (INCR) mode; 0x1 = Constant addressing (CONST) mode. ]
                                             //                      Increment (INCR) mode. Destination addressing within an array increments. Destination is not a FIFO.
                                             //                      Constant addressing (CONST) mode. Destination addressing within an array wraps around upon reaching FIFO width.
-                uint32_t    SYNCDIM   :1;   // bit: 2          (RW) Transfer synchronization dimension. [ 0x0 = A-synchronized; 0x1 = AB-synchronized. ]
+                uint32_t    SYNCDIM   :1;   // bit: 2          (RW) Transfer synchronization dimension. [see e_OPT_TRANSFER_TYPE]
                 uint32_t    STATIC    :1;   // bit: 3          (RW) Static set. [0x0 = Set is not static; 0x1 = Set is static. ]
                                             //                      Set is not static. The PaRAM set is updated or linked after a TR is submitted. A value of 0 should be
                                             //                      used for DMA channels and for non-final transfers in a linked list of QDMA transfers.
@@ -2179,10 +2179,10 @@ namespace n_EDMA
                 uint32_t    TCCHEN    :1;   // bit: 22         (RW) Transfer complete chaining enable. [ 0x0 = disabled; 0x1 = enabled ]
                 uint32_t    ITCCHEN   :1;   // bit: 23         (RW) Intermediate transfer completion chaining enable. [ 0x0 = disabled; 0x1 = enabled ]
                 uint32_t    PRIVID    :4;   // bit: 24..27     (R) Privilege identification for the external host/CPU/DMA that programmed this PaRAM set. This value is
-                                            //                     set with the EDMA3 master’s privilege identification value when any part of the PaRAM set is written.
+                                            //                     set with the EDMA3 masterâ€™s privilege identification value when any part of the PaRAM set is written.
                 uint32_t              :3;   // bit: 28..30     Reserved
                 uint32_t    PRIV      :1;   // bit: 31         (R) Privilege level (supervisor versus user) for the host/CPU/DMA that programmed this PaRAM set. This
-                                            //                     value is set with the EDMA3 master’s privilege value when any part of the PaRAM set is written.
+                                            //                     value is set with the EDMA3 masterâ€™s privilege value when any part of the PaRAM set is written.
                                             //                     [ 0x0 = User level privilege.; 0x1 = Supervisor level privilege. ] 
             } b;                            // Structure used for bit access 
             uint32_t  reg;                  // Type used for register access
@@ -2200,11 +2200,11 @@ namespace n_EDMA
         uint32_t  DST { 0 };    // The byte address to which data is transferred
         
          int16_t  SRCBIDX { 0 };// Signed value specifying the byte address offset between
-                                // source arrays within a frame (2nd dimension). Valid values range from –32 768 and 32 767.
+                                // source arrays within a frame (2nd dimension). Valid values range from â€“32 768 and 32 767.
          
          int16_t  DSTBIDX { 0 };// Signed value specifying the byte address offset between
                                 // destination arrays within a frame (2nd dimension). Valid
-                                // values range from –32 768 and 32 767.
+                                // values range from â€“32 768 and 32 767.
          
         uint16_t  LINK { 0 };   // The PaRAM address containing the PaRAM set to be linked
                                 // (copied from) when the current PaRAM set is exhausted. A
@@ -2216,7 +2216,7 @@ namespace n_EDMA
         
          int16_t  SRCCIDX { 0 };// Signed value specifying the byte address offset between
                                 // frames within a block (3rd dimension). Valid values range
-                                // from –32 768 and 32 767.
+                                // from â€“32 768 and 32 767.
                                 // A-synchronized transfers: The byte address offset from the
                                 // beginning of the last source array in a frame to the
                                 // beginning of the first source array in the next frame.
@@ -2226,7 +2226,7 @@ namespace n_EDMA
          
          int16_t  DSTCIDX { 0 };// Signed value specifying the byte address offset between
                                 // frames within a block (3rd dimension). Valid values range
-                                // from –32 768 and 32 767.
+                                // from â€“32 768 and 32 767.
                                 // A-synchronized transfers: The byte address offset from the
                                 // beginning of the last destination array in a frame to the
                                 // beginning of the first destination array in the next frame.
@@ -2259,6 +2259,12 @@ namespace n_EDMA
         
            return *this;
         }
+    };
+
+    enum e_OPT_TRANSFER_TYPE : uint32_t
+    {
+        A_SYNC  = 0x0,  // A-synchronized;  (BCNT Ã— CCNT ) transfers of ACNT bytes each
+        AB_SYNC = 0x1   // AB-synchronized.  CCNT transfers for ACNT x BCNT bytes each
     };
 
     enum e_paRAM_FIFO_WIDTH : uint32_t
