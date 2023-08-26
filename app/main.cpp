@@ -77,7 +77,7 @@ unsigned char intent[] = "The application echoes the characters that you type on
 unsigned char welcome[] = "StarterWare AM335X UART DMA application.\r\n";
 unsigned char enter[] = "Please Enter 08 bytes from keyboard.\r\n";
 
-UART_Driver UART_0;
+UART_Driver drvUART_0;
 
 extern "C" void Entry(void);
 extern "C" void UndefInstHandler(void);
@@ -127,14 +127,13 @@ int main(void)
     init_board();
     const char str[] = "Fear and loathing in Las-Vegas";
     // Transmit welcone string
-    UART_0.write((const uint8_t *)str,sizeof(str));
-    UART_0.send(welcome, sizeof(welcome));
-    UART_0.send(intent, sizeof(intent));
-    UART_0.send(enter, sizeof(enter));
+    drvUART_0.write((const uint8_t *)str,sizeof(str));
+    drvUART_0.send(welcome, sizeof(welcome));
+    drvUART_0.send(intent, sizeof(intent));
+    drvUART_0.send(enter, sizeof(enter));
     
-    UART_0.recieve(NUM_RX_BYTES);        // Receiving Data from User    
-    UART_0.flush();                      // Echoing received bytes
-    
+    drvUART_0.recieve(NUM_RX_BYTES);        // Receiving Data from User    
+    drvUART_0.flush();                      // Echoing received bytes    
 
     // Free EDMA3 Channels for TX and RX */
     EDMA3FreeChannel(SOC_EDMA30CC_0_REGS, EDMA3_CHANNEL_TYPE_DMA,

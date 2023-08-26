@@ -114,6 +114,6 @@ private:
   unsigned int  m_tx_thresh_level;
 };
 
-extern UART_Driver UART_0;
+extern UART_Driver drvUART_0;
 
 #endif //__UART_DRIVER_H

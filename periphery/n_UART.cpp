@@ -34,23 +34,58 @@ void  AM335x_UART::module_reset()
 }
                           
 void AM335x_UART::FIFO_configure_no_DMA(uint8_t tx_trig_lvl, uint8_t rx_trig_lvl)
-{    
+{   
+    // *********** SCR - content ************
+    //uint32_t    DMAMODECTL              :1;         // bit: 0       (RW) [0x0 = The DMAMODE is set with FCR[3].; 0x1 = The DMAMODE is set with SCR[2:1]. ]
+    //uint32_t    DMAMODE2                :2;         // bit: 1,2     (RW) Specifies the DMA mode valid if SCR[0] = 1, then:[ see e_SCR_DMA_MODE ]
+    //uint32_t    TXEMPTYCTLIT            :1;         // bit: 3       (RW) [0x0 = Normal mode for THR interrupt.; 0x1 = THR interrupt is generated when TX FIFO and TX shift register are empty. ]
+    //uint32_t    RXCTSDSRWAKEUPENABLE    :1;         // bit: 4       (RW) [0x0 = Disables the WAKE UP interrupt and clears SSR[1].; 
+    //                                                //                    0x1 = Waits for a falling edge of RX, CTS (active-low), or DSR (active-low) pins to generate an interrupt. ]
+    //uint32_t    DSRIT                   :1;         // bit: 5       (RW) [0x0 = Disables DSR (active-low) interrupt.; 0x1 = Enables DSR (active-low) interrupt. ]
+    //uint32_t    TXTRIGGRANU1            :1;         // bit: 6       (RW) [0x0 = Disables the granularity of 1 for trigger TX level.; 0x1 = Enables the granularity of 1 for trigger TX level. ]
+    //uint32_t    RXTRIGGRANU1            :1;         // bit: 7       (RW) [0x0 = Disables the granularity of 1 for trigger RX level.; 0x1 = Enables the granularity of 1 for trigger RX level. ]
+  
+    // ********** TLR - content *************
+    // uint32_t    TX_FIFO_TRIG_DMA       :4;          // bit: 0..3    (RW) Transmit FIFO trigger level.
+    // uint32_t    RX_FIFO_TRIG_DMA       :4;          // bit: 4..7    (RW) Receive FIFO trigger level.
+  
+    // FCR - content
+    //uint32_t    FIFO_EN         :1;     // bit: 0       (W) Can be changed only when the baud clock is not running (DLL and DLH cleared to 0). [0x0 = Disables rcv FIFO; 0x1 = Enables rcv FIFO ]
+    //uint32_t    RX_FIFO_CLEAR   :1;     // bit: 1       (W) [ 0x0 = No change.; 
+    //                                    //                    0x1 = Clears the receive FIFO and resets its counter logic to 0. Returns to 0 after clearing FIFO. ]
+    //uint32_t    TX_FIFO_CLEAR   :1;     // bit: 2       (W)  [ 0x0 = No change.; 
+    //                                    //                     0x1 = Clears the transmit FIFO and resets its counter logic to 0. Returns to 0 after clearing FIFO. ]
+    //uint32_t    DMA_MODE        :1;     // bit: 3       (W) Can be changed only when the baud clock is not running (DLL and DLH cleared to 0).
+    //                                    //                    If SCR[0] = 0, this register is considered. [0x0 = DMA_MODE 0 (No DMA).; 
+    //                                    //                                                                 0x1 = DMA_MODE 1 (UART_NDMA_REQ[0] in TX, UART_NDMA_REQ[1] in RX). ]
+    //uint32_t    TX_FIFO_TRIG    :2;     // bit: 4,5     (W) Can be written only if EFR[4] = 1. Sets the trigger level for the TX FIFO: If SCR[6] = 0 and TLR[3] to
+    //                                    //                  TLR[0] not equal to 0000, TX_FIFO_TRIG is not considered.
+    //                                    //                  If SCR[6] = 1, TX_FIFO_TRIG is 2 LSB of the trigger level (1 to 63
+    //                                    //                  on 6 bits) with a granularity of 1.
+    //                                    //                  If SCR[6] = 0 and TLR[3] to TLR[0] = 0000, then: [ see e_FCR_TX_FIFO_TRIG ]
+    //uint32_t    RX_FIFO_TRIG    :2;     // bit: 6,7     (RW) Sets the trigger level for the RX FIFO: If SCR[7] = 0 and TLR[7] to
+    //                                    //                   TLR[4] not equal to 0000, RX_FIFO_TRIG is not considered.
+    //                                    //                   If SCR[7] = 1, RX_FIFO_TRIG is 2 LSB of the trigger level (1 to 63
+    //                                    //                   on 6 bits) with the granularity 1.
+                                                //                   If SCR[7] = 0 and TLR[7] to TLR[4] = 0000, then: [ see e_FCR_RX_FIFO_TRIG ]
+  
     n_UART::SCR_reg_t  cfg_scr         = {.reg = 0x0 };
     n_UART::TLR_reg_t  trigger_lvl_cfg = {.reg = 0x0 };
     n_UART::FCR_reg_t  cfg_fcr         = {.reg = 0x0 }; 
     
     cfg_scr.b.TXTRIGGRANU1 = 0x1;
     cfg_scr.b.RXTRIGGRANU1 = 0x1;
-    cfg_scr.b.DMAMODECTL   = 0x1;
+    cfg_scr.b.DMAMODECTL   = 0x1;                       // Setting DMAMODE in SCR
     cfg_scr.b.DMAMODE2     = n_UART::SCR_DMA_MODE_0;    // no dma
-
-    tx_trig_lvl &= 0x003F;                                             // 'tx_trig_lvl' now has the 6-bit TX Trigger level value.
-    trigger_lvl_cfg.b.TX_FIFO_TRIG_DMA  = (tx_trig_lvl & 0x003C) >> 2; // Collecting the bits tx_trig_lvl[5:2].        
-    cfg_fcr.b.TX_FIFO_TRIG |= (tx_trig_lvl & 0x0003);                  // Collecting the bits tx_trig_lvl[1:0] and writing to 'fcr_value'.
     
-    rx_trig_lvl &= 0x003F;                                             // 'rx_trig_lvl' now has the 6-bit RX Trigger level value.
-    trigger_lvl_cfg.b.RX_FIFO_TRIG_DMA = (rx_trig_lvl & 0x003C) >> 2;  // Collecting the bits rx_trig_lvl[5:2]. 
-    cfg_fcr.b.RX_FIFO_TRIG = (rx_trig_lvl & 0x0003);                   // Collecting the bits rx_trig_lvl[1:0] and writing to 'fcr_value'.   
+    tx_trig_lvl &= 0x003F;                                             // not more than 63 symbols TX FIFO-size
+    trigger_lvl_cfg.b.TX_FIFO_TRIG_DMA  = (tx_trig_lvl & 0x003C) >> 2; // Collecting the most significant of 4 bits and write it to TLR[0..3].   
+    cfg_fcr.b.TX_FIFO_TRIG |= (tx_trig_lvl & 0x0003);                  // Collecting the last significant 2 bits and writing to FCR[4,5].  
+    
+    
+    rx_trig_lvl &= 0x003F;                                             // not more than 63 symbols RX FIFO-size
+    trigger_lvl_cfg.b.RX_FIFO_TRIG_DMA = (rx_trig_lvl & 0x003C) >> 2;  // Collecting the most significant 4 bits and write it to TLR[4..7].  
+    cfg_fcr.b.RX_FIFO_TRIG = (rx_trig_lvl & 0x0003);                   // Collecting the last significant 2 bits and writing to FCR[6,7].   
     
     cfg_fcr.b.TX_FIFO_CLEAR = 1;
     cfg_fcr.b.RX_FIFO_CLEAR = 1;
@@ -1085,6 +1120,54 @@ uint32_t  AM335x_UART::sub_config_XOFF_mode_en()
  */
 void  AM335x_UART::TCRTLR_bit_val_restore(uint32_t tcr_tlr_bit_val)
 {
+    // ********* MCR - content *********
+    //uint32_t    DTR                     :1;         // bit: 0       (RW)  DTR. [0x0 = Force DTR (active-low) output (used in loopback mode) to inactive (high).;
+    //                                                //                          0x1 = Force DTR (active-low) output (used in loopback mode) to active (low). ]
+    //uint32_t    RTS                     :1;         // bit: 1       (RW)  In loopback mode, controls MSR[4]. If auto-RTS is enabled, the RTS (active-low) output is controlled by
+    //                                                //                     hardware flow control.[0x0 = Force RTS (active-low) output to inactive (high).; 
+    //                                                //                                            0x1 = Force RTS (active-low) output to active (low). ]
+    //uint32_t    RISTSCH                 :1;         // bit: 2       (RW)  RISTSCH. [ 0x0 = In loopback mode, forces RI (active-low) input inactive (high).;
+    //                                                //                               0x1 = In loopback mode, forces RI (active-low) input active (low). ]
+    //uint32_t    CDSTSCH                 :1;         // bit: 3       (RW)  CDSTSCH. [0x0 = In loopback mode, forces DCD (active-low) input high and IRQ outputs to INACTIVE state.;
+    //                                                //                              0x1 = In loopback mode, forces DCD (active-low) input low and IRQ outputs to INACTIVE state. ]
+    //uint32_t    LOOPBACKEN              :1;         // bit: 4       (RW)  Loopback mode enable. [0x0 = Normal operating mode.; 0x1 = Enable local loopback mode (internal). In this mode, the
+    //                                                //                                           MCR[3:0] signals are looped back into MSR[7:4]. The transmit output
+    //                                                //                                           is looped back to the receive input internally. ]
+    //uint32_t    XONEN                   :1;         // bit: 5       (RW) Can be written only when EFR[4] = 1. [0x0 = Disable XON any function.; 0x1 = Enable XON any function. ]
+    //uint32_t    TCRTLR                  :1;         // bit: 6       (RW) Can be written only when EFR[4] = 1. [0x0 = No action.; 0x1 = Enables access to the TCR and TLR registers. ]
+  
+    // ********* EFR - content **********
+    //uint32_t    SWFLOWCONTROL       :4;     // bit: 0..3   (RW) Combinations of software flow control can be selected by programming this bit. [ see e_SW_TX_FLOW_CTRL and  e_SW_RX_FLOW_CTRL]
+    //uint32_t    ENHANCEDEN          :1;     // bit: 4      (RW) Enhanced functions write enable bit.Writing to IER[7:4], FCR[5:4], and MCR[7:5].[0x0 = disable; 0x1 = enable ] 
+    //uint32_t    SPECIALCHARDETECT   :1;     // bit: 5      (RW) Special character detect (UART mode only).[0x0 = Normal operation.; 0x1 = Special character 
+    //                                        //                  detect enable. Received data is compared
+    //                                        //                  with XOFF2 data. If a match occurs, the received data is transferred
+    //                                        //                  to RX FIFO and the IIR[4] bit is set to 1 to indicate that a special
+    //                                        //                  character was detected. ]
+    //uint32_t    AUTORTSEN           :1;     // bit: 6      (RW) Auto-RTS enable bit (UART mode only). [0x0 = Normal operation.; 0x1 = Auto-RTS flow control is enabled; RTS (active-low) pin goes
+    //                                        //                  high (inactive) when the receiver FIFO HALT trigger level, TCR[3:0],
+    //                                        //                  is reached and goes low (active) when the receiver FIFO RESTORE
+    //                                        //                  transmission trigger level is reached. ]
+    //uint32_t    AUTOCTSEN           :1;     // bit: 7      (RW) Auto-CTS enable bit (UART mode only). [0x0 = Normal operation.; 0x1 = Auto-CTS flow control is enabled; transmission is halted when
+                                              //                  the CTS (active-low) pin is high (inactive).
+  
+    // ********* LCR - content *********
+    //uint32_t    CHAR_LENGTH     :2;        // bit: 0,1     (RW) Specifies the word length to be transmitted or received. [ see e_CHAR_LENGHT ]
+    //uint32_t    NB_STOP         :1;        // bit: 2       (RW) Specifies the number of stop bits. [0x0 = 1 stop bit (word length = 5, 6, 7, 8).;
+    //                                       //                                                       0x1 = 1.5 stop bits (word length = 5) or 2 stop bits (word length = 6, 7, 8). ]
+    //uint32_t    PARITY_EN       :1;        // bit: 3       (RW) Parity bit. [0x0 = No parity; 
+    //                                       //                                0x1 = A parity bit is generated during transmission, and the receiver checks for received parity. ]
+    //uint32_t    PARITY_TYPE1    :1;        // bit: 4       (RW) If LCR[3] = 1, then: [0x0 = Odd parity is generated.; 0x1 = Even parity is generated. ]
+    //uint32_t    PARITY_TYPE2    :1;        // bit: 5       (RW) If LCR[3] = 1, then: [0x0 = If LCR[5] = 0, LCR[4] selects the forced parity format.; 
+    //                                       //                                         0x1 = If LCR[5] = 1 and LCR[4] = 0, the parity bit is forced to 1 in the
+    //                                       //                                         transmitted and received data. If LCR[5] = 1 and LCR[4] = 1, the
+    //                                       //                                         parity bit is forced to 0 in the transmitted and received data. ]
+    //uint32_t    BREAK_EN        :1;        // bit: 6       (RW) Break control bit. Note: When LCR[6] is set to 1, the TX line is forced to 0 and remains
+    //                                       //                   in this state as long as LCR[6] = 1.
+    //                                       //                   [0x0 = Normal operating condition.; 
+    //                                       //                    0x1 = Forces the transmitter output to go low to alert the communication terminal ]
+    //uint32_t    DIV_EN          :1;        // bit: 7       (RW) Divisor latch enable. [0x0 = Normal operating condition.; 
+                                             //                                          0x1 = Divisor latch enable. Allows access to DLL and DLH. ]
     uint32_t enhan_fn_bit_val = 0;
     uint32_t LCR_reg_value = 0;
 

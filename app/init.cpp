@@ -12,5 +12,5 @@ void init_board(void)
     CP15BranchPredictionEnable();    // Enable Branch Prediction включаем предсказание ветвления - нужно для ускорения работы.
     
     //__iar_dynamic_initialization();       // in case using RTOS
-    UART_0.setup(); 
+    drvUART_0.setup(); 
 }

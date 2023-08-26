@@ -43,14 +43,16 @@ void  UART_Driver::setup()
     UARTModuleReset(UART_INSTANCE_BASE_ADD);                                // Performing a module reset.
 
 #ifdef UART_ENABLE_FIFO     
-    FIFO_configure();    // Performing FIFO configurations.
+    //FIFO_configure();    // Performing FIFO configurations.
+    //uart_0.FIFO_configure_no_DMA(TX_TRIGGER_SPACE_GRAN_1, RX_DMA_THRESHOLD);
+    uart_0.FIFO_configure_DMA_RxTx(TX_TRIGGER_SPACE_GRAN_1, RX_DMA_THRESHOLD); 
 #else    
     UARTDMAEnable(UART_INSTANCE_BASE_ADD, UART_DMA_MODE_1_ENABLE);  // Enabling DMA Mode 1. 
 #endif
 
 #if (defined UART_ENABLE_FIFO) && (defined DIRECT_TX_DMA_THRESH_MODE)    
     UARTTxDMAThresholdControl(UART_INSTANCE_BASE_ADD, UART_TX_DMA_THRESHOLD_REG);   // Selecting the method of setting the Transmit DMA Threshold value.    
-    UARTTxDMAThresholdValConfig(UART_INSTANCE_BASE_ADD, m_tx_thresh_level); // Configuring the Transmit DMA Threshold value.
+    UARTTxDMAThresholdValConfig(UART_INSTANCE_BASE_ADD, TX_DMA_THRESHOLD); // Configuring the Transmit DMA Threshold value.
 #endif
     
     Baud_set();  // Performing Baud Rate settings.    
@@ -416,7 +418,7 @@ void UART_Driver::flush()
 // ISR and other callbacks
 void  EDMA_Completion_Isr(void)
 {
-    UART_Driver *s_UART = &UART_0;
+    UART_Driver *s_UART = &drvUART_0;
 
     volatile unsigned int pendingIrqs = 0;
     unsigned int index = 1;
@@ -468,7 +470,7 @@ void  EDMA_Completion_Isr(void)
 
 void  RXTX_end_clbck(unsigned int tccNum)
 {
-    UART_Driver *s_UART = &UART_0;
+    UART_Driver *s_UART = &drvUART_0;
 
     UARTDMADisable(UART_INSTANCE_BASE_ADD); // Disabling DMA Mode of operation in UART.     
     EDMA3DisableTransfer(SOC_EDMA30CC_0_REGS, tccNum, EDMA3_TRIG_MODE_EVENT);   // Disabling DMA transfer on the specified channel.
