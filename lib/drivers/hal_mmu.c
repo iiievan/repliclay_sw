@@ -44,7 +44,7 @@
 /**************************************************************************************************************************/
 /*                                                        LITERALS                                                        */
 /**************************************************************************************************************************/
-#define START_ADDR_SRAM                    (0x402FFFFF)
+
 #define START_ADDR_DDR                     (0x80000000)
 #define START_ADDR_DEV                     (0x44000000)
 #define START_ADDR_OCMC                    (0x40300000)
@@ -98,16 +98,6 @@ void MMUConfigAndEnable(void)
     ** Inner - Write through, No Write Allocate
     ** Outer - Write Back, Write Allocate
     */
-  /*
-    // Define Internal RAM region of AM335x.
-    REGION regionSram = {
-                        MMU_PGTYPE_SECTION, START_ADDR_SRAM, 1,
-                        MMU_MEMTYPE_NORMAL_NON_SHAREABLE(MMU_CACHE_WT_NOWA,
-                        MMU_CACHE_WB_WA),
-                        MMU_REGION_NON_SECURE, MMU_AP_PRV_RW_USR_RW,
-                        (unsigned int*)pageTable
-                        };
-    */
     REGION regionDdr = {
                         MMU_PGTYPE_SECTION, START_ADDR_DDR, NUM_SECTIONS_DDR,
                         MMU_MEMTYPE_NORMAL_NON_SHAREABLE(MMU_CACHE_WT_NOWA,
@@ -115,7 +105,6 @@ void MMUConfigAndEnable(void)
                         MMU_REGION_NON_SECURE, MMU_AP_PRV_RW_USR_RW,
                         (unsigned int*)pageTable
                        };
-    
     /*
     ** Define OCMC RAM region of AM335x. Same Attributes of DDR region given.
     */
@@ -144,7 +133,6 @@ void MMUConfigAndEnable(void)
     MMUInit((unsigned int*)pageTable);
 
     /* Map the defined regions */
-    //MMUMemRegionMap(&regionSram);
     MMUMemRegionMap(&regionDdr);
     MMUMemRegionMap(&regionOcmc);
     MMUMemRegionMap(&regionDev);
