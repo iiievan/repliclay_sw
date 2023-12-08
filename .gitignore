@@ -1,3 +1,7 @@
-.launches/
-.settings/
 Debug/
+Release/
+settings/
+.metadata/
+*.ewt
+*.dep
+*.html

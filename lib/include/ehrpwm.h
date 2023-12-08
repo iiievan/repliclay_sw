@@ -162,7 +162,9 @@ extern "C" {
 
 
 
+#ifndef __cplusplus
 typedef char bool;
+#endif
 
 //**********************************************************************
 //  API FUNCTION PROTOTYPES

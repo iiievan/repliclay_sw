@@ -40,7 +40,7 @@
 */
 
 
-#ifndef _BEAGLEBONE_H_
+#ifndef _BEALGEBONE_H_
 #define _BEAGLEBONE_H_
 
 #ifdef __cplusplus
@@ -63,23 +63,6 @@ extern "C" {
 #define BOARD_ID_BBB_A3                     (0x3)
 #define BOARD_ID_BBB_A5                     (0x4)
 #define BOARD_ID_BBB_A6                     (0x5)
-
-/*
-** BeagleBone Black
-*/
-#define BNL_BOARD_NAME                      ("A335BNL")
-#define BNL_A1_VERSION                      ("00A1")
-#define BNL_A2_VERSION                      ("00A2")
-#define BNL_A3_VERSION                      ("00A3")
-#define BNL_A4_VERSION                      ("00A4")
-#define BNL_A5_VERSION                      ("00A5")
-#define BNL_A6_VERSION                      ("00A6")
-#define BOARD_ID_BNL_A1                     (0x1)
-#define BOARD_ID_BNL_A2                     (0x2)
-#define BOARD_ID_BNL_A3                     (0x3)
-#define BOARD_ID_BNL_A4                     (0x4)
-#define BOARD_ID_BNL_A5                     (0x5)
-#define BOARD_ID_BNL_A6                     (0x6)
 
 /*
 ** Structure to map selection of IO Pad for power down configuration

@@ -49,19 +49,17 @@
 //*****************************************************************************
 typedef unsigned char tBoolean;
 
-#ifndef __cplusplus
-    #ifndef true
-    #define true 1
-    #endif
-    
-    #ifndef false
-    #define false 0
-    #endif
-    
-    #ifndef NULL
-    #define NULL ((void*) 0)
-    #endif
-#endif // __cplusplus
+#ifndef true
+#define true 1
+#endif
+
+#ifndef false
+#define false 0
+#endif
+
+#ifndef NULL
+#define NULL ((void*) 0)
+#endif
 //*****************************************************************************
 //
 // Macros for hardware access, both direct and via the bit-band region.
