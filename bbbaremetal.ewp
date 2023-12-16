@@ -351,6 +351,7 @@
                     <state>$PROJ_DIR$\app</state>
                     <state>$PROJ_DIR$\regs</state>
                     <state>$PROJ_DIR$\utils</state>
+                    <state>$PROJ_DIR$\periph</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2332,9 +2333,21 @@
         </group>
     </group>
     <group>
+        <name>periph</name>
+        <file>
+            <name>$PROJ_DIR$\periph\am335x_intc.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\periph\am335x_intc.h</name>
+        </file>
+    </group>
+    <group>
         <name>regs</name>
         <file>
             <name>$PROJ_DIR$\regs\DM_Timer.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\regs\INTC.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\regs\PRCM.cpp</name>

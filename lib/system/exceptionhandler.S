@@ -50,7 +50,7 @@
         PUBLIC SVC_Handler
         PUBLIC UndefInstHandler
         EXTERN CPUAbortHandler
-        EXTERN fnRAMVectors       
+        EXTERN interrupt_vectors       
         
 ADDR_SIR_IRQ DEFINE SOC_AINTC_REGS + INTC_SIR_IRQ
 ADDR_SIR_FIQ DEFINE SOC_AINTC_REGS + INTC_SIR_FIQ
@@ -141,7 +141,7 @@ IRQHandler:
        
         STMFD    r13!, {r14}              ; Save lr_usr
 
-        LDR      r0, =fnRAMVectors        ; Load the base of the vector table
+        LDR      r0, =interrupt_vectors        ; Load the base of the vector table
         ADD      r14, pc, #0              ; Save return address in LR
         LDR      pc, [r0, r2, lsl #2]     ; Jump to the ISR
  

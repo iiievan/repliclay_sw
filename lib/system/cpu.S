@@ -98,7 +98,7 @@ CPUAbortHandler:
 ;
 CPUIntStatus:
 	mrs     r0, CPSR	; IRQ and FIQ in CPSR ;
-        and     r0, r0, #0xC0
+    and     r0, r0, #0xC0
 	bx 	lr
 ;
 ; Wrapper function for the IRQ disable function

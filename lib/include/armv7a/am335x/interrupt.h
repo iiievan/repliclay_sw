@@ -180,6 +180,8 @@ extern "C" {
 **                     API FUNCTION PROTOTYPES
 *****************************************************************************/
 extern void IntAINTCInit (void);
+extern void IntRegister(unsigned int intrNum, void (*pfnHandler)(void));
+extern void IntUnRegister(unsigned int intrNum);
 extern void IntIfClkFreeRunSet(void);
 extern void IntIfClkAutoGateSet(void);
 extern void IntProtectionEnable(void);
@@ -197,12 +199,10 @@ extern void IntMasterFIQEnable(void);
 extern void IntMasterFIQDisable(void);
 extern void IntSystemEnable(unsigned int intrNum);
 extern void IntSystemDisable(unsigned int intrNum);
-extern void IntUnRegister(unsigned int intrNum);
 extern void IntEnable(unsigned char  status);
-extern void IntRegister(unsigned int intrNum, void (*pfnHandler)(void));
+extern unsigned char IntDisable(void);
 extern void IntPrioritySet(unsigned int intrNum, unsigned int priority,
                            unsigned int hostIntRoute);
-extern unsigned char IntDisable(void);
 extern unsigned int IntMasterStatusGet(void);
 extern unsigned int IntActiveIrqNumGet(void);
 extern unsigned int IntActiveFiqNumGet(void);
@@ -211,6 +211,7 @@ extern unsigned int IntSpurFiqFlagGet(void);
 extern unsigned int IntCurrIrqPriorityGet(void);
 extern unsigned int IntCurrFiqPriorityGet(void);
 extern unsigned int IntPriorityThresholdGet(void);
+
 extern unsigned int IntRawStatusGet(unsigned int intrNum);
 extern unsigned int IntPendingIrqMaskedStatusGet(unsigned int intrNum);
 extern unsigned int IntPendingFiqMaskedStatusGet(unsigned int intrNum);
