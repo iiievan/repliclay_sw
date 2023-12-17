@@ -2335,6 +2335,12 @@
     <group>
         <name>periph</name>
         <file>
+            <name>$PROJ_DIR$\periph\am335x_dmtimer.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\periph\am335x_dmtimer.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\periph\am335x_intc.cpp</name>
         </file>
         <file>

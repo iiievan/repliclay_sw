@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "utils.h"
-#include "DM_Timer.h"
+#include "DMTIMER.h"
 
 namespace REGS
 {  

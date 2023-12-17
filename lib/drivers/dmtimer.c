@@ -72,14 +72,9 @@
 *******************************************************************************/
 
 /**
- * \brief   This API will start the timer. 
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  None.
- *
- * \note    The timer must be configured before it is started/enabled.
- *
+ * @brief   This API will start the timer. 
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @note    The timer must be configured before it is started/enabled.
  **/
 void DMTimerEnable(unsigned int baseAdd)
 {
@@ -91,12 +86,8 @@ void DMTimerEnable(unsigned int baseAdd)
 }
 
 /**
- * \brief   This API will stop the timer. 
- *
- * \param   baseAdd      Base Address of the DMTimer Module Register.
- *
- * \return  None.
- *
+ * @brief   This API will stop the timer. 
+ * @param   baseAdd      Base Address of the DMTimer Module Register.
  **/
 void DMTimerDisable(unsigned int baseAdd)
 {
@@ -108,22 +99,18 @@ void DMTimerDisable(unsigned int baseAdd)
 }
 
 /**
- * \brief   This API will configure the timer in combinations of 
+ * @brief   This API will configure the timer in combinations of 
  *          'One Shot timer' and 'Compare' Mode or 'Auto-reload timer' 
  *          and 'Compare' Mode.  
+ * @param   baseAdd      Base Address of the DMTimer Module Register.
+ * @param   timerMode    Mode for enabling the timer.
  *
- * \param   baseAdd      Base Address of the DMTimer Module Register.
- * \param   timerMode    Mode for enabling the timer.
- *
- * 'timerMode' can take the following values \n
+ *    'timerMode' can take the following values \n
  *    DMTIMER_ONESHOT_CMP_ENABLE - One shot and compare mode enabled \n
  *    DMTIMER_ONESHOT_NOCMP_ENABLE - One shot enabled, compare mode disabled \n
  *    DMTIMER_AUTORLD_CMP_ENABLE - Auto-reload and compare mode enabled \n
  *    DMTIMER_AUTORLD_NOCMP_ENABLE - Auto-reload enabled, compare mode 
  *                                   disabled \n
- *
- * \return  None.
- *
  **/
 void DMTimerModeConfigure(unsigned int baseAdd, unsigned int timerMode)
 {
@@ -142,12 +129,10 @@ void DMTimerModeConfigure(unsigned int baseAdd, unsigned int timerMode)
 }
 
 /**
- * \brief   This API will configure and enable the pre-scaler clock.
- *
- * \param   baseAdd      Base Address of the DMTimer Module Register.
- * \param   ptv          Pre-scale clock Timer value.
- *
- * 'ptv' can take the following values \n
+ * @brief   This API will configure and enable the pre-scaler clock.
+ * @param   baseAdd      Base Address of the DMTimer Module Register.
+ * @param   ptv          Pre-scale clock Timer value.
+ *    'ptv' can take the following values \n
  *    DMTIMER_PRESCALER_CLK_DIV_BY_2 - Timer clock divide by 2 \n
  *    DMTIMER_PRESCALER_CLK_DIV_BY_4 - Timer clock divide by 4 \n
  *    DMTIMER_PRESCALER_CLK_DIV_BY_8 - Timer clock divide by 8 \n
@@ -156,9 +141,6 @@ void DMTimerModeConfigure(unsigned int baseAdd, unsigned int timerMode)
  *    DMTIMER_PRESCALER_CLK_DIV_BY_64 - Timer clock divide by 64 \n
  *    DMTIMER_PRESCALER_CLK_DIV_BY_128 - Timer clock divide by 128 \n
  *    DMTIMER_PRESCALER_CLK_DIV_BY_256 - Timer clock divide by 256 \n
- *
- * \return  None.
- *
  **/
 void DMTimerPreScalerClkEnable(unsigned int baseAdd, unsigned int ptv)
 {
@@ -176,12 +158,8 @@ void DMTimerPreScalerClkEnable(unsigned int baseAdd, unsigned int ptv)
 }
 
 /**
- * \brief   This API will disable the pre-scaler clock.
- *
- * \param   baseAdd      Base Address of the DMTimer Module Register.
- *
- * \return  None.
- *
+ * @brief   This API will disable the pre-scaler clock.
+ * @param   baseAdd      Base Address of the DMTimer Module Register.
  **/
 void DMTimerPreScalerClkDisable(unsigned int baseAdd)
 {
@@ -193,14 +171,10 @@ void DMTimerPreScalerClkDisable(unsigned int baseAdd)
 }
 
 /**
- * \brief   Set/Write the Counter register with the counter value.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   counter       Count value for the timer.
- *
- * \return  None.
- *
- * \note    Value can be loaded into the counter register when the counter is 
+ * @brief   Set/Write the Counter register with the counter value.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   counter       Count value for the timer.
+ * @note    Value can be loaded into the counter register when the counter is 
  *          stopped or when it is running.
  **/
 void DMTimerCounterSet(unsigned int baseAdd, unsigned int counter)
@@ -213,14 +187,11 @@ void DMTimerCounterSet(unsigned int baseAdd, unsigned int counter)
 }
 
 /**
- * \brief   Get/Read the counter value from the counter register.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  This API returns the count value present in the DMTimer Counter
+ * @brief   Get/Read the counter value from the counter register.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @return  This API returns the count value present in the DMTimer Counter
  *          register.
- *
- * \note:   Value can be read from the counter register when the counter is
+ * @note:   Value can be read from the counter register when the counter is
  *          stopped or when it is running.
  **/
 unsigned int DMTimerCounterGet(unsigned int baseAdd)
@@ -233,14 +204,10 @@ unsigned int DMTimerCounterGet(unsigned int baseAdd)
 }
 
 /**
- * \brief   Set the reload count value in the timer load register.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   reload        The reload count value of the timer.
- *
- * \return  None.
- *
- * \note:   It is recommended to not use reload value as 0xFFFFFFFF as it can 
+ * @brief   Set the reload count value in the timer load register.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   reload        The reload count value of the timer.
+ * @note:   It is recommended to not use reload value as 0xFFFFFFFF as it can 
  *          lead to undesired results.
  **/
 void DMTimerReloadSet(unsigned int baseAdd, unsigned int reload)
@@ -253,12 +220,9 @@ void DMTimerReloadSet(unsigned int baseAdd, unsigned int reload)
 }
 
 /**
- * \brief   Get the reload count value from the timer load register.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  This API returns the value present in DMTimer Load Register.
- *
+ * @brief   Get the reload count value from the timer load register.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @return  This API returns the value present in DMTimer Load Register.
  **/
 unsigned int DMTimerReloadGet(unsigned int baseAdd)
 {
@@ -267,17 +231,12 @@ unsigned int DMTimerReloadGet(unsigned int baseAdd)
 }
 
 /**
- * \brief   Configure general purpose output pin.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   gpoCfg        General purpose output.
- * 
- * 'gpoCfg' can take the following values \n
+ * @brief   Configure general purpose output pin.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   gpoCfg        General purpose output. 
+ *    'gpoCfg' can take the following values \n
  *    DMTIMER_GPO_CFG_0 - PORGPOCFG drives 0 \n
  *    DMTIMER_GPO_CFG_1 - PORGPOCFG drives 1 \n  
- *
- * \return  None.
- *
  **/
 void DMTimerGPOConfigure(unsigned int baseAdd, unsigned int gpoCfg)
 {
@@ -295,13 +254,9 @@ void DMTimerGPOConfigure(unsigned int baseAdd, unsigned int gpoCfg)
 }
 
 /**
- * \brief   Set the match register with the compare value.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   compareVal    Compare value.
- *
- * \return  None.
- *
+ * @brief   Set the match register with the compare value.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   compareVal    Compare value.
  **/
 void DMTimerCompareSet(unsigned int baseAdd, unsigned int compareVal)
 {
@@ -313,12 +268,9 @@ void DMTimerCompareSet(unsigned int baseAdd, unsigned int compareVal)
 }
 
 /**
- * \brief   Get the match register contents.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  This API returns the match register contents.
- *
+ * @brief   Get the match register contents.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @return  This API returns the match register contents.
  **/
 unsigned int DMTimerCompareGet(unsigned int baseAdd)
 {
@@ -327,18 +279,13 @@ unsigned int DMTimerCompareGet(unsigned int baseAdd)
 }
 
 /**
- * \brief   Trigger IRQ event by software.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   intFlags      Variable used to trigger the events.
- *
- * 'intFlags' can take the following values \n
+ * @brief   Trigger IRQ event by software.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   intFlags      Variable used to trigger the events.
+ *    'intFlags' can take the following values \n
  *    DMTIMER_INT_TCAR_IT_FLAG - Trigger IRQ status for capture \n
  *    DMTIMER_INT_OVF_IT_FLAG - Trigger IRQ status for overflow \n
  *    DMTIMER_INT_MAT_IT_FLAG - Trigger IRQ status for match \n
- *
- * \return  None.
- *
  **/
 void DMTimerIntRawStatusSet(unsigned int baseAdd, unsigned int intFlags)
 {
@@ -350,12 +297,9 @@ void DMTimerIntRawStatusSet(unsigned int baseAdd, unsigned int intFlags)
 }
 
 /**
- * \brief   Read the status of IRQSTATUS_RAW register.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  This API returns the contents of IRQSTATUS_RAW register.
- *
+ * @brief   Read the status of IRQSTATUS_RAW register.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @return  This API returns the contents of IRQSTATUS_RAW register.
  **/
 unsigned int DMTimerIntRawStatusGet(unsigned int baseAdd)
 {
@@ -364,12 +308,9 @@ unsigned int DMTimerIntRawStatusGet(unsigned int baseAdd)
 }
 
 /**
- * \brief   Read the status of IRQ_STATUS register.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  This API returns the status of IRQSTATUS register.
- *
+ * @brief   Read the status of IRQ_STATUS register.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @return  This API returns the status of IRQSTATUS register.
  **/
 unsigned int DMTimerIntStatusGet(unsigned int baseAdd)
 {
@@ -378,18 +319,14 @@ unsigned int DMTimerIntStatusGet(unsigned int baseAdd)
 }
 
 /**
- * \brief   Clear the status of interrupt events.
+ * @brief   Clear the status of interrupt events.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   intFlags      Variable used to clear the events.
  *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   intFlags      Variable used to clear the events.
- *
- * 'intFlags' can take the following values \n
+ *   'intFlags' can take the following values \n
  *    DMTIMER_INT_TCAR_IT_FLAG - Clear IRQ status for capture \n
  *    DMTIMER_INT_OVF_IT_FLAG - Clear IRQ status for overflow \n
  *    DMTIMER_INT_MAT_IT_FLAG - Clear IRQ status for match \n
- *
- * \return  None.
- *
  **/
 void DMTimerIntStatusClear(unsigned int baseAdd, unsigned int intFlags)
 {
@@ -401,18 +338,14 @@ void DMTimerIntStatusClear(unsigned int baseAdd, unsigned int intFlags)
 }
 
 /**
- * \brief   Enable the DMTimer interrupts.
+ * @brief   Enable the DMTimer interrupts.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   intFlags      Variable used to enable the interrupts.
  *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   intFlags      Variable used to enable the interrupts.
- *
- * 'intFlags' can take the following values \n
+ *    'intFlags' can take the following values \n
  *    DMTIMER_INT_TCAR_EN_FLAG - IRQ enable for capture \n
  *    DMTIMER_INT_OVF_EN_FLAG - IRQ enable for overflow \n
  *    DMTIMER_INT_MAT_EN_FLAG - IRQ enable for match \n
- *
- * \return  None.
- *
  **/
 void DMTimerIntEnable(unsigned int baseAdd, unsigned int intFlags)
 {
@@ -424,18 +357,14 @@ void DMTimerIntEnable(unsigned int baseAdd, unsigned int intFlags)
 }
 
 /**
- * \brief   Disable the DMTimer interrupts.
+ * @brief   Disable the DMTimer interrupts.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   intFlags      Variable used to disable the interrupts.
  *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   intFlags      Variable used to disable the interrupts.
- *
- * 'intFlags' can take the following values \n
+ *    'intFlags' can take the following values \n
  *    DMTIMER_INT_TCAR_EN_FLAG - IRQ disable for capture \n
  *    DMTIMER_INT_OVF_EN_FLAG - IRQ disable for overflow \n
  *    DMTIMER_INT_MAT_EN_FLAG - IRQ disable for match \n
- *
- * \return  None.
- *
  **/
 void DMTimerIntDisable(unsigned int baseAdd, unsigned int intFlags)
 {
@@ -447,13 +376,9 @@ void DMTimerIntDisable(unsigned int baseAdd, unsigned int intFlags)
 }
 
 /**
- * \brief   Set/enable the trigger write access.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  None.
- *
- * \note    When we have enabled the timer in Auto-reload mode, the value from 
+ * @brief   Set/enable the trigger write access.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @note    When we have enabled the timer in Auto-reload mode, the value from 
  *          TLDR is reloaded into TCRR when a overflow condition occurs. But if 
  *           we want to load the contents from TLDR to TCRR before overflow 
  *          occurs then call this API.
@@ -468,12 +393,9 @@ void DMTimerTriggerSet(unsigned int baseAdd)
 }
 
 /**
- * \brief   Read the status of IRQENABLE_SET register.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  This API returns the status of IRQENABLE_SET register.
- *
+ * @brief   Read the status of IRQENABLE_SET register.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @return  This API returns the status of IRQENABLE_SET register.
  **/
 unsigned int DMTimerIntEnableGet(unsigned int baseAdd)
 {
@@ -482,17 +404,13 @@ unsigned int DMTimerIntEnableGet(unsigned int baseAdd)
 }
 
 /**
- * \brief   Enable/Disable software reset for DMTimer module.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   rstOption     Enable/Disable reset option for DMTimer.
+ * @brief   Enable/Disable software reset for DMTimer module.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   rstOption     Enable/Disable reset option for DMTimer.
  *          
  * 'rstOption' can take the following values \n
  *    DMTIMER_SFT_RESET_ENABLE - Software reset is enabled \n
  *    DMTIMER_SFT_RESET_DISABLE - Software reset is disabled \n   
- *
- * \return  None.
- *
  **/
 void DMTimerResetConfigure(unsigned int baseAdd, unsigned int rstOption)
 {
@@ -504,12 +422,8 @@ void DMTimerResetConfigure(unsigned int baseAdd, unsigned int rstOption)
 }
 
 /**
- * \brief   Reset the DMTimer module.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  None.
- *
+ * @brief   Reset the DMTimer module.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
  **/
 void DMTimerReset(unsigned int baseAdd)
 {
@@ -521,14 +435,10 @@ void DMTimerReset(unsigned int baseAdd)
 }
 
 /**
- * \brief   This API stores the context of the DMTimer
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   contextPtr    Pointer to the structure where the DM timer context
+ * @brief   This API stores the context of the DMTimer
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   contextPtr    Pointer to the structure where the DM timer context
  *                        need to be saved.
- *
- * \return  None.
- *
  **/
 void DMTimerContextSave(unsigned int baseAdd, DMTIMERCONTEXT *contextPtr)
 {
@@ -544,14 +454,10 @@ void DMTimerContextSave(unsigned int baseAdd, DMTIMERCONTEXT *contextPtr)
 }
 
 /**
- * \brief   This API restores the context of the DMTimer
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   contextPtr    Pointer to the structure where the DM timer context
+ * @brief   This API restores the context of the DMTimer
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   contextPtr    Pointer to the structure where the DM timer context
  *                        need to be restored from.
- *
- * \return  None.
- *
  **/
 void DMTimerContextRestore(unsigned int baseAdd,  DMTIMERCONTEXT *contextPtr)
 {
@@ -578,17 +484,13 @@ void DMTimerContextRestore(unsigned int baseAdd,  DMTIMERCONTEXT *contextPtr)
 }
 
 /**
- * \brief   Configure the posted mode of DMTimer.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- * \param   postMode      Posted mode configuration.
+ * @brief   Configure the posted mode of DMTimer.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @param   postMode      Posted mode configuration.
  *
  * 'postMode' can take the following values \n
  *    DMTIMER_NONPOSTED - Posted mode not used \n
  *    DMTIMER_POSTED - Posted mode used \n
- *
- * \return  None.
- *
  **/
 void DMTimerPostedModeConfig(unsigned int baseAdd, unsigned int postMode)
 {
@@ -600,12 +502,9 @@ void DMTimerPostedModeConfig(unsigned int baseAdd, unsigned int postMode)
 }
 
 /**
- * \brief   Read the status of Write Posted Status register.
- *
- * \param   baseAdd       Base Address of the DMTimer Module Register.
- *
- * \return  This API returns the status of TWPS register.
- *
+ * @brief   Read the status of Write Posted Status register.
+ * @param   baseAdd       Base Address of the DMTimer Module Register.
+ * @return  This API returns the status of TWPS register.
  **/
 unsigned int DMTimerWritePostedStatusGet(unsigned int baseAdd)
 {

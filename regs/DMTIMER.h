@@ -1,5 +1,5 @@
-#ifndef __DM_TIMER_H
-#define __DM_TIMER_H
+#ifndef __DMTIMER_H
+#define __DMTIMER_H
 
 #include <stdint.h>
 
@@ -63,6 +63,8 @@ namespace REGS
             } b;                                      // Structure used for bit access 
             uint32_t  reg;                            // Type used for register access 
         } IRQSTATUS_RAW_reg_t;
+
+        
     
         /* [reset state = 0x0]*/
         typedef union 
@@ -149,9 +151,22 @@ namespace REGS
     
         enum e_DMTIMER_mode: uint32_t
         {
-            MODE_NONE       = 0u,
-            MODE_AUTORELOAD = BIT(1),
-            MODE_COMPARE    = BIT(6)      
+            MODE_ONESHOT_NOCMP_ENABLE = 0U,
+            MODE_AUTORLD_NOCMP_ENABLE = BIT(1),
+            MODE_ONESHOT_CMP_ENABLE   = BIT(6),            
+            MODE_AUTORLD_CMP_ENABLE   = BIT(1)|BIT(6)   
+        };
+
+        enum e_DMTIMER_prescaler: uint32_t
+        {
+            CLK_DIV_BY_2   = 0x0,
+            CLK_DIV_BY_4   = 0x1,
+            CLK_DIV_BY_8   = 0x2,
+            CLK_DIV_BY_16  = 0x3,
+            CLK_DIV_BY_32  = 0x4,
+            CLK_DIV_BY_64  = 0x5,
+            CLK_DIV_BY_128 = 0x6,
+            CLK_DIV_BY_256 = 0x7
         };
         
         /* [reset state = 0x0]*/
@@ -326,5 +341,4 @@ namespace REGS
 
 }   //namespace REGS
 
-
-#endif //__DM_TIMER_H
+#endif //__DMTIMER_H

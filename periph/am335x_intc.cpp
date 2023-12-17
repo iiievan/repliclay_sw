@@ -1,4 +1,5 @@
 #include "am335x_intc.h"
+#include "utils.h"
 #include "cpu.h"
 
 am335x_intc intc;
