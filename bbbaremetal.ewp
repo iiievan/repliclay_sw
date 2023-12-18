@@ -2350,7 +2350,7 @@
     <group>
         <name>regs</name>
         <file>
-            <name>$PROJ_DIR$\regs\DM_Timer.h</name>
+            <name>$PROJ_DIR$\regs\DMTIMER.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\regs\INTC.h</name>

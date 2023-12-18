@@ -1,4 +1,5 @@
 #include "init.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,14 +18,14 @@ int main()
 
     while(1)
     {
-        /* Driving a logic HIGH on the GPIO pin. */
+        // Driving a logic HIGH on the GPIO pin.
         GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
                      GPIO_INSTANCE_PIN_NUMBER,
                      GPIO_PIN_HIGH);
 
        Delay(0x1FFFFFF);
 
-        /* Driving a logic LOW on the GPIO pin. */
+        // Driving a logic LOW on the GPIO pin
         GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
                      GPIO_INSTANCE_PIN_NUMBER,
                      GPIO_PIN_LOW);

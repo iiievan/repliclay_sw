@@ -275,7 +275,19 @@ protected:
 private:
                   void  m_wait_for_write(REGS::DMTIMER::e_TWPS_flags twps_mask);
 
-REGS::DMTIMER::AM335x_DMTIMER_Type  &m_DMTIMER_regs;     // DM_Timer registers
+REGS::DMTIMER::AM335x_DMTIMER_Type  &m_DMTIMER_regs;     // am335x_dmtimer registers
 };
+
+extern     void dmtimer_irqhandler(void *p_obj);
+
+#ifndef beaglebone_black    // such a timer has not yet been described in am335x_dmtimer.h
+    extern am335x_dmtimer dm_timer_1ms;
+#endif
+extern am335x_dmtimer dm_timer_2;
+extern am335x_dmtimer dm_timer_3;
+extern am335x_dmtimer dm_timer_4;
+extern am335x_dmtimer dm_timer_5;
+extern am335x_dmtimer dm_timer_6;
+extern am335x_dmtimer dm_timer_7;
 
 #endif //__DM_TIMER_H

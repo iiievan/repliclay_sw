@@ -292,4 +292,14 @@ void  am335x_dmtimer::m_wait_for_write(REGS::DMTIMER::e_TWPS_flags twps_mask)
     // Wait for previous write to complete if posted mode enabled
     if(m_DMTIMER_regs.TSICR.b.POSTED)
         while(m_DMTIMER_regs.TWPS.reg & twps_mask);
-}   
+}  
+
+#ifndef beaglebone_black    // such a timer has not yet been described in DM_Timer.h
+    am335x_dmtimer dm_timer_1ms(REGS::DMTIMER::AM335X_DMTIMER_1);
+#endif
+am335x_dmtimer dm_timer_2(REGS::DMTIMER::AM335X_DMTIMER_2);
+//am335x_dmtimer dm_timer_3(REGS::DMTIMER::AM335X_DMTIMER_3);
+//am335x_dmtimer dm_timer_4(REGS::DMTIMER::AM335X_DMTIMER_4);
+//am335x_dmtimer dm_timer_5(REGS::DMTIMER::AM335X_DMTIMER_5);
+//DM_Timer dm_timer_6(REGS::DMTIMER::AM335X_DMTIMER_6);
+//DM_Timer dm_timer_7(REGS::DMTIMER::AM335X_DMTIMER_7);

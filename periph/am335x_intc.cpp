@@ -35,12 +35,8 @@ void  am335x_intc::init (void)
         register_handler((REGS::INTC::e_INT_ID)int_id,(isr_handler_t)int_def_hndlr);
     }
     
-    m_INTC_regs.CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation
-    
-    #if !defined(am335x)
-        // not valid on am335x SoC
-        m_INTC_regs.CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
-    #endif
+    m_INTC_regs.CONTROL.b.NewIRQAgr = HIGH; //Reset IRQ output and enable new IRQ generation    
+    m_INTC_regs.CONTROL.b.NewFIQAgr = HIGH; //Reset FIQ output and enable new FIQ generation
 } 
 
 void  am335x_intc::register_handler(REGS::INTC::e_INT_ID  int_id, isr_handler_t isr_fnct)
