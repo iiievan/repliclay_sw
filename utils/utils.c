@@ -11,7 +11,7 @@ int random(void)
 
 int rnd_max(int max)
 {
-  return (max*random()) / 32767.0f;
+    return (int)(((float)(max*random())) / 32767.0f);
 }
 
 uint16_t crc16_fill(const uint8_t *p_Buf, uint32_t len, uint16_t fill)

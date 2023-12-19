@@ -1,53 +1,28 @@
-#include "init.h"
 #include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-static void Delay(unsigned int count);
-
-#ifdef __cplusplus
-}
-#endif
-
+#include "init.h"
+#include "sys_timer.h"
 
 int main()
 {  
+    static uint64_t time = 0;
+    static bool pin_state = true;
+    
     init_board();
 
     while(1)
-    {
-        // Driving a logic HIGH on the GPIO pin.
-        GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
+    {      
+        if(sys_time.get_ms() - time > 1000)
+        {
+            time = sys_time.get_ms();
+            
+            // toggle GPIO pin.
+            GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
                      GPIO_INSTANCE_PIN_NUMBER,
-                     GPIO_PIN_HIGH);
-
-       Delay(0x1FFFFFF);
-
-        // Driving a logic LOW on the GPIO pin
-        GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
-                     GPIO_INSTANCE_PIN_NUMBER,
-                     GPIO_PIN_LOW);
-
-        Delay(0x1FFFFFF);
+                     (unsigned int)pin_state);
+            
+            pin_state = !pin_state;
+        }
     }
-
 } 
-
-/*
-** A function which is used to generate a delay.
-*/
-#ifdef __cplusplus
-extern "C" {
-#endif
-static void Delay(volatile unsigned int count)
-{
-    while(count--);
-}
-#ifdef __cplusplus
-}
-#endif
-
 
 /******************************* End of file *********************************/

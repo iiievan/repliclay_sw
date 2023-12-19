@@ -5,7 +5,10 @@
 //#include "iar_dynamic_init.h" // in case using RTOS
 #include "am335x_intc.h"
 #include "am335x_dmtimer.h"
+#include "sys_timer.h"
 #include "PRCM.h"
+
+const uint32_t AM335X_VECTOR_BASE = 0x4030FC00;
 
 extern "C" void Entry(void);
 extern "C" void UndefInstHandler(void);
@@ -14,7 +17,8 @@ extern "C" void AbortHandler(void);
 extern "C" void IRQHandler(void);
 extern "C" void FIQHandler(void);
 
-static uint64_t time_from_boot = 0;
+// 1ms system timer for system time
+sys_timer sys_time(REGS::DMTIMER::AM335X_DMTIMER_2);
 
 static uint32_t const vec_tbl[14]=
 {
@@ -33,8 +37,6 @@ static uint32_t const vec_tbl[14]=
     (uint32_t)IRQHandler,
     (uint32_t)FIQHandler
 };
-
-const uint32_t AM335X_VECTOR_BASE = 0x4030FC00;
 
 static void copy_vector_table(void)
 {
@@ -60,7 +62,11 @@ void init_board(void)
     //__iar_dynamic_initialization();   // in case using RTOS
     
     intc.init();                       //Initializing the ARM Interrupt Controller.
-    dmtimer_setup(); 
+    
+    // setup system timer for 1ms interrupt 
+    sys_time.setup(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE,
+                   SYS_TIMER_RLD_COUNT,
+                   (REGS::INTC::MAX_IRQ_PRIORITIES - 1)); 
     
     REGS::PRCM::run_clk_GPIO1();
     
@@ -75,35 +81,3 @@ void init_board(void)
     intc.master_IRQ_enable();       
 }
 
-#define OS_TIMER dm_timer_2
-#define OS_TIMER_INTERRUPT  (REGS::INTC::TINT2)
-
-void dmtimer_setup(void)
-{
-    // run clock for timer instance
-    REGS::PRCM::run_clk_DMTIMER(REGS::DMTIMER::TIMER_2); 
-
-    // setup timer interrupt in INTC
-    intc.register_handler(OS_TIMER_INTERRUPT,(isr_handler_t)dmtimer_irqhandler);     // Registering dmtimer_irqhandler
-    intc.priority_set(OS_TIMER_INTERRUPT,(REGS::INTC::MAX_IRQ_PRIORITIES - 1));      // Set the lowest priority
-    intc.unmask_interrupt(OS_TIMER_INTERRUPT); 
-    
-    OS_TIMER.counter_set(DMTIMER_RLD_COUNT); //Load the counter with the initial count value
-    OS_TIMER.reload_set(DMTIMER_RLD_COUNT);    //Load the load register with the reload count value
-    OS_TIMER.mode_configure(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE); //Configure the DMTimer for Auto-reload and compare mode 
-    
-    OS_TIMER.IRQ_enable(REGS::DMTIMER::IRQ_OVF);
-    
-    OS_TIMER.enable();
-}
-
-void dmtimer_irqhandler(void *p_obj)
-{  
-    OS_TIMER.IRQ_disable(REGS::DMTIMER::IRQ_OVF); // Disable the DMTimer interrupts    
-    OS_TIMER.IRQ_clear(REGS::DMTIMER::IRQ_OVF);   // Clear the status of the interrupt flags 
-
-    time_from_boot++;
-    
-    OS_TIMER.IRQ_enable(REGS::DMTIMER::IRQ_OVF);  // Enable the DM_Timer interrupts
-    intc.unmask_interrupt(OS_TIMER_INTERRUPT);  
-}

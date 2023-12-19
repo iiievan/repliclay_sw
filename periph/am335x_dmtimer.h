@@ -269,13 +269,13 @@ REGS::INTC::e_INT_ID get_DMTIMER_sys_interrupt();
                 bool  get_debug_EMUFREE();
 
 protected:
-              uint64_t  m_time {0}; // the timer itself
-     dmtimer_context_t  m_context;  // dmtimer context for rebooting
+     volatile uint64_t  m_time; // the timer time     
                   bool  m_is_paused { true }; 
 private:
+     dmtimer_context_t  m_context;  // dmtimer context for rebooting
                   void  m_wait_for_write(REGS::DMTIMER::e_TWPS_flags twps_mask);
 
-REGS::DMTIMER::AM335x_DMTIMER_Type  &m_DMTIMER_regs;     // am335x_dmtimer registers
+REGS::DMTIMER::AM335x_DMTIMER_Type  &m_regs;     // am335x_dmtimer registers
 };
 
 extern     void dmtimer_irqhandler(void *p_obj);

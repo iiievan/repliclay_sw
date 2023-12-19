@@ -7,7 +7,6 @@
 
 #define GPIO_INSTANCE_ADDRESS           (SOC_GPIO_1_REGS)
 #define GPIO_INSTANCE_PIN_NUMBER        (23)
-#define DMTIMER_RLD_COUNT               (0xffffa261) // 1ms approximate
 
 void init_board(void);
 void dmtimer_setup(void);
