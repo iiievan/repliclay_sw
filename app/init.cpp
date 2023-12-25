@@ -5,8 +5,10 @@
 //#include "iar_dynamic_init.h" // in case using RTOS
 #include "am335x_intc.h"
 #include "am335x_dmtimer.h"
+#include "am335x_gpio.h"
 #include "sys_timer.h"
 #include "PRCM.h"
+
 
 const uint32_t AM335X_VECTOR_BASE = 0x4030FC00;
 
@@ -19,6 +21,10 @@ extern "C" void FIQHandler(void);
 
 // 1ms system timer for system time
 sys_timer sys_time(REGS::DMTIMER::AM335X_DMTIMER_2);
+//am335x_gpio gpio0(REGS::GPIO::AM335x_GPIO_0);
+am335x_gpio gpio1(REGS::GPIO::AM335x_GPIO_1);
+//am335x_gpio gpio2(REGS::GPIO::AM335x_GPIO_2);
+//am335x_gpio gpio3(REGS::GPIO::AM335x_GPIO_3);
 
 static uint32_t const vec_tbl[14]=
 {
@@ -56,11 +62,12 @@ void init_board(void)
 { 
     copy_vector_table();
 
+
     /// Для ускорения работы чтобы не было медленнее Cortex M3 требуется включать предсказание ветвления, кэш и MMU.///
     InitMem();                          // Initiate MMU and instruction Cache  
     CP15BranchPredictionEnable();       // Enable Branch Prediction включаем предсказание ветвления - нужно для ускорения работы.    
     //__iar_dynamic_initialization();   // in case using RTOS
-    
+        
     intc.init();                       //Initializing the ARM Interrupt Controller.
     
     // setup system timer for 1ms interrupt 
@@ -68,15 +75,17 @@ void init_board(void)
                    SYS_TIMER_RLD_COUNT,
                    (REGS::INTC::MAX_IRQ_PRIORITIES - 1)); 
     
-    REGS::PRCM::run_clk_GPIO1();
-    
+    REGS::PRCM::run_clk_GPIO1();    
 
-    GPIO1Pin23PinMuxSetup(); // GPIO1_23  
-    GPIOModuleEnable(GPIO_INSTANCE_ADDRESS);
-    GPIOModuleReset(GPIO_INSTANCE_ADDRESS);
-    GPIODirModeSet(GPIO_INSTANCE_ADDRESS,
-                   GPIO_INSTANCE_PIN_NUMBER,
-                   GPIO_DIR_OUTPUT);
+    GPIO1Pin23PinMuxSetup(); 
+    
+    gpio1.module_enable();
+    gpio1.module_reset();
+    gpio1.dir_mode_set(APP_LED, REGS::GPIO::GPIO_OUTPUT);
+
+    //GPIOModuleEnable(GPIO_INSTANCE_ADDRESS);
+    //GPIOModuleReset(GPIO_INSTANCE_ADDRESS);
+    //GPIODirModeSet(GPIO_INSTANCE_ADDRESS, GPIO_INSTANCE_PIN_NUMBER, GPIO_DIR_OUTPUT);
     
     intc.master_IRQ_enable();       
 }

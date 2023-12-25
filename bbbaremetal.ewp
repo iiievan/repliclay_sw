@@ -2341,6 +2341,12 @@
             <name>$PROJ_DIR$\periph\am335x_dmtimer.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\periph\am335x_gpio.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\periph\am335x_gpio.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\periph\am335x_intc.cpp</name>
         </file>
         <file>
@@ -2353,7 +2359,16 @@
     <group>
         <name>regs</name>
         <file>
+            <name>$PROJ_DIR$\regs\CONTROL_MODULE.CPP</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\regs\CONTROL_MODULE.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\regs\DMTIMER.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\regs\GPIO.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\regs\INTC.h</name>

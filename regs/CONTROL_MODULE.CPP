@@ -1,58 +1,61 @@
 #include "CONTROL_MODULE.h"
 
-x_CONTROL_MODULE ctrl_module;
-
-x_CONTROL_MODULE::x_CONTROL_MODULE()
-: m_CTRL_MODULE_regs(*CONTROL_MODULE::AM335x_CONTROL_MODULE)
-{ }
-                     
-void  x_CONTROL_MODULE::I2C0_pin_mux_setup()
-{    
-    m_CTRL_MODULE_regs.conf_i2c0_sda.b.putypesel = CONTROL_MODULE::PULL_UP;
-    m_CTRL_MODULE_regs.conf_i2c0_sda.b.rxactive  = CONTROL_MODULE::INPUT_ENABLE;
-    m_CTRL_MODULE_regs.conf_i2c0_sda.b.slewctrl  = CONTROL_MODULE::SLOW;
-
-    m_CTRL_MODULE_regs.conf_i2c0_scl.b.putypesel = CONTROL_MODULE::PULL_UP;
-    m_CTRL_MODULE_regs.conf_i2c0_scl.b.rxactive  = CONTROL_MODULE::INPUT_ENABLE;
-    m_CTRL_MODULE_regs.conf_i2c0_scl.b.slewctrl  = CONTROL_MODULE::SLOW;
-}
-
-void  x_CONTROL_MODULE::I2C1_pin_mux_setup()
-{
-    /** I2C_SCLK **/
-    m_CTRL_MODULE_regs.conf_spi0_d1.b.putypesel = CONTROL_MODULE::PULL_UP;
-    m_CTRL_MODULE_regs.conf_spi0_d1.b.rxactive  = CONTROL_MODULE::INPUT_ENABLE;
-    m_CTRL_MODULE_regs.conf_spi0_d1.b.slewctrl  = CONTROL_MODULE::SLOW;
-    m_CTRL_MODULE_regs.conf_spi0_d1.b.mode      = CONTROL_MODULE::PINMODE_2;
-   
-    /** I2C_SDA **/
-    m_CTRL_MODULE_regs.conf_spi0_cs0.b.putypesel = CONTROL_MODULE::PULL_UP;
-    m_CTRL_MODULE_regs.conf_spi0_cs0.b.rxactive  = CONTROL_MODULE::INPUT_ENABLE;
-    m_CTRL_MODULE_regs.conf_spi0_cs0.b.slewctrl  = CONTROL_MODULE::SLOW; 
-    m_CTRL_MODULE_regs.conf_spi0_cs0.b.mode      = CONTROL_MODULE::PINMODE_2;          
-}
-
-void  x_CONTROL_MODULE::I2C2_pin_mux_setup()
-{
-    /** I2C_SCLK **/ 
-    m_CTRL_MODULE_regs.conf_uart1_rtsn.b.putypesel = CONTROL_MODULE::PULL_UP;
-    m_CTRL_MODULE_regs.conf_uart1_rtsn.b.rxactive  = CONTROL_MODULE::INPUT_ENABLE;
-    m_CTRL_MODULE_regs.conf_uart1_rtsn.b.slewctrl  = CONTROL_MODULE::SLOW;
-    m_CTRL_MODULE_regs.conf_uart1_rtsn.b.mode      = CONTROL_MODULE::PINMODE_3;
-   
-    /** I2C_SDA **/ 
-    m_CTRL_MODULE_regs.conf_uart1_ctsn.b.putypesel = CONTROL_MODULE::PULL_UP;
-    m_CTRL_MODULE_regs.conf_uart1_ctsn.b.rxactive  = CONTROL_MODULE::INPUT_ENABLE;
-    m_CTRL_MODULE_regs.conf_uart1_ctsn.b.slewctrl  = CONTROL_MODULE::SLOW; 
-    m_CTRL_MODULE_regs.conf_uart1_ctsn.b.mode      = CONTROL_MODULE::PINMODE_3;
-}
-
-void  x_CONTROL_MODULE::UART0_pin_mux_setup()
-{
-   /** RXD **/
-   m_CTRL_MODULE_regs.conf_uart0_rxd.b.putypesel = CONTROL_MODULE::PULL_UP;
-   m_CTRL_MODULE_regs.conf_uart0_rxd.b.putypesel = CONTROL_MODULE::INPUT_ENABLE;
+namespace REGS
+{  
+    namespace CONTROL_MODULE
+    {                      
+        void  I2C0_pin_mux_setup()
+        {    
+            AM335x_CONTROL_MODULE->conf_i2c0_sda.b.putypesel = PULL_UP;
+            AM335x_CONTROL_MODULE->conf_i2c0_sda.b.rxactive  = INPUT_ENABLE;
+            AM335x_CONTROL_MODULE->conf_i2c0_sda.b.slewctrl  = SLOW;
+        
+            AM335x_CONTROL_MODULE->conf_i2c0_scl.b.putypesel = PULL_UP;
+            AM335x_CONTROL_MODULE->conf_i2c0_scl.b.rxactive  = INPUT_ENABLE;
+            AM335x_CONTROL_MODULE->conf_i2c0_scl.b.slewctrl  = SLOW;
+        }
     
-   /** TXD **/
-   m_CTRL_MODULE_regs.conf_uart0_txd.b.putypesel = CONTROL_MODULE::PULL_UP;
-}
+        void  I2C1_pin_mux_setup()
+        {
+            /** I2C_SCLK **/
+            AM335x_CONTROL_MODULE->conf_spi0_d1.b.putypesel  = PULL_UP;
+            AM335x_CONTROL_MODULE->conf_spi0_d1.b.rxactive   = INPUT_ENABLE;
+            AM335x_CONTROL_MODULE->conf_spi0_d1.b.slewctrl   = SLOW;
+            AM335x_CONTROL_MODULE->conf_spi0_d1.b.mode       = PINMODE_2;
+           
+            /** I2C_SDA **/
+            AM335x_CONTROL_MODULE->conf_spi0_cs0.b.putypesel = PULL_UP;
+            AM335x_CONTROL_MODULE->conf_spi0_cs0.b.rxactive  = INPUT_ENABLE;
+            AM335x_CONTROL_MODULE->conf_spi0_cs0.b.slewctrl  = SLOW; 
+            AM335x_CONTROL_MODULE->conf_spi0_cs0.b.mode      = PINMODE_2;          
+        }
+    
+        void  I2C2_pin_mux_setup()
+        {
+            /** I2C_SCLK **/ 
+            AM335x_CONTROL_MODULE->conf_uart1_rtsn.b.putypesel = PULL_UP;
+            AM335x_CONTROL_MODULE->conf_uart1_rtsn.b.rxactive  = INPUT_ENABLE;
+            AM335x_CONTROL_MODULE->conf_uart1_rtsn.b.slewctrl  = SLOW;
+            AM335x_CONTROL_MODULE->conf_uart1_rtsn.b.mode      = PINMODE_3;
+           
+            /** I2C_SDA **/ 
+            AM335x_CONTROL_MODULE->conf_uart1_ctsn.b.putypesel = PULL_UP;
+            AM335x_CONTROL_MODULE->conf_uart1_ctsn.b.rxactive  = INPUT_ENABLE;
+            AM335x_CONTROL_MODULE->conf_uart1_ctsn.b.slewctrl  = SLOW; 
+            AM335x_CONTROL_MODULE->conf_uart1_ctsn.b.mode      = PINMODE_3;
+        }
+    
+        void  UART0_pin_mux_setup()
+        {
+           /** RXD **/
+           AM335x_CONTROL_MODULE->conf_uart0_rxd.b.putypesel = PULL_UP;
+           AM335x_CONTROL_MODULE->conf_uart0_rxd.b.putypesel = INPUT_ENABLE;
+            
+           /** TXD **/
+           AM335x_CONTROL_MODULE->conf_uart0_txd.b.putypesel = PULL_UP;
+        }
+
+    }   //namespace CONTROL_MODULE
+    
+}   //namespace REGS
+

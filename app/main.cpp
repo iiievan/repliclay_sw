@@ -1,13 +1,14 @@
 #include <stdint.h>
 #include "init.h"
 #include "sys_timer.h"
+#include "GPIO.h"
 
 int main()
 {  
     static uint64_t time = 0;
     static bool pin_state = true;
     
-    init_board();
+    init_board();    
 
     while(1)
     {      
@@ -17,7 +18,7 @@ int main()
             
             // toggle GPIO pin.
             GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
-                     GPIO_INSTANCE_PIN_NUMBER,
+                     APP_LED,
                      (unsigned int)pin_state);
             
             pin_state = !pin_state;
