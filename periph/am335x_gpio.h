@@ -465,9 +465,9 @@ private:
   REGS::GPIO::AM335x_GPIO_Type &m_regs;
 };
 
-//extern am335x_gpio gpio0;
+extern am335x_gpio gpio0;
 extern am335x_gpio gpio1;
-//extern am335x_gpio gpio2;
-//extern am335x_gpio gpio3;
+extern am335x_gpio gpio2;
+extern am335x_gpio gpio3;
 
 #endif // _AM335x_GPIO_H

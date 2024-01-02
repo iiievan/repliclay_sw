@@ -6,6 +6,7 @@
 #include "am335x_intc.h"
 #include "am335x_dmtimer.h"
 #include "am335x_gpio.h"
+#include "pin.h"
 #include "sys_timer.h"
 #include "PRCM.h"
 
@@ -25,6 +26,8 @@ sys_timer sys_time(REGS::DMTIMER::AM335X_DMTIMER_2);
 am335x_gpio gpio1(REGS::GPIO::AM335x_GPIO_1);
 //am335x_gpio gpio2(REGS::GPIO::AM335x_GPIO_2);
 //am335x_gpio gpio3(REGS::GPIO::AM335x_GPIO_3);
+
+
 
 static uint32_t const vec_tbl[14]=
 {
@@ -75,17 +78,12 @@ void init_board(void)
                    SYS_TIMER_RLD_COUNT,
                    (REGS::INTC::MAX_IRQ_PRIORITIES - 1)); 
     
-    REGS::PRCM::run_clk_GPIO1();    
-
-    GPIO1Pin23PinMuxSetup(); 
-    
     gpio1.module_enable();
     gpio1.module_reset();
-    gpio1.dir_mode_set(APP_LED, REGS::GPIO::GPIO_OUTPUT);
-
-    //GPIOModuleEnable(GPIO_INSTANCE_ADDRESS);
-    //GPIOModuleReset(GPIO_INSTANCE_ADDRESS);
-    //GPIODirModeSet(GPIO_INSTANCE_ADDRESS, GPIO_INSTANCE_PIN_NUMBER, GPIO_DIR_OUTPUT);
+    
+    APP_LED.init(); 
+    APP_LED.switch_function(APP_PIN);
+    APP_LED.dir_set(REGS::GPIO::GPIO_OUTPUT); 
     
     intc.master_IRQ_enable();       
 }

@@ -13,25 +13,18 @@ void  am335x_gpio::module_reset()
 {
     //Setting the SOFTRESET bit in System Configuration register.
     //Doing so would reset the GPIO module.
-    //HWREG(baseAdd + GPIO_SYSCONFIG) |= (GPIO_SYSCONFIG_SOFTRESET);
     m_regs.SYSCONFIG.b.SOFTRESET = HIGH;
     
-    // Waiting until the GPIO Module is reset.
-    //while(!(HWREG(baseAdd + GPIO_SYSSTATUS) & GPIO_SYSSTATUS_RESETDONE));
     while(!m_regs.SYSSTATUS.b.RESETDONE);
 }
 
 void  am335x_gpio::module_enable()
 {
-    // Clearing the DISABLEMODULE bit in the Control(CTRL) register.
-    //HWREG(baseAdd + GPIO_CTRL) &= ~(GPIO_CTRL_DISABLEMODULE);
     m_regs.CTRL.b.DISABLEMODULE = LOW;
 }
 
 void  am335x_gpio::module_disable()
 {
-    // Setting the DISABLEMODULE bit in Control(CTRL) register.
-    //HWREG(baseAdd + GPIO_CTRL) |= (GPIO_CTRL_DISABLEMODULE);
     m_regs.CTRL.b.DISABLEMODULE = HIGH;
 }
 
@@ -43,22 +36,16 @@ void  am335x_gpio::dir_mode_set(uint32_t pinnum, REGS::GPIO::e_PINDIR pindir)
     
     // Checking if pin is required to be an output pin.
     if(REGS::GPIO::GPIO_INPUT == pindir)
-    {
-        //HWREG(baseAdd + GPIO_OE) |= (1 << pinnum);
-        m_regs.OE.b.OUTPUTEN |= (1 << pinnum); // config as input
-    }
+        m_regs.OE.reg |= (1 << pinnum); // config as input
     else
-    {
-        //HWREG(baseAdd + GPIO_OE) &= ~(1 << pinnum);
-        m_regs.OE.b.OUTPUTEN  &= ~(1 << pinnum); // config as output
-    }
+        m_regs.OE.reg  &= ~(1 << pinnum); // config as output
 }
 
 REGS::GPIO::e_PINDIR  am335x_gpio::dir_mode_get(uint32_t pinnum)
 {
     REGS::GPIO::e_PINDIR result = REGS::GPIO::GPIO_INPUT;
 
-    if(!(m_regs.OE.b.OUTPUTEN & (1 << pinnum)))
+    if(!(m_regs.OE.reg & (1 << pinnum)))
     {
         result = REGS::GPIO::GPIO_OUTPUT;
     }
@@ -69,37 +56,27 @@ REGS::GPIO::e_PINDIR  am335x_gpio::dir_mode_get(uint32_t pinnum)
 void  am335x_gpio::pin_write(uint32_t pinnum, bool value)
 {
     if(value)
-    {
-        //HWREG(baseAdd + GPIO_SETDATAOUT) = (1 << pinnum);
-        m_regs.SETDATAOUT.b.INTLINE = (1 << pinnum);
-    }
+        m_regs.SETDATAOUT.reg|= (1 << pinnum);
     else
-    {
-        //HWREG(baseAdd + GPIO_CLEARDATAOUT) = (1 << pinnum);
-        m_regs.CLEARDATAOUT.b.INTLINE = (1 << pinnum); 
-    }
+        m_regs.CLEARDATAOUT.reg |= (1 << pinnum); 
 }
 
 uint32_t  am335x_gpio::pin_read(uint32_t pinnum)
 {
-    //return(HWREG(baseAdd + GPIO_DATAIN) & (1 << pinnum));
     return (m_regs.DATAIN.reg & (1 << pinnum));    
 }
 
 void  am335x_gpio::multiple_pins_write(uint32_t setmsk, uint32_t clrmsk)
 {
     // Setting the specified output pins in GPIO_DATAOUT register.
-    //HWREG(baseAdd + GPIO_SETDATAOUT) = setmsk;
     m_regs.SETDATAOUT.reg = setmsk;
 
     // Clearing the specified output pins in GPIO_DATAOUT register.
-    //HWREG(baseAdd + GPIO_CLEARDATAOUT) = clrmsk;
     m_regs.CLEARDATAOUT.reg = clrmsk;
 }
 
 uint32_t  am335x_gpio::multiple_pins_read(uint32_t readmsk)
 {
-    //return(HWREG(baseAdd + GPIO_DATAIN) & readmsk);
     return (m_regs.DATAIN.reg & readmsk);
 }
 

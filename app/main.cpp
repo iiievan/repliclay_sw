@@ -1,12 +1,11 @@
 #include <stdint.h>
 #include "init.h"
 #include "sys_timer.h"
-#include "GPIO.h"
+#include "pin.h"
 
 int main()
 {  
     static uint64_t time = 0;
-    static bool pin_state = true;
     
     init_board();    
 
@@ -16,12 +15,7 @@ int main()
         {
             time = sys_time.get_ms();
             
-            // toggle GPIO pin.
-            GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
-                     APP_LED,
-                     (unsigned int)pin_state);
-            
-            pin_state = !pin_state;
+            APP_LED.toggle();
         }
     }
 } 

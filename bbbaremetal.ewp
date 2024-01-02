@@ -2353,6 +2353,12 @@
             <name>$PROJ_DIR$\periph\am335x_intc.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\periph\pin.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\periph\pin.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\periph\sys_timer.h</name>
         </file>
     </group>
