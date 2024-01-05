@@ -1,5 +1,6 @@
 #include "stdint.h"
 #include "init.h"
+#include "board.h"
 #include "cp15.h"
 #include "hal_mmu.h"
 //#include "iar_dynamic_init.h" // in case using RTOS
@@ -22,12 +23,10 @@ extern "C" void FIQHandler(void);
 
 // 1ms system timer for system time
 sys_timer sys_time(REGS::DMTIMER::AM335X_DMTIMER_2);
-//am335x_gpio gpio0(REGS::GPIO::AM335x_GPIO_0);
+am335x_gpio gpio0(REGS::GPIO::AM335x_GPIO_0);
 am335x_gpio gpio1(REGS::GPIO::AM335x_GPIO_1);
 //am335x_gpio gpio2(REGS::GPIO::AM335x_GPIO_2);
 //am335x_gpio gpio3(REGS::GPIO::AM335x_GPIO_3);
-
-
 
 static uint32_t const vec_tbl[14]=
 {
@@ -76,14 +75,21 @@ void init_board(void)
     // setup system timer for 1ms interrupt 
     sys_time.setup(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE,
                    SYS_TIMER_RLD_COUNT,
-                   (REGS::INTC::MAX_IRQ_PRIORITIES - 1)); 
+                   (REGS::INTC::MAX_IRQ_PRIORITIES - 1));     
     
-    gpio1.module_enable();
-    gpio1.module_reset();
+    gpio1.init();     
+    USR_LED_0.sel_pinmode(PINS::e_GPMC_A5::gpio1_21);
+    USR_LED_0.dir_set(REGS::GPIO::GPIO_OUTPUT); 
     
-    APP_LED.init(); 
-    APP_LED.switch_function(APP_PIN);
-    APP_LED.dir_set(REGS::GPIO::GPIO_OUTPUT); 
+    USR_LED_3.sel_pinmode(PINS::e_GPMC_A8::gpio1_24);
+    USR_LED_3.dir_set(REGS::GPIO::GPIO_OUTPUT);
+    
+    gpio0.init();
+    END_STOP_X_2.sel_pinmode(PINS::e_GPMC_WAIT0::gpio0_30);
+    END_STOP_X_2.dir_set(REGS::GPIO::GPIO_INPUT);
+    END_STOP_X_2.pullup_enable(false);
+    //END_STOP_X_2.sel_pull_type(REGS::CONTROL_MODULE::PULL_DOWN);
+    END_STOP_X_2.sel_slewrate(REGS::CONTROL_MODULE::SLOW);
     
     intc.master_IRQ_enable();       
 }

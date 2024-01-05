@@ -1,7 +1,9 @@
 #include <stdint.h>
+#include "board.h"
 #include "init.h"
 #include "sys_timer.h"
 #include "pin.h"
+#include "am3358zcz_pins.hpp"
 
 int main()
 {  
@@ -15,7 +17,12 @@ int main()
         {
             time = sys_time.get_ms();
             
-            APP_LED.toggle();
+            USR_LED_3.toggle();
+            
+            if(END_STOP_X_2.read_input())
+                USR_LED_0.set();
+            else
+                USR_LED_0.clear();
         }
     }
 } 

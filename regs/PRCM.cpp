@@ -215,6 +215,40 @@ namespace REGS
             while(AM335x_CM_PER->L4LS_CLKSTCTRL.b.CLKACTIVITY_GPIO_1_GDBCLK != CLK_ACT);
         }
         
+        void run_clk_GPIO2()
+        {
+            /* Writing to MODULEMODE field of CM_PER_GPIO2_CLKCTRL register. */
+            AM335x_CM_PER->GPIO2_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;    
+            /* Waiting for MODULEMODE field to reflect the written value. */
+            while(AM335x_CM_PER->GPIO2_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE);
+            /* Writing to OPTFCLKEN_GPIO_2_GDBCLK bit in CM_PER_GPIO1_CLKCTRL register. */
+            AM335x_CM_PER->GPIO2_CLKCTRL.b.OPTFCLKEN_GPIO_2_GDBCLK = HIGH;
+            /* Waiting for OPTFCLKEN_GPIO_2_GDBCLK bit to reflect the desired value. */
+            while(AM335x_CM_PER->GPIO2_CLKCTRL.b.OPTFCLKEN_GPIO_2_GDBCLK != HIGH);
+            
+            /* Waiting for IDLEST field in CM_PER_GPIO2_CLKCTRL register to attain the desired value. */
+            while(AM335x_CM_PER->GPIO2_CLKCTRL.b.IDLEST != IDLEST_FUNC);
+            /* Waiting for CLKACTIVITY_GPIO_2_GDBCLK bit in CM_PER_L4LS_CLKSTCTRL register to attain desired value.  */
+            while(AM335x_CM_PER->L4LS_CLKSTCTRL.b.CLKACTIVITY_GPIO_2_GDBCLK != CLK_ACT);
+        }
+        
+        void run_clk_GPIO3()
+        {
+            /* Writing to MODULEMODE field of CM_PER_GPIO3_CLKCTRL register. */
+            AM335x_CM_PER->GPIO3_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;    
+            /* Waiting for MODULEMODE field to reflect the written value. */
+            while(AM335x_CM_PER->GPIO3_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE);
+            /* Writing to OPTFCLKEN_GPIO_3_GDBCLK bit in CM_PER_GPIO1_CLKCTRL register. */
+            AM335x_CM_PER->GPIO3_CLKCTRL.b.OPTFCLKEN_GPIO_3_GDBCLK = HIGH;
+            /* Waiting for OPTFCLKEN_GPIO_3_GDBCLK bit to reflect the desired value. */
+            while(AM335x_CM_PER->GPIO3_CLKCTRL.b.OPTFCLKEN_GPIO_3_GDBCLK != HIGH);
+            
+            /* Waiting for IDLEST field in CM_PER_GPIO3_CLKCTRL register to attain the desired value. */
+            while(AM335x_CM_PER->GPIO3_CLKCTRL.b.IDLEST != IDLEST_FUNC);
+            /* Waiting for CLKACTIVITY_GPIO_3_GDBCLK bit in CM_PER_L4LS_CLKSTCTRL register to attain desired value.  */
+            while(AM335x_CM_PER->L4LS_CLKSTCTRL.b.CLKACTIVITY_GPIO_3_GDBCLK != CLK_ACT);
+        }
+        
         void run_I2C0_clk()
         {
             /** Configuring L3 Interface Clocks. **/

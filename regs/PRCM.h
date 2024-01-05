@@ -3091,7 +3091,11 @@ namespace REGS
         
         void  run_clk_GPIO0(); 
 
-        void  run_clk_GPIO1();                 
+        void  run_clk_GPIO1();  
+        
+        void  run_clk_GPIO2();
+        
+        void  run_clk_GPIO3();
    
         void  run_I2C0_clk();
 

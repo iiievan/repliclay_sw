@@ -352,6 +352,7 @@
                     <state>$PROJ_DIR$\regs</state>
                     <state>$PROJ_DIR$\utils</state>
                     <state>$PROJ_DIR$\periph</state>
+                    <state>$PROJ_DIR$\\periph\pins</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2128,6 +2129,9 @@
     <group>
         <name>app</name>
         <file>
+            <name>$PROJ_DIR$\app\board.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\app\init.cpp</name>
         </file>
         <file>
@@ -2334,6 +2338,21 @@
     </group>
     <group>
         <name>periph</name>
+        <group>
+            <name>pins</name>
+            <file>
+                <name>$PROJ_DIR$\periph\pins\am3358zcz_pins.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\periph\pins\am3358zcz_pins.hpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\periph\pins\pin.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\periph\pins\pin.h</name>
+            </file>
+        </group>
         <file>
             <name>$PROJ_DIR$\periph\am335x_dmtimer.cpp</name>
         </file>
@@ -2351,12 +2370,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\periph\am335x_intc.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\periph\pin.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\periph\pin.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\periph\sys_timer.h</name>
