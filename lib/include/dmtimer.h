@@ -241,6 +241,7 @@ extern void DMTimerContextSave(unsigned int baseAdd, DMTIMERCONTEXT *contextPtr)
 extern void DMTimerContextRestore(unsigned int baseAdd, DMTIMERCONTEXT *contextPtr);
 extern void DMTimerPostedModeConfig(unsigned int baseAdd, unsigned int postMode);
 extern unsigned int DMTimerWritePostedStatusGet(unsigned int baseAdd);
+extern void DMTimer1msModuleClkConfig(unsigned int clkselect);
 
 #ifdef __cplusplus
 }

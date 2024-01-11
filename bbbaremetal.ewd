@@ -36,7 +36,7 @@
                 </option>
                 <option>
                     <name>MacFile</name>
-                    <state>D:\7.beaglebone\bbbaremetal\AM335x_evm_DDR3.mac</state>
+                    <state>$PROJ_DIR$\AM335x_evm_DDR3.mac</state>
                 </option>
                 <option>
                     <name>MemOverride</name>

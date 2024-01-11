@@ -137,6 +137,16 @@ namespace REGS
             AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL = clk_sel;    // select clock source
             while(AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL != clk_sel); 
             
+            /** Configuring registers related to Wake-Up region. **/    
+            AM335x_CM_WKUP->CONTROL_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;          // Writing to MODULEMODE field of CM_WKUP_CONTROL_CLKCTRL register.   
+            while(AM335x_CM_WKUP->CONTROL_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE);  // Waiting for MODULEMODE field to reflect the written value.    
+            
+            AM335x_CM_WKUP->CLKSTCTRL.b.CLKTRCTRL = NO_SLEEP;           // Writing to CLKTRCTRL field of CM_PER_L3S_CLKSTCTRL register.
+            while(AM335x_CM_WKUP->CLKSTCTRL.b.CLKTRCTRL != NO_SLEEP);   // Waiting for CLKTRCTRL field to reflect the written value.             
+ 
+            AM335x_CM_WKUP->L3_AON_CLKSTCTRL.b.CLKTRCTRL = SW_WKUP;            // Writing to CLKTRCTRL field of CM_L3_AON_CLKSTCTRL register.    
+            while(AM335x_CM_WKUP->L3_AON_CLKSTCTRL.b.CLKTRCTRL != SW_WKUP);    // Waiting for CLKTRCTRL field to reflect the written value. 
+
             AM335x_CM_WKUP->TIMER1_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;
             while(AM335x_CM_WKUP->TIMER1_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE); 
             while(AM335x_CM_WKUP->TIMER1_CLKCTRL.b.IDLEST != IDLEST_FUNC);

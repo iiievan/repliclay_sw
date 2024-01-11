@@ -8,9 +8,12 @@
 #include "am335x_dmtimer.h"
 #include "am335x_gpio.h"
 #include "pin.h"
+//ghj#include "clock.h"
 #include "sys_timer.h"
 #include "PRCM.h"
-
+//#include "interrupt.h"
+//#include "dmtimer.h"
+//#include "soc_AM335x.h"
 
 const uint32_t AM335X_VECTOR_BASE = 0x4030FC00;
 
@@ -60,22 +63,49 @@ static void copy_vector_table(void)
     }
 }
 
+static void clearTimer1Int(void *p_obj)
+{
+	HWREG(0x44e31018) = 0x2;
+}
+
+static void initializeTimer1(void)
+{
+    REGS::PRCM::run_clk_DMTIMER_1ms(REGS::PRCM::MS1_M_OSC);
+        
+	//	wake up configs
+	HWREG(0x44e31010) = 0x214;
+
+	//	enable overflow int
+	HWREG(0x44e3101c) = 0x2;
+
+	//	enable overflow wakeup
+	HWREG(0x44e31020) = 0x2;
+    
+    intc.register_handler(REGS::INTC::TINT1_1MS, clearTimer1Int);
+    intc.priority_set(REGS::INTC::TINT1_1MS, 0);      
+    intc.unmask_interrupt(REGS::INTC::TINT1_1MS); 
+    
+    //IntSystemEnable(SYS_INT_TINT1_1MS);
+    //IntPrioritySet(SYS_INT_TINT1_1MS, 0, AINTC_HOSTINT_ROUTE_IRQ);
+    //IntRegister(SYS_INT_TINT1_1MS,clearTimer1Int);
+}
+
 void init_board(void)
 { 
     copy_vector_table();
-
 
     /// Для ускорения работы чтобы не было медленнее Cortex M3 требуется включать предсказание ветвления, кэш и MMU.///
     InitMem();                          // Initiate MMU and instruction Cache  
     CP15BranchPredictionEnable();       // Enable Branch Prediction включаем предсказание ветвления - нужно для ускорения работы.    
     //__iar_dynamic_initialization();   // in case using RTOS
-        
+            
     intc.init();                       //Initializing the ARM Interrupt Controller.
     
+    initializeTimer1();
     // setup system timer for 1ms interrupt 
     sys_time.setup(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE,
                    SYS_TIMER_RLD_COUNT,
-                   (REGS::INTC::MAX_IRQ_PRIORITIES - 1));     
+                   (REGS::INTC::MAX_IRQ_PRIORITIES - 1));        
     
     gpio1.init();     
     USR_LED_0.sel_pinmode(PINS::e_GPMC_A5::gpio1_21);
@@ -91,6 +121,5 @@ void init_board(void)
     //END_STOP_X_2.sel_pull_type(REGS::CONTROL_MODULE::PULL_DOWN);
     END_STOP_X_2.sel_slewrate(REGS::CONTROL_MODULE::SLOW);
     
-    intc.master_IRQ_enable();       
+    intc.master_IRQ_enable();    
 }
-
