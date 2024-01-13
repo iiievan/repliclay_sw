@@ -41,11 +41,6 @@ namespace REGS
                case DMTIMER::TIMER_6:
                     run_clk_DMTIMER_6();
                     return; // no need to run run_clk_interconnects() and other stuff below
-                case DMTIMER::TIMER_1ms:
-                #ifndef beaglebone_black
-                    run_clk_DMTIMER_1ms(MS1_M_OSC); // such a timer has not yet been described in DM_Timer.h
-                #endif
-                    return; // no need to run run_clk_interconnects() and other stuff below
                 default:
                     break;    
             }

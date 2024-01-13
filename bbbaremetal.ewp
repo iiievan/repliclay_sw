@@ -2390,6 +2390,9 @@
             <name>$PROJ_DIR$\regs\DMTIMER.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\regs\DMTIMER1MS.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\regs\GPIO.h</name>
         </file>
         <file>

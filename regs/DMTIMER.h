@@ -134,10 +134,10 @@ namespace REGS
             struct 
             {                                         /* Timer control register */                      
                 uint32_t    ST        :1;             // bit: 0       automatically reset when the counter is overflowed(if AR = 0) [0x0 = counter is frozen; 0x1 = start timer] 
-                uint32_t    AR        :1;             // bit: 1       [0x0 = One shot timer; 0x1 = Auto-reload timer] 
-                uint32_t    PTV       :3;             // bit: 2..4    Pre-scale clock Timer value 
+                uint32_t    AR        :1;             // bit: 1       [0x0 = One shot timer; 0x1 = Auto-reload timer] [see e_DMTIMER_mode] 
+                uint32_t    PTV       :3;             // bit: 2..4    Pre-scale clock Timer value [see e_DMTIMER_prescaler] 
                 uint32_t    PRE       :1;             // bit: 5       enable prescale  [0x0 = TIMER clock input pin clocks; 0x1 = divided input pin clocks] 
-                uint32_t    CE        :1;             // bit: 6       compare mode [0x0 = disabled; 0x1 = enabled] 
+                uint32_t    CE        :1;             // bit: 6       compare mode [0x0 = disabled; 0x1 = enabled] [see e_DMTIMER_mode] 
                 uint32_t    SCPWM     :1;             // bit: 7       [0x0 = clear PORTIMERPWM, sel positive pulse; 0x1 = set PORTIMERPWM, sel negative pulse]                   
                 uint32_t    TCM       :2;             // bit: 8,9     Transition on PIEVENTCAPT in  [0x0 = No; 0x1 = low to high; 0x2 = high to low; 0x3 = both edge]           
                 uint32_t    TRG       :2;             // bit: 10,11   Trigger on PORTIMERPWM out  [0x0 = No; 0x1 = on overflow; 0x2 = on overflow and match; 0x3 = Reserved]  
@@ -310,7 +310,7 @@ namespace REGS
         {   
             TIMER_NA  = 0x0,
             TIMER_0   = 0x1,
-            TIMER_1ms = 0x2,
+      //    TIMER_1ms = 0x2,    // see namespace DMTIMER1MS
             TIMER_2   = 0x3,
             TIMER_3   = 0x4,
             TIMER_4   = 0x5,
@@ -320,7 +320,6 @@ namespace REGS
         };
 
         constexpr uint32_t AM335x_DMTIMER_0_BASE = 0x44E05000;    // only 32KHz RC Clock
-        constexpr uint32_t AM335x_DMTIMER_1_BASE = 0x44E31000;    // 1ms timer
         constexpr uint32_t AM335x_DMTIMER_2_BASE = 0x48040000;
         constexpr uint32_t AM335x_DMTIMER_3_BASE = 0x48042000;
         constexpr uint32_t AM335x_DMTIMER_4_BASE = 0x48044000;
@@ -329,7 +328,6 @@ namespace REGS
         constexpr uint32_t AM335x_DMTIMER_7_BASE = 0x4804A000;
         
         constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_0 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_0_BASE); // only 32KHz RC Clock
-        constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_1 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_1_BASE); // only 1ms timer
         constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_2 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_2_BASE);
         constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_3 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_3_BASE);
         constexpr AM335x_DMTIMER_Type * AM335X_DMTIMER_4 = ((AM335x_DMTIMER_Type *) AM335x_DMTIMER_4_BASE);

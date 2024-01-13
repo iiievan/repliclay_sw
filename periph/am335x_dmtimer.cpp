@@ -228,8 +228,6 @@ REGS::DMTIMER::e_TIMER_NUM am335x_dmtimer::get_DMTIMER_number()
     {
         case REGS::DMTIMER::AM335x_DMTIMER_0_BASE:     // only 32KHz RC Clock
             return REGS::DMTIMER::TIMER_0;
-        case REGS::DMTIMER::AM335x_DMTIMER_1_BASE:     // 1ms timer
-            return REGS::DMTIMER::TIMER_1ms;
         case REGS::DMTIMER::AM335x_DMTIMER_2_BASE:
             return REGS::DMTIMER::TIMER_2;
         case REGS::DMTIMER::AM335x_DMTIMER_3_BASE: 
@@ -257,8 +255,6 @@ REGS::INTC::e_INT_ID am335x_dmtimer::get_DMTIMER_sys_interrupt()
     {
         case REGS::DMTIMER::AM335x_DMTIMER_0_BASE:     // only 32KHz RC Clock
             return REGS::INTC::TINT0;
-        case REGS::DMTIMER::AM335x_DMTIMER_1_BASE:     // 1ms timer
-            return REGS::INTC::TINT1_1MS;
         case REGS::DMTIMER::AM335x_DMTIMER_2_BASE:
             return REGS::INTC::TINT2;
         case REGS::DMTIMER::AM335x_DMTIMER_3_BASE: 

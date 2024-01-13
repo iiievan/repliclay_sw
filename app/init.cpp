@@ -11,6 +11,7 @@
 //ghj#include "clock.h"
 #include "sys_timer.h"
 #include "PRCM.h"
+#include "DMTIMER1MS.h"
 //#include "interrupt.h"
 //#include "dmtimer.h"
 //#include "soc_AM335x.h"
