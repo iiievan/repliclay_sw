@@ -224,8 +224,6 @@ namespace REGS
             } b;                                      // Structure used for bit access 
             uint32_t  reg;                            // Type used for register access 
         } TTGR_reg_t;
-
-        constexpr uint32_t TTGR_DEF_VALUE = 0xFFFFFFFFu;
     
         /* [reset state = 0x0]*/
         typedef union 
@@ -428,7 +426,7 @@ namespace REGS
         
         constexpr uint32_t AM335x_DMTIMER_1MS_BASE = 0x44E31000;    // 1ms timer
 
-        constexpr AM335x_DMTIMER1MS_Type * AM335X_DMTIMER_1 = ((AM335x_DMTIMER1MS_Type *) AM335x_DMTIMER_1MS_BASE); // only 1ms timer
+        constexpr AM335x_DMTIMER1MS_Type * AM335X_DMTIMER_1MS = ((AM335x_DMTIMER1MS_Type *) AM335x_DMTIMER_1MS_BASE); // only 1ms timer
 
 
     }   //namespace DMTIMER1MS

@@ -310,7 +310,7 @@ namespace REGS
         {   
             TIMER_NA  = 0x0,
             TIMER_0   = 0x1,
-      //    TIMER_1ms = 0x2,    // see namespace DMTIMER1MS
+            TIMER_1ms = 0x2,    // see namespace DMTIMER1MS
             TIMER_2   = 0x3,
             TIMER_3   = 0x4,
             TIMER_4   = 0x5,

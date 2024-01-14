@@ -11,11 +11,11 @@
 void sys_timer_irqhandler(void *p_obj);
 extern am335x_intc intc;
 
-class sys_timer : public am335x_dmtimer
+class sys_timer : public am335x_dmtimer<>
 {
 public:
     sys_timer(REGS::DMTIMER::AM335x_DMTIMER_Type *p_regs) 
-    : am335x_dmtimer(p_regs),
+    : am335x_dmtimer<>(p_regs),
       m_intc(intc)
     { 
         m_DMTIMER_num = am335x_dmtimer::get_DMTIMER_number();

@@ -25,7 +25,7 @@ extern "C" void AbortHandler(void);
 extern "C" void IRQHandler(void);
 extern "C" void FIQHandler(void);
 
-// 1ms system timer for system time
+// ~1ms system timer for system time
 sys_timer sys_time(REGS::DMTIMER::AM335X_DMTIMER_2);
 am335x_gpio gpio0(REGS::GPIO::AM335x_GPIO_0);
 am335x_gpio gpio1(REGS::GPIO::AM335x_GPIO_1);
@@ -66,7 +66,8 @@ static void copy_vector_table(void)
 
 static void clearTimer1Int(void *p_obj)
 {
-	HWREG(0x44e31018) = 0x2;
+	//HWREG(0x44e31018) = 0x2;  //TISR 
+    dm_timer_1ms.IRQ_clear(REGS::DMTIMER::IRQ_OVF);   // Clear the status of the interrupt flags
 }
 
 static void initializeTimer1(void)
@@ -74,17 +75,24 @@ static void initializeTimer1(void)
     REGS::PRCM::run_clk_DMTIMER_1ms(REGS::PRCM::MS1_M_OSC);
         
 	//	wake up configs
-	HWREG(0x44e31010) = 0x214;
+	//HWREG(0x44e31010) = 0x214; //TIOCP_CFG  set EnaWakeup,SMART_IDLE,ClockActivity = 0x2
 
 	//	enable overflow int
-	HWREG(0x44e3101c) = 0x2;
+	//HWREG(0x44e3101c) = 0x2; //TIER
 
 	//	enable overflow wakeup
-	HWREG(0x44e31020) = 0x2;
-    
+	//HWREG(0x44e31020) = 0x2;  //TWER
     intc.register_handler(REGS::INTC::TINT1_1MS, clearTimer1Int);
     intc.priority_set(REGS::INTC::TINT1_1MS, 0);      
-    intc.unmask_interrupt(REGS::INTC::TINT1_1MS); 
+    intc.unmask_interrupt(REGS::INTC::TINT1_1MS);
+    
+    dm_timer_1ms.counter_set(SYS_TIMER_RLD_COUNT);                                  //Load the counter with the initial count value
+    dm_timer_1ms.reload_set(SYS_TIMER_RLD_COUNT);                                   //Load the load register with the reload count value
+    dm_timer_1ms.mode_configure(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE);   //Configure the DMTimer for Auto-reload and compare mode 
+        
+    dm_timer_1ms.IRQ_enable(REGS::DMTIMER::IRQ_OVF);
+        
+    dm_timer_1ms.enable(); 
     
     //IntSystemEnable(SYS_INT_TINT1_1MS);
     //IntPrioritySet(SYS_INT_TINT1_1MS, 0, AINTC_HOSTINT_ROUTE_IRQ);

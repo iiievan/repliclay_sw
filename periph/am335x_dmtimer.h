@@ -3,9 +3,11 @@
 
 #include <stdint.h>
 #include "DMTIMER.h"
+#include "DMTIMER1MS.h"
 #include "PRCM.h"
 #include "INTC.h"
 
+template <typename DMT = REGS::DMTIMER::AM335x_DMTIMER_Type> // and REGS::DMTIMER1MS::AM335x_DMTIMER1MS_Type
 class am335x_dmtimer
 {
 public:
@@ -18,7 +20,7 @@ public:
                     uint32_t tclr;
                 } dmtimer_context_t;
 public:                      
-                 am335x_dmtimer(REGS::DMTIMER::AM335x_DMTIMER_Type *p_tmr_regs);
+                 am335x_dmtimer(DMT *p_tmr_regs);
                 
                 ~am335x_dmtimer() {}
 
@@ -130,12 +132,14 @@ public:
                  *    IRQ_TCAR - Trigger IRQ status for capture \n
                  *    IRQ_OVF  - Trigger IRQ status for overflow \n
                  *    IRQ_MAT  - Trigger IRQ status for match \n
+                 * @note !this function is not in the registers AM335x_DMTIMER1MS_Type! 
                  **/             
                 void  IRQ_raw_set(REGS::DMTIMER::e_IRQ_flags int_flags);
                 
                 /**
                  * @brief   Read the status of IRQSTATUS_RAW register.
                  * @return  This API returns the contents of IRQSTATUS_RAW register.
+                 * @note    !this function is not in the registers AM335x_DMTIMER1MS_Type!
                  **/            
                 uint32_t  IRQ_raw_get();
 
@@ -275,19 +279,18 @@ private:
      dmtimer_context_t  m_context;  // dmtimer context for rebooting
                   void  m_wait_for_write(REGS::DMTIMER::e_TWPS_flags twps_mask);
 
-REGS::DMTIMER::AM335x_DMTIMER_Type  &m_regs;     // am335x_dmtimer registers
+                  DMT  &m_regs;     // am335x_dmtimer registers
 };
 
 extern     void dmtimer_irqhandler(void *p_obj);
 
-#ifndef beaglebone_black    // such a timer has not yet been described in am335x_dmtimer.h
-    extern am335x_dmtimer dm_timer_1ms;
-#endif
-extern am335x_dmtimer dm_timer_2;
-extern am335x_dmtimer dm_timer_3;
-extern am335x_dmtimer dm_timer_4;
-extern am335x_dmtimer dm_timer_5;
-extern am335x_dmtimer dm_timer_6;
-extern am335x_dmtimer dm_timer_7;
+extern am335x_dmtimer<REGS::DMTIMER::AM335x_DMTIMER_Type> dm_timer_0;
+extern am335x_dmtimer<REGS::DMTIMER1MS::AM335x_DMTIMER1MS_Type> dm_timer_1ms;
+extern am335x_dmtimer<REGS::DMTIMER::AM335x_DMTIMER_Type> dm_timer_2;
+extern am335x_dmtimer<REGS::DMTIMER::AM335x_DMTIMER_Type> dm_timer_3;
+extern am335x_dmtimer<REGS::DMTIMER::AM335x_DMTIMER_Type> dm_timer_4;
+extern am335x_dmtimer<REGS::DMTIMER::AM335x_DMTIMER_Type> dm_timer_5;
+extern am335x_dmtimer<REGS::DMTIMER::AM335x_DMTIMER_Type> dm_timer_6;
+extern am335x_dmtimer<REGS::DMTIMER::AM335x_DMTIMER_Type> dm_timer_7;
 
 #endif //__DM_TIMER_H
