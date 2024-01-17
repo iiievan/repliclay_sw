@@ -9,90 +9,124 @@ namespace REGS
     { 
         /* [reset state = 0x0] [offset = 0x]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The SECONDS_REG is used to program the required seconds value of the current time. Seconds are
+                                           * stored as BCD format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary
+                                           * equivalent. If the seconds value is 45, then the value of SEC0 is 5 and value of SEC1 is 4.  
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    SEC0  :4;      // bit: 0..3     (RW) 1st digit of seconds, Range is 0 to 9  
+                uint32_t    SEC1  :3;      // bit: 4..6     (RW) 2nd digit of seconds, Range is 0 to 5 
+                uint32_t          :25;     // bit: 1..31    (R)  Reserved             
+            } b;                           // Structure used for bit access 
+            uint32_t  reg;                 // Type used for register access 
         } SECONDS_reg_t;
 
         /* [reset state = 0x0] [offset = 0x4]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The MINUTES_REG is used to program the minutes value of the current time. Minutes are stored as BCD
+                                           * format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary equivalent. If the
+                                           * minutes value is 32, then the value of MIN0 is 2 and value of MIN1 is 3.  
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
+                uint32_t    MIN0  :4;      // bit: 0..3  (RW) 1st digit of minutes, Range is 0 to 9 
+                uint32_t    MIN1  :3;      // bit: 4..6  (RW) 2nd digit of minutes, Range is 0 to 5
+                uint32_t          :25;     // bit: 1..31 (R)  Reserved             
             } b;                          // Structure used for bit access 
             uint32_t  reg;                // Type used for register access 
         } MINUTES_reg_t;
 
         /* [reset state = 0x0] [offset = 0x8]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The HOURS_REG is used to program the hours value of the current time. Hours are stored as BCD
+                                           * format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary equivalent. In 24Hr
+                                           * time mode if you want to set the hour as 18, then HOUR0 is set as 8 and HOUR1 is set as 1.  
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    HOUR0   :4;     // bit: 0..3    (RW) 1st digit of hours, Range is 0 to 9 
+                uint32_t    HOUR1   :2;     // bit: 4,5     (RW) 2nd digit of hours, Range is 0 to 2 
+                uint32_t            :1;     // bit: 6       (R)  Reserved
+                uint32_t    PM_nAM  :1;     // bit: 7       (RW) Only used in PM_AM mode (otherwise 0) [ 0h = AM; 1h = PM]
+                uint32_t            :24;    // bit: 8..31   (R)  Reserved             
+            } b;                            // Structure used for bit access 
+            uint32_t  reg;                  // Type used for register access 
         } HOURS_reg_t;
 
-        /* [reset state = 0x0] [offset = 0xC]*/
+        /* [reset state = 0x1] [offset = 0xC]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The DAYS_REG is used to program the day of the month value of the current date. Days are stored as
+                                           * BCD format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary equivalent. If
+                                           * the day value of the date is 28, DAY0 is set as 8 and DAY1 is set as 2. 
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
+                uint32_t    DAY0  :4;      // bit: 0..3     (RW) 1st digit of days, Range is 0 to 9 
+                uint32_t    DAY1  :2;      // bit: 4,5      (RW) 2nd digit of days, Range is 0 to 3
+                uint32_t          :26;     // bit: 6..31    (R)  Reserved             
             } b;                          // Structure used for bit access 
             uint32_t  reg;                // Type used for register access 
         } DAYS_reg_t;
 
-        /* [reset state = 0x0] [offset = 0x10]*/
+        /* [reset state = 0x1] [offset = 0x10]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The MONTHS_REG is used to set the month in the year value of the current date. Months are stored as
+                                           * BCD format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary equivalent.
+                                           * Usual notation is taken for month value: 1 = January, 2 = February, continuing until 12 = December.
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    MONTH0  :4;      // bit: 0..3  (RW) 1st digit of months, Range is 0 to 9
+                uint32_t    MONTH1  :1;      // bit: 4     (RW) 2nd digit of months, Range is 0 to 1 
+                uint32_t            :27;     // bit: 5..31 (R)  Reserved             
+            } b;                             // Structure used for bit access 
+            uint32_t  reg;                   // Type used for register access 
         } MONTHS_reg_t;
 
         /* [reset state = 0x0] [offset = 0x14]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The YEARS_REG is used to program the year value of the current date. The year value is represented by
+                                           * only the last 2 digits and is stored as BCD format. In BCD format, the decimal numbers 0 through 9 are
+                                           * encoded with their binary equivalent. The year 1979 is programmed as 79 with YEAR0 set as 9 and
+                                           * YEAR1 set as 7.  
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    YEAR0  :4;      // bit: 0..3     (RW) 1st digit of years, Range is 0 to 9 
+                uint32_t    YEAR1  :4;      // bit: 4..7     (RW) 2nd digit of years, Range is 0 to 9
+                uint32_t           :31;     // bit: 1..31 (R)  Reserved             
+            } b;                            // Structure used for bit access 
+            uint32_t  reg;                  // Type used for register access 
         } YEARS_reg_t;
 
         /* [reset state = 0x0] [offset = 0x18]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The WEEKS_REG is used to program the day of the week value of the current date. The day of the week
+                                           * is stored as BCD format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary
+                                           * equivalent. Sunday is treated as 0, Monday 1, and ending at Saturday with 6.  
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    WEEK  :3;      // bit: 0..2     (RW) 1st digit of days in a week, Range from 0 (Sunday) to 6 (Saturday)
+                uint32_t          :29;     // bit: 3..31    (R)  Reserved             
+            } b;                           // Structure used for bit access 
+            uint32_t  reg;                 // Type used for register access 
         } WEEKS_reg_t;
 
         /* [reset state = 0x0] [offset = 0x20]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The ALARM_SECONDS_REG is used to program the second value for the alarm interrupt. Seconds are
+                                           * stored as BCD format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary
+                                           * equivalent. 
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    ALARMSEC0  :4;      // bit: 0..3     (RW) 1st digit of seconds, Range is 0 to 9 
+                uint32_t    ALARMSEC1  :3;      // bit: 4..6     (RW) 2nd digit of seconds, Range is 0 to 5 
+                uint32_t               :25;     // bit: 7..31 (R)  Reserved             
+            } b;                                // Structure used for bit access 
+            uint32_t  reg;                      // Type used for register access 
         } ALARM_SECONDS_reg_t;
 
         /* [reset state = 0x0] [offset = 0x24]*/
