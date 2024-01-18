@@ -2408,6 +2408,9 @@
     <group>
         <name>utils</name>
         <file>
+            <name>$PROJ_DIR$\utils\ring_buffer.hpp</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\utils\utils.c</name>
             <configuration>
                 <name>Debug</name>
