@@ -131,35 +131,47 @@ namespace REGS
 
         /* [reset state = 0x0] [offset = 0x24]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The ALARM_MINUTES_REG is used to program the minute value for the alarm interrupt. Minutes are
+                                           * stored as BCD format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary equivalent. 
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    ALARM_MIN0  :4;      // bit: 0..3     (RW) 1st digit of minutes, Range is 0 to 9 
+                uint32_t    ALARM_MIN1  :3;      // bit: 4..6     (RW) 2nd digit of minutes, Range is 0 to 5 
+                uint32_t                :25;     // bit: 7..31    (R)  Reserved             
+            } b;                                 // Structure used for bit access 
+            uint32_t  reg;                       // Type used for register access 
         } ALARM_MINUTES_reg_t;
 
         /* [reset state = 0x0] [offset = 0x28]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The ALARM_HOURS_REG is used to program the hour value for the alarm interrupt. Hours are stored as
+                                           * BCD format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary equivalent. 
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    ALARM_HOUR0   :4;      // bit: 0..3     (RW) 1st digit of hours, Range is 0 to 9 
+                uint32_t    ALARM_HOUR1   :2;      // bit: 4,5      (RW) 2nd digit of hours, Range is 0 to 2
+                uint32_t                  :1;      // bit: 6        (R)  Reserved 
+                uint32_t    ALARM_PM_nAM  :1;      // bit: 7        (RW) Only used in PM_AM mode (otherwise 0) [0x0 = AM; 0x1 = PM]
+                uint32_t                  :24;     // bit: 8..31    (R)  Reserved             
+            } b;                                   // Structure used for bit access 
+            uint32_t  reg;                         // Type used for register access 
         } ALARM_HOURS_reg_t;
 
         /* [reset state = 0x0] [offset = 0x2C]*/
         typedef union 
-        {                                 /*  */
+        {                                 /* The ALARM_DAYS_REG is used to program the day of the month value for the alarm interrupt. Days are
+                                           * stored as BCD format. In BCD format, the decimal numbers 0 through 9 are encoded with their binary
+                                           * equivalent. 
+                                           */
             struct 
             {                                         
-                uint32_t    val  :1;      // bit: 0     (RW) T 
-                uint32_t         :31;     // bit: 1..31 (R)  Reserved             
-            } b;                          // Structure used for bit access 
-            uint32_t  reg;                // Type used for register access 
+                uint32_t    ALARM_DAY0  :4;      // bit: 0..3    (RW) 1st digit for days, Range from 0 to 9 
+                uint32_t    ALARM_DAY1  :2;      // bit: 4,5     (RW) 2nd digit for days, Range from 0 to 3
+                uint32_t                :26;     // bit: 6..31   (R)  Reserved             
+            } b;                                 // Structure used for bit access 
+            uint32_t  reg;                       // Type used for register access 
         } ALARM_DAYS_reg_t;
 
         /* [reset state = 0x0] [offset = 0x30]*/
