@@ -2324,7 +2324,21 @@ void RTCAlarm2CalendarSet(unsigned int baseAdd, unsigned int calVal)
 }
 
 /*****************************************************************************
-**                      End of APIs specific to AM335x                       
+**              Prototypes of Miscellaneous and related functions
 *****************************************************************************/
+
+/**
+ * \brief  This API returns a unique number which identifies itself
+ *         with the RTC IP in AM335X SoC.
+ *
+ * \param  None
+ *
+ * \return This returns a number '2' which is unique to RTC IP in AM335X.
+ */
+
+unsigned int RtcVersionGet(void)
+{
+    return 2;
+}
 
 /************************* End of file ***************************************/

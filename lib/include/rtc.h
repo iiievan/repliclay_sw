@@ -268,6 +268,17 @@ extern "C" {
 ******************************************************************************/
 extern void RTCRun(unsigned int baseAddr);
 extern void RTCStop(unsigned int baseAddr);
+extern void RTCWriteProtectEnable(unsigned int baseAddr);
+extern void RTCWriteProtectDisable(unsigned int baseAddr);
+extern void RTCIntAlarmEnable(unsigned int baseAddr);
+extern void RTCIntAlarmDisable(unsigned int baseAddr);
+extern void RTCIntTimerEnable(unsigned int baseAddr, unsigned int timerPeriod);
+extern void RTCIntTimerDisable(unsigned int baseAddr);
+extern unsigned int RTCBusyStatusGet(unsigned int baseAddr);
+extern unsigned int RTCRunStatusGet(unsigned int baseAddr);
+extern unsigned int RTCAlarmIntStatusGet(unsigned int baseAddr);
+extern void RTCAlarmIntStatusClear(unsigned int baseAddr);
+extern unsigned int RTCEventUpdateGet(unsigned int baseAddr);
 extern void RTCMinRoundingEnable(unsigned int baseAddr);
 extern void RTCMinRoundingDisable(unsigned int baseAddr);
 extern void RTCAutoCompEnable(unsigned int baseAddr);
@@ -276,29 +287,15 @@ extern void RTCHourModeSet(unsigned int baseAddr, unsigned int hourType);
 extern unsigned int RTCHourModeGet(unsigned int baseAddr);
 extern void RTCSet32CounterEnable(unsigned int baseAddr);
 extern void RTCSet32CounterDisable(unsigned int baseAddr);
-
-extern unsigned int RTCEnableStatus(unsigned int baseAddr);
 extern void RTCDisable(unsigned int baseAddr);
 extern void RTCEnable(unsigned int baseAddr);
+extern unsigned int RTCEnableStatus(unsigned int baseAddr);
 extern void RTCSplitPwrEnable(unsigned int baseAddr);
 extern void RTCSplitPwrDisable(unsigned int baseAddr);
-extern void RTCWriteProtectEnable(unsigned int baseAddr);
-extern void RTCWriteProtectDisable(unsigned int baseAddr);
-extern void RTCIntAlarmEnable(unsigned int baseAddr);
-extern void RTCIntAlarmDisable(unsigned int baseAddr);
-extern void RTCIntTimerEnable(unsigned int baseAddr, unsigned int timerPeriod);
-
-extern void RTCIntTimerDisable(unsigned int baseAddr);
-extern unsigned int RTCBusyStatusGet(unsigned int baseAddr);
-extern unsigned int RTCRunStatusGet(unsigned int baseAddr);
-extern unsigned int RTCAlarmIntStatusGet(unsigned int baseAddr);
-extern void RTCAlarmIntStatusClear(unsigned int baseAddr);
-extern unsigned int RTCEventUpdateGet(unsigned int baseAddr);
 extern void RTCSecondSet(unsigned int baseAddr, unsigned int secValue);
 extern unsigned int RTCSecondGet(unsigned int baseAddr);
 extern void RTCMinuteSet(unsigned int baseAddr, unsigned int minValue);
 extern unsigned int RTCMinuteGet(unsigned int baseAddr);
-
 extern void RTCHourSet(unsigned int baseAddr, unsigned int hourValue);
 extern unsigned int RTCHourGet(unsigned int baseAddr);
 extern void RTCMeridiemSet(unsigned int baseAddr, unsigned int meridiemType);
@@ -309,7 +306,6 @@ extern void RTCMonthSet(unsigned int baseAddr, unsigned int monthValue);
 extern unsigned int RTCMonthGet(unsigned int baseAddr);
 extern void RTCYearSet(unsigned int baseAddr, unsigned int yearValue);
 extern unsigned int RTCYearGet(unsigned int baseAddr);
-
 extern void RTCDayOfTheWeekSet(unsigned int baseAddr, unsigned int dotwValue);
 extern unsigned int RTCDayOfTheWeekGet(unsigned int baseAddr);
 extern void RTCTimeSet(unsigned int baseAddr, unsigned int time);
@@ -320,7 +316,6 @@ extern void RTCAlarmSecondSet(unsigned int baseAddr, unsigned int alarmSecValue)
 extern unsigned int RTCAlarmSecondGet(unsigned int baseAddr);
 extern void RTCAlarmMinuteSet(unsigned int baseAddr, unsigned int alrmMinValue);
 extern unsigned int RTCAlarmMinuteGet(unsigned int baseAddr);
-
 extern void RTCAlarmHourSet(unsigned int baseAddr, unsigned int alrmHourVal);
 extern unsigned int RTCAlarmHourGet(unsigned int baseAddr);
 extern void RTCAlarmHourMeridiemSet(unsigned int baseAddr, unsigned int meridiemType);
@@ -331,15 +326,13 @@ extern void RTCAlarmDayOfMonthSet(unsigned int baseAddr, unsigned int alarmDayVa
 extern unsigned int RTCAlarmDayOfMonthGet(unsigned int baseAddr);
 extern void RTCAlarmMonthSet(unsigned int baseAddr, unsigned int alrmMnthVal);
 extern unsigned int RTCAlarmMonthGet(unsigned int baseAddr);
-
 extern void RTCAlarmYearSet(unsigned int baseAddr, unsigned int alrmYrVal);
 extern unsigned int RTCAlarmYearGet(unsigned int baseAddr);
 extern void RTCAlarmCalendarSet(unsigned int baseAddr, unsigned int calVal);
 extern unsigned int RTCAlarmCalendarGet(unsigned int baseAddr);
 extern void RTCCompensationSet(unsigned int baseAddr, unsigned int compVal);
 extern unsigned int RTCCompensationGet(unsigned int baseAddr);
-extern void RTCScratchPadSet(unsigned int baseAddr, unsigned int regNumber,
-                      unsigned int scratchValue);
+extern void RTCScratchPadSet(unsigned int baseAddr, unsigned int regNumber, unsigned int scratchValue);
 extern unsigned int RTCScratchPadGet(unsigned int baseAddr, unsigned int regNumber);
 
 /*****************************************************************************
@@ -350,6 +343,7 @@ extern void RTCSoftwareReset(unsigned int baseAddr);
 /*****************************************************************************
 **  APIs specific to RTC IP of AM335x and not applicable for that in AM1808.
 *****************************************************************************/
+extern unsigned int RTCRevisionIDGet(unsigned int baseAdd);
 extern void RTCIdleModeConfigure(unsigned int baseAdd, unsigned int modeFlag);
 extern void RTCWakeUpAlarmEventControl(unsigned int baseAdd, unsigned int controlFlag);
 extern void RTCWakeUpTimerEventControl(unsigned int baseAdd, unsigned int controlFlag);
@@ -359,21 +353,16 @@ extern void RTC32KClkClockControl(unsigned int baseAdd, unsigned int controlFlag
 extern void RTCOscillatorStateControl(unsigned int baseAdd, unsigned int controlFlag);
 extern void RTCFeedbackResistanceSelect(unsigned int baseAdd, unsigned int selectFlag);
 extern void RTCConfigPmicPowerEnable(unsigned int baseAdd, unsigned int selectFlag);
-extern void RTCConfigPmicExtWakePolarity(unsigned int baseAdd,
-                                         unsigned int extInput,
-                                         unsigned int selectFlag);
-extern void RTCConfigPmicExtWake(unsigned int baseAdd, unsigned int extInput,
-                                 unsigned int selectFlag);
-extern void RTCConfigPmicExtWakeDebounce(unsigned int baseAdd,
-                                         unsigned int extInput,
-                                         unsigned int selectFlag);
-extern void RTCPmicExtWakeStatusClear(unsigned int baseAdd,
-                                      unsigned int extInput);
+extern void RTCConfigPmicExtWakePolarity(unsigned int baseAdd, unsigned int extInput, unsigned int selectFlag);
+extern void RTCConfigPmicExtWake(unsigned int baseAdd, unsigned int extInput, unsigned int selectFlag);
+extern void RTCConfigPmicExtWakeDebounce(unsigned int baseAdd, unsigned int extInput, unsigned int selectFlag);
+extern void RTCPmicExtWakeStatusClear(unsigned int baseAdd, unsigned int extInput);
 extern void RTCIntAlarm2Enable(unsigned int baseAddr);
+extern unsigned int RTCAlarm2IntStatusGet(unsigned int baseAdd);
 extern void RTCAlarm2IntStatusClear(unsigned int baseAddr);
 extern void RTCAlarm2TimeSet(unsigned int baseAddr, unsigned int alarmTime);
 extern void RTCAlarm2CalendarSet(unsigned int baseAddr, unsigned int calVal);
-extern unsigned int RTCAlarm2IntStatusGet(unsigned int baseAdd);
+
 
 /*****************************************************************************
 **              Prototypes of Miscellaneous and related functions
@@ -381,7 +370,6 @@ extern unsigned int RTCAlarm2IntStatusGet(unsigned int baseAdd);
 
 /* Function which helps determine the SoC(Platform) in use. */
 extern unsigned int RtcVersionGet(void);
-
 
 #ifdef __cplusplus
 }

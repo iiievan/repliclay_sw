@@ -47,20 +47,6 @@
 #include "hw_cm_rtc.h"
 #include "hw_types.h"
 
-/**
- * \brief  This API returns a unique number which identifies itself
- *         with the RTC IP in AM335X SoC.
- *
- * \param  None
- *
- * \return This returns a number '2' which is unique to RTC IP in AM335X.
- */
-
-unsigned int RtcVersionGet(void)
-{
-    return 2;
-}
-
 /*
 ** This function enables the system L3 and system L4_WKUP clocks.
 ** This also enables the clocks for the RTC module.

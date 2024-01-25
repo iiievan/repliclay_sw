@@ -7,11 +7,13 @@
 #include "am335x_intc.h"
 #include "am335x_dmtimer.h"
 #include "am335x_gpio.h"
+#include "am335x_rtc.h"
 #include "pin.h"
 //ghj#include "clock.h"
 #include "sys_timer.h"
 #include "PRCM.h"
 #include "DMTIMER1MS.h"
+
 //#include "interrupt.h"
 //#include "dmtimer.h"
 //#include "soc_AM335x.h"

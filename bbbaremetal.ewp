@@ -2375,6 +2375,12 @@
             <name>$PROJ_DIR$\periph\am335x_intc.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\periph\am335x_rtc.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\periph\am335x_rtc.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\periph\sys_timer.h</name>
         </file>
     </group>
@@ -2403,6 +2409,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\regs\PRCM.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\regs\RTC.hpp</name>
         </file>
     </group>
     <group>
