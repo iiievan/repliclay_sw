@@ -552,7 +552,7 @@ void  am335x_rtc::year_set(uint8_t year_value)
     uint8_t year_raw = ((year_value > 99) ? 00: year_value);    
     
     year.b.YEAR0 =  year_raw%10;
-    year.b.YEAR0 = (year_raw/10)%10;
+    year.b.YEAR1 = (year_raw/10)%10;
 
     // Writing to YEAR register requires that BUSY bit in STATUS register
     // is low.  
@@ -601,19 +601,12 @@ void  am335x_rtc::time_set(REGS::RTC::TIME_t time)
     {
         split_power = REGS::RTC::AM1808_CTRL_SPLITPOWER;
     }
-
-    //HWREG(baseAdd + RTC_CTRL) &= ~(RTC_CTRL_RUN);
-    //HWREG(baseAdd + RTC_CTRL) |= split_power;
     
     // Stop the RTC.
     m_regs.RTC_CTRL.b.STOP_RTC = LOW;
     
     // Enable split power mode.
     m_regs.RTC_CTRL.reg |= split_power;
-
-    //HWREG(baseAdd + RTC_SECOND) = (time & SECOND_MASK) >> SECOND_SHIFT;
-    //HWREG(baseAdd + RTC_MINUTE) = (time & MINUTE_MASK) >> MINUTE_SHIFT;
-    //HWREG(baseAdd + RTC_HOUR) = (((time & HOUR_MASK) >> HOUR_SHIFT) | (time & MERIDIEM_MASK));
 
     // Writing to SECOND register.
     second_set((uint8_t)time.SEC);
@@ -1356,10 +1349,7 @@ void  am335x_rtc::test_mode_control(bool control_flag)
 }
  
 void  am335x_rtc::clk_32k_source_select(bool clk_src_flag)
-{
-    //HWREG(baseAdd + RTC_OSC) &= ~(RTC_OSC_32KCLK_SEL);
-    //HWREG(baseAdd + RTC_OSC) |= (clkSrcFlag & RTC_OSC_32KCLK_SEL);
-    
+{    
     // Clearing the 32KCLK_SEL bit in Oscilltor register.
     m_regs.RTC_OSC.b.SEL_32KCLK_SRC = LOW;
 
@@ -1367,11 +1357,7 @@ void  am335x_rtc::clk_32k_source_select(bool clk_src_flag)
     m_regs.RTC_OSC.b.SEL_32KCLK_SRC = clk_src_flag; 
 
     if(clk_src_flag)
-    {
-        //HWREG(baseAdd + RTC_OSC) =
-        //      ((HWREG(baseAdd + RTC_OSC) & (~RTC_OSC_OSC32K_GZ)) |
-        //       (RTC_OSC_OSC32K_GZ_ENABLE << RTC_OSC_OSC32K_GZ_SHIFT));
-        
+    {        
         // Clearing the OSC32K_GZ field in RTC_OSC register.
         m_regs.RTC_OSC.b.OSC32K_GZ &= ~REGS::RTC::OSC_OSC32K_GZ_MSK;
         m_regs.RTC_OSC.b.OSC32K_GZ = LOW;
@@ -1379,10 +1365,7 @@ void  am335x_rtc::clk_32k_source_select(bool clk_src_flag)
 }
  
 void  am335x_rtc::clk_32k_clock_control(bool control_flag)
-{
-    //HWREG(baseAdd + RTC_OSC) &= ~(RTC_OSC_32KCLK_EN);
-    //HWREG(baseAdd + RTC_OSC) |= (controlFlag & RTC_OSC_32KCLK_EN);
-    
+{    
     // Clearing the 32KCLK_EN bit in RTC_OSC register. 
     m_regs.RTC_OSC.b.EN_32KCLK = LOW;
 
@@ -1470,4 +1453,6 @@ void  am335x_rtc::pmic_ext_wake_status_clear(REGS::RTC::e_EXT_WAKEUP_IN ext_inpu
     //                     ((1 << ext_input) << RTC_PMIC_EXT_WAKEUP_STATUS_SHIFT));
     m_regs.RTC_PMIC.b.EXT_WAKEUP_STATUS |= (1 << ext_input);
 }
+
+am335x_rtc rtc_module(REGS::RTC::AM335X_RTC);
  

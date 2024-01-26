@@ -74,7 +74,19 @@ static void clearTimer1Int(void *p_obj)
 
 static void initializeTimer1(void)
 {
-    REGS::PRCM::run_clk_DMTIMER_1ms(REGS::PRCM::MS1_M_OSC);
+    REGS::PRCM::run_RTC_clk(); 
+
+    rtc_module.write_protect_disable();
+    rtc_module.clk_32k_source_select(true); // internal clk
+    rtc_module.clk_32k_clock_control(true);  // enable recieve clk inputs
+    rtc_module.enable();
+    
+    REGS::RTC::TIME_t time = {.HOUR = 12, .MIN = 34, .SEC = 0};
+    REGS::RTC::CALENDAR_t calendar = {.YEAR = 24, .MONTH = 1, .DAY = 25};
+    rtc_module.calendar_set(calendar);
+    rtc_module.time_set(time);
+    
+    rtc_module.run();
         
 	//	wake up configs
 	//HWREG(0x44e31010) = 0x214; //TIOCP_CFG  set EnaWakeup,SMART_IDLE,ClockActivity = 0x2
@@ -84,6 +96,7 @@ static void initializeTimer1(void)
 
 	//	enable overflow wakeup
 	//HWREG(0x44e31020) = 0x2;  //TWER
+    REGS::PRCM::run_clk_DMTIMER_1ms(REGS::PRCM::MS1_32768HZ);
     intc.register_handler(REGS::INTC::TINT1_1MS, clearTimer1Int);
     intc.priority_set(REGS::INTC::TINT1_1MS, 0);      
     intc.unmask_interrupt(REGS::INTC::TINT1_1MS);
@@ -113,6 +126,9 @@ void init_board(void)
     intc.init();                       //Initializing the ARM Interrupt Controller.
     
     initializeTimer1();
+    
+    
+    
     // setup system timer for 1ms interrupt 
     sys_time.setup(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE,
                    SYS_TIMER_RLD_COUNT,

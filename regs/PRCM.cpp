@@ -501,48 +501,32 @@ namespace REGS
         {
             /// Configuring L3 Interface Clocks. ///
         
-            //HWREG(SOC_CM_PER_REGS + CM_PER_L3_CLKCTRL) |= CM_PER_L3_CLKCTRL_MODULEMODE_ENABLE;
-            //while(CM_PER_L3_CLKCTRL_MODULEMODE_ENABLE != (HWREG(SOC_CM_PER_REGS + CM_PER_L3_CLKCTRL) & CM_PER_L3_CLKCTRL_MODULEMODE));
             // Writing to MODULEMODE field of CM_PER_L3_CLKCTRL register.
             // Waiting for MODULEMODE field to reflect the written value. 
             AM335x_CM_PER->L3_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;
             while(AM335x_CM_PER->L3_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE);
-        
-            //HWREG(SOC_CM_PER_REGS + CM_PER_L3_INSTR_CLKCTRL) |= CM_PER_L3_INSTR_CLKCTRL_MODULEMODE_ENABLE;
-            //while(CM_PER_L3_INSTR_CLKCTRL_MODULEMODE_ENABLE != (HWREG(SOC_CM_PER_REGS + CM_PER_L3_INSTR_CLKCTRL) & CM_PER_L3_INSTR_CLKCTRL_MODULEMODE));            
+                   
             // Writing to MODULEMODE field of CM_PER_L3_INSTR_CLKCTRL register.
             // Waiting for MODULEMODE field to reflect the written value.
             AM335x_CM_PER->L3_INSTR_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;
             while(AM335x_CM_PER->L3_INSTR_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE);        
-        
-            //HWREG(SOC_CM_PER_REGS + CM_PER_L3_CLKSTCTRL) |= CM_PER_L3_CLKSTCTRL_CLKTRCTRL_SW_WKUP;
-            //while(CM_PER_L3_CLKSTCTRL_CLKTRCTRL_SW_WKUP != (HWREG(SOC_CM_PER_REGS + CM_PER_L3_CLKSTCTRL) & CM_PER_L3_CLKSTCTRL_CLKTRCTRL));            
+                    
             // Writing to CLKTRCTRL field of CM_PER_L3_CLKSTCTRL register.
             // Waiting for CLKTRCTRL field to reflect the written value.
             AM335x_CM_PER->L3_CLKSTCTRL.b.CLKTRCTRL = SW_WKUP; 
             while(AM335x_CM_PER->L3_CLKSTCTRL.b.CLKTRCTRL != SW_WKUP);
-        
-            //HWREG(SOC_CM_PER_REGS + CM_PER_OCPWP_L3_CLKSTCTRL) |= CM_PER_OCPWP_L3_CLKSTCTRL_CLKTRCTRL_SW_WKUP;
-            //while(CM_PER_OCPWP_L3_CLKSTCTRL_CLKTRCTRL_SW_WKUP != (HWREG(SOC_CM_PER_REGS + CM_PER_OCPWP_L3_CLKSTCTRL) & CM_PER_OCPWP_L3_CLKSTCTRL_CLKTRCTRL));            
+                   
             // Writing to CLKTRCTRL field of CM_PER_OCPWP_L3_CLKSTCTRL register.
             // Waiting for CLKTRCTRL field to reflect the written value.
             AM335x_CM_PER->OCPWP_L3_CLKSTCTRL.b.CLKTRCTRL = SW_WKUP;
             while(AM335x_CM_PER->OCPWP_L3_CLKSTCTRL.b.CLKTRCTRL != SW_WKUP);
-        
-            //HWREG(SOC_CM_PER_REGS + CM_PER_L3S_CLKSTCTRL) |= CM_PER_L3S_CLKSTCTRL_CLKTRCTRL_SW_WKUP;
-            //while(CM_PER_L3S_CLKSTCTRL_CLKTRCTRL_SW_WKUP != (HWREG(SOC_CM_PER_REGS + CM_PER_L3S_CLKSTCTRL) & CM_PER_L3S_CLKSTCTRL_CLKTRCTRL));            
+                   
             // Writing to CLKTRCTRL field of CM_PER_L3S_CLKSTCTRL register. 
             // Waiting for CLKTRCTRL field to reflect the written value.
             AM335x_CM_PER->L3S_CLKSTCTRL.b.CLKTRCTRL = SW_WKUP;    
             while(AM335x_CM_PER->L3S_CLKSTCTRL.b.CLKTRCTRL != SW_WKUP);
         
             /// Checking fields for necessary values.  ///
-        
-            //while((CM_PER_L3_CLKCTRL_IDLEST_FUNC << CM_PER_L3_CLKCTRL_IDLEST_SHIFT)!= (HWREG(SOC_CM_PER_REGS + CM_PER_L3_CLKCTRL) & CM_PER_L3_CLKCTRL_IDLEST));
-            //while((CM_PER_L3_INSTR_CLKCTRL_IDLEST_FUNC << CM_PER_L3_INSTR_CLKCTRL_IDLEST_SHIFT)!= (HWREG(SOC_CM_PER_REGS + CM_PER_L3_INSTR_CLKCTRL) & CM_PER_L3_INSTR_CLKCTRL_IDLEST));
-            //while(CM_PER_L3_CLKSTCTRL_CLKACTIVITY_L3_GCLK != (HWREG(SOC_CM_PER_REGS + CM_PER_L3_CLKSTCTRL) & CM_PER_L3_CLKSTCTRL_CLKACTIVITY_L3_GCLK));
-            //while(CM_PER_OCPWP_L3_CLKSTCTRL_CLKACTIVITY_OCPWP_L3_GCLK != (HWREG(SOC_CM_PER_REGS + CM_PER_OCPWP_L3_CLKSTCTRL) & CM_PER_OCPWP_L3_CLKSTCTRL_CLKACTIVITY_OCPWP_L3_GCLK));
-            //while(CM_PER_L3S_CLKSTCTRL_CLKACTIVITY_L3S_GCLK != (HWREG(SOC_CM_PER_REGS + CM_PER_L3S_CLKSTCTRL) & CM_PER_L3S_CLKSTCTRL_CLKACTIVITY_L3S_GCLK));
             
             // Waiting for IDLEST field in CM_PER_L3_CLKCTRL register to be set to 0x0.
             while(AM335x_CM_PER->L3_CLKCTRL.b.IDLEST != IDLEST_FUNC);
@@ -566,22 +550,16 @@ namespace REGS
         
             // Configuring registers related to Wake-Up region. 
         
-            //HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CONTROL_CLKCTRL) |= CM_WKUP_CONTROL_CLKCTRL_MODULEMODE_ENABLE;
-            //while(CM_WKUP_CONTROL_CLKCTRL_MODULEMODE_ENABLE != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CONTROL_CLKCTRL) & CM_WKUP_CONTROL_CLKCTRL_MODULEMODE));
             // Writing to MODULEMODE field of CM_WKUP_CONTROL_CLKCTRL register.        
             // Waiting for MODULEMODE field to reflect the written value.
             AM335x_CM_WKUP->CONTROL_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;
             while(AM335x_CM_WKUP->CONTROL_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE); 
         
-            //HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CLKSTCTRL) |= CM_WKUP_CLKSTCTRL_CLKTRCTRL_SW_WKUP;
-            //while(CM_WKUP_CLKSTCTRL_CLKTRCTRL_SW_WKUP != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CLKSTCTRL) & CM_WKUP_CLKSTCTRL_CLKTRCTRL));
             // Writing to CLKTRCTRL field of CM_WKUP_CLKSTCTRL register.
             // Waiting for CLKTRCTRL field to reflect the written value.
             AM335x_CM_WKUP->CLKSTCTRL.b.CLKTRCTRL = SW_WKUP;
             while(AM335x_CM_WKUP->CLKSTCTRL.b.CLKTRCTRL != SW_WKUP);
         
-            //HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CM_L3_AON_CLKSTCTRL) |= CM_WKUP_CM_L3_AON_CLKSTCTRL_CLKTRCTRL_SW_WKUP;
-            //while(CM_WKUP_CM_L3_AON_CLKSTCTRL_CLKTRCTRL_SW_WKUP != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CM_L3_AON_CLKSTCTRL) & CM_WKUP_CM_L3_AON_CLKSTCTRL_CLKTRCTRL));
             // Writing to CLKTRCTRL field of CM_L3_AON_CLKSTCTRL register.
             // Waiting for CLKTRCTRL field to reflect the written value.
             AM335x_CM_WKUP->L3_AON_CLKSTCTRL.b.CLKTRCTRL = SW_WKUP;     
@@ -589,12 +567,6 @@ namespace REGS
         
         
             /// Verifying if the other bits are set to required settings. ///        
-            //while((CM_WKUP_CONTROL_CLKCTRL_IDLEST_FUNC << CM_WKUP_CONTROL_CLKCTRL_IDLEST_SHIFT) != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CONTROL_CLKCTRL) & CM_WKUP_CONTROL_CLKCTRL_IDLEST));
-            //while(CM_WKUP_CM_L3_AON_CLKSTCTRL_CLKACTIVITY_L3_AON_GCLK != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CM_L3_AON_CLKSTCTRL) & CM_WKUP_CM_L3_AON_CLKSTCTRL_CLKACTIVITY_L3_AON_GCLK));
-            //while((CM_WKUP_L4WKUP_CLKCTRL_IDLEST_FUNC << CM_WKUP_L4WKUP_CLKCTRL_IDLEST_SHIFT) != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_L4WKUP_CLKCTRL) & CM_WKUP_L4WKUP_CLKCTRL_IDLEST));
-            //while(CM_WKUP_CLKSTCTRL_CLKACTIVITY_L4_WKUP_GCLK != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CLKSTCTRL) & CM_WKUP_CLKSTCTRL_CLKACTIVITY_L4_WKUP_GCLK));
-            //while(CM_WKUP_CM_L4_WKUP_AON_CLKSTCTRL_CLKACTIVITY_L4_WKUP_AON_GCLK != (HWREG(SOC_CM_WKUP_REGS + CM_WKUP_CM_L4_WKUP_AON_CLKSTCTRL) & CM_WKUP_CM_L4_WKUP_AON_CLKSTCTRL_CLKACTIVITY_L4_WKUP_AON_GCLK));
-
             // Waiting for IDLEST field in CM_WKUP_CONTROL_CLKCTRL register to attain
             // desired value.
             while(AM335x_CM_WKUP->CONTROL_CLKCTRL.b.IDLEST != IDLEST_FUNC);
@@ -616,25 +588,17 @@ namespace REGS
             while(AM335x_CM_WKUP->L4_WKUP_AON_CLKSTCTRL.b.CLKACTIVITY_L4_WKUP_AON_GCLK != CLK_ACT);
             /// Performing Clock configurations of RTC. ///
         
-            //HWREG(SOC_CM_RTC_REGS + CM_RTC_RTC_CLKCTRL) |= CM_RTC_RTC_CLKCTRL_MODULEMODE_ENABLE;
-            //while(CM_RTC_RTC_CLKCTRL_MODULEMODE_ENABLE != (HWREG(SOC_CM_RTC_REGS + CM_RTC_RTC_CLKCTRL) & CM_RTC_RTC_CLKCTRL_MODULEMODE));
             // Writing to MODULEMODE field of CM_RTC_RTC_CLKCTRL register.        
             // Waiting for MODULEMODE field to reflect the written value.
             AM335x_CM_RTC->RTC_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;
             while(AM335x_CM_RTC->RTC_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE);
         
-            //HWREG(SOC_CM_RTC_REGS + CM_RTC_CLKSTCTRL) |= CM_RTC_CLKSTCTRL_CLKTRCTRL_SW_WKUP;
-            //while(CM_RTC_CLKSTCTRL_CLKTRCTRL_SW_WKUP != (HWREG(SOC_CM_RTC_REGS + CM_RTC_CLKSTCTRL) & CM_RTC_CLKSTCTRL_CLKTRCTRL));
             // Writing to CLKTRCTRL field of CM_RTC_CLKSTCTRL register. 
             // Waiting for CLKTRCTRL field to reflect the written value. 
             AM335x_CM_RTC->CLKSTCTRL.b.CLKTRCTRL = SW_WKUP;
             while(AM335x_CM_RTC->CLKSTCTRL.b.CLKTRCTRL != SW_WKUP);
         
             /// Checking the RTC registers for desired values being set. ///
-            
-            //while((CM_RTC_RTC_CLKCTRL_IDLEST_FUNC << CM_RTC_RTC_CLKCTRL_IDLEST_SHIFT) != (HWREG(SOC_CM_RTC_REGS + CM_RTC_RTC_CLKCTRL) & CM_RTC_RTC_CLKCTRL_IDLEST));
-            //while(CM_RTC_CLKSTCTRL_CLKACTIVITY_L4_RTC_GCLK != (HWREG(SOC_CM_RTC_REGS + CM_RTC_CLKSTCTRL) & CM_RTC_CLKSTCTRL_CLKACTIVITY_L4_RTC_GCLK));
-            //while(CM_RTC_CLKSTCTRL_CLKACTIVITY_RTC_32KCLK != (HWREG(SOC_CM_RTC_REGS + CM_RTC_CLKSTCTRL) & CM_RTC_CLKSTCTRL_CLKACTIVITY_RTC_32KCLK));
         
             // Waiting for IDLEST field in CM_RTC_RTC_CLKCTRL register to attain the
             // desired value.

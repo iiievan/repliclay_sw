@@ -998,4 +998,6 @@ public:
         void  pmic_ext_wake_status_clear(REGS::RTC::e_EXT_WAKEUP_IN ext_input);
 };
 
+extern am335x_rtc rtc_module;
+
 #endif //_AM335X_RTC_H_
