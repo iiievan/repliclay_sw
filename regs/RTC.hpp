@@ -436,12 +436,7 @@ namespace REGS
                 uint32_t    SW1             :1;      // bit: 0     (RW) Inverter size adjustment 
                 uint32_t    SW2             :1;      // bit: 1     (RW) Inverter size adjustment
                 uint32_t    RES_SELECT      :1;      // bit: 2     (RW) External feedback resistor [ 0x0 = Internal; 0x1 = External]
-                uint32_t    SEL_32KCLK_SRC  :1;      // bit: 3     (RW) 32-kHz clock source select
-                                                     //                 [0x0 = Selects internal clock source, namely
-                                                     //                        rtc_32k_clk_rtc_32k_aux_clk; 
-                                                     //                  0x1 = Selects external clock source, namely 
-                                                     //                        rtc_32k_clk_rtc_32k_clk
-                                                     //                        that is from the 32-kHz oscillator]
+                uint32_t    SEL_32KCLK_SRC  :1;      // bit: 3     (RW) 32-kHz clock source select [ see e_32KCLKSOURCE]
                 uint32_t    OSC32K_GZ       :1;      // bit: 4     (RW) Disable the oscillator and apply high impedance to the output 
                                                      //                 [0x0 = Enable; 
                                                      //                  0x1 = Disabled and high impedance]
@@ -458,6 +453,12 @@ namespace REGS
 
         //----- Definition specific to RTC IP in AM1808 ----------
         constexpr uint32_t OSC_SWRESET = 0x00000020u;
+
+        enum e_32KCLKSOURCE : uint8_t
+        {
+            CLK32K_INTERNAL = 0x0,  // Selects internal clock source, namely rtc_32k_clk_rtc_32k_aux_clk;
+            CLK32K_EXTERNAL = 0x1   // Selects external clock source, namely rtc_32k_clk_rtc_32k_clk that is from the 32-kHz oscillator 
+        };
 
         /* [reset state = 0x0] [offset = 0x60]*/
         typedef union 

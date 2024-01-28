@@ -6,6 +6,7 @@
 #include "am3358zcz_pins.hpp"
 #include "ring_buffer.hpp"
 
+#define ever (;;)
 
 typedef union 
 { 
@@ -32,6 +33,7 @@ typedef struct
 int main()
 {  
     static uint64_t time = 0;
+    static uint32_t counter = 0;
     
     test_struct_t pop_result;
     
@@ -115,13 +117,15 @@ int main()
     
     
 
-    while(1)
+    for ever
     {      
         if(sys_time.get_ms() - time > 1000)
         {
             time = sys_time.get_ms();
             
             USR_LED_3.toggle();
+            
+            counter++;
             
             if(END_STOP_X_2.read_input())
                 USR_LED_0.set();

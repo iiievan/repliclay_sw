@@ -350,7 +350,7 @@ namespace REGS
                                                        */
             struct 
             { 
-                uint32_t  NEGATIVE_INV_VALUE  :32;    // bit: 0..31 (RW) The value of the negative increment.  
+                uint32_t  NEGATIVE_INC_VALUE  :32;    // bit: 0..31 (RW) The value of the negative increment.  
             } b;                                      // Structure used for bit access 
             uint32_t  reg;                            // Type used for register access 
         } TNIR_reg_t;

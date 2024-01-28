@@ -69,6 +69,11 @@ public:
                  * @brief   This API will disable the pre-scaler clock.
                  **/
                 void  prescaler_clk_disable();
+
+                /**
+                 * @brief   This API will set 1ms block values for precision 1ms only for DMTIMER_1MS
+                 **/
+                void  set_1ms_block(int32_t pos = 232000, int32_t neg = (-768000));
                 
                 /**
                  * @brief   Set/Write the Counter register with the counter value.

@@ -65,6 +65,16 @@ void  am335x_dmtimer<DMT>::prescaler_clk_disable()
     m_regs.TCLR.b.PRE = LOW;
 }
 
+template<>
+void  am335x_dmtimer<REGS::DMTIMER1MS::AM335x_DMTIMER1MS_Type>::set_1ms_block(int32_t pos, int32_t neg)
+{
+    m_wait_for_write(REGS::DMTIMER::F_PEND_TCLR); // wait in posted mode
+
+    m_regs.TPIR.b.POSITIVE_INC_VALUE = pos;
+
+    m_regs.TNIR.b.NEGATIVE_INC_VALUE = neg;
+}
+
 template <typename DMT>
 void  am335x_dmtimer<DMT>::counter_set(uint32_t counter)
 {

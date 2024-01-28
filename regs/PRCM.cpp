@@ -1,4 +1,5 @@
 #include "PRCM.h"
+#include "RTC.hpp"
 //#include "EDMA.h"
 
 namespace REGS
@@ -125,22 +126,81 @@ namespace REGS
         
         void run_clk_DMTIMER_1ms(e_TIMER1MS_CLKSEL clk_sel)
         {
-            /* Select the clock source for the Timer1ms instance. */
-            AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL = LOW;         // clear bitfield
+            #define RTC_regs (REGS::RTC::AM335X_RTC) 
+
+            e_TIMER1MS_CLKSEL clksel_copy = clk_sel;
+
+            // disable write protect RTC registers
+            RTC_regs->KICK0R.reg = REGS::RTC::KICK0R_KEY_DIS;
+            RTC_regs->KICK1R.reg = REGS::RTC::KICK1R_KEY_DIS;
+
+            switch(clksel_copy)
+            {
+                /// it is also necessary to allow use of external or internal oscillator 32768 in RTC module ///
+                case MS1_32768HZ:
+                    // if RTC running 
+                    if(RTC_regs->RTC_CTRL.b.STOP_RTC && 
+                       !RTC_regs->RTC_CTRL.b.RTC_DISABLE)
+                    {
+                        // if RTC running and clock source is internal, we cannot supply an external source
+                        if(!RTC_regs->RTC_OSC.b.SEL_32KCLK_SRC)
+                        {
+                            // external source used, just activate the remaining clocks
+                            clksel_copy = MS1_32KHZ;
+                            break;
+                        }
+    
+                    }
+                    // use external source
+                    RTC_regs->RTC_OSC.b.SEL_32KCLK_SRC = LOW;
+                    RTC_regs->RTC_OSC.b.SEL_32KCLK_SRC = HIGH;
+                    RTC_regs->RTC_OSC.reg &= ~REGS::RTC::OSC_OSC32K_GZ_MSK;
+                    RTC_regs->RTC_OSC.b.OSC32K_GZ = LOW;
+                    break;
+                case MS1_32KHZ:
+                    // if RTC running
+                    if(RTC_regs->RTC_CTRL.b.STOP_RTC && 
+                       !RTC_regs->RTC_CTRL.b.RTC_DISABLE)
+                    {
+                        // if RTC running and clock source is external, we cannot supply an internal source
+                        if(RTC_regs->RTC_OSC.b.SEL_32KCLK_SRC)
+                        {
+                            // external source used, just activate the remaining clocks
+                            clksel_copy = MS1_32768HZ;                            
+                            break;
+                        }
+                    }
+                    
+                    //  just use internal source
+                    RTC_regs->RTC_OSC.b.SEL_32KCLK_SRC = LOW;
+                    RTC_regs->RTC_OSC.b.SEL_32KCLK_SRC = LOW;
+                    break;
+                default:
+                    break;
+            }
+
+            // enable write protect RTC registers
+            RTC_regs->KICK0R.reg = REGS::RTC::KICK0_KICK0_KEY_EN;
+            RTC_regs->KICK1R.reg = REGS::RTC::KICK1_KICK1_KEY_EN;
+
+            #undef RTC_regs
+
+            // Select the clock source for the Timer1ms instance.
+            AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL = LOW;        
             while(AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL != LOW);    
             
-            AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL = clk_sel;    // select clock source
-            while(AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL != clk_sel); 
+            AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL = clksel_copy;    // select clock source
+            while(AM335x_CM_DPLL->TIMER1MS_CLK.b.CLKSEL != clksel_copy); 
             
-            /** Configuring registers related to Wake-Up region. **/    
-            AM335x_CM_WKUP->CONTROL_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;          // Writing to MODULEMODE field of CM_WKUP_CONTROL_CLKCTRL register.   
-            while(AM335x_CM_WKUP->CONTROL_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE);  // Waiting for MODULEMODE field to reflect the written value.    
+            // Configuring registers related to Wake-Up region.    
+            AM335x_CM_WKUP->CONTROL_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;           // Writing to MODULEMODE field of CM_WKUP_CONTROL_CLKCTRL register.   
+            while(AM335x_CM_WKUP->CONTROL_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE);   // Waiting for MODULEMODE field to reflect the written value.    
             
-            AM335x_CM_WKUP->CLKSTCTRL.b.CLKTRCTRL = NO_SLEEP;           // Writing to CLKTRCTRL field of CM_PER_L3S_CLKSTCTRL register.
-            while(AM335x_CM_WKUP->CLKSTCTRL.b.CLKTRCTRL != NO_SLEEP);   // Waiting for CLKTRCTRL field to reflect the written value.             
+            AM335x_CM_WKUP->CLKSTCTRL.b.CLKTRCTRL = NO_SLEEP;                           // Writing to CLKTRCTRL field of CM_PER_L3S_CLKSTCTRL register.
+            while(AM335x_CM_WKUP->CLKSTCTRL.b.CLKTRCTRL != NO_SLEEP);                   // Waiting for CLKTRCTRL field to reflect the written value.             
  
-            AM335x_CM_WKUP->L3_AON_CLKSTCTRL.b.CLKTRCTRL = SW_WKUP;            // Writing to CLKTRCTRL field of CM_L3_AON_CLKSTCTRL register.    
-            while(AM335x_CM_WKUP->L3_AON_CLKSTCTRL.b.CLKTRCTRL != SW_WKUP);    // Waiting for CLKTRCTRL field to reflect the written value. 
+            AM335x_CM_WKUP->L3_AON_CLKSTCTRL.b.CLKTRCTRL = SW_WKUP;                     // Writing to CLKTRCTRL field of CM_L3_AON_CLKSTCTRL register.    
+            while(AM335x_CM_WKUP->L3_AON_CLKSTCTRL.b.CLKTRCTRL != SW_WKUP);             // Waiting for CLKTRCTRL field to reflect the written value. 
 
             AM335x_CM_WKUP->TIMER1_CLKCTRL.b.MODULEMODE = MODULEMODE_ENABLE;
             while(AM335x_CM_WKUP->TIMER1_CLKCTRL.b.MODULEMODE != MODULEMODE_ENABLE); 

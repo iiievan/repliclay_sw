@@ -1,4 +1,5 @@
 #include "am335x_rtc.h"
+#include "PRCM.h"
 #include "utils.h"
 
 am335x_rtc::am335x_rtc(REGS::RTC::AM335x_RTC_Type *p_rtc_regs)
@@ -11,6 +12,24 @@ am335x_rtc::am335x_rtc(REGS::RTC::AM335x_RTC_Type *p_rtc_regs)
 /******************************************************************************
 **         APIs common to the RTC IPs of both AM1808 and AM335x.
 ******************************************************************************/
+
+void  am335x_rtc::setup(REGS::RTC::TIME_t time, REGS::RTC::CALENDAR_t calendar, REGS::RTC::e_32KCLKSOURCE clksource)
+{
+    REGS::PRCM::run_RTC_clk(); 
+
+    write_protect_disable();
+    clk_32k_source_select(clksource); 
+    clk_32k_clock_control(true);  // enable recieve clk inputs
+    enable();
+    
+    calendar_set(calendar);
+    time_set(time);
+    
+    run();
+    
+    //write_protect_enable();
+}
+
 void  am335x_rtc::run()
 {
     volatile uint32_t split_power = 0;
@@ -1348,7 +1367,7 @@ void  am335x_rtc::test_mode_control(bool control_flag)
     m_regs.RTC_CTRL.b.TEST_MODE = control_flag;
 }
  
-void  am335x_rtc::clk_32k_source_select(bool clk_src_flag)
+void  am335x_rtc::clk_32k_source_select(REGS::RTC::e_32KCLKSOURCE clk_src_flag)
 {    
     // Clearing the 32KCLK_SEL bit in Oscilltor register.
     m_regs.RTC_OSC.b.SEL_32KCLK_SRC = LOW;
@@ -1356,10 +1375,10 @@ void  am335x_rtc::clk_32k_source_select(bool clk_src_flag)
     // Programming the 32KCLK_SEL bit in Oscillator register.
     m_regs.RTC_OSC.b.SEL_32KCLK_SRC = clk_src_flag; 
 
-    if(clk_src_flag)
+    if(clk_src_flag == REGS::RTC::CLK32K_EXTERNAL)
     {        
         // Clearing the OSC32K_GZ field in RTC_OSC register.
-        m_regs.RTC_OSC.b.OSC32K_GZ &= ~REGS::RTC::OSC_OSC32K_GZ_MSK;
+        m_regs.RTC_OSC.reg &= ~REGS::RTC::OSC_OSC32K_GZ_MSK;
         m_regs.RTC_OSC.b.OSC32K_GZ = LOW;
     }
 }

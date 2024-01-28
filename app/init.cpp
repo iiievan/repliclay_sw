@@ -27,8 +27,8 @@ extern "C" void AbortHandler(void);
 extern "C" void IRQHandler(void);
 extern "C" void FIQHandler(void);
 
-// ~1ms system timer for system time
-sys_timer sys_time(REGS::DMTIMER::AM335X_DMTIMER_2);
+// precision 1ms system timer for system time
+sys_timer<SYST_t> sys_time(SYST_TIMER_ptr);
 am335x_gpio gpio0(REGS::GPIO::AM335x_GPIO_0);
 am335x_gpio gpio1(REGS::GPIO::AM335x_GPIO_1);
 //am335x_gpio gpio2(REGS::GPIO::AM335x_GPIO_2);
@@ -66,54 +66,6 @@ static void copy_vector_table(void)
     }
 }
 
-static void clearTimer1Int(void *p_obj)
-{
-	//HWREG(0x44e31018) = 0x2;  //TISR 
-    dm_timer_1ms.IRQ_clear(REGS::DMTIMER::IRQ_OVF);   // Clear the status of the interrupt flags
-}
-
-static void initializeTimer1(void)
-{
-    REGS::PRCM::run_RTC_clk(); 
-
-    rtc_module.write_protect_disable();
-    rtc_module.clk_32k_source_select(true); // internal clk
-    rtc_module.clk_32k_clock_control(true);  // enable recieve clk inputs
-    rtc_module.enable();
-    
-    REGS::RTC::TIME_t time = {.HOUR = 12, .MIN = 34, .SEC = 0};
-    REGS::RTC::CALENDAR_t calendar = {.YEAR = 24, .MONTH = 1, .DAY = 25};
-    rtc_module.calendar_set(calendar);
-    rtc_module.time_set(time);
-    
-    rtc_module.run();
-        
-	//	wake up configs
-	//HWREG(0x44e31010) = 0x214; //TIOCP_CFG  set EnaWakeup,SMART_IDLE,ClockActivity = 0x2
-
-	//	enable overflow int
-	//HWREG(0x44e3101c) = 0x2; //TIER
-
-	//	enable overflow wakeup
-	//HWREG(0x44e31020) = 0x2;  //TWER
-    REGS::PRCM::run_clk_DMTIMER_1ms(REGS::PRCM::MS1_32768HZ);
-    intc.register_handler(REGS::INTC::TINT1_1MS, clearTimer1Int);
-    intc.priority_set(REGS::INTC::TINT1_1MS, 0);      
-    intc.unmask_interrupt(REGS::INTC::TINT1_1MS);
-    
-    dm_timer_1ms.counter_set(SYS_TIMER_RLD_COUNT);                                  //Load the counter with the initial count value
-    dm_timer_1ms.reload_set(SYS_TIMER_RLD_COUNT);                                   //Load the load register with the reload count value
-    dm_timer_1ms.mode_configure(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE);   //Configure the DMTimer for Auto-reload and compare mode 
-        
-    dm_timer_1ms.IRQ_enable(REGS::DMTIMER::IRQ_OVF);
-        
-    dm_timer_1ms.enable(); 
-    
-    //IntSystemEnable(SYS_INT_TINT1_1MS);
-    //IntPrioritySet(SYS_INT_TINT1_1MS, 0, AINTC_HOSTINT_ROUTE_IRQ);
-    //IntRegister(SYS_INT_TINT1_1MS,clearTimer1Int);
-}
-
 void init_board(void)
 { 
     copy_vector_table();
@@ -123,16 +75,15 @@ void init_board(void)
     CP15BranchPredictionEnable();       // Enable Branch Prediction включаем предсказание ветвления - нужно для ускорения работы.    
     //__iar_dynamic_initialization();   // in case using RTOS
             
-    intc.init();                       //Initializing the ARM Interrupt Controller.
+    intc.init();                       //Initializing the ARM Interrupt Controller. 
     
-    initializeTimer1();
+    REGS::RTC::TIME_t time = {.HOUR = 12, .MIN = 34, .SEC = 0};
+    REGS::RTC::CALENDAR_t calendar = {.YEAR = 24, .MONTH = 1, .DAY = 25};    
     
-    
+    rtc_module.setup(time,calendar, REGS::RTC::CLK32K_EXTERNAL);
     
     // setup system timer for 1ms interrupt 
-    sys_time.setup(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE,
-                   SYS_TIMER_RLD_COUNT,
-                   (REGS::INTC::MAX_IRQ_PRIORITIES - 1));        
+    sys_time.init();
     
     gpio1.init();     
     USR_LED_0.sel_pinmode(PINS::e_GPMC_A5::gpio1_21);

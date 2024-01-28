@@ -18,6 +18,22 @@ public:
         /******************************************************************************
          **         APIs common to the RTC IPs of both AM1808 and AM335x.
          ******************************************************************************/
+        
+        /*
+         * @brief   This function generally set up RTC module 
+         *
+         * @param   time  - sets rtc start time    
+         * @param   calendar  - sets rtc start date  
+         * @param   clksource  - sets type of clk source 32.768k:
+         *          REGS::RTC::CLK32K_INTERNAL - selects internal clk source
+         *          REGS::RTC::CLK32K_EXTERNAL - selects external clk source (ceramic oscillator)
+         *
+         * @note    If the application uses RTC, then it should be borne in mind that 
+         *          register RTC_OSC_reg_t settings  may affect the DMTIMER_1ms settings if it 
+         *          also run from 32768Hz.Øt is necessary that they both use the same clock source (CLK32K_INTERNAL or CLK32K_EXTERNAL) 
+         */
+       void  setup(REGS::RTC::TIME_t time, REGS::RTC::CALENDAR_t calendar, REGS::RTC::e_32KCLKSOURCE clksource);
+
         /*
          * @brief    This function sets the 32KHz counter to run.
          */
@@ -877,10 +893,10 @@ public:
          * @param  clk_src_flag  This specifies the RTC Clock source to be selected
          *
          *  'clk_src_flag' can take one of the following two values:
-         * - false - to select the Internal Clock source 
-         * - true - to select the External Clock source 
+         * - REGS::RTC::CLK32K_INTERNAL - to select the Internal Clock source 
+         * - REGS::RTC::CLK32K_EXTERNAL - to select the External Clock source(ceramic oscillator) 
          */        
-        void  clk_32k_source_select(bool clk_src_flag);
+        void  clk_32k_source_select(REGS::RTC::e_32KCLKSOURCE clk_src_flag);
 
         /*
          * @brief This API controls(enables/disables) the RTC to receive clocks
