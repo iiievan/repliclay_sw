@@ -33,11 +33,11 @@ public:
         m_isr_handler = (isr_handler_t)sys_timer_irqhandler;
     }
 
-    uint64_t  get_ms(void)  { return am335x_dmtimer<DMT>::m_time; }
+    float  get_ms(void)  { return am335x_dmtimer<DMT>::m_time; }
     
-    inline void  increment(size_t dt = 1)
+    inline void  increment(float dt = 1.0)
     {  
-        am335x_dmtimer<DMT>::m_time += dt;
+        am335x_dmtimer<DMT>::m_time += (float)dt;
     }
 
     void  init()

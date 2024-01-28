@@ -351,6 +351,8 @@
                     <state>$PROJ_DIR$\app</state>
                     <state>$PROJ_DIR$\regs</state>
                     <state>$PROJ_DIR$\utils</state>
+                    <state>$PROJ_DIR$\utils\fsm_cpp</state>
+                    <state>$PROJ_DIR$\utils\fsm_c</state>
                     <state>$PROJ_DIR$\periph</state>
                     <state>$PROJ_DIR$\\periph\pins</state>
                 </option>
@@ -2416,6 +2418,45 @@
     </group>
     <group>
         <name>utils</name>
+        <group>
+            <name>fsm_c</name>
+            <group>
+                <name>fsm_list</name>
+            </group>
+        </group>
+        <group>
+            <name>fsm_cpp</name>
+            <group>
+                <name>fsm_list</name>
+                <file>
+                    <name>$PROJ_DIR$\utils\fsm_cpp\fsm_list\fsm_list_common.cpp</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\utils\fsm_cpp\fsm_list\test_fsm_a.cpp</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\utils\fsm_cpp\fsm_list\test_fsm_b.cpp</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\utils\fsm_cpp\fsm_list\test_fsm_c.cpp</name>
+                </file>
+            </group>
+            <file>
+                <name>$PROJ_DIR$\utils\fsm_cpp\fsm.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\utils\fsm_cpp\fsm.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\utils\fsm_cpp\fsm_sheduler.cpp</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\utils\fsm_cpp\fsm_sheduler.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\utils\fsm_cpp\fsm_types_capi.h</name>
+            </file>
+        </group>
         <file>
             <name>$PROJ_DIR$\utils\ring_buffer.hpp</name>
         </file>

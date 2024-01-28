@@ -278,7 +278,7 @@ REGS::INTC::e_INT_ID get_DMTIMER_sys_interrupt();
                 bool  get_debug_EMUFREE();
 
 protected:
-     volatile uint64_t  m_time; // the timer time     
+     volatile    float  m_time; // the timer time     
                   bool  m_is_paused { true }; 
 private:
      dmtimer_context_t  m_context;  // dmtimer context for rebooting

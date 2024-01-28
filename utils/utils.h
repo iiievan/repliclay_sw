@@ -50,6 +50,8 @@ else                                                                          \
 #define DLY_10US     (1139) 
 #define DLY_1US      (89)   
 
+#define ever (;;)
+
 extern     void  delay_100us(uint32_t delay);
 extern     void  delay_10us(uint32_t delay);     
 extern      int  random(void); // RAND_MAX assumed to be 32767
