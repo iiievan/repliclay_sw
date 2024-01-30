@@ -147,13 +147,8 @@ void init_fsm(void)
         
     
     fsm_start(&test_fsm_c,(void *)&usr_led_2_cmd);
-    
-    test_fsm_a.m_can_run_simultaneously = true;
-    fsm_start(&test_fsm_a,(void *)&usr_led_0_cmd);
-    
-    test_fsm_b.m_can_run_simultaneously = true;
-    fsm_start(&test_fsm_b,(void *)&usr_led_1_cmd);
-    
+    fsm_start(&test_fsm_a,(void *)&usr_led_0_cmd, true);
+    fsm_start(&test_fsm_b,(void *)&usr_led_1_cmd, true);    
     fsm_start(&test_fsm_c,(void *)&usr_led_2_cmd);
 
     

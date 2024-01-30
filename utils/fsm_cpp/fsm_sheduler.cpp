@@ -1,11 +1,12 @@
 #include <string.h>         // for memcpy
 #include "fsm_sheduler.h"
 #include "fsm_timer.h"
+#include "board.hpp"
 //#include "SEGGER_RTT.h"
 
 fsm_sheduler action_cmd_sheduler;
 
-bool  fsm_sheduler::fsm_start(fsm_t& fsm, void* params)
+bool  fsm_sheduler::fsm_start(fsm_t& fsm, void* params, bool simult)
 {
     bool func_result = false;
     action_cmd*  p_cmd;
@@ -31,6 +32,10 @@ bool  fsm_sheduler::fsm_start(fsm_t& fsm, void* params)
         }
         else
             func_result = false;
+
+        // fsm can run simultaneously with others
+        if(simult)
+            fsm_copy.m_can_run_simultaneously = true;
 
         // place fsm in active list
         if(m_ACTIVE_FSM_LIST.push(fsm_copy))
@@ -147,6 +152,7 @@ void fsm_sheduler::dispatch(void)
 
     if((GET_MS() - execute_interval_tmr) > FSM_POLLING_DELTA)
     {
+        DBG_PIN4.set();
         execute_interval_tmr = GET_MS();
         uint32_t available_FSMs = m_ACTIVE_FSM_LIST.get_avail();
         uint32_t current_fsm    = 0;
@@ -207,6 +213,7 @@ void fsm_sheduler::dispatch(void)
             else
             {
                 REBOOT_MS();    // reboot ms timer for fsm if no available fsms in progress
+                execute_interval_tmr = 0;
             }
         }  
         while (available_FSMs);
@@ -215,6 +222,8 @@ void fsm_sheduler::dispatch(void)
         {
             m_remove_from_list(uid);
         }
+        
+        DBG_PIN4.clear();
     }
 }
     
@@ -492,9 +501,9 @@ void fsm_sheduler_dispatch(void)
 /**
 * @brief run FSM execution (add to list)
 */
-bool fsm_start(fsm_t *fsm, void* params)
+bool fsm_start(fsm_t *fsm, void* params, bool simult)
 {
-    return action_cmd_sheduler.fsm_start(*fsm,params);
+    return action_cmd_sheduler.fsm_start(*fsm,params,simult);
 }
 
 /**

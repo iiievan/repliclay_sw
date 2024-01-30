@@ -67,7 +67,7 @@ void fsm_sheduler_dispatch(void);
 /**
 * @brief run FSM execution (add to list)
 */
-bool fsm_start(fsm_t *fsm, void* params);
+bool fsm_start(fsm_t *fsm, void* params, bool simult = false);
 
 /**
 * @brief safe run FSM execution(add it to the list or delete it if it
