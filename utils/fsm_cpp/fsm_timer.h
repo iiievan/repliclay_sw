@@ -28,8 +28,8 @@ public:
         // FFFF FFFE = (4294967294 /26000000)*2 =  330 seconds
         // 0.001s = 4294967294*0.001/330 = 13015(0x32D7)
 
-        #define ms_INTERVALi (0x2EE0)
-        #define ms_INTERVALf (12000.0f)
+        #define ms_INTERVALi (0x10E8)
+        #define ms_INTERVALf (4328.0f)
 
         if(!m_enabled)
             enable();

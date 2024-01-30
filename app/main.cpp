@@ -17,7 +17,8 @@ int main()
     init_fsm(); 
 
     for ever
-    {      
+    {   
+      /*
         if(sys_time.get_ms() - time > 1000.0f)
         {
             time = sys_time.get_ms();
@@ -29,7 +30,7 @@ int main()
             else
                 USR_LED_0.clear();
         }
-        
+        */
         fsm_sheduler_dispatch();
     }
 } 

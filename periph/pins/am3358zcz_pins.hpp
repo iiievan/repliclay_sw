@@ -139,6 +139,55 @@ namespace PINS
     };
     extern pin<e_XDMA_EVENT_INTR1, 20U, 0x9B4>  xdma_event_intr1; 
 
+    enum class e_LCD_DATA1 : uint8_t
+    { 
+        lcd_data1           = 0, // I/O
+        gpmc_a1             = 1, // O
+        pr1_mii0_txen       = 2, // O
+        ehrpwm2B            = 3, // O
+        pr1_pru1_pru_r30_1  = 5, // O
+        pr1_pru1_pru_r31_1  = 6, // I
+        gpio2_7             = 7  // I/O
+    };
+    extern       pin<e_LCD_DATA1, 7U, 0x8A4>  lcd_data1;
+
+    enum class e_LCD_DATA3 : uint8_t
+    { 
+        lcd_data3           = 0, // I/O 
+        gpmc_a3             = 1, // O
+        pr1_mii0_txd2       = 2, // O
+        ehrpwm0_synco       = 3, // O
+        pr1_pru1_pru_r30_3  = 5, // O
+        pr1_pru1_pru_r31_3  = 6, // I
+        gpio2_9             = 7  // I/O
+    };
+    extern       pin<e_LCD_DATA3, 9U, 0x8AC>  lcd_data3;
+
+    enum class e_LCD_DATA5 : uint8_t
+    { 
+        lcd_data5           = 0, // I/O 
+        gpmc_a5             = 1, // O
+        pr1_mii0_txd0       = 2, // O
+        eQEP2B_in           = 3, // I
+        pr1_pru1_pru_r30_5  = 5, // O
+        pr1_pru1_pru_r31_5  = 6, // I
+        gpio2_11            = 7  // I/O
+    };
+    extern       pin<e_LCD_DATA5, 11U, 0x8B4>  lcd_data5;
+
+    enum class e_LCD_DATA7 : uint8_t
+    { 
+        lcd_data7           = 0, // I/O 
+        gpmc_a7             = 1, // O
+        pr1_edio_data_in7   = 2, // I
+        eQEP2_strobe        = 3, // I/O
+        pr1_edio_data_out7  = 4, // O
+        pr1_pru1_pru_r30_7  = 5, // O
+        pr1_pru1_pru_r31_7  = 6, // I
+        gpio2_13            = 7  // I/O
+    };
+    extern       pin<e_LCD_DATA7, 13U, 0x8BC>  lcd_data7;
+
 } // namespace PINS
 
 #endif // _AM3358ZCZ_PINS_H

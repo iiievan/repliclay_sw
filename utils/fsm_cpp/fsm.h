@@ -4,11 +4,12 @@
 #include <stdbool.h>
 #include "stdint.h"
 #include "fsm_types_capi.h"
+
 //#include "tim.h"
 
 
-#define FSM_TIME_DELTA (5.0f)     // quantum of fsm tick reference 5ms
-#define FSM_POLLING_DELTA (4.5f)  // interval of processing all FSMs in the list. 4.5ms
+#define FSM_TIME_DELTA (5.0f)       // quantum of fsm tick reference 5ms
+#define FSM_POLLING_DELTA (4.999f)  // interval of processing all FSMs in the list. 4.999ms
 
 #if defined(STM32F765xx)
 #    include "cmsis_os.h"
@@ -19,9 +20,9 @@
     #define GET_MS()   (MX_TIM6_get_ms())      // float
     #define GET_MS10() (MX_TIM6_get_ms10())    // ms*10 - tenths of a microseconds
 #elif defined(am335x)
-    #include "sys_timer.h"
-    #define GET_MS()   (sys_time.get_ms())      // float
-    //#define GET_MS10()   (sys_time.get_ms())      // ms*10 - tenths of a microseconds
+    #include "fsm_timer.h"
+    #define GET_MS()      (fsm_time.get_ms())    // float with ms.us value
+    #define REBOOT_MS()   (fsm_time.reboot())    // reboot ms timer for fsm if no available fsms in progress
 #else
     #include "stm32f7xx_hal.h"
     #define GET_MS() HAL_GetTick()    

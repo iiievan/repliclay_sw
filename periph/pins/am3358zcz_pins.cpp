@@ -20,6 +20,10 @@ namespace PINS
     enum class e_UART0_TXD  : uint8_t;
     enum class e_UART0_RXD  : uint8_t;
     enum class e_XDMA_EVENT_INTR1 : uint8_t;
+    enum class e_LCD_DATA1 : uint8_t;
+    enum class e_LCD_DATA3 : uint8_t;
+    enum class e_LCD_DATA5  : uint8_t;
+    enum class e_LCD_DATA7  : uint8_t;
 
     
              pin<e_GPMC_A5, 21U, 0x854>  gpmc_a5(REGS::GPIO::AM335x_GPIO_1);
@@ -33,6 +37,11 @@ namespace PINS
            pin<e_UART0_TXD, 11U, 0x974>  uart0_txd(REGS::GPIO::AM335x_GPIO_1);
            pin<e_UART0_RXD, 10U, 0x970>  uart0_rxd(REGS::GPIO::AM335x_GPIO_1);
     pin<e_XDMA_EVENT_INTR1, 20U, 0x9B4>  xdma_event_intr1(REGS::GPIO::AM335x_GPIO_0);
+
+            pin<e_LCD_DATA1, 7U, 0x8A4>  lcd_data1(REGS::GPIO::AM335x_GPIO_2);
+            pin<e_LCD_DATA3, 9U, 0x8AC>  lcd_data3(REGS::GPIO::AM335x_GPIO_2);
+           pin<e_LCD_DATA5, 11U, 0x8B4>  lcd_data5(REGS::GPIO::AM335x_GPIO_2);
+           pin<e_LCD_DATA7, 13U, 0x8BC>  lcd_data7(REGS::GPIO::AM335x_GPIO_2);
 
 
 

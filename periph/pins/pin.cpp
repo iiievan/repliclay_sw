@@ -338,4 +338,9 @@ namespace PINS
     template class pin<e_UART0_RXD,  10U, 0x970>;
     template class pin<e_XDMA_EVENT_INTR1, 20U, 0x9B4>;
 
+    template class pin<e_LCD_DATA1, 7U, 0x8A4>;
+    template class pin<e_LCD_DATA3, 9U, 0x8AC>;
+    template class pin<e_LCD_DATA5, 11U, 0x8B4>;
+    template class pin<e_LCD_DATA7, 13U, 0x8BC>;
+
 }   // namespace PINS

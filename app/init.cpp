@@ -34,7 +34,7 @@ sys_timer<SYST_t> sys_time(SYST_TIMER_ptr);
 fsm_timer<FSMT_t> fsm_time(FSMT_TIMER_ptr);
 am335x_gpio gpio0(REGS::GPIO::AM335x_GPIO_0);
 am335x_gpio gpio1(REGS::GPIO::AM335x_GPIO_1);
-//am335x_gpio gpio2(REGS::GPIO::AM335x_GPIO_2);
+am335x_gpio gpio2(REGS::GPIO::AM335x_GPIO_2);
 //am335x_gpio gpio3(REGS::GPIO::AM335x_GPIO_3);
 
 static uint32_t const vec_tbl[14]=
@@ -97,10 +97,21 @@ void init_board(void)
     USR_LED_2.dir_set(REGS::GPIO::GPIO_OUTPUT);    
     USR_LED_3.sel_pinmode(PINS::e_GPMC_A8::gpio1_24);
     USR_LED_3.dir_set(REGS::GPIO::GPIO_OUTPUT);
-    DBG_PIN1.sel_pinmode(PINS::e_UART0_TXD::gpio1_11);
-    DBG_PIN1.dir_set(REGS::GPIO::GPIO_OUTPUT);
+ 
+    gpio2.init();
+    DBG_PIN1.sel_pinmode(PINS::e_LCD_DATA1::gpio2_7);
+    DBG_PIN1.dir_set(REGS::GPIO::GPIO_OUTPUT);    
+    DBG_PIN2.sel_pinmode(PINS::e_LCD_DATA3::gpio2_9);
+    DBG_PIN2.dir_set(REGS::GPIO::GPIO_OUTPUT);    
+    DBG_PIN3.sel_pinmode(PINS::e_LCD_DATA5::gpio2_11);
+    DBG_PIN3.dir_set(REGS::GPIO::GPIO_OUTPUT);    
+    DBG_PIN4.sel_pinmode(PINS::e_LCD_DATA7::gpio2_13);
+    DBG_PIN4.dir_set(REGS::GPIO::GPIO_OUTPUT);
     
     DBG_PIN1.clear();
+    DBG_PIN2.clear();
+    DBG_PIN3.clear();
+    DBG_PIN4.clear();
     
     gpio0.init();
     END_STOP_X_2.sel_pinmode(PINS::e_GPMC_WAIT0::gpio0_30);
@@ -114,14 +125,37 @@ void init_board(void)
 
 void init_fsm(void)
 {
-  action_cmd usr_led_0_cmd = { .name = "usrled0", 
-                               .repetitions = 8, 
-                               .rep_delay = 250 ,
-                               {.HOUR = 12, .MIN = 35, .SEC = 30} };
-    fsm_construct_static(&test_fsm_a,FSM_TEST_A, test_fsm_a_prog);
-    //test_fsm_a.m_can_run_simultaneously = true;
+    action_cmd usr_led_0_cmd = { .name = "usrled0", 
+                                 .repetitions = 20, 
+                                 .rep_delay = 100 ,
+                                {.HOUR = 12, .MIN = 35, .SEC = 10} };
+  
+    action_cmd usr_led_1_cmd = { .name = "usrled1", 
+                                 .repetitions = 12, 
+                                 .rep_delay = 300 ,
+                                {.HOUR = 12, .MIN = 35, .SEC = 20} };
     
+    action_cmd usr_led_2_cmd = { .name = "usrled2", 
+                                 .repetitions = 6, 
+                                 .rep_delay = 900 ,
+                                {.HOUR = 12, .MIN = 35, .SEC = 40} };
+    
+    
+    fsm_construct_static(&test_fsm_a, FSM_TEST_A, test_fsm_a_prog);    
+    fsm_construct_static(&test_fsm_b, FSM_TEST_B, test_fsm_b_prog);
+    fsm_construct_static(&test_fsm_c, FSM_TEST_C, test_fsm_c_prog);
+        
+    
+    fsm_start(&test_fsm_c,(void *)&usr_led_2_cmd);
+    
+    test_fsm_a.m_can_run_simultaneously = true;
     fsm_start(&test_fsm_a,(void *)&usr_led_0_cmd);
+    
+    test_fsm_b.m_can_run_simultaneously = true;
+    fsm_start(&test_fsm_b,(void *)&usr_led_1_cmd);
+    
+    fsm_start(&test_fsm_c,(void *)&usr_led_2_cmd);
+
     
     fsm_time.init(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE);
     fsm_time.enable();

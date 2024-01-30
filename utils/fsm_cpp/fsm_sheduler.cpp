@@ -144,19 +144,20 @@ void fsm_sheduler::force_terminate_all_list(void)
 void fsm_sheduler::dispatch(void)
 {
     static float execute_interval_tmr = 0;
-    static uint8_t  simultaneously_running_num = 0;
 
     if((GET_MS() - execute_interval_tmr) > FSM_POLLING_DELTA)
     {
         execute_interval_tmr = GET_MS();
         uint32_t available_FSMs = m_ACTIVE_FSM_LIST.get_avail();
         uint32_t current_fsm    = 0;
-
+         uint8_t running_number = m_get_running_number();
+        unique_id uid = { 0 ,FSM_NOINIT};
+         
         // initialization of FSM (when new execution commands appear)
         do
         {   
             if(available_FSMs > 0)
-            {                
+            {    
                 fsm_t* item = m_ACTIVE_FSM_LIST.peek_item(current_fsm);
                 
                 if (item->m_status == FSM_DELAYED_START)
@@ -167,82 +168,79 @@ void fsm_sheduler::dispatch(void)
 
                 // do not allow more than MAX_ACTIVE_FSM of FSMs to operate simultaneously
                 if (item->m_status == FSM_READY)
-                    simultaneously_running_num++;
-
-                if (simultaneously_running_num <= MAX_ACTIVE_FSM)
                 {
-                    if (item->m_status == FSM_READY)
+                    if((running_number == 0) ||
+                       ((running_number > 0) && 
+                        (running_number < MAX_ACTIVE_FSM) && 
+                        item->m_can_run_simultaneously))
                     {
-                        if(simultaneously_running_num > 1 && item->m_can_run_simultaneously)
-                        {
-                            // charge fsm for execution from the beginning
-                            m_fsm_processing(*item,true);
-                        }
-                        
-                        if(simultaneously_running_num == 1)
-                        {
-                            // charge fsm for execution from the beginning
-                            m_fsm_processing(*item,true);
-                        }
-
+                        // charge fsm for execution from the beginning
+                        m_fsm_processing(*item,true);
+                    }
+                    
 #if defined(DBG_FSM_DISPATCHER)
-                        SEGGER_RTT_printf(0, "fsm(%d):STARTED.\r\n", (int)item->m_id);
-                        SEGGER_RTT_printf(0, "fsm_avail:simult_runned:current_fsm.\r\n");
-                        SEGGER_RTT_printf(0, "%d:", (int)available_FSMs);
-                        SEGGER_RTT_printf(0, "%d:", (int)simultaneously_running_num);
-                        SEGGER_RTT_printf(0, "%d.\r\n", (int)current_fsm);
-#endif
-                    }
-                    else
-                    {
-                        // continue running fsm until completion
-                        m_fsm_processing(*item,false);
-                    }
+                    SEGGER_RTT_printf(0, "fsm(%d):STARTED.\r\n", (int)item->m_id);
+                    SEGGER_RTT_printf(0, "fsm_avail:simult_runned:current_fsm.\r\n");
+                    SEGGER_RTT_printf(0, "%d:", (int)available_FSMs);
+                    SEGGER_RTT_printf(0, "%d:", (int)running_number);
+                    SEGGER_RTT_printf(0, "%d.\r\n", (int)current_fsm);
+#endif          
                 }
-                else
-                	simultaneously_running_num = MAX_ACTIVE_FSM;
+
+                if (item->m_status == FSM_RUN)
+                {
+                    // continue running fsm until completion
+                    m_fsm_processing(*item,false);
+                }
+                
+                running_number = m_get_running_number();
+
+                if (FSM_RELEASE == item->m_status)
+                {
+                    // if the FSM has finished its work, remove it from the list later
+                    uid.raw = item->m_id;                    
+                }
 
                 current_fsm++;
                 available_FSMs--;
-
-                fsm_t* item_in_tail = m_ACTIVE_FSM_LIST.peek();
-                if (FSM_RELEASE == item->m_status)
-                {
-                    unique_id uid;
-                    uid.raw = item->m_id;
-                     // if the FSM has finished its work, remove it from the list
-                    if(simultaneously_running_num > 0)
-                    	simultaneously_running_num--;
-
-                    if(current_fsm > 0)
-                        current_fsm--;
-
-#if defined(DBG_FSM_DISPATCHER)
-                    SEGGER_RTT_printf(0, "fsm(%d):REMOVED.\r\n", (int)item->m_id);
-                    SEGGER_RTT_printf(0, "fsm_avail:simult_runned:current_fsm.\r\n");
-                    SEGGER_RTT_printf(0, "%d:", (int)available_FSMs);
-                    SEGGER_RTT_printf(0, "%d:", (int)simultaneously_running_num);
-                    SEGGER_RTT_printf(0, "%d.\r\n", (int)current_fsm);
-#endif
-                    m_remove_from_list(uid);
-                }
-
-                // do not waste time processing the remaining fsms, since it will no longer be possible to launch one more
-                /*if(simultaneously_running_num > (MAX_ACTIVE_FSM - 1) &&
-                   current_fsm == MAX_ACTIVE_FSM)
-                    break;*/
             }
             else
             {
-                fsm_time.reboot();
-                execute_interval_tmr = 0;
-                simultaneously_running_num = 0;
+                REBOOT_MS();    // reboot ms timer for fsm if no available fsms in progress
             }
         }  
         while (available_FSMs);
 
-
+        if(uid.raw != 0U)
+        {
+            m_remove_from_list(uid);
+        }
     }
+}
+    
+uint8_t  fsm_sheduler::m_get_running_number()
+{
+    uint8_t number_of_running = 0;
+    auto  list_index   = 0;
+    auto  curr_fifo_avail = m_ACTIVE_FSM_LIST.get_avail();
+   fsm_t* item = nullptr;
+
+    if(curr_fifo_avail == 0)
+        return number_of_running;    
+
+    while(curr_fifo_avail > list_index)
+    {
+        item = m_ACTIVE_FSM_LIST.peek_item(list_index);
+        
+        if(item->m_status == FSM_RUN)
+        {
+            number_of_running++;
+        }
+        
+        list_index++;        
+    }
+    
+    return number_of_running; 
 }
 
 int fsm_sheduler::m_is_in_list(unique_id uid)
@@ -317,6 +315,14 @@ void fsm_sheduler::m_remove_from_list(unique_id uid)
 
             m_ACTIVE_FSM_LIST.pop_item(i);
             m_FSM_INPUT_DATA_BUF.pop_item(i);
+            
+            // remap poiners and their data
+            for (size_t y = 0; y < m_ACTIVE_FSM_LIST.get_avail(); y++)
+            {
+                fsm_t* item = m_ACTIVE_FSM_LIST.peek_item(y);
+                
+                item->params = (void *)m_FSM_INPUT_DATA_BUF.peek_item(y);
+            }
             break;
         }        
     }     
@@ -338,6 +344,14 @@ void fsm_sheduler::m_remove_from_list(fsm_id_t fsm_id)
 
             m_ACTIVE_FSM_LIST.pop_item(i);
             m_FSM_INPUT_DATA_BUF.pop_item(i);
+            
+            // remap poiners and their data
+            for (size_t y = 0; y < m_ACTIVE_FSM_LIST.get_avail(); y++)
+            {
+                fsm_t* item = m_ACTIVE_FSM_LIST.peek_item(y);
+                
+                item->params = (void *)m_FSM_INPUT_DATA_BUF.peek_item(y);
+            }
             break;
         }
     }      
@@ -455,7 +469,7 @@ void fsm_sheduler::m_fsm_processing(fsm_t& fsm, bool trigger)
 }
 
 // for id generation
-static unique_id m_unique_id = { 0 ,FSM_NOINIT};
+static unique_id m_unique_id = { 1 ,FSM_NOINIT};
 
 uint32_t  fsm_sheduler::m_generate_id(fsm_id_t id)
 {

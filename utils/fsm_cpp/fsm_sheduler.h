@@ -50,6 +50,11 @@ public:
 
 
 private: 
+   /*
+    * @brief get the number of running fsms
+    */     
+    uint8_t  m_get_running_number();
+
     /**
     * @brief check FSM is in list by uniqiue id
     */     
