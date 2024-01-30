@@ -1,10 +1,11 @@
 #include <stdint.h>
-#include "board.h"
+#include "board.hpp"
 #include "init.h"
 #include "sys_timer.h"
 #include "pin.h"
 #include "am3358zcz_pins.hpp"
-#include "ring_buffer.hpp"
+#include "fsm_types_capi.h"
+#include "fsm_timer.h"
 #include "utils.h"
 
 int main()
@@ -12,6 +13,8 @@ int main()
     static float time = 0;
        
     init_board(); 
+    
+    init_fsm(); 
 
     for ever
     {      
@@ -26,6 +29,8 @@ int main()
             else
                 USR_LED_0.clear();
         }
+        
+        fsm_sheduler_dispatch();
     }
 } 
 

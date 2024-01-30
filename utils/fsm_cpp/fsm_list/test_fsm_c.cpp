@@ -2,6 +2,7 @@
 //#include "SEGGER_RTT.h"
 
 #include "fsm.h"
+#include "fsm_types_capi.h"
 //#include "tim.h"
 
 //-------------------------------------------------------------------------------------------------

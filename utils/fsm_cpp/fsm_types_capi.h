@@ -28,13 +28,13 @@ typedef struct
     uint32_t    HOUR      :8;     // bit: 24..31      
 } abTime_t;
 
-struct action_cmd
+typedef struct 
 {
        char  name[8];
     uint8_t  repetitions;
-      float  rep_delay;
+      float  rep_delay;         // in ms
    abTime_t  absolute_start_time;
-};
+}action_cmd;
 
 typedef enum
 {
@@ -120,7 +120,7 @@ extern const fsm_step_t test_fsm_c_prog[];
 /*
  * common for many fsms
  */
-extern int  stage_before_movement_wait;
+extern int  stage_before_wait;
 //extern encoder_pos_t encoder_pos_before_move;
 //extern encoder_pos_t encoder_distance;
 

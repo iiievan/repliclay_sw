@@ -101,6 +101,32 @@ namespace PINS
     };
     extern       pin<e_UART1_CTSn, 12U, 0x978>  uart1_ctsn;
 
+    enum class e_UART0_TXD : uint8_t
+    { 
+        uart0_txd           = 0, // O 
+        spi1_cs1            = 1, // I/O
+        dcan0_rx            = 2, // I
+        I2C2_SCL            = 3, // I/OD
+        eCAP1_in_PWM1_out   = 4, // I/O
+        pr1_pru1_pru_r30_15 = 5, // O
+        pr1_pru1_pru_r31_15 = 6, // I
+        gpio1_11            = 7  // I/O
+    };
+    extern       pin<e_UART0_TXD, 11U, 0x974>  uart0_txd;
+
+    enum class e_UART0_RXD : uint8_t
+    { 
+        uart0_rxd           = 0, // I 
+        spi1_cs0            = 1, // I/O
+        dcan0_tx            = 2, // O
+        I2C2_SDA            = 3, // I/OD
+        eCAP2_in_PWM2_out   = 4, // I/O
+        pr1_pru1_pru_r30_14 = 5, // O
+        pr1_pru1_pru_r31_14 = 6, // I
+        gpio1_10            = 7  // I/O
+    };
+    extern       pin<e_UART0_RXD, 10U, 0x970>  uart0_rxd;
+
     enum class e_XDMA_EVENT_INTR1 : uint8_t
     { 
         xdma_event_intr1    = 0, // I 

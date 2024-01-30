@@ -54,16 +54,16 @@ public:
                  * @brief   This API will configure and enable the pre-scaler clock.
                  * @param   ptv          Pre-scale clock Timer value.
                  *    'ptv' can take the following values \n
-                 *    CLK_DIV_BY_2 - Timer clock divide by 2 \n
-                 *    CLK_DIV_BY_4 - Timer clock divide by 4 \n
-                 *    CLK_DIV_BY_8 - Timer clock divide by 8 \n
-                 *    CLK_DIV_BY_16 - Timer clock divide by 16 \n
-                 *    CLK_DIV_BY_32 - Timer clock divide by 32 \n
-                 *    CLK_DIV_BY_64 - Timer clock divide by 64 \n
-                 *    CLK_DIV_BY_128 - Timer clock divide by 128 \n
-                 *    CLK_DIV_BY_256 - Timer clock divide by 256 \n
+                 *    REGS::DMTIMER::CLK_DIV_BY_2 - Timer clock divide by 2 \n
+                 *    REGS::DMTIMER::CLK_DIV_BY_4 - Timer clock divide by 4 \n
+                 *    REGS::DMTIMER::CLK_DIV_BY_8 - Timer clock divide by 8 \n
+                 *    REGS::DMTIMER::CLK_DIV_BY_16 - Timer clock divide by 16 \n
+                 *    REGS::DMTIMER::CLK_DIV_BY_32 - Timer clock divide by 32 \n
+                 *    REGS::DMTIMER::CLK_DIV_BY_64 - Timer clock divide by 64 \n
+                 *    REGS::DMTIMER::CLK_DIV_BY_128 - Timer clock divide by 128 \n
+                 *    REGS::DMTIMER::CLK_DIV_BY_256 - Timer clock divide by 256 \n
                  **/               
-                void  prescaler_clk_enable(uint8_t ptv);
+                void  prescaler_clk_enable(REGS::DMTIMER::e_PRSC ptv);
                 
                 /**
                  * @brief   This API will disable the pre-scaler clock.

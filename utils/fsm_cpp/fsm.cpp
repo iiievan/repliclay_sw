@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "fsm.h"
+#include "fsm_timer.h"
 
 void fsm_construct_static(fsm_t* p_fsm, fsm_id_t id, const fsm_step_t* fsm_prog)
 {

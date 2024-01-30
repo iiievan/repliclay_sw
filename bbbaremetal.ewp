@@ -2134,7 +2134,7 @@
             <name>$PROJ_DIR$\app\am335x_clock_data.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\app\board.h</name>
+            <name>$PROJ_DIR$\app\board.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\app\init.cpp</name>
@@ -2452,6 +2452,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\utils\fsm_cpp\fsm_sheduler.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\utils\fsm_cpp\fsm_timer.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\utils\fsm_cpp\fsm_types_capi.h</name>

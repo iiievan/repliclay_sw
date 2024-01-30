@@ -15,12 +15,7 @@
 #define USR_LED_2        (PINS::gpmc_a7)    // gpio1_23
 #define USR_LED_3        (PINS::gpmc_a8)    // gpio1_24
 
-#define APP_LED USR_LED_3
-//#define APP_PIN (PINS::e_GPMC_A5::gpio1_21)
-//#define APP_PIN (PINS::e_GPMC_A6::gpio1_22)
-//#define APP_PIN (PINS::e_GPMC_A7::gpio1_23)
-#define APP_PIN (PINS::e_GPMC_A8::gpio1_24)
-
+#define DBG_PIN1         (PINS::uart0_txd)  // gpio1_11
 
 /********************************************************************************************************************/  
 

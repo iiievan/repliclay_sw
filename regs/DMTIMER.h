@@ -135,7 +135,7 @@ namespace REGS
             {                                         /* Timer control register */                      
                 uint32_t    ST        :1;             // bit: 0       automatically reset when the counter is overflowed(if AR = 0) [0x0 = counter is frozen; 0x1 = start timer] 
                 uint32_t    AR        :1;             // bit: 1       [0x0 = One shot timer; 0x1 = Auto-reload timer] [see e_DMTIMER_mode] 
-                uint32_t    PTV       :3;             // bit: 2..4    Pre-scale clock Timer value [see e_DMTIMER_prescaler] 
+                uint32_t    PTV       :3;             // bit: 2..4    Pre-scale clock Timer value [see e_PRSC] 
                 uint32_t    PRE       :1;             // bit: 5       enable prescale  [0x0 = TIMER clock input pin clocks; 0x1 = divided input pin clocks] 
                 uint32_t    CE        :1;             // bit: 6       compare mode [0x0 = disabled; 0x1 = enabled] [see e_DMTIMER_mode] 
                 uint32_t    SCPWM     :1;             // bit: 7       [0x0 = clear PORTIMERPWM, sel positive pulse; 0x1 = set PORTIMERPWM, sel negative pulse]                   
@@ -157,7 +157,7 @@ namespace REGS
             MODE_AUTORLD_CMP_ENABLE   = BIT(1)|BIT(6)   
         };
 
-        enum e_DMTIMER_prescaler: uint32_t
+        enum e_PRSC: uint8_t
         {
             CLK_DIV_BY_2   = 0x0,
             CLK_DIV_BY_4   = 0x1,

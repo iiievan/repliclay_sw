@@ -43,7 +43,7 @@ void  am335x_dmtimer<DMT>::mode_configure(REGS::DMTIMER::e_DMTIMER_mode mode)
 }
 
 template <typename DMT>
-void  am335x_dmtimer<DMT>::prescaler_clk_enable(uint8_t ptv)
+void  am335x_dmtimer<DMT>::prescaler_clk_enable(REGS::DMTIMER::e_PRSC ptv)
 {
     m_wait_for_write(REGS::DMTIMER::F_PEND_TCLR); // wait in posted mode
    

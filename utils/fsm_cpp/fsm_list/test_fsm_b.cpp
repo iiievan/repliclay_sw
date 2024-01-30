@@ -2,6 +2,7 @@
 //#include "SEGGER_RTT.h"
 
 #include "fsm.h"
+#include "fsm_types_capi.h"
 //#include "tim.h"
 
 //-------------------------------------------------------------------------------------------------
@@ -16,6 +17,7 @@ static float  ms = 0;
 
 static bool test_fsm_init(fsm_t* fsm)
 {
+    action_cmd* cmd = (action_cmd*) fsm->params;
     repeats = 0;
     ms = GET_MS();
     //SEGGER_RTT_printf(0, "dti(:%d:)\r\n", ms);

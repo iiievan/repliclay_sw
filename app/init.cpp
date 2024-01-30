@@ -1,6 +1,6 @@
 #include "stdint.h"
 #include "init.h"
-#include "board.h"
+#include "board.hpp"
 #include "cp15.h"
 #include "hal_mmu.h"
 //#include "iar_dynamic_init.h" // in case using RTOS
@@ -11,8 +11,10 @@
 #include "pin.h"
 //ghj#include "clock.h"
 #include "sys_timer.h"
+#include "fsm_timer.h"
 #include "PRCM.h"
 #include "DMTIMER1MS.h"
+#include "fsm_types_capi.h"
 
 //#include "interrupt.h"
 //#include "dmtimer.h"
@@ -29,6 +31,7 @@ extern "C" void FIQHandler(void);
 
 // precision 1ms system timer for system time
 sys_timer<SYST_t> sys_time(SYST_TIMER_ptr);
+fsm_timer<FSMT_t> fsm_time(FSMT_TIMER_ptr);
 am335x_gpio gpio0(REGS::GPIO::AM335x_GPIO_0);
 am335x_gpio gpio1(REGS::GPIO::AM335x_GPIO_1);
 //am335x_gpio gpio2(REGS::GPIO::AM335x_GPIO_2);
@@ -87,10 +90,17 @@ void init_board(void)
     
     gpio1.init();     
     USR_LED_0.sel_pinmode(PINS::e_GPMC_A5::gpio1_21);
-    USR_LED_0.dir_set(REGS::GPIO::GPIO_OUTPUT); 
-    
+    USR_LED_0.dir_set(REGS::GPIO::GPIO_OUTPUT);    
+    USR_LED_1.sel_pinmode(PINS::e_GPMC_A6::gpio1_22);
+    USR_LED_1.dir_set(REGS::GPIO::GPIO_OUTPUT);    
+    USR_LED_2.sel_pinmode(PINS::e_GPMC_A7::gpio1_23);
+    USR_LED_2.dir_set(REGS::GPIO::GPIO_OUTPUT);    
     USR_LED_3.sel_pinmode(PINS::e_GPMC_A8::gpio1_24);
     USR_LED_3.dir_set(REGS::GPIO::GPIO_OUTPUT);
+    DBG_PIN1.sel_pinmode(PINS::e_UART0_TXD::gpio1_11);
+    DBG_PIN1.dir_set(REGS::GPIO::GPIO_OUTPUT);
+    
+    DBG_PIN1.clear();
     
     gpio0.init();
     END_STOP_X_2.sel_pinmode(PINS::e_GPMC_WAIT0::gpio0_30);
@@ -100,4 +110,19 @@ void init_board(void)
     END_STOP_X_2.sel_slewrate(REGS::CONTROL_MODULE::SLOW);
     
     intc.master_IRQ_enable();    
+}
+
+void init_fsm(void)
+{
+  action_cmd usr_led_0_cmd = { .name = "usrled0", 
+                               .repetitions = 8, 
+                               .rep_delay = 250 ,
+                               {.HOUR = 12, .MIN = 35, .SEC = 30} };
+    fsm_construct_static(&test_fsm_a,FSM_TEST_A, test_fsm_a_prog);
+    //test_fsm_a.m_can_run_simultaneously = true;
+    
+    fsm_start(&test_fsm_a,(void *)&usr_led_0_cmd);
+    
+    fsm_time.init(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE);
+    fsm_time.enable();
 }

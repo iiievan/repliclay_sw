@@ -12,7 +12,7 @@
 // volatile static uint32_t wait_move_end_cntr = 0;
 //encoder_pos_t encoder_pos_before_move = {0, 0};
 //encoder_pos_t encoder_distance = {0, 0};
-int  stage_before_movement_wait = 0;
+int  stage_before_wait = 0;
 /*
 bool wait_movement_end_common(fsm_t* p_fsm)
 {

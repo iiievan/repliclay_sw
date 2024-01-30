@@ -1,12 +1,12 @@
-#ifndef __OS_TIMER_H
-#define __OS_TIMER_H
+#ifndef _SYS_TIMER_H
+#define _SYS_TIMER_H
 
 #include <cstddef> // for size_t
 #include "PRCM.h"
 #include "am335x_dmtimer.h"
 #include "am335x_intc.h"
 
-//#define USE_DMTIMER_1ms
+#define USE_DMTIMER_1ms
 #define SYST_RLD_COUNT                (0xffffa261) // 1ms approximate
 
 #if defined(USE_DMTIMER_1ms)
@@ -129,4 +129,4 @@ inline void sys_timer_irqhandler(void *p_obj)
 
 
 
-#endif //__OS_TIMER_H
+#endif //_SYS_TIMER_H

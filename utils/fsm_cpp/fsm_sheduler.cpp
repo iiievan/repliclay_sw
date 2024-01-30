@@ -1,5 +1,6 @@
 #include <string.h>         // for memcpy
 #include "fsm_sheduler.h"
+#include "fsm_timer.h"
 //#include "SEGGER_RTT.h"
 
 fsm_sheduler action_cmd_sheduler;
@@ -177,6 +178,12 @@ void fsm_sheduler::dispatch(void)
                             // charge fsm for execution from the beginning
                             m_fsm_processing(*item,true);
                         }
+                        
+                        if(simultaneously_running_num == 1)
+                        {
+                            // charge fsm for execution from the beginning
+                            m_fsm_processing(*item,true);
+                        }
 
 #if defined(DBG_FSM_DISPATCHER)
                         SEGGER_RTT_printf(0, "fsm(%d):STARTED.\r\n", (int)item->m_id);
@@ -227,7 +234,7 @@ void fsm_sheduler::dispatch(void)
             }
             else
             {
-                //MX_TIM6_reboot();
+                fsm_time.reboot();
                 execute_interval_tmr = 0;
                 simultaneously_running_num = 0;
             }
@@ -380,7 +387,7 @@ void fsm_sheduler::m_fsm_processing(fsm_t& fsm, bool trigger)
             // before the action - so that you can correct it in the modifier handler
             fsm.interval = (int)((float)fsm.m_program[fsm.stage].interval)/FSM_TIME_DELTA;  //tenths of a millisecond
             
-            if (fsm.interval == 0)
+            if (fsm.interval < 1)
             {
                 fsm.interval = 1; 
                 // rounding up a multiple of TICK_COUNT_INTERVAL
