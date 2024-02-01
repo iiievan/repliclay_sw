@@ -325,7 +325,7 @@ void fsm_sheduler::m_remove_from_list(unique_id uid)
             m_ACTIVE_FSM_LIST.pop_item(i);
             m_FSM_INPUT_DATA_BUF.pop_item(i);
             
-            // remap poiners and their data
+            // remap pointers and their data
             for (size_t y = 0; y < m_ACTIVE_FSM_LIST.get_avail(); y++)
             {
                 fsm_t* item = m_ACTIVE_FSM_LIST.peek_item(y);
@@ -354,7 +354,7 @@ void fsm_sheduler::m_remove_from_list(fsm_id_t fsm_id)
             m_ACTIVE_FSM_LIST.pop_item(i);
             m_FSM_INPUT_DATA_BUF.pop_item(i);
             
-            // remap poiners and their data
+            // remap pointers and their data
             for (size_t y = 0; y < m_ACTIVE_FSM_LIST.get_avail(); y++)
             {
                 fsm_t* item = m_ACTIVE_FSM_LIST.peek_item(y);
