@@ -7,10 +7,11 @@
 #include "fsm_types_capi.h"
 #include "fsm_timer.h"
 #include "utils.h"
+#include "ring_buffer.h"
 
 int main()
 {  
-    static float time = 0;
+    //static float time = 0;
        
     init_board(); 
     
@@ -31,6 +32,7 @@ int main()
                 USR_LED_0.clear();
         }
         */
+      
         fsm_sheduler_dispatch();
     }
 } 

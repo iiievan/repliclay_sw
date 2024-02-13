@@ -4,6 +4,7 @@
 #include "GPIO.h"
 #include "am3358zcz_pins.hpp"
 #include "pin.h"
+#include "am3358zcz_pins_capi.h"
 
 namespace PINS
 {
@@ -43,8 +44,161 @@ namespace PINS
            pin<e_LCD_DATA5, 11U, 0x8B4>  lcd_data5(REGS::GPIO::AM335x_GPIO_2);
            pin<e_LCD_DATA7, 13U, 0x8BC>  lcd_data7(REGS::GPIO::AM335x_GPIO_2);
 
-
-
 } // namespace PINS
+
+/**********************************  pins using capi  ********************************/
+
+void pin_set(e_AM3358_pins pin)
+{
+    switch(pin)
+    {
+        case GPMC_A5_pin:
+            PINS::gpmc_a5.set();
+            break;
+        case GPMC_A6_pin:
+            PINS::gpmc_a6.set();
+            break;
+        case GPMC_A7_pin:
+            PINS::gpmc_a7.set();
+            break;
+        case GPMC_A8_pin:
+            PINS::gpmc_a8.set();
+            break;
+        case GPMC_WAIT0_pin:
+            PINS::gpmc_wait0.set();
+            break;
+        case UART1_RTSn_pin:
+            PINS::uart1_rtsn.set();
+            break;
+        case UART1_CTSn_pin:
+            PINS::uart1_ctsn.set();
+            break;
+        case UART0_TXD_pin:
+            PINS::uart0_txd.set();
+            break;
+        case UART0_RXD_pin:
+            PINS::uart0_rxd.set();
+            break;
+        case XDMA_EVENT_INTR1_pin:
+            PINS::xdma_event_intr1.set();
+            break;
+        case LCD_DATA1_pin:
+            PINS::lcd_data1.set();
+            break;
+        case LCD_DATA3_pin:
+            PINS::lcd_data3.set();
+            break;
+        case LCD_DATA5_pin:
+            PINS::lcd_data5.set();
+            break;
+        case LCD_DATA7_pin:
+            PINS::lcd_data7.set();
+            break;
+        default:
+            break;
+    }
+}
+
+void pin_toggle(e_AM3358_pins pin)
+{
+    switch(pin)
+    {
+        case GPMC_A5_pin:
+            PINS::gpmc_a5.toggle();
+            break;
+        case GPMC_A6_pin:
+            PINS::gpmc_a6.toggle();
+            break;
+        case GPMC_A7_pin:
+            PINS::gpmc_a7.toggle();
+            break;
+        case GPMC_A8_pin:
+            PINS::gpmc_a8.toggle();
+            break;
+        case GPMC_WAIT0_pin:
+            PINS::gpmc_wait0.toggle();
+            break;
+        case UART1_RTSn_pin:
+            PINS::uart1_rtsn.toggle();
+            break;
+        case UART1_CTSn_pin:
+            PINS::uart1_ctsn.toggle();
+            break;
+        case UART0_TXD_pin:
+            PINS::uart0_txd.toggle();
+            break;
+        case UART0_RXD_pin:
+            PINS::uart0_rxd.toggle();
+            break;
+        case XDMA_EVENT_INTR1_pin:
+            PINS::xdma_event_intr1.toggle();
+            break;
+        case LCD_DATA1_pin:
+            PINS::lcd_data1.toggle();
+            break;
+        case LCD_DATA3_pin:
+            PINS::lcd_data3.toggle();
+            break;
+        case LCD_DATA5_pin:
+            PINS::lcd_data5.toggle();
+            break;
+        case LCD_DATA7_pin:
+            PINS::lcd_data7.toggle();
+            break;
+        default:
+            break;
+    }
+}
+
+void pin_clear(e_AM3358_pins pin)
+{
+    switch(pin)
+    {
+        case GPMC_A5_pin:
+            PINS::gpmc_a5.clear();
+            break;
+        case GPMC_A6_pin:
+            PINS::gpmc_a6.clear();
+            break;
+        case GPMC_A7_pin:
+            PINS::gpmc_a7.clear();
+            break;
+        case GPMC_A8_pin:
+            PINS::gpmc_a8.clear();
+            break;
+        case GPMC_WAIT0_pin:
+            PINS::gpmc_wait0.clear();
+            break;
+        case UART1_RTSn_pin:
+            PINS::uart1_rtsn.clear();
+            break;
+        case UART1_CTSn_pin:
+            PINS::uart1_ctsn.clear();
+            break;
+        case UART0_TXD_pin:
+            PINS::uart0_txd.clear();
+            break;
+        case UART0_RXD_pin:
+            PINS::uart0_rxd.clear();
+            break;
+        case XDMA_EVENT_INTR1_pin:
+            PINS::xdma_event_intr1.clear();
+            break;
+        case LCD_DATA1_pin:
+            PINS::lcd_data1.clear();
+            break;
+        case LCD_DATA3_pin:
+            PINS::lcd_data3.clear();
+            break;
+        case LCD_DATA5_pin:
+            PINS::lcd_data5.clear();
+            break;
+        case LCD_DATA7_pin:
+            PINS::lcd_data7.clear();
+            break;
+        default:
+            break;
+    }
+}
 
 #endif // _AM3358ZCZ_PINS_H

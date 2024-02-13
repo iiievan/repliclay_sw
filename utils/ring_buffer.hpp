@@ -78,8 +78,8 @@ public:
         {
             if((index + 1) == m_Avail) // last element in buffer !!index + 1 - because index started from 0, m_Avail - from 1
             {
-                result = m_BUF[m_Head - 1];
-                memset(&m_BUF[m_Head - 1], 0, sizeof(T));
+                result = *peek_item(m_Avail - 1);
+                memset(peek_item(m_Avail - 1), 0, sizeof(T));
 
                 (m_Head) ? (m_Head--) : m_Head = (m_Size - 1); // loopback
                 m_Avail--;
@@ -111,7 +111,7 @@ public:
                     memcpy(&m_BUF[buf_idx],&m_BUF[buf_idx_p1],sizeof(T));
                 }
 
-                memset(&m_BUF[m_Head - 1], 0, sizeof(T));
+                memset(peek_item(m_Avail - 1), 0, sizeof(T));
 
                 (m_Head) ? (m_Head--) : m_Head = (m_Size - 1); // loopback
                 m_Avail--;

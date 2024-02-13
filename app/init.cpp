@@ -1,4 +1,5 @@
 #include "stdint.h"
+
 #include "init.h"
 #include "board.hpp"
 #include "cp15.h"
@@ -10,8 +11,8 @@
 #include "am335x_rtc.h"
 #include "pin.h"
 //ghj#include "clock.h"
-#include "sys_timer.h"
 #include "fsm_timer.h"
+#include "sys_timer.h"
 #include "PRCM.h"
 #include "DMTIMER1MS.h"
 #include "fsm_types_capi.h"
@@ -125,6 +126,7 @@ void init_board(void)
 
 void init_fsm(void)
 {
+  
     action_cmd usr_led_0_cmd = { .name = "usrled0", 
                                  .repetitions = 20, 
                                  .rep_delay = 100 ,
@@ -140,17 +142,16 @@ void init_fsm(void)
                                  .rep_delay = 900 ,
                                 {.HOUR = 12, .MIN = 35, .SEC = 40} };
     
+    fsm_sheduler_init();
     
     fsm_construct_static(&test_fsm_a, FSM_TEST_A, test_fsm_a_prog);    
     fsm_construct_static(&test_fsm_b, FSM_TEST_B, test_fsm_b_prog);
-    fsm_construct_static(&test_fsm_c, FSM_TEST_C, test_fsm_c_prog);
-        
+    fsm_construct_static(&test_fsm_c, FSM_TEST_C, test_fsm_c_prog);        
     
-    fsm_start(&test_fsm_c,(void *)&usr_led_2_cmd);
-    fsm_start(&test_fsm_a,(void *)&usr_led_0_cmd, true);
-    fsm_start(&test_fsm_b,(void *)&usr_led_1_cmd, true);    
-    fsm_start(&test_fsm_c,(void *)&usr_led_2_cmd);
-
+    fsm_sheduler_fsm_start(&test_fsm_c,(void *)&usr_led_2_cmd, false);
+    fsm_sheduler_fsm_start(&test_fsm_a,(void *)&usr_led_0_cmd, false);
+    fsm_sheduler_fsm_start(&test_fsm_b,(void *)&usr_led_1_cmd, true);    
+    fsm_sheduler_fsm_start(&test_fsm_c,(void *)&usr_led_2_cmd, false);
     
     fsm_time.init(REGS::DMTIMER::MODE_AUTORLD_NOCMP_ENABLE);
     fsm_time.enable();

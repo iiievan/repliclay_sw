@@ -1,7 +1,8 @@
-#ifndef __FSM_LIST_TYPES_CAPI_H
-#define __FSM_LIST_TYPES_CAPI_H
+#ifndef __FSM_TYPES_CAPI_H
+#define __FSM_TYPES_CAPI_H
 
-#include "fsm.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,37 +57,8 @@ typedef struct
     };
 }unique_id;
 
-typedef struct fsm_t fsm_t;
-typedef struct fsm_step_t fsm_step_t;
-
-/**********************************  sheduler functions capi  ********************************/
-void fsm_sheduler_dispatch(void);
-
-/**
-* @brief run FSM execution (add to list)
-*/
-bool fsm_start(fsm_t *fsm, void* params, bool simult = false);
-
-/**
-* @brief safe run FSM execution(add it to the list or delete it if it
-*  is already in the list, but has not yet been processed)
-*/
-bool fsm_safe_start(fsm_t *fsm, void* params);
-
-/**
-* @brief force terinate FSM by fsm id
-*/
-bool fsm_force_terminate_uid(unique_id uid);
-
-/**
-* @brief force terinate FSM by fsm id
-*/
-bool fsm_force_terminate_fsm_id(fsm_id_t fsm_id);
-
-/**
-* @brief force terminate all in active list
-*/
-void fsm_force_terminate_all_list(void);
+typedef struct fsmt fsm_t;
+typedef struct fsm_step fsm_step_t;
 
 /**********************************  fsm creation  ********************************/
 /**
@@ -106,6 +78,51 @@ fsm_t* fsm_construct_heap(fsm_id_t id, const fsm_step_t* fsm_prog);
  */
 void fsm_free(fsm_t* p_fsm);
 
+/**********************************  sheduler functions capi  ********************************/
+
+/**
+ * @brief initiate shedulers buffers
+ */
+void fsm_sheduler_init(void);
+
+
+/**
+* @brief run FSM execution (add to list)
+*/ 
+bool  fsm_sheduler_fsm_start(fsm_t* fsm, void* params, bool simult);
+
+/**
+* @brief run FSM execution with time delay (add to list)
+*/
+bool fsm_sheduler_fsm_delayed_start(fsm_t *fsm, void* params, timestamp_t timestamp, bool simult);
+
+/**
+* @brief safe run FSM execution(add it to the list or delete it if it
+*  is already in the list, but has not yet been processed) 
+*/     
+bool  fsm_sheduler_fsm_safe_start(fsm_t* p_fsm, void* params, bool simult);
+
+/**
+* @brief force terinate FSM by unique id
+*/
+bool  fsm_sheduler_fsm_force_terminate_uid(unique_id uid);
+
+/**
+* @brief force terinate FSM by fsm id
+*/
+bool  fsm_sheduler_fsm_force_terminate_fid(fsm_id_t fsm_id); 
+
+/**
+* @brief force terminate all in active list
+*/
+void  fsm_sheduler_force_terminate_all_list(void);
+
+/**
+* @brief fsm execution loop
+*/     
+void  fsm_sheduler_dispatch(void);
+
+
 extern fsm_t test_fsm_a;
 extern const fsm_step_t test_fsm_a_prog[];
 
@@ -118,7 +135,7 @@ extern const fsm_step_t test_fsm_c_prog[];
 /*
  * common for many fsms
  */
-extern int  stage_before_wait;
+//extern int  stage_before_wait;
 //extern encoder_pos_t encoder_pos_before_move;
 //extern encoder_pos_t encoder_distance;
 
@@ -129,4 +146,4 @@ extern int  stage_before_wait;
 }
 #endif
 
-#endif // __FSM_LIST_TYPES_CAPI_H
+#endif // __FSM_TYPES_CAPI_H

@@ -1,6 +1,5 @@
 #include "pin.h"
 
-
 namespace PINS
 {
     template <typename T, uint32_t pinnum, uint32_t ctrlm_reg> 
@@ -344,3 +343,4 @@ namespace PINS
     template class pin<e_LCD_DATA7, 13U, 0x8BC>;
 
 }   // namespace PINS
+
