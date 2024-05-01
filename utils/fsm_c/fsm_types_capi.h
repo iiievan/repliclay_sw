@@ -85,7 +85,6 @@ void fsm_free(fsm_t* p_fsm);
  */
 void fsm_sheduler_init(void);
 
-
 /**
 * @brief run FSM execution (add to list)
 */ 
