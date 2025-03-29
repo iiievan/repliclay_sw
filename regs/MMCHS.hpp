@@ -1,5 +1,5 @@
- #ifndef _MMCHS_H_
-#define _MMCHS_H_
+#ifndef __MMCHS_HPP
+#define __MMCHS_HPP
 
 #include <stdint.h>
 
@@ -57,7 +57,7 @@ namespace REGS
             /*  Controls which clocks remain active during wake-up
              *  Determines clock gating behavior during low-power states
              */
-            CLKACT_BOTH_OFF   = 0x0,  // Interface and Functional clock may be switched off
+            CLKACT_BOTH_OFF   = 0x0,  // Interface and Functional clock may  be switched off
             CLKACT_INTF_ON    = 0x1,  // Interface clock maintained
             CLKACT_FUNC_ON    = 0x2,  // Functional clock maintained
             CLKACT_BOTH_ON    = 0x3   // Both clocks maintained
@@ -1140,4 +1140,4 @@ namespace REGS
     } // namespace MMCHS
 } // namespace REGS
 
-#endif //_MMCHS_H_
+#endif //__MMCHS_HPP
